@@ -1,25 +1,3 @@
-const packageJSON = require('./package.json')
-
-const flowBin = packageJSON.devDependencies['flow-bin']
-const { react } = packageJSON.dependencies
-
-/**
- * Takes the version number from `package.json` and returns the same value, minus
- * the `^` character (if present), and minus everything following the second `.`
- * (if present, inclusive).
- * @param {string} entry the version number as specified in `package.json`
- * @returns {string} the version number as expected by [eslint-plugin-react](https://github.com/yannickcr/eslint-plugin-react#configuration)
- */
-const formatVersionNumber = entry =>
-	entry.startsWith('^')
-		? entry.split('.').length === 3
-			? `${entry.split('.')[0].substring(1)}.${entry.split('.')[1]}`
-			: entry.substring(1)
-		: entry
-
-const flowVersion = formatVersionNumber(flowBin)
-const reactVersion = formatVersionNumber(react)
-
 module.exports = {
 	env: { browser: true, es6: true, jest: true, node: true },
 	extends: [
@@ -27,9 +5,7 @@ module.exports = {
 		'eslint:recommended',
 		'plugin:flowtype/recommended',
 		'plugin:jest/recommended',
-		'plugin:react/recommended',
 		'prettier',
-		'prettier/react',
 		'prettier/flowtype'
 	],
 	globals: {
@@ -48,7 +24,7 @@ module.exports = {
 		ecmaVersion: 10,
 		sourceType: 'module'
 	},
-	plugins: ['babel', 'flowtype', 'jest', 'react', 'react-hooks'],
+	plugins: ['babel', 'flowtype', 'jest'],
 	rules: {
 		// Disallow `this` keywords outside of classes or class-like objects
 		// Used via `eslint-plugin-babel` to be compatible with class properties.
@@ -319,40 +295,6 @@ module.exports = {
 		// Prefer template literal notation over string concatenation
 		'prefer-template': 'error',
 
-		// Override:
-		'react/destructuring-assignment': [
-			'warn',
-			'always',
-			{ ignoreClassFields: true }
-		],
-
-		'react-hooks/rules-of-hooks': 'error',
-
-		'react-hooks/exhaustive-deps': 'warn',
-
-		'react/jsx-indent': ['error', 'tab'],
-		'react/jsx-indent-props': ['error', 'tab'],
-		// 'react/jsx-no-bind': 'error', // Figure out what to do with `react-apollo`’s `<Query />` and `<Mutation />` first
-		// "react/prop-types": "off", // temporary
-
-		// Disable error because we assign a default value via props destructuring, instead of using `defaultProps`
-		'react/require-default-props': 'off',
-
-		// Override:
-		'react/sort-comp': [
-			'warn',
-			{
-				order: [
-					'type-annotations', // Added and placed first
-					'instance-variables',
-					'static-methods',
-					'lifecycle',
-					'everything-else',
-					'render'
-				]
-			}
-		],
-
 		// Disallow `async` functions which have no `await` expression
 		'require-await': 'error',
 
@@ -433,6 +375,5 @@ module.exports = {
 	},
 	settings: {
 		'import/resolver': { 'babel-module': {} },
-		react: { flowVersion, version: reactVersion }
 	}
 }
