@@ -6,8 +6,10 @@ module.exports = {
 		'plugin:flowtype/recommended',
 		'plugin:vue/recommended',
 		'plugin:jest/recommended',
+		'plugin:prettier/recommended',
 		'prettier',
-		'prettier/flowtype'
+		'prettier/flowtype',
+		'prettier/vue'
 	],
 	globals: {
 		browser: true, // jest-puppeteer
@@ -145,7 +147,7 @@ module.exports = {
 		'jest/valid-expect': 'error',
 
 		// Leads to problems with ? :, removes indentation for switch/case
-		// indent: ['error', 'tab'],
+		// indent: ['error', 4],
 
 		'jsx-a11y/href-no-hash': 'off', // Ignore erraneous error in every file (temporary)
 
@@ -190,7 +192,7 @@ module.exports = {
 		// Avoid using hard-coded numbers, use constants instead
 		'no-magic-numbers': [
 			'warn',
-			{ enforceConst: true, ignore: [-1, 0, 1, 2], ignoreArrayIndexes: true }
+			{ enforceConst: true, ignore: [-1, 0, 1, 2, 4], ignoreArrayIndexes: true }
 		],
 
 		// Disallow `var a = b = c = 1`
