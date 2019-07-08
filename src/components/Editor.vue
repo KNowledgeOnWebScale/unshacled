@@ -6,20 +6,26 @@
     @wheel="scroll"
   >
     <v-layer>
-      <v-circle :config="configCircle"></v-circle>
+      <div v-for="(obj, index) in this.$store.state.shapes" :key="index">
+        <v-circle :config="configCircle" @click="print(obj)"></v-circle>
+      </div>
     </v-layer>
   </v-stage>
 </template>
 
 <script>
+import Shape from "./Shape.vue";
+
 export default {
   name: "Editor",
+  components: { Shape },
   data() {
+    const marginTop = 40;
     return {
-      marginTop: 40, // Provide space for the NavBar
+      marginTop, // Provide space for the NavBar
       configKonva: {
         width: window.innerWidth,
-        height: window.innerHeight - this.marginTop
+        height: window.innerHeight - marginTop
       },
       // TODO Remove this hard coded circle
       configCircle: {
@@ -28,7 +34,8 @@ export default {
         radius: 70,
         fill: "red",
         stroke: "black",
-        strokeWidth: 4
+        strokeWidth: 4,
+        draggable: "true"
       }
     };
   },
@@ -37,11 +44,13 @@ export default {
     this.handleResize();
   },
   methods: {
+    print(sth) {
+      console.log(sth);
+    },
     /**
      * Resize the canvas on resizing of the window.
      */
     handleResize() {
-      console.log(window.innerWidth, window.innerHeight);
       const stage = this.$refs.stage.getNode();
       this.configKonva.height = window.innerHeight - this.marginTop;
       this.configKonva.width = window.innerWidth;

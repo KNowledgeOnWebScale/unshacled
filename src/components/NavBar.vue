@@ -5,12 +5,19 @@
         <sui-dropdown-item>Import</sui-dropdown-item>
         <sui-dropdown-item>Export</sui-dropdown-item>
         <sui-dropdown-divider></sui-dropdown-divider>
-        <sui-dropdown-item>Load Example</sui-dropdown-item>
+        <sui-dropdown-item @click="loadExample">
+          Load Example
+        </sui-dropdown-item>
       </sui-dropdown-menu>
     </sui-dropdown>
-    <sui-menu-item icon="add">Shape</sui-menu-item>
+    <sui-menu-item class="clickable" icon="add">Shape</sui-menu-item>
+    <sui-menu-item
+      class="clickable"
+      icon="trash"
+      @click="clear"
+    ></sui-menu-item>
     <sui-menu-menu position="right">
-      <sui-menu-item icon="user"></sui-menu-item>
+      <sui-menu-item class="clickable" icon="user"></sui-menu-item>
     </sui-menu-menu>
   </sui-menu>
 </template>
@@ -21,8 +28,20 @@ import SuiDropdownDivider from "semantic-ui-vue/dist/commonjs/modules/Dropdown/D
 
 export default {
   name: "NavBar",
-  components: { SuiDropdownDivider, SuiDropdown }
+  components: { SuiDropdownDivider, SuiDropdown },
+  methods: {
+    clear() {
+      this.$store.commit("clear");
+    },
+    loadExample() {
+      this.$store.commit("loadExample");
+    }
+  }
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.clickable {
+  cursor: pointer;
+}
+</style>
