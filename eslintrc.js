@@ -4,6 +4,7 @@ module.exports = {
 		'airbnb',
 		'eslint:recommended',
 		'plugin:flowtype/recommended',
+		'plugin:vue/recommended',
 		'plugin:jest/recommended',
 		'prettier',
 		'prettier/flowtype'
@@ -15,8 +16,8 @@ module.exports = {
 		page: true, // jest-puppeteer
 		Raven: true // Sentry error logging
 	},
-	parser: 'babel-eslint',
 	parserOptions: {
+		parser: 'babel-eslint',
 		ecmaFeatures: {
 			impliedStrict: true,
 			jsx: true
