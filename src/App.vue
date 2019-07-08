@@ -1,17 +1,19 @@
 <template>
   <div id="app">
     <nav-bar></nav-bar>
-    <img alt="Vue logo" src="./assets/logo.png" />
+    <editor></editor>
   </div>
 </template>
 
 <script>
 import NavBar from "./components/NavBar.vue";
+import Editor from "./components/Editor.vue";
 
 export default {
   name: "App",
   components: {
-    NavBar
+    NavBar,
+    Editor
   }
 };
 </script>

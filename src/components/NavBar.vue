@@ -1,15 +1,13 @@
 <template>
-  <sui-menu attached="top" inverted="true">
-    <sui-dropdown-menu>
-      <sui-dropdown item icon="file alternate" simple>
-        <sui-dropdown-menu>
-          <sui-dropdown-item>Import</sui-dropdown-item>
-          <sui-dropdown-item>Export</sui-dropdown-item>
-          <sui-dropdown-divider></sui-dropdown-divider>
-          <sui-dropdown-item>Load Example</sui-dropdown-item>
-        </sui-dropdown-menu>
-      </sui-dropdown>
-    </sui-dropdown-menu>
+  <sui-menu ref="navbar" attached="top" inverted>
+    <sui-dropdown item icon="file alternate" simple>
+      <sui-dropdown-menu>
+        <sui-dropdown-item>Import</sui-dropdown-item>
+        <sui-dropdown-item>Export</sui-dropdown-item>
+        <sui-dropdown-divider></sui-dropdown-divider>
+        <sui-dropdown-item>Load Example</sui-dropdown-item>
+      </sui-dropdown-menu>
+    </sui-dropdown>
     <sui-menu-item icon="add">Shape</sui-menu-item>
     <sui-menu-menu position="right">
       <sui-menu-item icon="user"></sui-menu-item>
