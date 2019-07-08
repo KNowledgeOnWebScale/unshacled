@@ -1,4 +1,4 @@
-# unshacled
+# UnSHACLed
 
 ## Project setup
 ```
