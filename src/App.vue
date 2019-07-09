@@ -1,7 +1,9 @@
 <template>
   <div id="app">
-    <nav-bar></nav-bar>
-    <editor></editor>
+    <portal-target name="semantic-ui-vue">
+      <nav-bar></nav-bar>
+      <editor></editor>
+    </portal-target>
   </div>
 </template>
 

@@ -1,34 +1,26 @@
 <template>
-  <v-stage
-    ref="stage"
-    :config="configKonva"
-    style="background-color: lightgrey;"
-    @wheel="scroll"
-  >
+  <v-stage ref="stage" :config="configKonva" @wheel="scroll">
     <v-layer>
-      <v-circle :config="configCircle"></v-circle>
+      <div v-for="(obj, key) in this.$store.state.nodeShapes" :key="key">
+        <node-shape :id="key" @click="print(key)"></node-shape>
+      </div>
     </v-layer>
   </v-stage>
 </template>
 
 <script>
+import NodeShape from "./NodeShape.vue";
+
 export default {
   name: "Editor",
+  components: { NodeShape },
   data() {
+    const marginTop = 40;
     return {
-      marginTop: 40, // Provide space for the NavBar
+      marginTop, // Provide space for the NavBar
       configKonva: {
         width: window.innerWidth,
-        height: window.innerHeight - this.marginTop
-      },
-      // TODO Remove this hard coded circle
-      configCircle: {
-        x: 100,
-        y: 100,
-        radius: 70,
-        fill: "red",
-        stroke: "black",
-        strokeWidth: 4
+        height: window.innerHeight - marginTop
       }
     };
   },
@@ -37,11 +29,13 @@ export default {
     this.handleResize();
   },
   methods: {
+    print(sth) {
+      console.log(sth);
+    },
     /**
      * Resize the canvas on resizing of the window.
      */
     handleResize() {
-      console.log(window.innerWidth, window.innerHeight);
       const stage = this.$refs.stage.getNode();
       this.configKonva.height = window.innerHeight - this.marginTop;
       this.configKonva.width = window.innerWidth;
