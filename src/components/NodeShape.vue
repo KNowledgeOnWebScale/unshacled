@@ -2,6 +2,7 @@
   <div>
     <v-group :draggable="true">
       <v-rect :config="shapeConfig"></v-rect>
+      <v-text ref="nodeID" :config="idConfig"></v-text>
       <!-- TODO add text -->
       <!-- TODO add text editor -->
       <!-- TODO add button for deleting the shape -->
@@ -26,26 +27,38 @@ export default {
   },
   data() {
     const x = 0;
+    const width = 250;
     return {
       propYValues: {},
       shapeConfig: {
         x,
         y: 0,
         height: 40,
-        width: 250,
+        width,
         fill: "lightgreen",
         stroke: "green",
         strokeWidth: 3
       },
+      idConfig: {
+        text: "",
+        size: 20,
+        align: "center",
+        x,
+        y: 15,
+        width
+      },
       propertyConfig: {
         x,
         height: 40,
-        width: 250,
+        width,
         fill: "white",
         stroke: "black",
         strokeWidth: 2
       }
     };
+  },
+  mounted() {
+    this.idConfig = { ...this.idConfig, text: this.$props.id };
   },
   methods: {
     /**
