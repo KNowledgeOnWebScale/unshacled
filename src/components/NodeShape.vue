@@ -17,7 +17,7 @@
 
 <script>
 export default {
-  name: "Shape",
+  name: "NodeShape",
   props: {
     id: {
       type: String,

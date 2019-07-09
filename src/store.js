@@ -36,6 +36,16 @@ export default new Vuex.Store({
       };
     },
 
+    addNodeShape(state, name) {
+      state.nodeShapes[name] = {};
+      console.log(state.nodeShapes);
+    },
+
+    addPropertyShape(state, name) {
+      state.properties[name] = {};
+      console.log(state.properties);
+    },
+
     /**
      * Clear all shapes and properties from the current state.
      * @param state the current state

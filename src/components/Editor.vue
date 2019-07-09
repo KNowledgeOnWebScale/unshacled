@@ -2,18 +2,18 @@
   <v-stage ref="stage" :config="configKonva" @wheel="scroll">
     <v-layer>
       <div v-for="(obj, key) in this.$store.state.nodeShapes" :key="key">
-        <shape :id="key" @click="print(key)"></shape>
+        <node-shape :id="key" @click="print(key)"></node-shape>
       </div>
     </v-layer>
   </v-stage>
 </template>
 
 <script>
-import Shape from "./Shape.vue";
+import NodeShape from "./NodeShape.vue";
 
 export default {
   name: "Editor",
-  components: { Shape },
+  components: { NodeShape },
   data() {
     const marginTop = 40;
     return {
@@ -21,16 +21,6 @@ export default {
       configKonva: {
         width: window.innerWidth,
         height: window.innerHeight - marginTop
-      },
-      // TODO Remove this hard coded circle
-      configCircle: {
-        x: 100,
-        y: 100,
-        radius: 70,
-        fill: "red",
-        stroke: "black",
-        strokeWidth: 4,
-        draggable: "true"
       }
     };
   },
