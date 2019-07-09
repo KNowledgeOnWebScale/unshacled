@@ -2,8 +2,7 @@ import * as N3 from "n3";
 import * as jsonld from "jsonld";
 
 class Parser {
-  constructor() {
-  }
+  constructor() {}
 
   // Removes blank nodes from doc array and returns them in a dictionary
   static removeBlankNodes(doc) {
@@ -55,19 +54,18 @@ class Parser {
 export class N3Parser extends Parser {
   constructor() {
     super();
-    this.parser = new N3.Parser();
-    this.writer = new N3.Writer({format: "application/n-quads"});
   }
 
   parse(rdf, type) {
     return new Promise(resolve => {
       const quads = [];
-      this.parser.parse(rdf, (error, quad) => {
+      new N3.Parser().parse(rdf, (error, quad) => {
         if (quad) {
           quads.push(quad);
         } else {
-          this.writer.addQuads(quads);
-          this.writer.end(async (error, nquads) => {
+          const writer = new N3.Writer({ format: "application/n-quads" });
+          writer.addQuads(quads);
+          writer.end(async (error, nquads) => {
             const doc = await jsonld.fromRDF(nquads, {
               format: type
             });
