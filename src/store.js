@@ -6,7 +6,8 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     nodeShapes: {},
-    properties: {}
+    properties: {},
+    showNodeShapeModal: false
   },
   mutations: {
     loadExample(state) {
@@ -48,6 +49,10 @@ export default new Vuex.Store({
     addPropertyShape(state, name) {
       Vue.set(state.properties, name, {});
       console.log("Properties:", state.properties);
+    },
+
+    toggleNodeShapeModal(state) {
+      state.showNodeShapeModal = !state.showNodeShapeModal;
     },
 
     /**
