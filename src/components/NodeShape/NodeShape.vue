@@ -9,17 +9,16 @@
       <v-text ref="nodeID" :config="idTextConfig"></v-text>
       <v-circle
         v-if="hover"
-        :config="deleteConfig"
+        :config="deleteNodeConfig"
         @mousedown="deleteNodeShape"
       ></v-circle>
       <!-- TODO add text editor -->
       <div v-for="(prop, key) in getProperties()" :key="key">
-        <v-rect :config="getPropConfig(propYValues[key])"></v-rect>
-        <v-text
-          ref="key"
-          :config="getPropTextConfig(propYValues[key], key)"
-        ></v-text>
-        <!-- TODO add editor -->
+<!--        <node-property-->
+<!--          prop="key"-->
+<!--          node="this.$props.id"-->
+<!--          y="this.propYValues[key]"-->
+<!--        ></node-property>-->
       </div>
       <!-- TODO add button for adding property -->
     </v-group>
@@ -27,10 +26,11 @@
 </template>
 
 <script>
-import Util from "../util";
+import NodeProperty from "./NodeProperty.vue";
 
 export default {
   name: "NodeShape",
+  components: { NodeProperty },
   props: {
     id: {
       type: String,
@@ -52,15 +52,7 @@ export default {
         stroke: "green",
         strokeWidth: 3
       },
-      propertyConfig: {
-        x,
-        height: 40,
-        width,
-        fill: "white",
-        stroke: "black",
-        strokeWidth: 2
-      },
-      deleteConfig: {
+      deleteNodeConfig: {
         x: 240,
         y: 10,
         radius: 6,
@@ -74,13 +66,6 @@ export default {
         width,
         align: "center",
         fontStyle: "bold"
-      },
-      propTextConfig: {
-        x,
-        size: 20,
-        text: "",
-        width,
-        align: "center"
       }
     };
   },
@@ -107,35 +92,9 @@ export default {
       const y = this.shapeConfig.y + this.shapeConfig.height;
       for (const prop of Object.keys(properties)) {
         // The properties should be listed below eachother.
-        this.propYValues[prop] = y + i * this.propertyConfig.height;
+        this.propYValues[prop] = y + i * this.shapeConfig.height;
         i += 1;
       }
-    },
-
-    /**
-     * Create a new property config object using the given y value.
-     * @param y the y coordinate that should be used in the new config object.
-     * @returns {*} a new config object adapted using the given coordinate.
-     */
-    getPropConfig(y) {
-      // We have to create a copy of this config object.
-      const newConfig = Util.clone(this.propertyConfig);
-      newConfig.y = y; // Position the property field under the previous ones.
-      return newConfig;
-    },
-
-    /**
-     * Create a new text property config object using the given y value.
-     * @param y the coordinate that should be used to calculate the y coordinate of the new config object.
-     * @param key the text that should be used in the new config object.
-     * @returns {*} a new config object adapted using the given information.
-     */
-    getPropTextConfig(y, key) {
-      // We have to create a copy of this config object.
-      const newConfig = Util.clone(this.propTextConfig);
-      newConfig.y = y + 15; // Make sure the text is vertically centered in the rectangle.
-      newConfig.text = key; // Update the text using the key.
-      return newConfig;
     },
 
     deleteNodeShape() {

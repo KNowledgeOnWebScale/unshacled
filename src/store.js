@@ -64,6 +64,18 @@ export default new Vuex.Store({
     },
 
     /**
+     * Delete the given property from the given node shape.
+     * @param state
+     * @param node the id of the node shape.
+     * @param prop the id of the property that should be removed from the shape.
+     */
+    deletePropFromNode(state, node, prop) {
+      this.state.nodeShapes[node].properties = this.state.nodeShapes[
+        node
+      ].filter(p => p !== prop);
+    },
+
+    /**
      * Add a property shape with the given id.
      * @param state
      * @param id

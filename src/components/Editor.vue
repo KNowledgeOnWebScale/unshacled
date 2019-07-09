@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import NodeShape from "./NodeShape.vue";
+import NodeShape from "./NodeShape/NodeShape.vue";
 
 export default {
   name: "Editor",
