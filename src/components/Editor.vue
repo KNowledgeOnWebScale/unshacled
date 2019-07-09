@@ -6,8 +6,8 @@
     @wheel="scroll"
   >
     <v-layer>
-      <div v-for="(obj, index) in this.$store.state.shapes" :key="index">
-        <v-circle :config="configCircle" @click="print(obj)"></v-circle>
+      <div v-for="(obj, key) in this.$store.state.shapes" :key="key">
+        <shape :id="key" @click="print(key)"></shape>
       </div>
     </v-layer>
   </v-stage>

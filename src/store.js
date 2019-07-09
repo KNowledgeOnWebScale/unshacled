@@ -5,16 +5,16 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    shapes: []
+    shapes: {}
   },
   mutations: {
     loadExample(state) {
       console.log("Loading example...");
-      state.shapes = [
-        {
-          id: "ex:Alice",
-          type: "ex:Person",
-          properties: {
+      state.shapes = {
+        "ex:Alice": {
+          "@id": "ex:Alice",
+          "@type": "ex:Person",
+          property: {
             "foaf:firstName": {
               path: "foaf:firstName",
               maxCount: 1,
@@ -29,14 +29,14 @@ export default new Vuex.Store({
             }
           }
         }
-      ];
+      };
       for (const obj of state.shapes) {
         console.log(obj);
       }
     },
     clear(state) {
       console.log("Clear!");
-      state.shapes = [];
+      state.shapes = {};
     }
   },
   actions: {}
