@@ -30,7 +30,7 @@ module.exports = {
 	plugins: ['babel', 'flowtype', 'jest'],
 	rules: {
 		// Disallow `this` keywords outside of classes or class-like objects
-		// Used via `eslint-plugin-babel` to be compatible with class properties.
+		// Used via `eslint-plugin-babel` to be compatible with class property.
 		'babel/no-invalid-this': 'error',
 
 		// Disallow underscores in variable names

@@ -11,6 +11,7 @@
   "dependencies": {
     "core-js": "^2.6.5",
     "konva": "^3.3.3",
+    "portal-vue": "^2.1.5",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-vue": "^0.8.1",
     "vue": "^2.6.10",
