@@ -14,11 +14,11 @@
       ></v-circle>
       <!-- TODO add text editor -->
       <div v-for="(prop, key) in getProperties()" :key="key">
-<!--        <node-property-->
-<!--          prop="key"-->
-<!--          node="this.$props.id"-->
-<!--          y="this.propYValues[key]"-->
-<!--        ></node-property>-->
+        <node-property
+          :prop="key"
+          :node="$props.id"
+          :y="propYValues[key]"
+        ></node-property>
       </div>
       <!-- TODO add button for adding property -->
     </v-group>

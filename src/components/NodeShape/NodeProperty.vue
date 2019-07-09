@@ -1,11 +1,10 @@
 <template>
-  <v-group @mouseenter="hoverProp = true" @mouseleave="hoverProp = false">
+  <v-group>
     <v-rect :config="propertyConfig"></v-rect>
     <v-text ref="prop" :config="propTextConfig"></v-text>
     <v-circle
-      v-if="hoverProp"
       :config="deleteNodeConfig"
-      @mousedown="deleteNodeShape"
+<!--      @mousedown="deleteNodeShape"-->
     ></v-circle>
     <!-- TODO add editor -->
   </v-group>
@@ -24,15 +23,13 @@ export default {
       type: String
     },
     y: {
-      required: true,
-      type: Number
+      required: true
     }
   },
   data() {
     const x = 0;
     const width = 250;
     return {
-      hoverProp: false,
       propertyConfig: {
         x,
         y: this.$props.y,
