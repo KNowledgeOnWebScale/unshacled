@@ -2,12 +2,15 @@
   <div>
     <v-group :draggable="true">
       <v-rect :config="shapeConfig"></v-rect>
-      <v-text ref="nodeID" :config="idConfig"></v-text>
-      <!-- TODO add text -->
+      <v-text ref="nodeID" :config="idTextConfig"></v-text>
       <!-- TODO add text editor -->
       <!-- TODO add button for deleting the shape -->
       <div v-for="(prop, key) in getProperties()" :key="key">
         <v-rect :config="getPropConfig(propYValues[key])"></v-rect>
+        <v-text
+          ref="key"
+          :config="getPropTextConfig(propYValues[key], key)"
+        ></v-text>
         <!-- TODO add text -->
         <!-- TODO add editor -->
       </div>
@@ -39,14 +42,6 @@ export default {
         stroke: "green",
         strokeWidth: 3
       },
-      idConfig: {
-        text: "",
-        size: 20,
-        align: "center",
-        x,
-        y: 15,
-        width
-      },
       propertyConfig: {
         x,
         height: 40,
@@ -54,11 +49,27 @@ export default {
         fill: "white",
         stroke: "black",
         strokeWidth: 2
+      },
+      idTextConfig: {
+        x,
+        y: 15,
+        size: 20,
+        text: "",
+        width,
+        align: "center",
+        fontStyle: "bold"
+      },
+      propTextConfig: {
+        x,
+        size: 20,
+        text: "",
+        width,
+        align: "center",
       }
     };
   },
   mounted() {
-    this.idConfig = { ...this.idConfig, text: this.$props.id };
+    this.idTextConfig = { ...this.idTextConfig, text: this.$props.id };
   },
   methods: {
     /**
@@ -96,6 +107,15 @@ export default {
         newConfig[key] = this.propertyConfig[key];
       }
       newConfig.y = y;
+      return newConfig;
+    },
+    getPropTextConfig(y, key) {
+      const newConfig = {};
+      for (const key of Object.keys(this.propTextConfig)) {
+        newConfig[key] = this.propTextConfig[key];
+      }
+      newConfig.y = y + 15;
+      newConfig.text = key;
       return newConfig;
     }
   }
