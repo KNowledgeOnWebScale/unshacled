@@ -37,13 +37,17 @@ export default new Vuex.Store({
     },
 
     addNodeShape(state, name) {
-      state.nodeShapes[name] = {};
-      console.log(state.nodeShapes);
+      Vue.set(state.nodeShapes, name, {
+        "@id": name,
+        "@type:": null,
+        properties: []
+      });
+      console.log("NodeShapes:", state.nodeShapes);
     },
 
     addPropertyShape(state, name) {
-      state.properties[name] = {};
-      console.log(state.properties);
+      Vue.set(state.properties, name, {});
+      console.log("Properties:", state.properties);
     },
 
     /**
