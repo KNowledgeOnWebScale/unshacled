@@ -20,6 +20,8 @@
 </template>
 
 <script>
+import Util from "../util";
+
 export default {
   name: "NodeShape",
   props: {
@@ -54,7 +56,7 @@ export default {
         x,
         y: 15,
         size: 20,
-        text: "",
+        text: this.$props.id,
         width,
         align: "center",
         fontStyle: "bold"
@@ -64,17 +66,14 @@ export default {
         size: 20,
         text: "",
         width,
-        align: "center",
+        align: "center"
       }
     };
-  },
-  mounted() {
-    this.idTextConfig = { ...this.idTextConfig, text: this.$props.id };
   },
   methods: {
     /**
      * Get an object containing all the properties and set their y values.
-     * @return an object mapping every property name to a property object.
+     * @returns an object mapping every property name to a property object.
      */
     getProperties() {
       const { id } = this.$props;
@@ -85,6 +84,7 @@ export default {
       this.setPropYValues(properties);
       return properties;
     },
+
     /**
      * Set the y value of every property in the propYValues object.
      */
@@ -92,30 +92,35 @@ export default {
       let i = 0;
       const y = this.shapeConfig.y + this.shapeConfig.height;
       for (const prop of Object.keys(properties)) {
+        // The properties should be listed below eachother.
         this.propYValues[prop] = y + i * this.propertyConfig.height;
         i += 1;
       }
     },
+
     /**
      * Create a new property config object using the given y value.
-     * @param y
+     * @param y the y coordinate that should be used in the new config object.
+     * @returns {*} a new config object adapted using the given coordinate.
      */
     getPropConfig(y) {
-      const newConfig = {};
       // We have to create a copy of this config object.
-      for (const key of Object.keys(this.propertyConfig)) {
-        newConfig[key] = this.propertyConfig[key];
-      }
-      newConfig.y = y;
+      const newConfig = Util.clone(this.propertyConfig);
+      newConfig.y = y; // Position the property field under the previous ones.
       return newConfig;
     },
+
+    /**
+     * Create a new text property config object using the given y value.
+     * @param y the coordinate that should be used to calculate the y coordinate of the new config object.
+     * @param key the text that should be used in the new config object.
+     * @returns {*} a new config object adapted using the given information.
+     */
     getPropTextConfig(y, key) {
-      const newConfig = {};
-      for (const key of Object.keys(this.propTextConfig)) {
-        newConfig[key] = this.propTextConfig[key];
-      }
-      newConfig.y = y + 15;
-      newConfig.text = key;
+      // We have to create a copy of this config object.
+      const newConfig = Util.clone(this.propTextConfig);
+      newConfig.y = y + 15; // Make sure the text is vertically centered in the rectangle.
+      newConfig.text = key; // Update the text using the key.
       return newConfig;
     }
   }
