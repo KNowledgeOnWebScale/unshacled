@@ -5,38 +5,45 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    shapes: {}
+    nodeShapes: {},
+    properties: {}
   },
   mutations: {
     loadExample(state) {
       console.log("Loading example...");
-      state.shapes = {
+
+      state.nodeShapes = {
         "ex:Alice": {
           "@id": "ex:Alice",
           "@type": "ex:Person",
-          property: {
-            "foaf:firstName": {
-              path: "foaf:firstName",
-              maxCount: 1,
-              minCount: 1,
-              datatype: "xsd:string"
-            },
-            "foaf:lastName": {
-              path: "foaf:lastName",
-              maxCount: 1,
-              minCount: 1,
-              datatype: "xsd:string"
-            }
-          }
+          properties: ["foaf:firstName", "foaf:lastName"]
         }
       };
-      for (const obj of state.shapes) {
-        console.log(obj);
-      }
+
+      state.properties = {
+        "foaf:firstName": {
+          path: "foaf:firstName",
+          maxCount: 1,
+          minCount: 1,
+          datatype: "xsd:string"
+        },
+        "foaf:lastName": {
+          path: "foaf:lastName",
+          maxCount: 1,
+          minCount: 1,
+          datatype: "xsd:string"
+        }
+      };
     },
+
+    /**
+     * Clear all shapes and properties from the current state.
+     * @param state the current state
+     */
     clear(state) {
       console.log("Clear!");
-      state.shapes = {};
+      state.nodeShapes = {};
+      state.properties = {};
     }
   },
   actions: {}

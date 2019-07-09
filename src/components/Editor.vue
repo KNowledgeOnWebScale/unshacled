@@ -1,12 +1,7 @@
 <template>
-  <v-stage
-    ref="stage"
-    :config="configKonva"
-    style="background-color: lightgrey;"
-    @wheel="scroll"
-  >
+  <v-stage ref="stage" :config="configKonva" @wheel="scroll">
     <v-layer>
-      <div v-for="(obj, key) in this.$store.state.shapes" :key="key">
+      <div v-for="(obj, key) in this.$store.state.nodeShapes" :key="key">
         <shape :id="key" @click="print(key)"></shape>
       </div>
     </v-layer>
