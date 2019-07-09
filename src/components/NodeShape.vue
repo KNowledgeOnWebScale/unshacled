@@ -1,17 +1,24 @@
 <template>
   <div>
-    <v-group :draggable="true">
+    <v-group
+      :draggable="true"
+      @mouseenter="hover = true"
+      @mouseleave="hover = false"
+    >
       <v-rect :config="shapeConfig"></v-rect>
       <v-text ref="nodeID" :config="idTextConfig"></v-text>
+      <v-circle
+        v-if="hover"
+        :config="deleteConfig"
+        @mousedown="deleteNodeShape"
+      ></v-circle>
       <!-- TODO add text editor -->
-      <!-- TODO add button for deleting the shape -->
       <div v-for="(prop, key) in getProperties()" :key="key">
         <v-rect :config="getPropConfig(propYValues[key])"></v-rect>
         <v-text
           ref="key"
           :config="getPropTextConfig(propYValues[key], key)"
         ></v-text>
-        <!-- TODO add text -->
         <!-- TODO add editor -->
       </div>
       <!-- TODO add button for adding property -->
@@ -34,6 +41,7 @@ export default {
     const x = 0;
     const width = 250;
     return {
+      hover: false,
       propYValues: {},
       shapeConfig: {
         x,
@@ -51,6 +59,12 @@ export default {
         fill: "white",
         stroke: "black",
         strokeWidth: 2
+      },
+      deleteConfig: {
+        x: 240,
+        y: 10,
+        radius: 6,
+        fill: "red"
       },
       idTextConfig: {
         x,
@@ -122,6 +136,10 @@ export default {
       newConfig.y = y + 15; // Make sure the text is vertically centered in the rectangle.
       newConfig.text = key; // Update the text using the key.
       return newConfig;
+    },
+
+    deleteNodeShape() {
+      this.$store.commit("deleteNodeShape", this.$props.id);
     }
   }
 };

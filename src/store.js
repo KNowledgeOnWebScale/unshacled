@@ -10,6 +10,10 @@ export default new Vuex.Store({
     showNodeShapeModal: false
   },
   mutations: {
+    /**
+     * Load in some example data
+     * @param state
+     */
     loadExample(state) {
       console.log("Loading example...");
 
@@ -37,20 +41,50 @@ export default new Vuex.Store({
       };
     },
 
-    addNodeShape(state, name) {
-      Vue.set(state.nodeShapes, name, {
-        "@id": name,
+    /**
+     * Add an empty node shape with the given id.
+     * @param state
+     * @param id
+     */
+    addNodeShape(state, id) {
+      Vue.set(state.nodeShapes, id, {
+        "@id": id,
         "@type:": null,
         properties: []
       });
-      console.log("NodeShapes:", state.nodeShapes);
     },
 
-    addPropertyShape(state, name) {
-      Vue.set(state.properties, name, {});
-      console.log("Properties:", state.properties);
+    /**
+     * Delete the node shape with the given id.
+     * @param state
+     * @param id
+     */
+    deleteNodeShape(state, id) {
+      Vue.delete(state.nodeShapes, id);
     },
 
+    /**
+     * Add a property shape with the given id.
+     * @param state
+     * @param id
+     */
+    addPropertyShape(state, id) {
+      Vue.set(state.properties, id, {});
+    },
+
+    /**
+     * Delete the property shape with the given id.
+     * @param state
+     * @param id
+     */
+    deletePropertyShape(state, id) {
+      Vue.delete(state.properties, id);
+    },
+
+    /**
+     * Toggle the visibility of the node shape modal.
+     * @param state
+     */
     toggleNodeShapeModal(state) {
       state.showNodeShapeModal = !state.showNodeShapeModal;
     },
