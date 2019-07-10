@@ -1,5 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import { format } from "./util/enums/format";
+import { getConstraints } from "./util/constraintSelector";
 
 Vue.use(Vuex);
 
@@ -9,7 +11,8 @@ export default new Vuex.Store({
     properties: {},
     yValues: {},
     coordinates: {},
-    showNodeShapeModal: false
+    showNodeShapeModal: false,
+    format: format.SHACL
   },
   mutations: {
     /**
@@ -36,6 +39,7 @@ export default new Vuex.Store({
         "@type": "ex:Person",
         properties: ["foaf:firstName", "foaf:lastName"]
       };
+      console.log(getConstraints(state.format));
 
       state.nodeShapes = {};
       state.nodeShapes[id] = alice;
@@ -146,5 +150,10 @@ export default new Vuex.Store({
       state.properties = {};
     }
   },
-  actions: {}
+  actions: {},
+  getters: {
+    getValidators(state) {
+      return getConstraints(state.format);
+    }
+  }
 });
