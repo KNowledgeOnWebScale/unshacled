@@ -7,6 +7,8 @@ export default new Vuex.Store({
   state: {
     nodeShapes: {},
     properties: {},
+    yValues: {},
+    coordinates: {},
     showNodeShapeModal: false
   },
   mutations: {
@@ -117,6 +119,13 @@ export default new Vuex.Store({
      */
     deletePropertyShape(state, id) {
       Vue.delete(state.properties, id);
+    },
+
+    updateCoordinates(state, args) {
+      const { node, x, y } = args;
+      const coords = { x, y };
+      Vue.set(state.coordinates, node, coords);
+      console.log(state.coordinates[node].x, state.coordinates[node].y);
     },
 
     /**

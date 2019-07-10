@@ -1,9 +1,11 @@
 <template>
   <div>
     <v-group
+      ref="posRef"
       :draggable="true"
       @mouseenter="hover = true"
       @mouseleave="hover = false"
+      @dragend="updateCoordinates"
     >
       <v-rect :config="shapeConfig"></v-rect>
       <v-text ref="nodeID" :config="idTextConfig"></v-text>
@@ -135,6 +137,16 @@ export default {
      */
     deleteNodeShape() {
       this.$store.commit("deleteNodeShape", this.$props.id);
+    },
+
+    updateCoordinates() {
+      const pos = this.$refs.posRef.getNode().position();
+      const args = {
+        node: this.$props.id,
+        x: pos.x,
+        y: pos.y
+      };
+      this.$store.commit("updateCoordinates", args);
     }
   }
 };
