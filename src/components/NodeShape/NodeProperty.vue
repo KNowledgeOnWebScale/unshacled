@@ -23,45 +23,22 @@ export default {
       type: String
     },
     propertyConfig: {
-      required: true
+      required: true,
+      type: Object
     },
     propTextConfig: {
-      required: true
+      required: true,
+      type: Object
     },
     deletePropConfig: {
-      required: true
+      required: true,
+      type: Object
     }
   },
-  // data() {
-  //   const x = 0;
-  //   const width = 250;
-  //   return {
-  //     propertyConfig: {
-  //       x,
-  //       y: this.$props.y,
-  //       height: 40,
-  //       width,
-  //       fill: "white",
-  //       stroke: "black",
-  //       strokeWidth: 2
-  //     },
-  //     propTextConfig: {
-  //       x,
-  //       y: this.$props.y + 15,
-  //       size: 20,
-  //       text: this.$props.propKey,
-  //       width,
-  //       align: "center"
-  //     },
-  //     deletePropConfig: {
-  //       x: 240,
-  //       y: this.$props.y + 20,
-  //       radius: 6,
-  //       fill: "red"
-  //     }
-  //   };
-  // },
   methods: {
+    /**
+     * Delete the current property from its node shape.
+     */
     deleteProperty() {
       const args = {
         node: this.$props.node,

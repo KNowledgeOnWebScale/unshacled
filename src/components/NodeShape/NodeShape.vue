@@ -44,7 +44,6 @@ export default {
     const width = 250;
     return {
       hover: false,
-      // propYValues: {},
       propertyConfigs: {},
       propTextConfigs: {},
       deletePropConfigs: {},
@@ -74,7 +73,6 @@ export default {
       },
       propertyConfig: {
         x,
-        // y: this.$props.y,
         height: 40,
         width,
         fill: "white",
@@ -83,7 +81,6 @@ export default {
       },
       propTextConfig: {
         x,
-        // y: this.$props.y + 15,
         size: 20,
         text: this.$props.propKey,
         width,
@@ -91,7 +88,6 @@ export default {
       },
       deletePropConfig: {
         x: 240,
-        // y: this.$props.y + 20,
         radius: 6,
         fill: "red"
       }
@@ -112,6 +108,10 @@ export default {
       return properties;
     },
 
+    /**
+     * Set the configurations of its children using the updated y values from the state.
+     * @param properties a dictionary containing the node shape's properties.
+     */
     setPropConfigs(properties) {
       const { id } = this.$props;
       const ys = this.$store.state.yValues[id];
@@ -130,6 +130,9 @@ export default {
       }
     },
 
+    /**
+     * Delete this node shape.
+     */
     deleteNodeShape() {
       this.$store.commit("deleteNodeShape", this.$props.id);
     }

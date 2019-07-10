@@ -42,6 +42,7 @@ export default new Vuex.Store({
         "foaf:lastName": lastName
       };
 
+      // Update the y values of the properties.
       const ys = {};
       const height = 40;
       let i = 1;
@@ -90,10 +91,11 @@ export default new Vuex.Store({
         properties: newProperties
       };
       state.nodeShapes = { ...state.nodeShapes };
-      const nodeObj = state.nodeShapes[node];
+
+      // Update the y values of the properties.
       const height = 40;
       let i = 1;
-      for (const prop of nodeObj.properties) {
+      for (const prop of state.nodeShapes[node].properties) {
         Vue.set(state.yValues[node], prop, i * height);
         i += 1;
       }
