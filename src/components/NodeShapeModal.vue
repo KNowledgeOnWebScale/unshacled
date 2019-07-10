@@ -9,7 +9,7 @@
             <input id="shapeNodeID" v-model="id" placeholder="Unique ID" />
           </sui-form-field>
         </sui-form>
-        <sui-segment color="red">
+        <sui-segment v-if="error" color="red">
           The ID should be unique.
         </sui-segment>
       </sui-modal-content>
@@ -30,7 +30,8 @@ export default {
   name: "NodeShapeModal",
   data() {
     return {
-      idString: ""
+      idString: "",
+      error: false
     };
   },
   computed: {
@@ -48,9 +49,9 @@ export default {
       const id = this.idString;
       // Only commit if the name is unique. Otherwise, show an error message.
       if (id === "" || this.$store.state.nodeShapes[id]) {
-        console.log("error");
-        // TODO show the error message only when needed
+        this.error = true;
       } else {
+        this.error = false;
         this.toggleModal();
         this.idString = "";
         this.$store.commit("addNodeShape", id);
