@@ -1,5 +1,8 @@
-import * as Parsers from "./parsers.js";
+import * as Parsers from "./parsers";
 
+/**
+ *  ParserManager retrieves the correct parser for the format of RDF (Turtle, RDF/XML, ...)
+ */
 export class ParserManager {
   constructor() {
     this.N3Parser = new Parsers.N3Parser();

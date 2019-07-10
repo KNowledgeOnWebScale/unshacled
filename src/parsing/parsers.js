@@ -1,14 +1,15 @@
 import * as N3 from "n3";
 import * as jsonld from "jsonld";
 
+/**
+ *  Abstract Parser class with functionality for all parsers
+ */
 class Parser {
-  constructor() {}
-
   // Removes blank nodes from doc array and returns them in a dictionary
   static removeBlankNodes(doc) {
-    let blankNodes = {};
+    const blankNodes = {};
     if (Array.isArray(doc)) {
-      for (let i in doc) {
+      for (const i in doc) {
         const e = doc[i];
         if (Parser.isBlankNode(e)) {
           blankNodes[e["@id"]] = e;
@@ -30,7 +31,7 @@ class Parser {
       }
       const blankNode = blankNodes[object["@id"]];
       delete blankNodes[object["@id"]];
-      for (let property in blankNode) {
+      for (const property in blankNode) {
         // Copy properties
         object[property] = blankNode[property];
       }
@@ -38,28 +39,29 @@ class Parser {
   }
 
   traverse(o, func, blankNodes) {
-    for (let i in o) {
+    for (const i in o) {
       func.apply(this, [i, o[i], blankNodes]);
-      if (o[i] !== null && typeof o[i] == "object") {
+      if (o[i] !== null && typeof o[i] === "object") {
         this.traverse(o[i], func, blankNodes);
       }
     }
   }
-
-  parse() {
-    console.log("PARSING NOT IMPLEMENTED IF YOU SEE THIS MESSAGE");
-  }
 }
 
+/**
+ *  N3Parser can parse Turtle, TriG, N-Triples, N-Quads, and Notation3 (N3) to json-ld
+ */
 export class N3Parser extends Parser {
-  constructor() {
-    super();
-  }
-
-  parse(rdf, type) {
+  /**
+   *
+   * @param rdf RDF string
+   * @param type Format of RDF string (Turtle, RDF/XML, ...)
+   * @returns {Promise<any>}
+   */
+  static parse(rdf, type) {
     return new Promise(resolve => {
       const quads = [];
-      new N3.Parser().parse(rdf, (error, quad) => {
+      new N3.Parser({ format: type }).parse(rdf, (error, quad) => {
         if (quad) {
           quads.push(quad);
         } else {
@@ -67,7 +69,7 @@ export class N3Parser extends Parser {
           writer.addQuads(quads);
           writer.end(async (error, nquads) => {
             const doc = await jsonld.fromRDF(nquads, {
-              format: type
+              format: "application/n-quads"
             });
             // console.log(JSON.stringify(doc));
             // const blankNodes = super.removeBlankNodes(doc);
@@ -81,10 +83,19 @@ export class N3Parser extends Parser {
   }
 }
 
+/**
+ *  XMLParser can parse RDF/XML to json-ld
+ */
 export class XMLParser extends Parser {
-  constructor() {
-    super();
+  /**
+   *
+   * @param rdf RDF string
+   * @param type Format of RDF string (Turtle, RDF/XML, ...)
+   * @returns {Promise<any>}
+   */
+  static parse(rdf, type) {
+    return new Promise(resolve => {
+      resolve({ rdf, type }); // TODO: implement #parse(rdf, type)
+    });
   }
-
-  // TODO: implement #parse(rdf, type)
 }
