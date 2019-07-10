@@ -1,11 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import {
-  format
-} from "./util/enums/format"
-import {
-  getConstraints
-} from "./util/constraintSelector"
+import { format } from "./util/enums/format";
+import { getConstraints } from "./util/constraintSelector";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -18,7 +14,7 @@ export default new Vuex.Store({
   mutations: {
     loadExample(state) {
       console.log("Loading example...");
-      console.log(getConstraints(state.format))
+      console.log(getConstraints(state.format));
       state.nodeShapes = {
         "ex:Alice": {
           "@id": "ex:Alice",
@@ -73,8 +69,8 @@ export default new Vuex.Store({
   },
   actions: {},
   getters: {
-    getValidators() {
-      return getValidators(state.format)
+    getValidators(state) {
+      return getConstraints(state.format);
     }
   }
 });
