@@ -1,7 +1,11 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { format } from "./util/enums/format";
-import { getConstraints } from "./util/constraintSelector";
+import {
+  format
+} from "./util/enums/format";
+import {
+  getConstraints
+} from "./util/constraintSelector";
 
 Vue.use(Vuex);
 
@@ -12,7 +16,8 @@ export default new Vuex.Store({
     yValues: {},
     coordinates: {},
     showNodeShapeModal: false,
-    format: format.SHACL
+    format: format.SHACL,
+    relationships: {}
   },
   mutations: {
     /**
@@ -88,7 +93,10 @@ export default new Vuex.Store({
      * @param args the id of the node shape and the id of the property that should be removed from the shape.
      */
     deletePropFromNode(state, args) {
-      const { node, prop } = args;
+      const {
+        node,
+        prop
+      } = args;
       const newProperties = state.nodeShapes[node].properties.filter(
         p => p !== prop
       );
@@ -96,7 +104,9 @@ export default new Vuex.Store({
         ...state.nodeShapes[node],
         properties: newProperties
       };
-      state.nodeShapes = { ...state.nodeShapes };
+      state.nodeShapes = {
+        ...state.nodeShapes
+      };
 
       // Update the y values of the properties.
       const height = 40;
@@ -126,12 +136,32 @@ export default new Vuex.Store({
     },
 
     updateCoordinates(state, args) {
-      const { node, x, y } = args;
-      const coords = { x, y };
+      const {
+        node,
+        x,
+        y
+      } = args;
+      const coords = {
+        x,
+        y
+      };
       Vue.set(state.coordinates, node, coords);
       console.log(state.coordinates[node].x, state.coordinates[node].y);
     },
 
+    /**
+     * Takes two keys from nodeshapes and uses them to add a relationship to the state
+     * @param state
+     * @param keyOne
+     * @param keyTwo
+     */
+    addRelationship(state, keyOne, keyTwo) {
+      Vue.set(state.relationships, keyOne + keyTwo, {
+        "@id": keyOne + keyTwo,
+        one: keyOne,
+        two: keyTwo
+      });
+    },
     /**
      * Toggle the visibility of the node shape modal.
      * @param state
@@ -154,6 +184,10 @@ export default new Vuex.Store({
   getters: {
     getValidators(state) {
       return getConstraints(state.format);
+    },
+
+    getCoördinatesFromNodeByName(state, key) {
+      return state.coordinates[key];
     }
   }
 });
