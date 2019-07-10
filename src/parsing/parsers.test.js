@@ -19,6 +19,5 @@ const jsonldSHACL =
 
 test("turtle SHACL to json-ld", async () => {
   const jsonld = await Parsers.N3Parser.parse(ttlShacl, "text/turtle");
-  console.log(jsonld);
   expect(JSON.stringify(jsonld)).toBe(jsonldSHACL);
 });

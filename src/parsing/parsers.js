@@ -1,8 +1,8 @@
 import * as N3 from "n3";
-import * as jsonld from "jsonld";
+import jsonld from "jsonld";
 
 /**
- *  Abstract Parser class with functionality for all parsers
+ *  Parser class contains utility functions for parsers
  */
 class Parser {
   // Removes blank nodes from doc array and returns them in a dictionary
@@ -38,11 +38,11 @@ class Parser {
     }
   }
 
-  traverse(o, func, blankNodes) {
+  static traverse(o, func, blankNodes) {
     for (const i in o) {
       func.apply(this, [i, o[i], blankNodes]);
       if (o[i] !== null && typeof o[i] === "object") {
-        this.traverse(o[i], func, blankNodes);
+        Parser.traverse(o[i], func, blankNodes);
       }
     }
   }
@@ -51,7 +51,7 @@ class Parser {
 /**
  *  N3Parser can parse Turtle, TriG, N-Triples, N-Quads, and Notation3 (N3) to json-ld
  */
-export class N3Parser extends Parser {
+export class N3Parser {
   /**
    *
    * @param rdf RDF string
@@ -84,7 +84,7 @@ export class N3Parser extends Parser {
 }
 
 /**
- *  XMLParser can parse RDF/XML to json-ld
+ *  XMLParser class can parse RDF/XML to json-ld
  */
 export class XMLParser extends Parser {
   /**
