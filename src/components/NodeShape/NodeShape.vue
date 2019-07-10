@@ -15,7 +15,7 @@
       <!-- TODO add text editor -->
       <div v-for="(prop, key) in getProperties()" :key="key">
         <node-property
-          :prop="key"
+          :prop-key="key"
           :node="$props.id"
           :y="propYValues[key]"
         ></node-property>

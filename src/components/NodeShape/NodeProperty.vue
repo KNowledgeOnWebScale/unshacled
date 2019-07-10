@@ -1,11 +1,8 @@
 <template>
   <v-group>
     <v-rect :config="propertyConfig"></v-rect>
-    <v-text ref="prop" :config="propTextConfig"></v-text>
-    <v-circle
-      :config="deleteNodeConfig"
-<!--      @mousedown="deleteNodeShape"-->
-    ></v-circle>
+    <v-text ref="propKey" :config="propTextConfig"></v-text>
+    <v-circle :config="deletePropConfig" @mousedown="deleteProperty"></v-circle>
     <!-- TODO add editor -->
   </v-group>
 </template>
@@ -18,7 +15,7 @@ export default {
       required: true,
       type: String
     },
-    prop: {
+    propKey: {
       required: true,
       type: String
     },
@@ -43,13 +40,13 @@ export default {
         x,
         y: this.$props.y + 15,
         size: 20,
-        text: this.$props.prop,
+        text: this.$props.propKey,
         width,
         align: "center"
       },
       deletePropConfig: {
         x: 240,
-        y: 10,
+        y: this.$props.y + 20,
         radius: 6,
         fill: "red"
       }
@@ -57,7 +54,11 @@ export default {
   },
   methods: {
     deleteProperty() {
-      this.$store.commit("deleteProperty", this.$props.node, this.$props.prop);
+      const args = {
+        node: this.$props.node,
+        prop: this.$props.propKey
+      };
+      this.$store.commit("deletePropFromNode", args);
     }
   }
 };

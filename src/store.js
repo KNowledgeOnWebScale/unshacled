@@ -17,27 +17,28 @@ export default new Vuex.Store({
     loadExample(state) {
       console.log("Loading example...");
 
-      state.nodeShapes = {
-        "ex:Alice": {
-          "@id": "ex:Alice",
-          "@type": "ex:Person",
-          properties: ["foaf:firstName", "foaf:lastName"]
-        }
+      const alice = {
+        "@id": "ex:Alice",
+        "@type": "ex:Person",
+        properties: ["foaf:firstName", "foaf:lastName"]
+      };
+      const firstName = {
+        path: "foaf:firstName",
+        maxCount: 1,
+        minCount: 1,
+        datatype: "xsd:string"
+      };
+      const lastName = {
+        path: "foaf:lastName",
+        maxCount: 1,
+        minCount: 1,
+        datatype: "xsd:string"
       };
 
+      state.nodeShapes = { "ex:Alice": alice };
       state.properties = {
-        "foaf:firstName": {
-          path: "foaf:firstName",
-          maxCount: 1,
-          minCount: 1,
-          datatype: "xsd:string"
-        },
-        "foaf:lastName": {
-          path: "foaf:lastName",
-          maxCount: 1,
-          minCount: 1,
-          datatype: "xsd:string"
-        }
+        "foaf:firstName": firstName,
+        "foaf:lastName": lastName
       };
     },
 
@@ -66,13 +67,18 @@ export default new Vuex.Store({
     /**
      * Delete the given property from the given node shape.
      * @param state
-     * @param node the id of the node shape.
-     * @param prop the id of the property that should be removed from the shape.
+     * @param args the id of the node shape and the id of the property that should be removed from the shape.
      */
-    deletePropFromNode(state, node, prop) {
-      this.state.nodeShapes[node].properties = this.state.nodeShapes[
-        node
-      ].filter(p => p !== prop);
+    deletePropFromNode(state, args) {
+      const { node, prop } = args;
+      const newProperties = state.nodeShapes[node].properties.filter(
+        p => p !== prop
+      );
+      state.nodeShapes[node] = {
+        ...state.nodeShapes[node],
+        properties: newProperties
+      };
+      state.nodeShapes = { ...state.nodeShapes };
     },
 
     /**
