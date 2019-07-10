@@ -16,12 +16,7 @@ export default new Vuex.Store({
      */
     loadExample(state) {
       console.log("Loading example...");
-
-      const alice = {
-        "@id": "ex:Alice",
-        "@type": "ex:Person",
-        properties: ["foaf:firstName", "foaf:lastName"]
-      };
+      const id = "ex:Alice";
       const firstName = {
         path: "foaf:firstName",
         maxCount: 1,
@@ -34,12 +29,28 @@ export default new Vuex.Store({
         minCount: 1,
         datatype: "xsd:string"
       };
+      const alice = {
+        "@id": id,
+        "@type": "ex:Person",
+        properties: ["foaf:firstName", "foaf:lastName"]
+      };
 
-      state.nodeShapes = { "ex:Alice": alice };
+      state.nodeShapes = {};
+      state.nodeShapes[id] = alice;
       state.properties = {
         "foaf:firstName": firstName,
         "foaf:lastName": lastName
       };
+
+      const ys = {};
+      const height = 40;
+      let i = 1;
+      for (const prop of alice.properties) {
+        ys[prop] = i * height;
+        i += 1;
+      }
+      state.yValues = {};
+      state.yValues[id] = ys;
     },
 
     /**
@@ -79,6 +90,13 @@ export default new Vuex.Store({
         properties: newProperties
       };
       state.nodeShapes = { ...state.nodeShapes };
+      const nodeObj = state.nodeShapes[node];
+      const height = 40;
+      let i = 1;
+      for (const prop of nodeObj.properties) {
+        Vue.set(state.yValues[node], prop, i * height);
+        i += 1;
+      }
     },
 
     /**

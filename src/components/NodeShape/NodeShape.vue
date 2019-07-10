@@ -17,7 +17,9 @@
         <node-property
           :prop-key="key"
           :node="$props.id"
-          :y="propYValues[key]"
+          :property-config="propertyConfigs[key]"
+          :prop-text-config="propTextConfigs[key]"
+          :delete-prop-config="deletePropConfigs[key]"
         ></node-property>
       </div>
       <!-- TODO add button for adding property -->
@@ -42,7 +44,10 @@ export default {
     const width = 250;
     return {
       hover: false,
-      propYValues: {},
+      // propYValues: {},
+      propertyConfigs: {},
+      propTextConfigs: {},
+      deletePropConfigs: {},
       shapeConfig: {
         x,
         y: 0,
@@ -66,6 +71,29 @@ export default {
         width,
         align: "center",
         fontStyle: "bold"
+      },
+      propertyConfig: {
+        x,
+        // y: this.$props.y,
+        height: 40,
+        width,
+        fill: "white",
+        stroke: "black",
+        strokeWidth: 2
+      },
+      propTextConfig: {
+        x,
+        // y: this.$props.y + 15,
+        size: 20,
+        text: this.$props.propKey,
+        width,
+        align: "center"
+      },
+      deletePropConfig: {
+        x: 240,
+        // y: this.$props.y + 20,
+        radius: 6,
+        fill: "red"
       }
     };
   },
@@ -80,20 +108,25 @@ export default {
       for (const prop of this.$store.state.nodeShapes[id].properties) {
         properties[prop] = this.$store.state.properties[prop];
       }
-      this.setPropYValues(properties);
+      this.setPropConfigs(properties);
       return properties;
     },
 
-    /**
-     * Set the y value of every property in the propYValues object.
-     */
-    setPropYValues(properties) {
-      let i = 0;
-      const y = this.shapeConfig.y + this.shapeConfig.height;
+    setPropConfigs(properties) {
+      const { id } = this.$props;
+      const ys = this.$store.state.yValues[id];
       for (const prop of Object.keys(properties)) {
         // The properties should be listed below eachother.
-        this.propYValues[prop] = y + i * this.shapeConfig.height;
-        i += 1;
+        this.propertyConfigs[prop] = { ...this.propertyConfig, y: ys[prop] };
+        this.propTextConfigs[prop] = {
+          ...this.propTextConfig,
+          y: ys[prop] + 15,
+          text: prop
+        };
+        this.deletePropConfigs[prop] = {
+          ...this.deletePropConfig,
+          y: ys[prop] + 20
+        };
       }
     },
 
