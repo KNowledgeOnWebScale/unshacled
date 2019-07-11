@@ -21,9 +21,17 @@ export default {
     };
   },
   methods: {
+    /**
+     * Start editing using the given text.
+     * Create an input field on top of the text node.
+     * Add an event listener to stop editing when pressing the ENTER key.
+     * @param textNode the Konva node which contains the text we need to edit.
+     */
     startEditing(textNode) {
-      const textfield = this.$refs.input;
+      const input = this.$refs.input;
       const stage = this.$store.state.editor;
+
+      // Get the position of the original text node to put the input field on top.
       const textPosition = textNode.getAbsolutePosition();
       const stageBounds = stage.container().getBoundingClientRect();
       const fieldPosition = {
@@ -31,23 +39,30 @@ export default {
         y: stageBounds.top + textPosition.y
       };
 
-      document.getElementById("app").appendChild(textfield);
+      // Add the input field to the document.
+      document.getElementById("app").appendChild(input);
 
-      textfield.id = "reactiveInput";
-      textfield.type = "text";
-      textfield.value = textNode.text();
-      textfield.style.position = "absolute";
-      textfield.style.top = `${fieldPosition.y - MARGIN_TOP}px`;
-      textfield.style.left = `${fieldPosition.x + MARGIN_LEFT}px`;
-      textfield.focus();
+      // Set the input field properties.
+      input.id = "reactiveInput";
+      input.type = "text";
+      input.value = textNode.text();
+      input.style.position = "absolute";
+      input.style.top = `${fieldPosition.y - MARGIN_TOP}px`;
+      input.style.left = `${fieldPosition.x + MARGIN_LEFT}px`;
+      input.focus(); // Select the input field.
 
       this.editing = true;
+
+      // Add a listener to stop editing on ENTER button press.
       const self = this;
-      textfield.addEventListener("keydown", e => {
+      input.addEventListener("keydown", e => {
         if (e.keyCode === ENTER) self.stopEditing();
       });
     },
 
+    /**
+     * Call the exit function and remove the input field from the page.
+     */
     stopEditing() {
       if (this.editing) {
         this.editing = false;

@@ -155,6 +155,14 @@ export default new Vuex.Store({
       Vue.delete(state.properties, id);
     },
 
+    /**
+     * Update the coordinates of the given shape.
+     * @param state
+     * @param args
+     *    node: the ID of the node shape whose location should be updated.
+     *    x: the new x coordinate.
+     *    y: the new y coordinate.
+     */
     updateCoordinates(state, args) {
       const { node, x, y } = args;
       const coords = { x, y };

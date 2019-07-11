@@ -141,11 +141,19 @@ export default {
       }
     },
 
+    /**
+     * Call the ReactiveInput component to start editing using the given text node.
+     */
     startEditing() {
       if (this.$refs.reactiveInput)
         this.$refs.reactiveInput.startEditing(this.$refs.nodeID.getNode());
     },
 
+    /**
+     * Stop editing.
+     * Check if the filled in value is valid and unique.
+     * Call the store to edit the node shape if possible.
+     */
     stopEditing(newValue) {
       // Check if the new value is valid and unique.
       if (newValue !== "" && !this.$store.state.nodeShapes[newValue]) {
