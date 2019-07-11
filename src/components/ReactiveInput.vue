@@ -28,7 +28,7 @@ export default {
      * @param textNode the Konva node which contains the text we need to edit.
      */
     startEditing(textNode) {
-      const input = this.$refs.input;
+      const { input } = this.$refs;
       const stage = this.$store.state.editor;
 
       // Get the position of the original text node to put the input field on top.

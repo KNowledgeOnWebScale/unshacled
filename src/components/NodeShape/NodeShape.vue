@@ -6,7 +6,7 @@
       :draggable="true"
       @mouseenter="hover = true"
       @mouseleave="hover = false"
-      @dragend="updateCoordinates"
+      @dragmove="updateCoordinates"
     >
       <v-rect :config="shapeConfig"></v-rect>
       <v-text
@@ -104,6 +104,9 @@ export default {
       }
     };
   },
+  mounted() {
+    this.updateCoordinates();
+  },
   methods: {
     /**
      * Get an object containing all the properties and set their y values.
@@ -172,6 +175,9 @@ export default {
       this.$store.commit("deleteNodeShape", this.$props.id);
     },
 
+    /**
+     * Takes the coördinates from this node shape and calls store to update them.
+     */
     updateCoordinates() {
       const pos = this.$refs.posRef.getNode().position();
       const args = {

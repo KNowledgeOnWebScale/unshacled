@@ -4,16 +4,20 @@
       <div v-for="(obj, key) in this.$store.state.nodeShapes" :key="key">
         <node-shape :id="key" @click="print(key)"></node-shape>
       </div>
+      <div v-for="(obj, key) in this.$store.state.relationships" :key="key">
+        <relationship :coords="obj.coords"></relationship>
+      </div>
     </v-layer>
   </v-stage>
 </template>
 
 <script>
 import NodeShape from "./NodeShape/NodeShape.vue";
+import Relationship from "./Relationship.vue";
 
 export default {
   name: "Editor",
-  components: { NodeShape },
+  components: { NodeShape, Relationship },
 
   data() {
     const marginTop = 40;
