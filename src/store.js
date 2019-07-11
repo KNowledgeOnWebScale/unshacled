@@ -41,21 +41,21 @@ export default new Vuex.Store({
       };
 
       const idAlice = "ex:Alice";
-      const idTom = "ex:Tom";
+      const idBob = "ex:Bob";
 
       const alice = {
         "@id": idAlice,
         "@type": "ex:Person",
         properties: ["foaf:firstName", "foaf:lastName"]
       };
-      const tom = {
-        "@id": idTom,
+      const bob = {
+        "@id": idBob,
         "@type": "ex:Person",
         properties: ["foaf:firstName", "foaf:lastName"]
       };
 
       state.nodeShapes = {};
-      state.nodeShapes[idTom] = tom;
+      state.nodeShapes[idBob] = bob;
       state.nodeShapes[idAlice] = alice;
       state.properties = {
         "foaf:firstName": firstName,
@@ -65,7 +65,7 @@ export default new Vuex.Store({
       // Update the y values of the properties.
       state.yValues = {};
       const height = 40;
-      const people = [alice, tom];
+      const people = [alice, bob];
       for (const p in people) {
         const ys = {};
         let i = 1;
@@ -76,8 +76,8 @@ export default new Vuex.Store({
         state.yValues[people[p]["@id"]] = ys;
       }
       state.coordinates[idAlice] = { x: 0, y: 0 };
-      state.coordinates[idTom] = { x: 200, y: 200 };
-      this.commit("addRelationship", { one: idAlice, two: idTom });
+      state.coordinates[idBob] = { x: 200, y: 200 };
+      this.commit("addRelationship", { one: idAlice, two: idBob });
     },
 
     /**
@@ -183,14 +183,10 @@ export default new Vuex.Store({
      */
     updateCoordinates(state, args) {
       const { node, x, y } = args;
-      const coords = {
-        x,
-        y
-      };
+      const coords = { x, y };
       Vue.set(state.coordinates, node, coords);
 
       for (const prop in state.relationships) {
-        console.log(prop);
         if (prop.includes(node)) {
           const changedKey = node;
           const otherKey = prop.replace(changedKey, "");
