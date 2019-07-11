@@ -86,10 +86,21 @@ export default new Vuex.Store({
      */
     editNodeShape(state, args) {
       const { oldID, newID } = args;
+
+      // Update nodeShapes
       Vue.set(state.nodeShapes, newID, state.nodeShapes[oldID]);
       Vue.delete(state.nodeShapes, oldID);
       state.nodeShapes[newID] = { ...state.nodeShapes[newID], "@id": newID };
-      // TODO replace oldID by newID everywhere
+
+      // Update coordinates
+      Vue.set(state.coordinates, newID, state.coordinates[oldID]);
+      Vue.delete(state.coordinates, oldID);
+      state.coordinates[newID] = { ...state.coordinates[newID], "@id": newID };
+
+      // Update yValues
+      Vue.set(state.yValues, newID, state.yValues[oldID]);
+      Vue.delete(state.yValues, oldID);
+      state.yValues[newID] = { ...state.yValues[newID], "@id": newID };
     },
 
     /**
@@ -148,7 +159,6 @@ export default new Vuex.Store({
       const { node, x, y } = args;
       const coords = { x, y };
       Vue.set(state.coordinates, node, coords);
-      console.log(state.coordinates[node].x, state.coordinates[node].y);
     },
 
     /**

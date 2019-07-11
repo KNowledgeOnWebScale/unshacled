@@ -3,6 +3,10 @@
 </template>
 
 <script>
+const ENTER = 13;
+const MARGIN_TOP = 5;
+const MARGIN_LEFT = 20;
+
 export default {
   name: "ReactiveInput",
   props: {
@@ -33,20 +37,21 @@ export default {
       textfield.type = "text";
       textfield.value = textNode.text();
       textfield.style.position = "absolute";
-      textfield.style.top = `${fieldPosition.y - 5}px`;
-      textfield.style.left = `${fieldPosition.x + 20}px`;
+      textfield.style.top = `${fieldPosition.y - MARGIN_TOP}px`;
+      textfield.style.left = `${fieldPosition.x + MARGIN_LEFT}px`;
       textfield.focus();
 
       this.editing = true;
+      const self = this;
       textfield.addEventListener("keydown", e => {
-        if (e.keyCode === 13) self.stopEditing();
+        if (e.keyCode === ENTER) self.stopEditing();
       });
     },
 
     stopEditing() {
       if (this.editing) {
         this.editing = false;
-        // this.$props.onExit(this.$refs.input.value);
+        this.$props.onExit(this.$refs.input.value);
         document.getElementById("app").removeChild(this.$refs.input);
       }
     }

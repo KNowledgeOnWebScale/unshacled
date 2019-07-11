@@ -1,5 +1,6 @@
 <template>
   <div>
+    <reactive-input ref="reactiveInput" :on-exit="stopEditing"></reactive-input>
     <v-group
       ref="posRef"
       :draggable="true"
@@ -18,11 +19,6 @@
         :config="deleteNodeConfig"
         @mousedown="deleteNodeShape"
       ></v-circle>
-      <!-- TODO add text editor -->
-      <reactive-input
-        ref="reactiveInput"
-        :on-exit="stopEditing"
-      ></reactive-input>
       <div v-for="(prop, key) in getProperties()" :key="key">
         <node-property
           :prop-key="key"
@@ -40,6 +36,9 @@
 <script>
 import NodeProperty from "./NodeProperty.vue";
 import ReactiveInput from "../ReactiveInput.vue";
+
+const DELTA_Y_TEXT = 15;
+const DELTA_Y_DELETE = 20;
 
 export default {
   name: "NodeShape",
@@ -59,7 +58,6 @@ export default {
       propertyConfigs: {},
       propTextConfigs: {},
       deletePropConfigs: {},
-      // reactiveInput: null,
       shapeConfig: {
         x,
         y: 0,
@@ -133,29 +131,29 @@ export default {
         this.propertyConfigs[prop] = { ...this.propertyConfig, y: ys[prop] };
         this.propTextConfigs[prop] = {
           ...this.propTextConfig,
-          y: ys[prop] + 15,
+          y: ys[prop] + DELTA_Y_TEXT,
           text: prop
         };
         this.deletePropConfigs[prop] = {
           ...this.deletePropConfig,
-          y: ys[prop] + 20
+          y: ys[prop] + DELTA_Y_DELETE
         };
       }
     },
 
     startEditing() {
-      if (this.$refs.reactiveInput) {
+      if (this.$refs.reactiveInput)
         this.$refs.reactiveInput.startEditing(this.$refs.nodeID.getNode());
-      }
     },
 
     stopEditing(newValue) {
+      // Check if the new value is valid and unique.
       if (newValue !== "" && !this.$store.state.nodeShapes[newValue]) {
         const args = {
           oldID: this.$props.id,
           newID: newValue
         };
-        this.$store.commit("addNodeShape", args);
+        this.$store.commit("editNodeShape", args);
       }
     },
 
