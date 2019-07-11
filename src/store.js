@@ -7,6 +7,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    editor: null,
     nodeShapes: {},
     properties: {},
     yValues: {},
@@ -15,6 +16,10 @@ export default new Vuex.Store({
     format: format.SHACL
   },
   mutations: {
+    setEditor(state, reference) {
+      state.editor = reference;
+    },
+
     /**
      * Load in some example data
      * @param state
@@ -39,7 +44,6 @@ export default new Vuex.Store({
         "@type": "ex:Person",
         properties: ["foaf:firstName", "foaf:lastName"]
       };
-      console.log(getConstraints(state.format));
 
       state.nodeShapes = {};
       state.nodeShapes[id] = alice;
@@ -71,6 +75,21 @@ export default new Vuex.Store({
         "@type:": null,
         properties: []
       });
+    },
+
+    /**
+     * Edit the id of the given node shape.
+     * @param state
+     * @param args
+     *    oldID: the old ID we want to change.
+     *    newID: the new ID for the node shape.
+     */
+    editNodeShape(state, args) {
+      const { oldID, newID } = args;
+      Vue.set(state.nodeShapes, newID, state.nodeShapes[oldID]);
+      Vue.delete(state.nodeShapes, oldID);
+      state.nodeShapes[newID] = { ...state.nodeShapes[newID], "@id": newID };
+      // TODO replace oldID by newID everywhere
     },
 
     /**

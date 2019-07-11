@@ -8,13 +8,21 @@
       @dragend="updateCoordinates"
     >
       <v-rect :config="shapeConfig"></v-rect>
-      <v-text ref="nodeID" :config="idTextConfig"></v-text>
+      <v-text
+        ref="nodeID"
+        :config="idTextConfig"
+        @click="startEditing"
+      ></v-text>
       <v-circle
         v-if="hover"
         :config="deleteNodeConfig"
         @mousedown="deleteNodeShape"
       ></v-circle>
       <!-- TODO add text editor -->
+      <reactive-input
+        ref="reactiveInput"
+        :on-exit="stopEditing"
+      ></reactive-input>
       <div v-for="(prop, key) in getProperties()" :key="key">
         <node-property
           :prop-key="key"
@@ -31,10 +39,11 @@
 
 <script>
 import NodeProperty from "./NodeProperty.vue";
+import ReactiveInput from "../ReactiveInput.vue";
 
 export default {
   name: "NodeShape",
-  components: { NodeProperty },
+  components: { ReactiveInput, NodeProperty },
   props: {
     id: {
       type: String,
@@ -46,9 +55,11 @@ export default {
     const width = 250;
     return {
       hover: false,
+      editing: false,
       propertyConfigs: {},
       propTextConfigs: {},
       deletePropConfigs: {},
+      // reactiveInput: null,
       shapeConfig: {
         x,
         y: 0,
@@ -129,6 +140,22 @@ export default {
           ...this.deletePropConfig,
           y: ys[prop] + 20
         };
+      }
+    },
+
+    startEditing() {
+      if (this.$refs.reactiveInput) {
+        this.$refs.reactiveInput.startEditing(this.$refs.nodeID.getNode());
+      }
+    },
+
+    stopEditing(newValue) {
+      if (newValue !== "" && !this.$store.state.nodeShapes[newValue]) {
+        const args = {
+          oldID: this.$props.id,
+          newID: newValue
+        };
+        this.$store.commit("addNodeShape", args);
       }
     },
 
