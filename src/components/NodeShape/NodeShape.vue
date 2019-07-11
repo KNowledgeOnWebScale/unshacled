@@ -5,15 +5,11 @@
       :draggable="true"
       @mouseenter="hover = true"
       @mouseleave="hover = false"
-      @dragend="updateCoordinates"
+      @dragmove="updateCoordinates"
     >
       <v-rect :config="shapeConfig"></v-rect>
       <v-text ref="nodeID" :config="idTextConfig"></v-text>
-      <v-circle
-        v-if="hover"
-        :config="deleteNodeConfig"
-        @mousedown="deleteNodeShape"
-      ></v-circle>
+      <v-circle v-if="hover" :config="deleteNodeConfig" @mousedown="deleteNodeShape"></v-circle>
       <!-- TODO add text editor -->
       <div v-for="(prop, key) in getProperties()" :key="key">
         <node-property
@@ -95,6 +91,9 @@ export default {
       }
     };
   },
+  mounted: function() {
+    this.updateCoordinates();
+  },
   methods: {
     /**
      * Get an object containing all the properties and set their y values.
@@ -138,7 +137,9 @@ export default {
     deleteNodeShape() {
       this.$store.commit("deleteNodeShape", this.$props.id);
     },
-
+    /**
+     * Takes the coördinates from this nodeshape and tells store to update them.
+     */
     updateCoordinates() {
       const pos = this.$refs.posRef.getNode().position();
       const args = {
