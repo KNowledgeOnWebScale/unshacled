@@ -91,6 +91,9 @@ export default {
       }
     };
   },
+  mounted: function() {
+    this.updateCoordinates();
+  },
   methods: {
     /**
      * Get an object containing all the properties and set their y values.

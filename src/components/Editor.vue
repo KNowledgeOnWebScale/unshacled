@@ -5,7 +5,7 @@
         <node-shape :id="key" @click="print(key)"></node-shape>
       </div>
       <div v-for="(obj, key) in this.$store.state.relationships" :key="key">
-        <relationship :keyOne="obj.one" :keyTwo="obj.two"></relationship>
+        <relationship :coords="obj.coords"></relationship>
       </div>
     </v-layer>
   </v-stage>

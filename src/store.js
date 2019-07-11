@@ -71,7 +71,9 @@ export default new Vuex.Store({
       state.yValues = {};
       state.yValues[id] = ys;
       state.yValues[id2] = yeet;
-      this.commit("addRelationship", id, id2);
+      state.coordinates[id] = { x: 0, y: 0 };
+      state.coordinates[id2] = { x: 200, y: 200 };
+      this.commit("addRelationship", { one: id, two: id2 });
     },
 
     /**
@@ -148,7 +150,20 @@ export default new Vuex.Store({
         y
       };
       Vue.set(state.coordinates, node, coords);
-      console.log(state.coordinates[node].x, state.coordinates[node].y);
+
+      for (const prop in state.relationships) {
+        if (prop.includes(node)) {
+          const changedKey = node;
+          const otherKey = prop.replace(changedKey, "");
+          state.relationships[prop].coords = [
+            state.coordinates[otherKey].x,
+            state.coordinates[otherKey].y,
+            state.coordinates[changedKey].x,
+            state.coordinates[changedKey].y
+          ];
+          //  console.log(state.relationships[prop].coords);
+        }
+      }
     },
 
     /**
@@ -157,11 +172,17 @@ export default new Vuex.Store({
      * @param keyOne
      * @param keyTwo
      */
-    addRelationship(state, keyOne, keyTwo) {
-      Vue.set(state.relationships, keyOne + keyTwo, {
-        "@id": keyOne + keyTwo,
-        one: keyOne,
-        two: keyTwo
+    addRelationship(state, keys) {
+      Vue.set(state.relationships, keys.one + keys.two, {
+        "@id": keys.one + keys.two,
+        one: keys.one,
+        two: keys.two,
+        coords: [
+          state.coordinates[keys.two].x,
+          state.coordinates[keys.two].y,
+          state.coordinates[keys.one].y,
+          state.coordinates[keys.one].x
+        ]
       });
     },
     /**
@@ -188,10 +209,8 @@ export default new Vuex.Store({
       return getConstraints(state.format);
     },
 
-    getCoordinatesFromNodeByName: (state, key) => {
-      console.log(key);
-      console.log("nee");
-      return key => state.coordinates[key];
+    getCoordinatesFromNodeByName: state => key => {
+      return state.coordinates[key];
     }
   }
 });

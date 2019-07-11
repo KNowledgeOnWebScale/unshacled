@@ -6,30 +6,23 @@
 export default {
   name: "Relationship",
   props: {
-    keyOne: String,
-    keyTwo: String
+    coords: Array
   },
   data() {
     return {
       lineconfig: {
-        points: this.coordinates(),
+        points: this.coords,
         stroke: "black",
         strokewidth: 1
       }
     };
   },
-  methods: {
-    coordinates: function() {
-      const c1 = this.$store.getters.getCoordinatesFromNodeByName(this.keyOne);
-      /*this.$store.getters["getCoordinatesFromNodeByName"](
-        this.keyOne
-      );*/
-      const c2 = this.$store.getters["getCoordinatesFromNodeByName"](
-        this.keyTwo
-      );
-      return [c1.x, c1.y, c2.x, c2.y];
+  watch: {
+    coords: function(newCoors, old) {
+      this.lineconfig.points = newCoors;
     }
-  }
+  },
+  methods: {}
 };
 </script>
 
