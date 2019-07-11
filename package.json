@@ -6,11 +6,13 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "test:unit": "vue-cli-service test:unit"
+    "test": "vue-cli-service test:unit"
   },
   "dependencies": {
     "core-js": "^2.6.5",
+    "jsonld": "^1.6.2",
     "konva": "^3.3.3",
+    "n3": "^1.1.1",
     "portal-vue": "^2.1.5",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-vue": "^0.8.1",
