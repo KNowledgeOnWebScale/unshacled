@@ -1,5 +1,5 @@
 <template>
-  <input ref="input" type="text" />
+  <input ref="input" type="text" @blur="stopEditing" />
 </template>
 
 <script>
@@ -18,7 +18,6 @@ export default {
   },
   methods: {
     startEditing(textNode) {
-      console.log("startEditing");
       const textfield = this.$refs.input;
       const stage = this.$store.state.editor;
       const textPosition = textNode.getAbsolutePosition();
@@ -38,24 +37,15 @@ export default {
       textfield.style.left = `${fieldPosition.x + 20}px`;
       textfield.focus();
 
-      const self = this;
-      document.addEventListener("click", e => {
-        if (this.editing && e.target !== textfield) {
-          self.stopEditing();
-        }
-      });
-      textfield.addEventListener("keydown", e => {
-        if (this.editing && e.keyCode === 13) {
-          self.stopEditing();
-        }
-      });
       this.editing = true;
+      textfield.addEventListener("keydown", e => {
+        if (e.keyCode === 13) self.stopEditing();
+      });
     },
 
     stopEditing() {
       if (this.editing) {
         this.editing = false;
-        console.log("stopEditing");
         // this.$props.onExit(this.$refs.input.value);
         document.getElementById("app").removeChild(this.$refs.input);
       }
