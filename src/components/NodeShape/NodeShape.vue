@@ -5,15 +5,11 @@
       :draggable="true"
       @mouseenter="hover = true"
       @mouseleave="hover = false"
-      @dragend="updateCoordinates"
+      @dragmove="updateCoordinates"
     >
       <v-rect :config="shapeConfig"></v-rect>
       <v-text ref="nodeID" :config="idTextConfig"></v-text>
-      <v-circle
-        v-if="hover"
-        :config="deleteNodeConfig"
-        @mousedown="deleteNodeShape"
-      ></v-circle>
+      <v-circle v-if="hover" :config="deleteNodeConfig" @mousedown="deleteNodeShape"></v-circle>
       <!-- TODO add text editor -->
       <div v-for="(prop, key) in getProperties()" :key="key">
         <node-property

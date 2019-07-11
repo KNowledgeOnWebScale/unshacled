@@ -1,11 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import {
-  format
-} from "./util/enums/format";
-import {
-  getConstraints
-} from "./util/constraintSelector";
+import { format } from "./util/enums/format";
+import { getConstraints } from "./util/constraintSelector";
 
 Vue.use(Vuex);
 
@@ -27,6 +23,7 @@ export default new Vuex.Store({
     loadExample(state) {
       console.log("Loading example...");
       const id = "ex:Alice";
+      const id2 = "ex:Tom";
       const firstName = {
         path: "foaf:firstName",
         maxCount: 1,
@@ -44,25 +41,37 @@ export default new Vuex.Store({
         "@type": "ex:Person",
         properties: ["foaf:firstName", "foaf:lastName"]
       };
-      console.log(getConstraints(state.format));
+      const tom = {
+        "@id": id2,
+        "@type": "ex:Person",
+        properties: ["foaf:firstName", "foaf:lastName"]
+      };
 
       state.nodeShapes = {};
+      state.nodeShapes[id2] = tom;
       state.nodeShapes[id] = alice;
       state.properties = {
         "foaf:firstName": firstName,
         "foaf:lastName": lastName
       };
-
       // Update the y values of the properties.
       const ys = {};
+      const yeet = {};
       const height = 40;
       let i = 1;
       for (const prop of alice.properties) {
         ys[prop] = i * height;
         i += 1;
       }
+      i = 0;
+      for (const prop of tom.properties) {
+        yeet[prop] = i * height;
+        i += 1;
+      }
       state.yValues = {};
       state.yValues[id] = ys;
+      state.yValues[id2] = yeet;
+      this.commit("addRelationship", id, id2);
     },
 
     /**
@@ -93,10 +102,7 @@ export default new Vuex.Store({
      * @param args the id of the node shape and the id of the property that should be removed from the shape.
      */
     deletePropFromNode(state, args) {
-      const {
-        node,
-        prop
-      } = args;
+      const { node, prop } = args;
       const newProperties = state.nodeShapes[node].properties.filter(
         p => p !== prop
       );
@@ -136,11 +142,7 @@ export default new Vuex.Store({
     },
 
     updateCoordinates(state, args) {
-      const {
-        node,
-        x,
-        y
-      } = args;
+      const { node, x, y } = args;
       const coords = {
         x,
         y
@@ -182,12 +184,14 @@ export default new Vuex.Store({
   },
   actions: {},
   getters: {
-    getValidators(state) {
+    getValidators: state => {
       return getConstraints(state.format);
     },
 
-    getCoördinatesFromNodeByName(state, key) {
-      return state.coordinates[key];
+    getCoordinatesFromNodeByName: (state, key) => {
+      console.log(key);
+      console.log("nee");
+      return key => state.coordinates[key];
     }
   }
 });
