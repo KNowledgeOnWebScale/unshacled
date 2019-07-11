@@ -137,7 +137,9 @@ export default {
     deleteNodeShape() {
       this.$store.commit("deleteNodeShape", this.$props.id);
     },
-
+    /**
+     * Takes the coördinates from this nodeshape and tells store to update them.
+     */
     updateCoordinates() {
       const pos = this.$refs.posRef.getNode().position();
       const args = {

@@ -143,6 +143,12 @@ export default new Vuex.Store({
       Vue.delete(state.properties, id);
     },
 
+    /**
+     * Takes a node and 2 coördinates in args, updates the coördinates from given node.
+     * After that it checks if the given node has any relationships and if he does, updates the relationship aswell.
+     * @param {*} state
+     * @param {*} args
+     */
     updateCoordinates(state, args) {
       const { node, x, y } = args;
       const coords = {
@@ -207,10 +213,6 @@ export default new Vuex.Store({
   getters: {
     getValidators: state => {
       return getConstraints(state.format);
-    },
-
-    getCoordinatesFromNodeByName: state => key => {
-      return state.coordinates[key];
     }
   }
 });

@@ -18,6 +18,9 @@ export default {
     };
   },
   watch: {
+    /**
+     * just makes sure the lineconfig changes whenever it gets new props
+     */
     coords: function(newCoors, old) {
       this.lineconfig.points = newCoors;
     }
