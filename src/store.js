@@ -95,18 +95,13 @@ export default new Vuex.Store({
      * @param id
      */
     deleteNodeShape(state, id) {
-      console.log(id);
       for (const prop in state.relationships) {
-        console.log(prop);
-        console.log(id);
         if (prop.includes(id)) {
           const changedKey = id;
           const otherKey = prop.replace(changedKey, "");
-          console.log("wow");
           if (state.nodeShapes[otherKey] !== undefined) {
             delete state.relationships[prop];
           }
-          //  console.log(state.relationships[prop].coords);
         }
       }
       Vue.delete(state.nodeShapes, id);
