@@ -1,7 +1,7 @@
 import { N3Serializer, XMLSerializer } from "./serializers";
 
 /**
- *  ParserManager retrieves the correct parser for the format of RDF (Turtle, RDF/XML, ...)
+ *  SerializerManager retrieves the correct serializer for the format of RDF (Turtle, RDF/XML, ...)
  */
 export class SerializerManager {
   static parse(doc, type) {
