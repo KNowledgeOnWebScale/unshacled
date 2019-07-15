@@ -63,7 +63,7 @@ export default new Vuex.Store({
         ys[prop] = i * height;
         i += 1;
       }
-      i = 0;
+      i = 1;
       for (const prop of tom.properties) {
         yeet[prop] = i * height;
         i += 1;
@@ -95,6 +95,15 @@ export default new Vuex.Store({
      * @param id
      */
     deleteNodeShape(state, id) {
+      for (const prop in state.relationships) {
+        if (prop.includes(id)) {
+          const changedKey = id;
+          const otherKey = prop.replace(changedKey, "");
+          if (state.nodeShapes[otherKey] !== undefined) {
+            delete state.relationships[prop];
+          }
+        }
+      }
       Vue.delete(state.nodeShapes, id);
     },
 
