@@ -1,7 +1,7 @@
 <template>
   <div>
     <sui-modal v-model="this.$store.state.showNodeShapeModal">
-      <sui-modal-header>Add a Node Shape</sui-modal-header>
+      <sui-modal-header>Add a {{isPropertyShapeModal? "Property" : "Node"}} Shape</sui-modal-header>
       <sui-modal-content>
         <sui-form>
           <sui-form-field id="shapeNodeField" inline>
@@ -9,17 +9,11 @@
             <input id="shapeNodeID" v-model="id" placeholder="Unique ID" />
           </sui-form-field>
         </sui-form>
-        <sui-segment v-if="error" color="red">
-          The ID should be unique.
-        </sui-segment>
+        <sui-segment v-if="error" color="red">The ID should be unique.</sui-segment>
       </sui-modal-content>
       <sui-modal-actions>
-        <sui-button negative @click="toggleModal">
-          Cancel
-        </sui-button>
-        <sui-button positive @click="confirmNodeShape">
-          Add
-        </sui-button>
+        <sui-button negative @click="toggleModal">Cancel</sui-button>
+        <sui-button positive @click="confirmNodeShape">Add</sui-button>
       </sui-modal-actions>
     </sui-modal>
   </div>
@@ -28,6 +22,12 @@
 <script>
 export default {
   name: "NodeShapeModal",
+  props: {
+    isPropertyShapeModal: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       idString: "",
@@ -47,14 +47,20 @@ export default {
   methods: {
     confirmNodeShape() {
       const id = this.idString;
+      //Checks if name is a unique key, also checking propertyshapes
+      for (let prop in this.$store.state.properties) {
+        if (this.$store.state.properties[prop].path == id) this.error = true;
+      }
       // Only commit if the name is unique. Otherwise, show an error message.
       if (id === "" || this.$store.state.nodeShapes[id]) {
         this.error = true;
-      } else {
-        this.error = false;
+      }
+      if (!this.error) {
         this.toggleModal();
         this.idString = "";
-        this.$store.commit("addNodeShape", id);
+        if (this.$props.isPropertyShapeModal)
+          this.$store.commit("addPropertyShape", id);
+        else this.$store.commit("addNodeShape", id);
       }
     },
     toggleModal() {

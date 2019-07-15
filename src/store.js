@@ -1,7 +1,14 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { format } from "./util/enums/format";
-import { getConstraints } from "./util/constraintSelector";
+import {
+  format
+} from "./util/enums/format";
+import {
+  getConstraints
+} from "./util/constraintSelector";
+import {
+  stat
+} from "fs";
 
 Vue.use(Vuex);
 
@@ -10,6 +17,7 @@ export default new Vuex.Store({
     editor: null,
     format: format.SHACL,
     nodeShapes: {},
+    propertyShapes: {},
     properties: {},
     relationships: {},
     yValues: {},
@@ -75,9 +83,18 @@ export default new Vuex.Store({
         }
         state.yValues[people[p]["@id"]] = ys;
       }
-      state.coordinates[idAlice] = { x: 0, y: 0 };
-      state.coordinates[idBob] = { x: 200, y: 200 };
-      this.commit("addRelationship", { one: idAlice, two: idBob });
+      state.coordinates[idAlice] = {
+        x: 0,
+        y: 0
+      };
+      state.coordinates[idBob] = {
+        x: 200,
+        y: 200
+      };
+      this.commit("addRelationship", {
+        one: idAlice,
+        two: idBob
+      });
     },
 
     /**
@@ -101,22 +118,47 @@ export default new Vuex.Store({
      *    newID: the new ID for the node shape.
      */
     editNodeShape(state, args) {
-      const { oldID, newID } = args;
+      const {
+        oldID,
+        newID
+      } = args;
 
       // Update nodeShapes
       Vue.set(state.nodeShapes, newID, state.nodeShapes[oldID]);
       Vue.delete(state.nodeShapes, oldID);
-      state.nodeShapes[newID] = { ...state.nodeShapes[newID], "@id": newID };
+      state.nodeShapes[newID] = {
+        ...state.nodeShapes[newID],
+        "@id": newID
+      };
+
+      // Update Relationships
+      for (let prop in state.relationships) {
+        console.log(state.relationships[prop]);
+
+        if (state.relationships[prop].one === oldID)
+          state.relationships[prop].one = newID;
+        if (state.relationships[prop].two === oldID)
+          state.relationships[prop].two = newID;
+        prop = state.relationships[prop].one + state.relationships[prop].two;
+        console.log(prop);
+      }
 
       // Update coordinates
       Vue.set(state.coordinates, newID, state.coordinates[oldID]);
       Vue.delete(state.coordinates, oldID);
-      state.coordinates[newID] = { ...state.coordinates[newID], "@id": newID };
+      state.coordinates[newID] = {
+        ...state.coordinates[newID],
+        "@id": newID
+      };
 
       // Update yValues
       Vue.set(state.yValues, newID, state.yValues[oldID]);
       Vue.delete(state.yValues, oldID);
-      state.yValues[newID] = { ...state.yValues[newID], "@id": newID };
+      state.yValues[newID] = {
+        ...state.yValues[newID],
+        "@id": newID
+      };
+      console.log(state.relationships);
     },
 
     /**
@@ -134,7 +176,10 @@ export default new Vuex.Store({
      * @param args the id of the node shape and the id of the property that should be removed from the shape.
      */
     deletePropFromNode(state, args) {
-      const { node, prop } = args;
+      const {
+        node,
+        prop
+      } = args;
       const newProperties = state.nodeShapes[node].properties.filter(
         p => p !== prop
       );
@@ -161,7 +206,10 @@ export default new Vuex.Store({
      * @param id
      */
     addPropertyShape(state, id) {
-      Vue.set(state.properties, id, {});
+      Vue.set(state.propertyShapes, id, {
+        "@id": id
+      });
+      console.log(state.properties);
     },
 
     /**
@@ -182,8 +230,15 @@ export default new Vuex.Store({
      *    y: the new y coordinate.
      */
     updateCoordinates(state, args) {
-      const { node, x, y } = args;
-      const coords = { x, y };
+      const {
+        node,
+        x,
+        y
+      } = args;
+      const coords = {
+        x,
+        y
+      };
       Vue.set(state.coordinates, node, coords);
 
       for (const prop in state.relationships) {
@@ -236,7 +291,9 @@ export default new Vuex.Store({
       console.log("Clear!");
       state.nodeShapes = {};
       state.properties = {};
-    }
+    },
+
+    createProperty() {}
   },
   actions: {},
   getters: {

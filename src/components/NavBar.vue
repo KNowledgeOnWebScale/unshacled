@@ -6,21 +6,17 @@
           <sui-dropdown-item>Import</sui-dropdown-item>
           <sui-dropdown-item>Export</sui-dropdown-item>
           <sui-dropdown-divider></sui-dropdown-divider>
-          <sui-dropdown-item @click="loadExample">
-            Load Example
-          </sui-dropdown-item>
+          <sui-dropdown-item @click="loadExample">Load Example</sui-dropdown-item>
         </sui-dropdown-menu>
       </sui-dropdown>
-      <sui-menu-item class="clickable" icon="add" @click="toggleModal">
-        Shape
-      </sui-menu-item>
-      <sui-menu-item class="clickable" icon="trash" @click="clear">
-      </sui-menu-item>
+      <sui-menu-item class="clickable" icon="add" @click="toggleModal">Shape</sui-menu-item>
+      <sui-menu-item class="clickable" icon="add" @click="addProperty">Property</sui-menu-item>
+      <sui-menu-item class="clickable" icon="trash" @click="clear"></sui-menu-item>
       <sui-menu-menu position="right">
         <sui-menu-item class="clickable" icon="user"></sui-menu-item>
       </sui-menu-menu>
     </sui-menu>
-    <node-shape-modal></node-shape-modal>
+    <node-shape-modal :isPropertyShapeModal="CreatePropertyShape"></node-shape-modal>
   </div>
 </template>
 
@@ -40,8 +36,18 @@ export default {
       this.$store.commit("loadExample");
     },
     toggleModal() {
+      this.CreatePropertyShape = false;
+      this.$store.commit("toggleNodeShapeModal");
+    },
+    addProperty() {
+      this.CreatePropertyShape = true;
       this.$store.commit("toggleNodeShapeModal");
     }
+  },
+  data: function() {
+    return {
+      CreatePropertyShape: false
+    };
   }
 };
 </script>

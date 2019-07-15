@@ -9,16 +9,8 @@
       @dragmove="updateCoordinates"
     >
       <v-rect :config="shapeConfig"></v-rect>
-      <v-text
-        ref="nodeID"
-        :config="idTextConfig"
-        @click="startEditing"
-      ></v-text>
-      <v-circle
-        v-if="hover"
-        :config="deleteNodeConfig"
-        @mousedown="deleteNodeShape"
-      ></v-circle>
+      <v-text ref="nodeID" :config="idTextConfig" @click="startEditing"></v-text>
+      <v-circle v-if="hover" :config="deleteNodeConfig" @mousedown="deleteNodeShape"></v-circle>
       <div v-for="(prop, key) in getProperties()" :key="key">
         <node-property
           :prop-key="key"
