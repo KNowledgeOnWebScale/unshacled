@@ -1,7 +1,14 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { format } from "./util/enums/format";
-import { getConstraints } from "./util/constraintSelector";
+import {
+  format
+} from "./util/enums/format";
+import {
+  getConstraints
+} from "./util/constraintSelector";
+import {
+  stat
+} from "fs";
 
 Vue.use(Vuex);
 
@@ -111,7 +118,10 @@ export default new Vuex.Store({
      *    newID: the new ID for the node shape.
      */
     editNodeShape(state, args) {
-      const { oldID, newID } = args;
+      const {
+        oldID,
+        newID
+      } = args;
 
       // Update nodeShapes
       Vue.set(state.nodeShapes, newID, state.nodeShapes[oldID]);
@@ -136,10 +146,19 @@ export default new Vuex.Store({
       // Update coordinates
       Vue.set(state.coordinates, newID, state.coordinates[oldID]);
       Vue.delete(state.coordinates, oldID);
+      state.coordinates[newID] = {
+        ...state.coordinates[newID],
+        "@id": newID
+      };
 
       // Update yValues
       Vue.set(state.yValues, newID, state.yValues[oldID]);
       Vue.delete(state.yValues, oldID);
+      state.yValues[newID] = {
+        ...state.yValues[newID],
+        "@id": newID
+      };
+      console.log(state.relationships);
     },
 
     /**
@@ -148,15 +167,6 @@ export default new Vuex.Store({
      * @param id
      */
     deleteNodeShape(state, id) {
-      for (const prop in state.relationships) {
-        if (prop.includes(id)) {
-          const changedKey = id;
-          const otherKey = prop.replace(changedKey, "");
-          if (state.nodeShapes[otherKey] !== undefined) {
-            delete state.relationships[prop];
-          }
-        }
-      }
       Vue.delete(state.nodeShapes, id);
     },
 
@@ -166,7 +176,10 @@ export default new Vuex.Store({
      * @param args the id of the node shape and the id of the property that should be removed from the shape.
      */
     deletePropFromNode(state, args) {
-      const { node, prop } = args;
+      const {
+        node,
+        prop
+      } = args;
       const newProperties = state.nodeShapes[node].properties.filter(
         p => p !== prop
       );
@@ -196,7 +209,6 @@ export default new Vuex.Store({
       Vue.set(state.propertyShapes, id, {
         "@id": id
       });
-      console.log(state.properties);
     },
 
     /**
@@ -217,7 +229,11 @@ export default new Vuex.Store({
      *    y: the new y coordinate.
      */
     updateCoordinates(state, args) {
-      const { node, x, y } = args;
+      const {
+        node,
+        x,
+        y
+      } = args;
       const coords = {
         x,
         y
@@ -273,11 +289,7 @@ export default new Vuex.Store({
     clear(state) {
       console.log("Clear!");
       state.nodeShapes = {};
-      state.propertyShapes = {};
       state.properties = {};
-      state.relationships = {};
-      state.coordinates = {};
-      state.yValues = {};
     },
 
     createProperty() {}
