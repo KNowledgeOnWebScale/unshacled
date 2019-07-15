@@ -36,6 +36,14 @@
 <script>
 import NodeProperty from "./NodeProperty.vue";
 import ReactiveInput from "../ReactiveInput.vue";
+import {
+  DELETE_NODE_CONFIG,
+  DELETE_PROP_CONFIG,
+  ID_TEXT_CONFIG,
+  PROP_TEXT_CONFIG,
+  PROPERTY_CONFIG,
+  SHAPE_CONFIG
+} from "../../util/konvaConfigs";
 
 const DELTA_Y_TEXT = 15;
 const DELTA_Y_DELETE = 20;
@@ -50,61 +58,27 @@ export default {
     }
   },
   data() {
-    const x = 0;
-    const width = 250;
     return {
       hover: false,
       editing: false,
       propertyConfigs: {},
       propTextConfigs: {},
       deletePropConfigs: {},
-      shapeConfig: {
-        x,
-        y: 0,
-        height: 40,
-        width,
-        fill: "lightgreen",
-        stroke: "green",
-        strokeWidth: 3
-      },
-      deleteNodeConfig: {
-        x: 240,
-        y: 10,
-        radius: 6,
-        fill: "red"
-      },
+      shapeConfig: SHAPE_CONFIG,
+      deleteNodeConfig: DELETE_NODE_CONFIG,
       idTextConfig: {
-        x,
-        y: 15,
-        size: 20,
-        text: this.$props.id,
-        width,
-        align: "center",
-        fontStyle: "bold"
+        ...ID_TEXT_CONFIG,
+        text: this.$props.id
       },
-      propertyConfig: {
-        x,
-        height: 40,
-        width,
-        fill: "white",
-        stroke: "black",
-        strokeWidth: 2
-      },
-      propTextConfig: {
-        x,
-        size: 20,
-        text: this.$props.propKey,
-        width,
-        align: "center"
-      },
-      deletePropConfig: {
-        x: 240,
-        radius: 6,
-        fill: "red"
-      }
+      propertyConfig: PROPERTY_CONFIG,
+      propTextConfig: PROP_TEXT_CONFIG,
+      deletePropConfig: DELETE_PROP_CONFIG
     };
   },
   mounted() {
+    this.$refs.posRef
+      .getNode()
+      .setPosition(this.$store.state.coordinates[this.$props.id]);
     this.updateCoordinates();
   },
   methods: {

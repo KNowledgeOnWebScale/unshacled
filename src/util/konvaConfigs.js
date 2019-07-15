@@ -1,7 +1,7 @@
 const X = 0;
 const WIDTH = 250;
 
-const shapeConfig = {
+export const SHAPE_CONFIG = {
   x: X,
   y: 0,
   height: 40,
@@ -11,14 +11,14 @@ const shapeConfig = {
   strokeWidth: 3
 };
 
-const deleteNodeConfig = {
+export const DELETE_NODE_CONFIG = {
   x: 240,
   y: 10,
   radius: 6,
   fill: "red"
 };
 
-const idTextConfig = {
+export const ID_TEXT_CONFIG = {
   x: X,
   y: 15,
   size: 20,
@@ -29,7 +29,7 @@ const idTextConfig = {
   fontStyle: "bold"
 };
 
-const propertyConfig = {
+export const PROPERTY_CONFIG = {
   x: X,
   height: 40,
   width: WIDTH,
@@ -38,7 +38,7 @@ const propertyConfig = {
   strokeWidth: 2
 };
 
-const propTextConfig = {
+export const PROP_TEXT_CONFIG = {
   x: X,
   size: 20,
   text: "",
@@ -47,7 +47,7 @@ const propTextConfig = {
   align: "center"
 };
 
-const deletePropConfig = {
+export const DELETE_PROP_CONFIG = {
   x: 240,
   radius: 6,
   fill: "red"

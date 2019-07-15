@@ -111,12 +111,10 @@ export default new Vuex.Store({
       // Update coordinates
       Vue.set(state.coordinates, newID, state.coordinates[oldID]);
       Vue.delete(state.coordinates, oldID);
-      state.coordinates[newID] = { ...state.coordinates[newID], "@id": newID };
 
       // Update yValues
       Vue.set(state.yValues, newID, state.yValues[oldID]);
       Vue.delete(state.yValues, oldID);
-      state.yValues[newID] = { ...state.yValues[newID], "@id": newID };
     },
 
     /**
