@@ -1,14 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import {
-  format
-} from "./util/enums/format";
-import {
-  getConstraints
-} from "./util/constraintSelector";
-import {
-  stat
-} from "fs";
+import { format } from "./util/enums/format";
+import { getConstraints } from "./util/constraintSelector";
 
 Vue.use(Vuex);
 
@@ -118,10 +111,7 @@ export default new Vuex.Store({
      *    newID: the new ID for the node shape.
      */
     editNodeShape(state, args) {
-      const {
-        oldID,
-        newID
-      } = args;
+      const { oldID, newID } = args;
 
       // Update nodeShapes
       Vue.set(state.nodeShapes, newID, state.nodeShapes[oldID]);
@@ -176,10 +166,7 @@ export default new Vuex.Store({
      * @param args the id of the node shape and the id of the property that should be removed from the shape.
      */
     deletePropFromNode(state, args) {
-      const {
-        node,
-        prop
-      } = args;
+      const { node, prop } = args;
       const newProperties = state.nodeShapes[node].properties.filter(
         p => p !== prop
       );
@@ -230,11 +217,7 @@ export default new Vuex.Store({
      *    y: the new y coordinate.
      */
     updateCoordinates(state, args) {
-      const {
-        node,
-        x,
-        y
-      } = args;
+      const { node, x, y } = args;
       const coords = {
         x,
         y

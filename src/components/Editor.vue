@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import NodeShape from "./NodeShape/NodeShape.vue";
+import NodeShape from "./Shapes/NodeShape.vue";
 import Relationship from "./Relationship.vue";
 
 export default {
