@@ -10,7 +10,7 @@
     >
       <v-rect :config="shapeConfig"></v-rect>
       <v-text ref="nodeID" :config="idTextConfig" @click="startEditing"></v-text>
-      <v-circle v-if="hover" :config="deleteNodeConfig" @mousedown="deleteNodeShape"></v-circle>
+      <v-circle v-if="hover" :config="deleteNodeConfig" @mousedown="deletePropertyShape"></v-circle>
 
       <!-- TODO add button for adding property -->
     </v-group>
@@ -155,8 +155,8 @@ export default {
     /**
      * Delete this node shape.
      */
-    deleteNodeShape() {
-      this.$store.commit("deleteNodeShape", this.$props.id);
+    deletePropertyShape() {
+      this.$store.commit("deletePropertyShape", this.$props.id);
     },
 
     /**

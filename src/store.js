@@ -217,7 +217,7 @@ export default new Vuex.Store({
      * @param id
      */
     deletePropertyShape(state, id) {
-      Vue.delete(state.properties, id);
+      Vue.delete(state.propertyShapes, id);
     },
 
     /**
