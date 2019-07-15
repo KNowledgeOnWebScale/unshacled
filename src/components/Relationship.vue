@@ -6,7 +6,10 @@
 export default {
   name: "Relationship",
   props: {
-    coords: Array
+    coords: {
+      required: true,
+      type: Array
+    }
   },
   data() {
     return {
@@ -21,7 +24,7 @@ export default {
     /**
      * just makes sure the lineconfig changes whenever it gets new props
      */
-    coords: function(newCoors, old) {
+    coords(newCoors) {
       this.lineconfig.points = newCoors;
     }
   },

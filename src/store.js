@@ -7,23 +7,26 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    editor: null,
+    format: format.SHACL,
     nodeShapes: {},
     properties: {},
+    relationships: {},
     yValues: {},
     coordinates: {},
-    showNodeShapeModal: false,
-    format: format.SHACL,
-    relationships: {}
+    showNodeShapeModal: false
   },
   mutations: {
+    setEditor(state, reference) {
+      state.editor = reference;
+    },
+
     /**
      * Load in some example data
      * @param state
      */
     loadExample(state) {
       console.log("Loading example...");
-      const id = "ex:Alice";
-      const id2 = "ex:Tom";
       const firstName = {
         path: "foaf:firstName",
         maxCount: 1,
@@ -36,44 +39,45 @@ export default new Vuex.Store({
         minCount: 1,
         datatype: "xsd:string"
       };
+
+      const idAlice = "ex:Alice";
+      const idBob = "ex:Bob";
+
       const alice = {
-        "@id": id,
+        "@id": idAlice,
         "@type": "ex:Person",
         properties: ["foaf:firstName", "foaf:lastName"]
       };
-      const tom = {
-        "@id": id2,
+      const bob = {
+        "@id": idBob,
         "@type": "ex:Person",
         properties: ["foaf:firstName", "foaf:lastName"]
       };
 
       state.nodeShapes = {};
-      state.nodeShapes[id2] = tom;
-      state.nodeShapes[id] = alice;
+      state.nodeShapes[idBob] = bob;
+      state.nodeShapes[idAlice] = alice;
       state.properties = {
         "foaf:firstName": firstName,
         "foaf:lastName": lastName
       };
+
       // Update the y values of the properties.
-      const ys = {};
-      const yeet = {};
-      const height = 40;
-      let i = 1;
-      for (const prop of alice.properties) {
-        ys[prop] = i * height;
-        i += 1;
-      }
-      i = 1;
-      for (const prop of tom.properties) {
-        yeet[prop] = i * height;
-        i += 1;
-      }
       state.yValues = {};
-      state.yValues[id] = ys;
-      state.yValues[id2] = yeet;
-      state.coordinates[id] = { x: 0, y: 0 };
-      state.coordinates[id2] = { x: 200, y: 200 };
-      this.commit("addRelationship", { one: id, two: id2 });
+      const height = 40;
+      const people = [alice, bob];
+      for (const p in people) {
+        const ys = {};
+        let i = 1;
+        for (const prop of people[p].properties) {
+          ys[prop] = i * height;
+          i += 1;
+        }
+        state.yValues[people[p]["@id"]] = ys;
+      }
+      state.coordinates[idAlice] = { x: 0, y: 0 };
+      state.coordinates[idBob] = { x: 200, y: 200 };
+      this.commit("addRelationship", { one: idAlice, two: idBob });
     },
 
     /**
@@ -87,6 +91,30 @@ export default new Vuex.Store({
         "@type:": null,
         properties: []
       });
+    },
+
+    /**
+     * Edit the id of the given node shape.
+     * @param state
+     * @param args
+     *    oldID: the old ID we want to change.
+     *    newID: the new ID for the node shape.
+     */
+    editNodeShape(state, args) {
+      const { oldID, newID } = args;
+
+      // Update nodeShapes
+      Vue.set(state.nodeShapes, newID, state.nodeShapes[oldID]);
+      Vue.delete(state.nodeShapes, oldID);
+      state.nodeShapes[newID] = { ...state.nodeShapes[newID], "@id": newID };
+
+      // Update coordinates
+      Vue.set(state.coordinates, newID, state.coordinates[oldID]);
+      Vue.delete(state.coordinates, oldID);
+
+      // Update yValues
+      Vue.set(state.yValues, newID, state.yValues[oldID]);
+      Vue.delete(state.yValues, oldID);
     },
 
     /**
@@ -153,17 +181,16 @@ export default new Vuex.Store({
     },
 
     /**
-     * Takes a node and 2 coördinates in args, updates the coördinates from given node.
-     * After that it checks if the given node has any relationships and if he does, updates the relationship aswell.
-     * @param {*} state
-     * @param {*} args
+     * Update the coordinates of the given shape.
+     * @param state
+     * @param args
+     *    node: the ID of the node shape whose location should be updated.
+     *    x: the new x coordinate.
+     *    y: the new y coordinate.
      */
     updateCoordinates(state, args) {
       const { node, x, y } = args;
-      const coords = {
-        x,
-        y
-      };
+      const coords = { x, y };
       Vue.set(state.coordinates, node, coords);
 
       for (const prop in state.relationships) {
@@ -184,8 +211,7 @@ export default new Vuex.Store({
     /**
      * Takes two keys from nodeshapes and uses them to add a relationship to the state
      * @param state
-     * @param keyOne
-     * @param keyTwo
+     * @param keys contains two keys, which can be queried using keys.one and keys.two.
      */
     addRelationship(state, keys) {
       Vue.set(state.relationships, keys.one + keys.two, {
@@ -200,6 +226,7 @@ export default new Vuex.Store({
         ]
       });
     },
+
     /**
      * Toggle the visibility of the node shape modal.
      * @param state

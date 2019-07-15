@@ -13,10 +13,12 @@
 
 <script>
 import NodeShape from "./NodeShape/NodeShape.vue";
-import Relationship from "./Relationship";
+import Relationship from "./Relationship.vue";
+
 export default {
   name: "Editor",
   components: { NodeShape, Relationship },
+
   data() {
     const marginTop = 40;
     return {
@@ -27,14 +29,18 @@ export default {
       }
     };
   },
+
   mounted() {
+    this.$store.commit("setEditor", this.$refs.stage.getNode());
     window.addEventListener("resize", this.handleResize);
     this.handleResize();
   },
+
   methods: {
     print(sth) {
       console.log(sth);
     },
+
     /**
      * Resize the canvas on resizing of the window.
      */
@@ -44,6 +50,7 @@ export default {
       this.configKonva.width = window.innerWidth;
       this.$nextTick(() => stage.draw()); // Resize on the next tick
     },
+
     /**
      * Scale the canvas depending on the pointer position when scrolling.
      * @param e scoll event

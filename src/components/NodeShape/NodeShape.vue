@@ -1,5 +1,6 @@
 <template>
   <div>
+    <reactive-input ref="reactiveInput" :on-exit="stopEditing"></reactive-input>
     <v-group
       ref="posRef"
       :draggable="true"
@@ -8,9 +9,16 @@
       @dragmove="updateCoordinates"
     >
       <v-rect :config="shapeConfig"></v-rect>
-      <v-text ref="nodeID" :config="idTextConfig"></v-text>
-      <v-circle v-if="hover" :config="deleteNodeConfig" @mousedown="deleteNodeShape"></v-circle>
-      <!-- TODO add text editor -->
+      <v-text
+        ref="nodeID"
+        :config="idTextConfig"
+        @click="startEditing"
+      ></v-text>
+      <v-circle
+        v-if="hover"
+        :config="deleteNodeConfig"
+        @mousedown="deleteNodeShape"
+      ></v-circle>
       <div v-for="(prop, key) in getProperties()" :key="key">
         <node-property
           :prop-key="key"
@@ -27,10 +35,22 @@
 
 <script>
 import NodeProperty from "./NodeProperty.vue";
+import ReactiveInput from "../ReactiveInput.vue";
+import {
+  DELETE_NODE_CONFIG,
+  DELETE_PROP_CONFIG,
+  ID_TEXT_CONFIG,
+  PROP_TEXT_CONFIG,
+  PROPERTY_CONFIG,
+  SHAPE_CONFIG
+} from "../../util/konvaConfigs";
+
+const DELTA_Y_TEXT = 15;
+const DELTA_Y_DELETE = 20;
 
 export default {
   name: "NodeShape",
-  components: { NodeProperty },
+  components: { ReactiveInput, NodeProperty },
   props: {
     id: {
       type: String,
@@ -38,60 +58,27 @@ export default {
     }
   },
   data() {
-    const x = 0;
-    const width = 250;
     return {
       hover: false,
+      editing: false,
       propertyConfigs: {},
       propTextConfigs: {},
       deletePropConfigs: {},
-      shapeConfig: {
-        x,
-        y: 0,
-        height: 40,
-        width,
-        fill: "lightgreen",
-        stroke: "green",
-        strokeWidth: 3
-      },
-      deleteNodeConfig: {
-        x: 240,
-        y: 10,
-        radius: 6,
-        fill: "red"
-      },
+      shapeConfig: SHAPE_CONFIG,
+      deleteNodeConfig: DELETE_NODE_CONFIG,
       idTextConfig: {
-        x,
-        y: 15,
-        size: 20,
-        text: this.$props.id,
-        width,
-        align: "center",
-        fontStyle: "bold"
+        ...ID_TEXT_CONFIG,
+        text: this.$props.id
       },
-      propertyConfig: {
-        x,
-        height: 40,
-        width,
-        fill: "white",
-        stroke: "black",
-        strokeWidth: 2
-      },
-      propTextConfig: {
-        x,
-        size: 20,
-        text: this.$props.propKey,
-        width,
-        align: "center"
-      },
-      deletePropConfig: {
-        x: 240,
-        radius: 6,
-        fill: "red"
-      }
+      propertyConfig: PROPERTY_CONFIG,
+      propTextConfig: PROP_TEXT_CONFIG,
+      deletePropConfig: DELETE_PROP_CONFIG
     };
   },
-  mounted: function() {
+  mounted() {
+    this.$refs.posRef
+      .getNode()
+      .setPosition(this.$store.state.coordinates[this.$props.id]);
     this.updateCoordinates();
   },
   methods: {
@@ -121,13 +108,37 @@ export default {
         this.propertyConfigs[prop] = { ...this.propertyConfig, y: ys[prop] };
         this.propTextConfigs[prop] = {
           ...this.propTextConfig,
-          y: ys[prop] + 15,
+          y: ys[prop] + DELTA_Y_TEXT,
           text: prop
         };
         this.deletePropConfigs[prop] = {
           ...this.deletePropConfig,
-          y: ys[prop] + 20
+          y: ys[prop] + DELTA_Y_DELETE
         };
+      }
+    },
+
+    /**
+     * Call the ReactiveInput component to start editing using the given text node.
+     */
+    startEditing() {
+      if (this.$refs.reactiveInput)
+        this.$refs.reactiveInput.startEditing(this.$refs.nodeID.getNode());
+    },
+
+    /**
+     * Stop editing.
+     * Check if the filled in value is valid and unique.
+     * Call the store to edit the node shape if possible.
+     */
+    stopEditing(newValue) {
+      // Check if the new value is valid and unique.
+      if (newValue !== "" && !this.$store.state.nodeShapes[newValue]) {
+        const args = {
+          oldID: this.$props.id,
+          newID: newValue
+        };
+        this.$store.commit("editNodeShape", args);
       }
     },
 
@@ -137,8 +148,9 @@ export default {
     deleteNodeShape() {
       this.$store.commit("deleteNodeShape", this.$props.id);
     },
+
     /**
-     * Takes the coördinates from this nodeshape and tells store to update them.
+     * Takes the coördinates from this node shape and calls store to update them.
      */
     updateCoordinates() {
       const pos = this.$refs.posRef.getNode().position();
