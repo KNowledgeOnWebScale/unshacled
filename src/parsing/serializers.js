@@ -55,7 +55,7 @@ export class N3Serializer extends Serializer {
 }
 
 /**
- *  XMLSerializer class can serialize to RDF/XML
+ *  TODO: XMLSerializer class can serialize to RDF/XML
  */
 export class XMLSerializer {
   /**

@@ -1,7 +1,7 @@
 getReady;
-let initialConstraints = [];
+const initialConstraints = [];
 let getReady = function() {
-  //Filters through vocabulary file to find all the constraints and then maps them into clean objects
+  // Filters through vocabulary file to find all the constraints and then maps them into clean objects
 
   json.forEach(obj => {
     if (obj["@type"] === "http://www.w3.org/ns/shacl#ConstraintComponent") {
@@ -9,7 +9,7 @@ let getReady = function() {
     }
   });
 
-  //Filters through the vocabulary to find all parameters and links the parameters to corresponding constraints
+  // Filters through the vocabulary to find all parameters and links the parameters to corresponding constraints
   json.forEach(obj => {
     if (obj["@type"] === "http://www.w3.org/ns/shacl#Parameter") {
       simplifyParameter(obj);
@@ -18,7 +18,7 @@ let getReady = function() {
 };
 
 function simplifyCons(obj) {
-  let constraint = {};
+  const constraint = {};
   constraint.comment = obj[
     "http://www.w3.org/2000/01/rdf-schema#comment"
   ].shift()["@value"];
@@ -35,8 +35,8 @@ function simplifyCons(obj) {
 }
 
 function simplifyParameter(obj) {
-  let parameter = {};
-  let constraint = initialConstraints
+  const parameter = {};
+  const constraint = initialConstraints
     .filter(constraint => constraint.parameter === obj["@id"])
     .shift();
   parameter.definedby = obj[
@@ -51,13 +51,13 @@ function simplifyParameter(obj) {
 }
 
 function groupBy(xs, key) {
-  return xs.reduce(function(rv, x) {
+  return xs.reduce((rv, x) => {
     (rv[x[key]] = rv[x[key]] || []).push(x);
     return rv;
   }, {});
 }
 
-//These are the constraints with the type added manually
+// These are the constraints with the type added manually
 const constraintsWithTypes = [
   {
     type: "Logical Constraints",
@@ -6408,4 +6408,5 @@ const json = [
     "@id": "http://www.w3.org/ns/shacl-shacl#"
   }
 ];
+
 export const groupedConstraints = groupBy(constraintsWithTypes, "type");
