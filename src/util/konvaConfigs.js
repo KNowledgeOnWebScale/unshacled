@@ -1,6 +1,6 @@
 const X = 0;
-const WIDTH = 250;
-const HEIGHT = 40;
+export const WIDTH = 250;
+export const HEIGHT = 40;
 const TEXT_SIZE = HEIGHT / 2;
 const BUTTON_OFFSET = 240;
 

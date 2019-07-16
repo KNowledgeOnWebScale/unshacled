@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import { format } from "./util/enums/format";
 import { getConstraints } from "./util/constraintSelector";
+import { HEIGHT } from "./util/konvaConfigs";
 
 Vue.use(Vuex);
 
@@ -11,7 +12,6 @@ export default new Vuex.Store({
     format: format.SHACL,
     nodeShapes: {},
     propertyShapes: {},
-    properties: {},
     relationships: {},
     yValues: {},
     coordinates: {},
@@ -43,47 +43,44 @@ export default new Vuex.Store({
 
       const idAlice = "ex:Alice";
       const idBob = "ex:Bob";
+      const idFirstName = "foaf:firstName";
+      const idLastName = "foaf:lastName";
 
       const alice = {
         "@id": idAlice,
         "@type": "ex:Person",
-        properties: ["foaf:firstName", "foaf:lastName"]
+        properties: [idFirstName, idLastName]
       };
       const bob = {
         "@id": idBob,
         "@type": "ex:Person",
-        properties: ["foaf:firstName", "foaf:lastName"]
+        properties: [idFirstName, idLastName]
       };
 
       state.nodeShapes = {};
       state.nodeShapes[idBob] = bob;
       state.nodeShapes[idAlice] = alice;
-      state.properties = {
-        "foaf:firstName": firstName,
-        "foaf:lastName": lastName
-      };
+
+      state.propertyShapes = {};
+      state.propertyShapes[idFirstName] = firstName;
+      state.propertyShapes[idLastName] = lastName;
 
       // Update the y values of the properties.
       state.yValues = {};
-      const height = 40;
       const people = [alice, bob];
       for (const p in people) {
         const ys = {};
         let i = 1;
         for (const prop of people[p].properties) {
-          ys[prop] = i * height;
+          ys[prop] = i * HEIGHT;
           i += 1;
         }
         state.yValues[people[p]["@id"]] = ys;
       }
-      state.coordinates[idAlice] = {
-        x: 0,
-        y: 0
-      };
-      state.coordinates[idBob] = {
-        x: 200,
-        y: 200
-      };
+      state.coordinates[idAlice] = { x: 0, y: 0 };
+      state.coordinates[idBob] = { x: 200, y: 200 };
+      state.coordinates[idFirstName] = { x: 100, y: 350 };
+      state.coordinates[idLastName] = { x: 100, y: 400 };
       this.commit("addRelationship", {
         one: idAlice,
         two: idBob
@@ -123,14 +120,11 @@ export default new Vuex.Store({
 
       // Update Relationships
       for (let prop in state.relationships) {
-        console.log(state.relationships[prop]);
-
         if (state.relationships[prop].one === oldID)
           state.relationships[prop].one = newID;
         if (state.relationships[prop].two === oldID)
           state.relationships[prop].two = newID;
         prop = state.relationships[prop].one + state.relationships[prop].two;
-        console.log(prop);
       }
 
       // Update coordinates
@@ -148,7 +142,6 @@ export default new Vuex.Store({
         ...state.yValues[newID],
         "@id": newID
       };
-      console.log(state.relationships);
     },
 
     /**
@@ -158,6 +151,73 @@ export default new Vuex.Store({
      */
     deleteNodeShape(state, id) {
       Vue.delete(state.nodeShapes, id);
+    },
+
+    /**
+     * Edit the given property in the given node shape.
+     * If the new property ID already exists, this will make a copy
+     * @param state
+     * @param args
+     */
+    editProperty(state, args) {
+      const { node, oldID, newID } = args;
+
+      const index = state.nodeShapes[node].properties.indexOf(oldID);
+      // Check if the new property name is already an existing PropertyShape.
+      if (!state.propertyShapes[newID]) {
+        // If not, create a new PropertyShape that's a copy of the original one.
+        const copied = { ...state.propertyShapes[oldID] };
+        Vue.set(state.propertyShapes, newID, copied);
+        Vue.set(state.coordinates, newID, { x: 0, y: 0 });
+      }
+
+      // Remove the old value from the list of properties.
+      state.nodeShapes[node].properties.splice(index, 1, newID);
+
+      // Update the y values of the properties.
+      Vue.set(state.yValues, node, {});
+      let i = 1;
+      for (const prop of state.nodeShapes[node].properties) {
+        Vue.set(state.yValues[node], prop, i * HEIGHT);
+        i += 1;
+      }
+    },
+
+    /**
+     * Edit the ID of a property shape.
+     * This will update the property list of every node shape that contains this property shape.
+     * @param state
+     * @param args
+     */
+    editPropertyShape(state, args) {
+      const { oldID, newID } = args;
+
+      // Update the state's list of propertyShapes.
+      Vue.set(state.propertyShapes, newID, state.propertyShapes[oldID]);
+      Vue.delete(state.propertyShapes, oldID);
+
+      // Update the coordinates.
+      Vue.set(state.coordinates, newID, state.coordinates[oldID]);
+      Vue.delete(state.coordinates, oldID);
+
+      // Update the property name in every node shape.
+      for (const n in state.nodeShapes) {
+        const currentNode = state.nodeShapes[n];
+        const index = currentNode.properties.indexOf(oldID);
+        if (index !== -1) {
+          state.nodeShapes[n].properties.splice(index, 1, newID);
+        }
+      }
+
+      // Update the y values of the properties.
+      for (const n in state.nodeShapes) {
+        Vue.set(state.yValues, n, {});
+        let i = 1;
+        for (const prop of state.nodeShapes[n].properties) {
+          Vue.set(state.yValues[n], prop, i * HEIGHT);
+          i += 1;
+        }
+      }
     },
 
     /**
@@ -179,10 +239,9 @@ export default new Vuex.Store({
       };
 
       // Update the y values of the properties.
-      const height = 40;
       let i = 1;
       for (const prop of state.nodeShapes[node].properties) {
-        Vue.set(state.yValues[node], prop, i * height);
+        Vue.set(state.yValues[node], prop, i * HEIGHT);
         i += 1;
       }
     },
@@ -196,6 +255,7 @@ export default new Vuex.Store({
       Vue.set(state.propertyShapes, id, {
         "@id": id
       });
+      Vue.set(state.coordinates, id, { x: 0, y: 0 });
     },
 
     /**
@@ -230,7 +290,6 @@ export default new Vuex.Store({
             state.coordinates[changedKey].x,
             state.coordinates[changedKey].y
           ];
-          //  console.log(state.relationships[prop].coords);
         }
       }
     },
@@ -270,7 +329,10 @@ export default new Vuex.Store({
     clear(state) {
       console.log("Clear!");
       state.nodeShapes = {};
-      state.properties = {};
+      state.propertyShapes = {};
+      state.relationships = {};
+      state.coordinates = {};
+      state.yValues = {};
     },
 
     createProperty() {}

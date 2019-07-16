@@ -69,6 +69,10 @@ export default {
     };
   },
   mounted() {
+    // Move the shape to the defined coordinate.
+    this.$refs.posRef
+      .getNode()
+      .setPosition(this.$store.state.coordinates[this.$props.id]);
     this.updateCoordinates();
   },
   methods: {
@@ -80,7 +84,7 @@ export default {
       const { id } = this.$props;
       const properties = {};
       for (const prop of this.$store.state.nodeShapes[id].properties) {
-        properties[prop] = this.$store.state.properties[prop];
+        properties[prop] = this.$store.state.propertyShapes[prop];
       }
       this.setPropConfigs(properties);
       return properties;
@@ -123,12 +127,12 @@ export default {
      */
     stopEditing(newValue) {
       // Check if the new value is valid and unique.
-      if (newValue !== "" && !this.$store.state.nodeShapes[newValue]) {
+      if (newValue !== "" && !this.$store.state.propertyShapes[newValue]) {
         const args = {
           oldID: this.$props.id,
           newID: newValue
         };
-        this.$store.commit("editNodeShape", args);
+        this.$store.commit("editPropertyShape", args);
       }
     },
 
