@@ -3,7 +3,9 @@
     <sui-menu ref="navbar" attached="top" inverted>
       <sui-dropdown item icon="file alternate" simple>
         <sui-dropdown-menu>
-          <sui-dropdown-item>Import</sui-dropdown-item>
+          <sui-dropdown-item
+            ><input id="file" type="file"  @change="readTextFile()"
+          /></sui-dropdown-item>
           <sui-dropdown-item>Export</sui-dropdown-item>
           <sui-dropdown-divider></sui-dropdown-divider>
           <sui-dropdown-item @click="loadExample">
@@ -59,6 +61,15 @@ export default {
     togglePropertyModal() {
       this.createPropertyShape = true;
       this.$store.commit("toggleShapeModal");
+    },
+    readTextFile() {
+      console.log("called");
+      const file = document.getElementById("file").files[0];
+      const reader = new FileReader();
+      reader.readAsText(file);
+      reader.onload = function(event) {
+        console.log(event.target.result);
+      };
     }
   }
 };
