@@ -79,6 +79,7 @@ export default {
     };
   },
   mounted() {
+    // Move the shape to the defined coordinate.
     this.$refs.posRef
       .getNode()
       .setPosition(this.$store.state.coordinates[this.$props.id]);
@@ -93,7 +94,7 @@ export default {
       const { id } = this.$props;
       const properties = {};
       for (const prop of this.$store.state.nodeShapes[id].properties) {
-        properties[prop] = this.$store.state.properties[prop];
+        properties[prop] = this.$store.state.propertyShapes[prop];
       }
       this.setPropConfigs(properties);
       return properties;
