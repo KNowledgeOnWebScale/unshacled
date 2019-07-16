@@ -1,11 +1,13 @@
 <template>
   <div>
     <sui-modal v-model="this.$store.state.showNodeShapeModal">
-      <sui-modal-header>Add a Node Shape</sui-modal-header>
+      <sui-modal-header>
+        Add a {{ isPropertyShapeModal ? "Property" : "Node" }} Shape
+      </sui-modal-header>
       <sui-modal-content>
         <sui-form>
           <sui-form-field id="shapeNodeField" inline>
-            <label>ID</label>
+            <label for="shapeNodeID">ID</label>
             <input id="shapeNodeID" v-model="id" placeholder="Unique ID" />
           </sui-form-field>
         </sui-form>
@@ -14,12 +16,8 @@
         </sui-segment>
       </sui-modal-content>
       <sui-modal-actions>
-        <sui-button negative @click="toggleModal">
-          Cancel
-        </sui-button>
-        <sui-button positive @click="confirmNodeShape">
-          Add
-        </sui-button>
+        <sui-button negative @click="toggleShapeModal">Cancel</sui-button>
+        <sui-button positive @click="confirmNodeShape">Add</sui-button>
       </sui-modal-actions>
     </sui-modal>
   </div>
@@ -28,10 +26,17 @@
 <script>
 export default {
   name: "NodeShapeModal",
+  props: {
+    isPropertyShapeModal: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       idString: "",
-      error: false
+      error: false,
+      listening: false
     };
   },
   computed: {
@@ -46,19 +51,27 @@ export default {
   },
   methods: {
     confirmNodeShape() {
+      this.error = false;
       const id = this.idString;
+      // Checks if name is a unique key, also checking propertyshapes
+      for (const prop in this.$store.state.propertyShapes) {
+        if (this.$store.state.propertyShapes[prop]["@id"] === id)
+          this.error = true;
+      }
       // Only commit if the name is unique. Otherwise, show an error message.
       if (id === "" || this.$store.state.nodeShapes[id]) {
         this.error = true;
-      } else {
-        this.error = false;
-        this.toggleModal();
+      }
+      if (!this.error) {
+        this.toggleShapeModal();
         this.idString = "";
-        this.$store.commit("addNodeShape", id);
+        if (this.$props.isPropertyShapeModal)
+          this.$store.commit("addPropertyShape", id);
+        else this.$store.commit("addNodeShape", id);
       }
     },
-    toggleModal() {
-      this.$store.commit("toggleNodeShapeModal");
+    toggleShapeModal() {
+      this.$store.commit("toggleShapeModal");
     }
   }
 };

@@ -2,7 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import { format } from "./util/enums/format";
 import { getConstraints } from "./util/constraintSelector";
-import {HEIGHT} from "./util/konvaConfigs";
+import { HEIGHT } from "./util/konvaConfigs";
 
 Vue.use(Vuex);
 
@@ -11,6 +11,7 @@ export default new Vuex.Store({
     editor: null,
     format: format.SHACL,
     nodeShapes: {},
+    propertyShapes: {},
     properties: {},
     relationships: {},
     yValues: {},
@@ -75,9 +76,18 @@ export default new Vuex.Store({
         }
         state.yValues[people[p]["@id"]] = ys;
       }
-      state.coordinates[idAlice] = { x: 0, y: 0 };
-      state.coordinates[idBob] = { x: 200, y: 200 };
-      this.commit("addRelationship", { one: idAlice, two: idBob });
+      state.coordinates[idAlice] = {
+        x: 0,
+        y: 0
+      };
+      state.coordinates[idBob] = {
+        x: 200,
+        y: 200
+      };
+      this.commit("addRelationship", {
+        one: idAlice,
+        two: idBob
+      });
     },
 
     /**
@@ -106,15 +116,39 @@ export default new Vuex.Store({
       // Update nodeShapes
       Vue.set(state.nodeShapes, newID, state.nodeShapes[oldID]);
       Vue.delete(state.nodeShapes, oldID);
-      state.nodeShapes[newID] = { ...state.nodeShapes[newID], "@id": newID };
+      state.nodeShapes[newID] = {
+        ...state.nodeShapes[newID],
+        "@id": newID
+      };
+
+      // Update Relationships
+      for (let prop in state.relationships) {
+        console.log(state.relationships[prop]);
+
+        if (state.relationships[prop].one === oldID)
+          state.relationships[prop].one = newID;
+        if (state.relationships[prop].two === oldID)
+          state.relationships[prop].two = newID;
+        prop = state.relationships[prop].one + state.relationships[prop].two;
+        console.log(prop);
+      }
 
       // Update coordinates
       Vue.set(state.coordinates, newID, state.coordinates[oldID]);
       Vue.delete(state.coordinates, oldID);
+      state.coordinates[newID] = {
+        ...state.coordinates[newID],
+        "@id": newID
+      };
 
       // Update yValues
       Vue.set(state.yValues, newID, state.yValues[oldID]);
       Vue.delete(state.yValues, oldID);
+      state.yValues[newID] = {
+        ...state.yValues[newID],
+        "@id": newID
+      };
+      console.log(state.relationships);
     },
 
     /**
@@ -123,15 +157,6 @@ export default new Vuex.Store({
      * @param id
      */
     deleteNodeShape(state, id) {
-      for (const prop in state.relationships) {
-        if (prop.includes(id)) {
-          const changedKey = id;
-          const otherKey = prop.replace(changedKey, "");
-          if (state.nodeShapes[otherKey] !== undefined) {
-            delete state.relationships[prop];
-          }
-        }
-      }
       Vue.delete(state.nodeShapes, id);
     },
 
@@ -146,9 +171,13 @@ export default new Vuex.Store({
       Vue.set(state.properties, newProp, state.properties[oldProp]);
       Vue.delete(state.properties, oldProp);
 
-      for (const n of state.nodeShapes) {
-        const index = n.properties
-        if (n.properties.indexOf(oldProp))
+      // Update the property name in every node shape
+      for (const n in state.nodeShapes) {
+        const currentNode = state.nodeShapes[n];
+        const index = currentNode.properties;
+        if (currentNode.properties.indexOf(oldProp)) {
+          state.nodeShapes[n].properties.splice(index, 1, newProp);
+        }
       }
 
       // Update the y values of the properties.
@@ -191,7 +220,9 @@ export default new Vuex.Store({
      * @param id
      */
     addPropertyShape(state, id) {
-      Vue.set(state.properties, id, {});
+      Vue.set(state.propertyShapes, id, {
+        "@id": id
+      });
     },
 
     /**
@@ -200,7 +231,7 @@ export default new Vuex.Store({
      * @param id
      */
     deletePropertyShape(state, id) {
-      Vue.delete(state.properties, id);
+      Vue.delete(state.propertyShapes, id);
     },
 
     /**
@@ -253,7 +284,8 @@ export default new Vuex.Store({
      * Toggle the visibility of the node shape modal.
      * @param state
      */
-    toggleNodeShapeModal(state) {
+    toggleShapeModal(state) {
+      event.preventDefault();
       state.showNodeShapeModal = !state.showNodeShapeModal;
     },
 
@@ -265,7 +297,9 @@ export default new Vuex.Store({
       console.log("Clear!");
       state.nodeShapes = {};
       state.properties = {};
-    }
+    },
+
+    createProperty() {}
   },
   actions: {},
   getters: {

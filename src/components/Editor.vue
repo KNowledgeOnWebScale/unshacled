@@ -4,20 +4,23 @@
       <div v-for="(obj, key) in this.$store.state.nodeShapes" :key="key">
         <node-shape :id="key" @click="print(key)"></node-shape>
       </div>
-      <div v-for="(obj, key) in this.$store.state.relationships" :key="key">
-        <relationship :coords="obj.coords"></relationship>
+      <!--      <div v-for="(obj, key) in this.$store.state.relationships" :key="key">-->
+      <!--        <relationship :coords="obj.coords"></relationship>-->
+      <!--      </div>-->
+      <div v-for="(obj, key) in this.$store.state.propertyShapes" :key="key">
+        <property-shape :id="key"></property-shape>
       </div>
     </v-layer>
   </v-stage>
 </template>
 
 <script>
-import NodeShape from "./NodeShape/NodeShape.vue";
-import Relationship from "./Relationship.vue";
+import NodeShape from "./Shapes/NodeShape.vue";
+import PropertyShape from "./Shapes/PropertyShape.vue";
 
 export default {
   name: "Editor",
-  components: { NodeShape, Relationship },
+  components: { NodeShape, PropertyShape },
 
   data() {
     const marginTop = 40;
@@ -31,6 +34,7 @@ export default {
   },
 
   mounted() {
+    console.log(this);
     this.$store.commit("setEditor", this.$refs.stage.getNode());
     window.addEventListener("resize", this.handleResize);
     this.handleResize();
