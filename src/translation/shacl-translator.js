@@ -3,7 +3,7 @@ import dictionary from "./shacl-dictionary";
 /**
  *  ShaclTranslator class translates SHACL JSON-LD to an internal model and back
  */
-export class SHACLTranslator {
+export default class SHACLTranslator {
   /**
    * Replaces all SHACL URI's with model URI's
    * @param shacl SHACL in JSON-LD
@@ -29,6 +29,15 @@ export class SHACLTranslator {
    * @returns {any} Translated document
    */
   static translate(document, dict) {
+    for (const property in document) {
+      if (Object.prototype.hasOwnProperty.call(document, property)) {
+        const translation = dict[property];
+        if (translation) {
+          document[translation] = document[property];
+          delete document[property];
+        }
+      }
+    }
     traverse(document, (index, object) => {
       // Translate strings in an array
       if (Array.isArray(object)) {
