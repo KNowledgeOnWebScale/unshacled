@@ -12,7 +12,6 @@
         :config="this.$props.deletePropConfig"
         @mousedown="deleteProperty"
       ></v-circle>
-      <!-- TODO add editor -->
     </v-group>
   </div>
 </template>
@@ -65,8 +64,8 @@ export default {
       if (newValue !== "" && properties.indexOf(newValue) === -1) {
         const args = {
           node: this.$props.node,
-          oldProp: this.$props.propKey,
-          newProp: newValue
+          oldID: this.$props.propKey,
+          newID: newValue
         };
         this.$store.commit("editProperty", args);
       }

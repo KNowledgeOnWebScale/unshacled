@@ -153,23 +153,59 @@ export default new Vuex.Store({
       Vue.delete(state.nodeShapes, id);
     },
 
+    /**
+     * Edit the given property in the given node shape.
+     * If the new property ID already exists, this will make a copy
+     * @param state
+     * @param args
+     */
     editProperty(state, args) {
-      const { node, oldProp, newProp } = args;
+      const { node, oldID, newID } = args;
 
-      // Update the given node's properties
-      const index = state.nodeShapes[node].properties.indexOf(oldProp);
-      state.nodeShapes[node].properties.splice(index, 1, newProp);
+      const index = state.nodeShapes[node].properties.indexOf(oldID);
+      // Check if the new property name is already an existing PropertyShape.
+      if (!state.propertyShapes[newID]) {
+        // If not, create a new PropertyShape that's a copy of the original one.
+        const copied = { ...state.propertyShapes[oldID] };
+        Vue.set(state.propertyShapes, newID, copied);
+        Vue.set(state.coordinates, newID, { x: 0, y: 0 });
+      }
 
-      // Update the state's properties
-      Vue.set(state.propertyShapes, newProp, state.propertyShapes[oldProp]);
-      Vue.delete(state.propertyShapes, oldProp);
+      // Remove the old value from the list of properties.
+      state.nodeShapes[node].properties.splice(index, 1, newID);
 
-      // Update the property name in every node shape
+      // Update the y values of the properties.
+      Vue.set(state.yValues, node, {});
+      let i = 1;
+      for (const prop of state.nodeShapes[node].properties) {
+        Vue.set(state.yValues[node], prop, i * HEIGHT);
+        i += 1;
+      }
+    },
+
+    /**
+     * Edit the ID of a property shape.
+     * This will update the property list of every node shape that contains this property shape.
+     * @param state
+     * @param args
+     */
+    editPropertyShape(state, args) {
+      const { oldID, newID } = args;
+
+      // Update the state's list of propertyShapes.
+      Vue.set(state.propertyShapes, newID, state.propertyShapes[oldID]);
+      Vue.delete(state.propertyShapes, oldID);
+
+      // Update the coordinates.
+      Vue.set(state.coordinates, newID, state.coordinates[oldID]);
+      Vue.delete(state.coordinates, oldID);
+
+      // Update the property name in every node shape.
       for (const n in state.nodeShapes) {
         const currentNode = state.nodeShapes[n];
-        const index = currentNode.properties.indexOf(oldProp);
+        const index = currentNode.properties.indexOf(oldID);
         if (index !== -1) {
-          state.nodeShapes[n].properties.splice(index, 1, newProp);
+          state.nodeShapes[n].properties.splice(index, 1, newID);
         }
       }
 
@@ -219,6 +255,7 @@ export default new Vuex.Store({
       Vue.set(state.propertyShapes, id, {
         "@id": id
       });
+      Vue.set(state.coordinates, id, { x: 0, y: 0 });
     },
 
     /**

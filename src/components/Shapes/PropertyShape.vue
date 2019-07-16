@@ -127,12 +127,12 @@ export default {
      */
     stopEditing(newValue) {
       // Check if the new value is valid and unique.
-      if (newValue !== "" && !this.$store.state.nodeShapes[newValue]) {
+      if (newValue !== "" && !this.$store.state.propertyShapes[newValue]) {
         const args = {
           oldID: this.$props.id,
           newID: newValue
         };
-        this.$store.commit("editNodeShape", args);
+        this.$store.commit("editPropertyShape", args);
       }
     },
 
