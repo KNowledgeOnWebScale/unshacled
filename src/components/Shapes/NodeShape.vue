@@ -42,7 +42,7 @@ import {
   ID_TEXT_CONFIG,
   PROP_TEXT_CONFIG,
   PROPERTY_CONFIG,
-  SHAPE_CONFIG
+  NODE_SHAPE_CONFIG
 } from "../../util/konvaConfigs";
 
 const DELTA_Y_TEXT = 15;
@@ -64,14 +64,17 @@ export default {
       propertyConfigs: {},
       propTextConfigs: {},
       deletePropConfigs: {},
-      shapeConfig: SHAPE_CONFIG,
+      shapeConfig: NODE_SHAPE_CONFIG,
       deleteNodeConfig: DELETE_NODE_CONFIG,
       idTextConfig: {
         ...ID_TEXT_CONFIG,
         text: this.$props.id
       },
       propertyConfig: PROPERTY_CONFIG,
-      propTextConfig: PROP_TEXT_CONFIG,
+      propTextConfig: {
+        ...PROP_TEXT_CONFIG,
+        text: this.$props.propKey
+      },
       deletePropConfig: DELETE_PROP_CONFIG
     };
   },

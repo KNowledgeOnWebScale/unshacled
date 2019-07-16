@@ -6408,4 +6408,5 @@ const json = [
     "@id": "http://www.w3.org/ns/shacl-shacl#"
   }
 ];
+
 export const groupedConstraints = groupBy(constraintsWithTypes, "type");
