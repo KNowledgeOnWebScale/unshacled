@@ -279,6 +279,7 @@ export default new Vuex.Store({
      * @param state
      */
     toggleNodeShapeModal(state) {
+      event.preventDefault();
       state.showNodeShapeModal = !state.showNodeShapeModal;
     },
 

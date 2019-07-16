@@ -31,7 +31,8 @@ export default {
   data() {
     return {
       idString: "",
-      error: false
+      error: false,
+      listening: false
     };
   },
   computed: {
@@ -46,10 +47,12 @@ export default {
   },
   methods: {
     confirmNodeShape() {
+      this.error = false;
       const id = this.idString;
       //Checks if name is a unique key, also checking propertyshapes
-      for (let prop in this.$store.state.properties) {
-        if (this.$store.state.properties[prop].path == id) this.error = true;
+      for (let prop in this.$store.state.propertyShapes) {
+        if (this.$store.state.propertyShapes[prop]["@id"] == id)
+          this.error = true;
       }
       // Only commit if the name is unique. Otherwise, show an error message.
       if (id === "" || this.$store.state.nodeShapes[id]) {
