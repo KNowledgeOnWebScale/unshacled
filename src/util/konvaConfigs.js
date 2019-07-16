@@ -1,10 +1,11 @@
 const X = 0;
-const WIDTH = 250;
+export const WIDTH = 250;
+export const HEIGHT = 40;
 
 export const SHAPE_CONFIG = {
   x: X,
   y: 0,
-  height: 40,
+  height: HEIGHT,
   width: WIDTH,
   fill: "lightgreen",
   stroke: "green",
@@ -23,7 +24,6 @@ export const ID_TEXT_CONFIG = {
   y: 15,
   size: 20,
   text: "",
-  // text: this.$props.id,
   width: WIDTH,
   align: "center",
   fontStyle: "bold"
@@ -31,7 +31,7 @@ export const ID_TEXT_CONFIG = {
 
 export const PROPERTY_CONFIG = {
   x: X,
-  height: 40,
+  height: HEIGHT,
   width: WIDTH,
   fill: "white",
   stroke: "black",
@@ -42,7 +42,6 @@ export const PROP_TEXT_CONFIG = {
   x: X,
   size: 20,
   text: "",
-  // text: this.$props.propKey,
   width: WIDTH,
   align: "center"
 };

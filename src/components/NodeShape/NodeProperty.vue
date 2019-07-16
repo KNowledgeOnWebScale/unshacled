@@ -1,18 +1,28 @@
 <template>
-  <v-group>
-    <v-rect :config="this.$props.propertyConfig"></v-rect>
-    <v-text ref="propKey" :config="this.$props.propTextConfig"></v-text>
-    <v-circle
-      :config="this.$props.deletePropConfig"
-      @mousedown="deleteProperty"
-    ></v-circle>
-    <!-- TODO add editor -->
-  </v-group>
+  <div>
+    <reactive-input ref="reactiveInput" :on-exit="stopEditing"></reactive-input>
+    <v-group>
+      <v-rect :config="this.$props.propertyConfig"></v-rect>
+      <v-text
+        ref="propKey"
+        :config="this.$props.propTextConfig"
+        @click="startEditing"
+      ></v-text>
+      <v-circle
+        :config="this.$props.deletePropConfig"
+        @mousedown="deleteProperty"
+      ></v-circle>
+      <!-- TODO add editor -->
+    </v-group>
+  </div>
 </template>
 
 <script>
+import ReactiveInput from "../ReactiveInput.vue";
+
 export default {
   name: "NodeProperty",
+  components: { ReactiveInput },
   props: {
     node: {
       required: true,
@@ -36,6 +46,32 @@ export default {
     }
   },
   methods: {
+    /**
+     * Call the ReactiveInput component to start editing using the given text node.
+     */
+    startEditing() {
+      if (this.$refs.reactiveInput)
+        this.$refs.reactiveInput.startEditing(this.$refs.propKey.getNode());
+    },
+
+    /**
+     * Stop editing.
+     * Check if the filled in value is valid and unique.
+     * Call the store to edit the property if possible.
+     */
+    stopEditing(newValue) {
+      // Check if the new value is valid and unique.
+      const { properties } = this.$store.state.nodeShapes[this.$props.node];
+      if (newValue !== "" && properties.indexOf(newValue) === -1) {
+        const args = {
+          node: this.$props.node,
+          oldProp: this.$props.propKey,
+          newProp: newValue
+        };
+        this.$store.commit("editProperty", args);
+      }
+    },
+
     /**
      * Delete the current property from its node shape.
      */
