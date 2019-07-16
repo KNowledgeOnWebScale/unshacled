@@ -5,7 +5,7 @@
         Add a {{ isPropertyShapeModal ? "Property" : "Node" }} Shape
       </sui-modal-header>
       <sui-modal-content>
-        <sui-form>
+        <sui-form v-on:submit.prevent="confirmNodeShape">
           <sui-form-field id="shapeNodeField" inline>
             <label for="shapeNodeID">ID</label>
             <input id="shapeNodeID" v-model="id" placeholder="Unique ID" />
