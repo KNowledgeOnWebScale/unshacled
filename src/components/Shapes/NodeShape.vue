@@ -79,6 +79,9 @@ export default {
     };
   },
   mounted() {
+    this.$refs.posRef
+      .getNode()
+      .setPosition(this.$store.state.coordinates[this.$props.id]);
     this.updateCoordinates();
   },
   methods: {

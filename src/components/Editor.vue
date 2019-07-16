@@ -4,9 +4,9 @@
       <div v-for="(obj, key) in this.$store.state.nodeShapes" :key="key">
         <node-shape :id="key" @click="print(key)"></node-shape>
       </div>
-      <div v-for="(obj, key) in this.$store.state.relationships" :key="key">
-        <relationship :coords="obj.coords"></relationship>
-      </div>
+<!--      <div v-for="(obj, key) in this.$store.state.relationships" :key="key">-->
+<!--        <relationship :coords="obj.coords"></relationship>-->
+<!--      </div>-->
       <div v-for="(obj, key) in this.$store.state.propertyShapes" :key="key">
         <property-shape :id="key"></property-shape>
       </div>
