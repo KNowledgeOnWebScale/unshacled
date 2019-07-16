@@ -6,17 +6,29 @@
           <sui-dropdown-item>Import</sui-dropdown-item>
           <sui-dropdown-item>Export</sui-dropdown-item>
           <sui-dropdown-divider></sui-dropdown-divider>
-          <sui-dropdown-item @click="loadExample">Load Example</sui-dropdown-item>
+          <sui-dropdown-item @click="loadExample">
+            Load Example
+          </sui-dropdown-item>
         </sui-dropdown-menu>
       </sui-dropdown>
-      <sui-menu-item class="clickable" icon="add" @click="toggleModal">Shape</sui-menu-item>
-      <sui-menu-item class="clickable" icon="add" @click="addProperty">Property</sui-menu-item>
-      <sui-menu-item class="clickable" icon="trash" @click="clear"></sui-menu-item>
+      <sui-menu-item class="clickable" icon="add" @click="toggleShapeModal">
+        Shape
+      </sui-menu-item>
+      <sui-menu-item class="clickable" icon="add" @click="togglePropertyModal">
+        Property
+      </sui-menu-item>
+      <sui-menu-item
+        class="clickable"
+        icon="trash"
+        @click="clear"
+      ></sui-menu-item>
       <sui-menu-menu position="right">
         <sui-menu-item class="clickable" icon="user"></sui-menu-item>
       </sui-menu-menu>
     </sui-menu>
-    <node-shape-modal :isPropertyShapeModal="CreatePropertyShape"></node-shape-modal>
+    <node-shape-modal
+      :is-property-shape-modal="createPropertyShape"
+    ></node-shape-modal>
   </div>
 </template>
 
@@ -28,6 +40,11 @@ import NodeShapeModal from "./NodeShapeModal.vue";
 export default {
   name: "NavBar",
   components: { NodeShapeModal, SuiDropdownDivider, SuiDropdown },
+  data() {
+    return {
+      createPropertyShape: false
+    };
+  },
   methods: {
     clear() {
       this.$store.commit("clear");
@@ -35,19 +52,14 @@ export default {
     loadExample() {
       this.$store.commit("loadExample");
     },
-    toggleModal() {
-      this.CreatePropertyShape = false;
-      this.$store.commit("toggleNodeShapeModal");
+    toggleShapeModal() {
+      this.createPropertyShape = false;
+      this.$store.commit("toggleShapeModal");
     },
-    addProperty() {
-      this.CreatePropertyShape = true;
-      this.$store.commit("toggleNodeShapeModal");
+    togglePropertyModal() {
+      this.createPropertyShape = true;
+      this.$store.commit("toggleShapeModal");
     }
-  },
-  data: function() {
-    return {
-      CreatePropertyShape: false
-    };
   }
 };
 </script>

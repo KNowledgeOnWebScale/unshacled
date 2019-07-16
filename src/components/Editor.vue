@@ -17,7 +17,8 @@
 <script>
 import NodeShape from "./Shapes/NodeShape.vue";
 import Relationship from "./Relationship.vue";
-import PropertyShape from "./NodeShape/PropertyShape.vue";
+import PropertyShape from "./Shapes/PropertyShape.vue";
+
 export default {
   name: "Editor",
   components: { NodeShape, Relationship, PropertyShape },

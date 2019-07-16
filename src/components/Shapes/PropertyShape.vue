@@ -9,32 +9,38 @@
       @dragmove="updateCoordinates"
     >
       <v-rect :config="shapeConfig"></v-rect>
-      <v-text ref="nodeID" :config="idTextConfig" @click="startEditing"></v-text>
-      <v-circle v-if="hover" :config="deleteNodeConfig" @mousedown="deleteNodeShape"></v-circle>
-      <div v-for="(prop, key) in getProperties()" :key="key">
-        <node-property
-          :prop-key="key"
-          :node="$props.id"
-          :property-config="propertyConfigs[key]"
-          :prop-text-config="propTextConfigs[key]"
-          :delete-prop-config="deletePropConfigs[key]"
-        ></node-property>
-      </div>
+      <v-text
+        ref="nodeID"
+        :config="idTextConfig"
+        @click="startEditing"
+      ></v-text>
+      <v-circle
+        v-if="hover"
+        :config="deleteNodeConfig"
+        @mousedown="deletePropertyShape"
+      ></v-circle>
+
       <!-- TODO add button for adding property -->
     </v-group>
   </div>
 </template>
 
 <script>
-import NodeProperty from "./NodeProperty.vue";
 import ReactiveInput from "../ReactiveInput.vue";
+import {
+  DELETE_NODE_CONFIG,
+  ID_TEXT_CONFIG,
+  PROP_TEXT_CONFIG,
+  PROPERTY_CONFIG,
+  PROPERTY_SHAPE_CONFIG
+} from "../../util/konvaConfigs";
 
 const DELTA_Y_TEXT = 15;
 const DELTA_Y_DELETE = 20;
 
 export default {
-  name: "NodeShape",
-  components: { ReactiveInput, NodeProperty },
+  name: "PropertyShape",
+  components: { ReactiveInput },
   props: {
     id: {
       type: String,
@@ -42,58 +48,24 @@ export default {
     }
   },
   data() {
-    const x = 0;
-    const width = 250;
     return {
       hover: false,
       editing: false,
       propertyConfigs: {},
       propTextConfigs: {},
       deletePropConfigs: {},
-      shapeConfig: {
-        x,
-        y: 0,
-        height: 40,
-        width,
-        fill: "lightgreen",
-        stroke: "green",
-        strokeWidth: 3
-      },
-      deleteNodeConfig: {
-        x: 240,
-        y: 10,
-        radius: 6,
-        fill: "red"
-      },
+      shapeConfig: PROPERTY_SHAPE_CONFIG,
+      deleteNodeConfig: DELETE_NODE_CONFIG,
       idTextConfig: {
-        x,
-        y: 15,
-        size: 20,
-        text: this.$props.id,
-        width,
-        align: "center",
-        fontStyle: "bold"
+        ...ID_TEXT_CONFIG,
+        text: this.$props.id
       },
-      propertyConfig: {
-        x,
-        height: 40,
-        width,
-        fill: "white",
-        stroke: "black",
-        strokeWidth: 2
-      },
+      propertyConfig: PROPERTY_CONFIG,
       propTextConfig: {
-        x,
-        size: 20,
-        text: this.$props.propKey,
-        width,
-        align: "center"
+        ...PROP_TEXT_CONFIG,
+        text: this.$props.propKey
       },
-      deletePropConfig: {
-        x: 240,
-        radius: 6,
-        fill: "red"
-      }
+      deletePropConfig: DELETE_NODE_CONFIG
     };
   },
   mounted() {
@@ -163,8 +135,8 @@ export default {
     /**
      * Delete this node shape.
      */
-    deleteNodeShape() {
-      this.$store.commit("deleteNodeShape", this.$props.id);
+    deletePropertyShape() {
+      this.$store.commit("deletePropertyShape", this.$props.id);
     },
 
     /**
