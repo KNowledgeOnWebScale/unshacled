@@ -38,7 +38,7 @@
 import SuiDropdown from "semantic-ui-vue/dist/commonjs/modules/Dropdown/Dropdown";
 import SuiDropdownDivider from "semantic-ui-vue/dist/commonjs/modules/Dropdown/DropdownDivider";
 import NodeShapeModal from "./NodeShapeModal.vue";
-import
+import { ParserManager } from "../parsing/parser-manager";
 
 export default {
   name: "NavBar",
@@ -64,16 +64,27 @@ export default {
       this.$store.commit("toggleShapeModal");
     },
     readTextFile() {
-      console.log("called");
       const file = document.getElementById("file").files[0];
       const reader = new FileReader();
-      reader.readAsText(file);
+      const fileExtension = file.name.split(".").pop();
       const self = this;
+      reader.readAsText(file);
       reader.onload = function(event) {
         self.$store.state.file.content = event.target.result;
-        self.$store.state.file.fileExtension = file.name.split(".").pop();
-      };
+        self.$store.state.file.fileExtension = fileExtension;
 
+        if (fileExtension === "ttl")
+          ParserManager.parse(
+            self.$store.state.file.content,
+            "text/turtle"
+          ).then(
+            // eslint-disable-next-line no-return-assign
+            e => {
+              self.$store.state.internalModel = e;
+              console.log(self.$store.state.internalModel);
+            }
+          );
+      };
     }
   }
 };
