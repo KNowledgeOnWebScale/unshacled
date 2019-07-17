@@ -72,18 +72,16 @@ export default {
       reader.onload = function(event) {
         self.$store.state.file.content = event.target.result;
         self.$store.state.file.fileExtension = fileExtension;
-
-        if (fileExtension === "ttl")
-          ParserManager.parse(
-            self.$store.state.file.content,
-            "text/turtle"
-          ).then(
-            // eslint-disable-next-line no-return-assign
-            e => {
-              self.$store.state.internalModel = e;
-              console.log(self.$store.state.internalModel);
-            }
-          );
+        ParserManager.parse(
+          self.$store.state.file.content,
+          self.$store.state.file.fileExtension
+        ).then(
+          // eslint-disable-next-line no-return-assign
+          e => {
+            self.$store.state.internalModel = e;
+            console.log(self.$store.state.internalModel);
+          }
+        );
       };
     }
   }
