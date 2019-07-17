@@ -93,7 +93,7 @@ export default {
     getProperties() {
       const { id } = this.$props;
       const properties = {};
-      for (const prop of this.$store.state.nodeShapes[id].properties) {
+      for (const prop of this.$store.state.getters.nodeShapes[id].properties) {
         properties[prop] = this.$store.state.propertyShapes[prop];
       }
       this.setPropConfigs(properties);
@@ -137,7 +137,7 @@ export default {
      */
     stopEditing(newValue) {
       // Check if the new value is valid and unique.
-      if (newValue !== "" && !this.$store.state.nodeShapes[newValue]) {
+      if (newValue !== "" && !this.$store.state.getters.nodeShapes[newValue]) {
         const args = {
           oldID: this.$props.id,
           newID: newValue

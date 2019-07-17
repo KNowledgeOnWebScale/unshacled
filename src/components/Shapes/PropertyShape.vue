@@ -83,7 +83,7 @@ export default {
     getProperties() {
       const { id } = this.$props;
       const properties = {};
-      for (const prop of this.$store.state.nodeShapes[id].properties) {
+      for (const prop of this.$store.state.getters.nodeShapes[id].properties) {
         properties[prop] = this.$store.state.propertyShapes[prop];
       }
       this.setPropConfigs(properties);

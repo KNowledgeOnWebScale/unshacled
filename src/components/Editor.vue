@@ -1,7 +1,7 @@
 <template>
   <v-stage ref="stage" :config="configKonva" @wheel="scroll">
     <v-layer>
-      <div v-for="(obj, key) in this.$store.state.nodeShapes" :key="key">
+      <div v-for="(obj, key) in this.$store.state.getters.nodeShapes" :key="key">
         <node-shape :id="key" @click="print(key)"></node-shape>
       </div>
       <!--      <div v-for="(obj, key) in this.$store.state.relationships" :key="key">-->

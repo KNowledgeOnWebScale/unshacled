@@ -1,4 +1,4 @@
-const examples = {
+const EXAMPLES = {
   shacl: [
     [
       {
@@ -1747,4 +1747,4 @@ const examples = {
   ]
 };
 
-export { examples as default };
+export { EXAMPLES as default };

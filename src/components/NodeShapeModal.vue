@@ -59,7 +59,7 @@ export default {
           this.error = true;
       }
       // Only commit if the name is unique. Otherwise, show an error message.
-      if (id === "" || this.$store.state.nodeShapes[id]) {
+      if (id === "" || this.$store.state.getters.nodeShapes[id]) {
         this.error = true;
       }
       if (!this.error) {
