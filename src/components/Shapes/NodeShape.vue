@@ -110,7 +110,6 @@ export default {
       // FIXME
       const { id } = this.$props;
       const ys = this.$store.state.yValues[id];
-      console.log(this);
       for (const prop of Object.keys(properties)) {
         // The properties should be listed below eachother.
         this.propertyConfigs[prop] = { ...this.propertyConfig, y: ys[prop] };

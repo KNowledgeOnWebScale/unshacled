@@ -41,7 +41,6 @@ export default new Vuex.Store({
         this.commit("updateYValues", shape["@id"]);
         Vue.set(state.coordinates, shape["@id"], { x: 0, y: 0 }); // TODO change default coordinates
       }
-      console.log("YValues updated:", state.yValues);
 
       /*
       const firstName = {

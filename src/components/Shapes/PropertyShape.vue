@@ -70,7 +70,6 @@ export default {
   },
   mounted() {
     // Move the shape to the defined coordinate.
-    console.log(this.$store.state.coordinates, this.$props.id);
     this.$refs.posRef
       .getNode()
       .setPosition(this.$store.state.coordinates[this.$props.id]);

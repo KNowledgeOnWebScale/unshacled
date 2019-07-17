@@ -6,7 +6,7 @@
  */
 function urlToName(url) {
   if (url.indexOf("#") < 0) return url;
-  return url.splice(url.substring(url.lastIndex("#")));
+  return url.substring(url.indexOf("#") + 1);
 }
 
 export { urlToName as default };
