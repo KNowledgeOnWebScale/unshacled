@@ -18,7 +18,10 @@ module.exports = {
         alias: {
           // Util
           Traverse: "./src/util/traverse",
-          Examples: "./src/util/examples"
+          Examples: "./src/util/examples",
+          // Translate
+          ShaclDictionary: "./src/translation/shacl-dictionary",
+          ShaclTranslator: "./src/translation/shacl-translator"
         }
       }
     ]
