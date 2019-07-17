@@ -78,8 +78,7 @@ export default {
         ).then(
           // eslint-disable-next-line no-return-assign
           e => {
-            self.$store.state.internalModel = e;
-            console.log(self.$store.state.internalModel);
+            self.$store.state.internalModel = `${e}`;
           }
         );
       };
