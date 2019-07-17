@@ -139,10 +139,6 @@ export default new Vuex.Store({
       // Update yValues
       Vue.set(state.yValues, newID, state.yValues[oldID]);
       Vue.delete(state.yValues, oldID);
-      state.yValues[newID] = {
-        ...state.yValues[newID],
-        "@id": newID
-      };
     },
 
     /**
@@ -152,6 +148,7 @@ export default new Vuex.Store({
      */
     deleteNodeShape(state, id) {
       Vue.delete(state.nodeShapes, id);
+      Vue.delete(state.coordinates, id);
     },
 
     /**
@@ -174,12 +171,20 @@ export default new Vuex.Store({
 
       // Remove the old value from the list of properties.
       state.nodeShapes[node].properties.splice(index, 1, newID);
+      this.commit("updateYValues", node);
+    },
 
+    /**
+     * Update the y values of the properties of the given node.
+     * @param state
+     * @param nodeID
+     */
+    updateYValues(state, nodeID) {
       // Update the y values of the properties.
-      Vue.set(state.yValues, node, {});
+      Vue.set(state.yValues, nodeID, {});
       let i = 1;
-      for (const prop of state.nodeShapes[node].properties) {
-        Vue.set(state.yValues[node], prop, i * HEIGHT);
+      for (const prop of state.nodeShapes[nodeID].properties) {
+        Vue.set(state.yValues[nodeID], prop, i * HEIGHT);
         i += 1;
       }
     },
@@ -212,12 +217,7 @@ export default new Vuex.Store({
 
       // Update the y values of the properties.
       for (const n in state.nodeShapes) {
-        Vue.set(state.yValues, n, {});
-        let i = 1;
-        for (const prop of state.nodeShapes[n].properties) {
-          Vue.set(state.yValues[n], prop, i * HEIGHT);
-          i += 1;
-        }
+        this.commit("updateYValues", n);
       }
     },
 
@@ -239,12 +239,7 @@ export default new Vuex.Store({
         ...state.nodeShapes
       };
 
-      // Update the y values of the properties.
-      let i = 1;
-      for (const prop of state.nodeShapes[node].properties) {
-        Vue.set(state.yValues[node], prop, i * HEIGHT);
-        i += 1;
-      }
+      this.commit("updateYValues", node);
     },
 
     /**
@@ -265,7 +260,19 @@ export default new Vuex.Store({
      * @param id
      */
     deletePropertyShape(state, id) {
+      // Check every nodeShape if it contains the given property.
+      for (const nodeID in state.nodeShapes) {
+        const node = state.nodeShapes[nodeID];
+        const index = node.properties.indexOf(id);
+        if (index !== -1) {
+          // Delete the property from the node and update the y values.
+          node.properties.splice(index, 1);
+          this.commit("updateYValues", nodeID);
+        }
+      }
+      // Remove the property from the state
       Vue.delete(state.propertyShapes, id);
+      Vue.delete(state.coordinates, id);
     },
 
     /**
