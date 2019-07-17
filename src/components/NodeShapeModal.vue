@@ -54,12 +54,12 @@ export default {
       this.error = false;
       const id = this.idString;
       // Checks if name is a unique key, also checking propertyshapes
-      for (const prop in this.$store.state.propertyShapes) {
-        if (this.$store.state.propertyShapes[prop]["@id"] === id)
+      for (const prop in this.$store.getters.propertyShapes) {
+        if (this.$store.getters.propertyShapes[prop]["@id"] === id)
           this.error = true;
       }
       // Only commit if the name is unique. Otherwise, show an error message.
-      if (id === "" || this.$store.state.getters.nodeShapes[id]) {
+      if (id === "" || this.$store.getters.nodeShapes[id]) {
         this.error = true;
       }
       if (!this.error) {

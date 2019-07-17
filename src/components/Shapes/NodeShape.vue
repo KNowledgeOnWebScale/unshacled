@@ -91,13 +91,16 @@ export default {
      * @returns an object mapping every property name to a property object.
      */
     getProperties() {
-      const { id } = this.$props;
-      const properties = {};
-      for (const prop of this.$store.state.getters.nodeShapes[id].properties) {
-        properties[prop] = this.$store.state.propertyShapes[prop];
-      }
-      this.setPropConfigs(properties);
-      return properties;
+      console.log(this.$props.id);
+      console.log(this.$store.getters.nodeProperties(this.$props.id));
+      return this.$store.getters.nodeProperties(this.$props.id);
+      // const { id } = this.$props;
+      // const properties = {};
+      // for (const prop of this.$store.getters.nodeShapes[id].properties) {
+      //   properties[prop] = this.$store.getters.propertyShapes[prop];
+      // }
+      // this.setPropConfigs(properties);
+      // return properties;
     },
 
     /**
@@ -137,7 +140,7 @@ export default {
      */
     stopEditing(newValue) {
       // Check if the new value is valid and unique.
-      if (newValue !== "" && !this.$store.state.getters.nodeShapes[newValue]) {
+      if (newValue !== "" && !this.$store.getters.nodeShapes[newValue]) {
         const args = {
           oldID: this.$props.id,
           newID: newValue

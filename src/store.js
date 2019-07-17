@@ -10,7 +10,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     editor: null,
-    model: null,
+    model: [],
     format: format.SHACL,
     // nodeShapes: {}, // TODO remove this
     // propertyShapes: {}, // TODO remove this
@@ -33,8 +33,8 @@ export default new Vuex.Store({
       console.log("Loading example...");
 
       const example = EXAMPLE.model[0];
-      console.log(example);
-      state.model = Vue.util.extend({}, example[0]); // Deep copy
+      console.log("Example:", example);
+      state.model = Vue.util.extend([], example); // Deep copy
 
       // TODO update y values
       // TODO update coordinates
@@ -340,7 +340,7 @@ export default new Vuex.Store({
         shape["https://2019.summerofcode.be/unshacled#property"];
 
       for (const p in properties) {
-        if (properties[p]["@id"]) {
+        if (properties[p]["@id"] === prop) {
           // Delete the property from the node and update the y values.
           properties.splice(p, 1);
         }
@@ -423,7 +423,7 @@ export default new Vuex.Store({
      * @param state
      * @returns {null}
      */
-    validators(state) {
+    validators: state => {
       return getConstraints(state.format);
     },
 
@@ -433,7 +433,7 @@ export default new Vuex.Store({
      * @param id
      * @returns {null}
      */
-    shapeWithID(state, id) {
+    shapeWithID: state => id => {
       for (const item of state.model) {
         if (item["@id"] === id) return item;
       }
@@ -446,7 +446,7 @@ export default new Vuex.Store({
      * @param id
      * @returns {string|number}
      */
-    indexWithID(state, id) {
+    indexWithID: state => id => {
       for (const i in state.model) {
         if (state.model[i]["@id"] === id) return i;
       }
@@ -457,7 +457,7 @@ export default new Vuex.Store({
      * TODO
      * @param state
      */
-    nodeShapes(state) {
+    nodeShapes: state => {
       const nodeShapes = {};
       for (const item of state.model) {
         if (item["@type"]) {
@@ -471,7 +471,7 @@ export default new Vuex.Store({
      * TODO
      * @param state
      */
-    propertyShapes(state) {
+    propertyShapes: state => {
       const propertyShapes = {};
       for (const item of state.model) {
         if (!item["@type"]) {
@@ -484,11 +484,16 @@ export default new Vuex.Store({
     /**
      * TODO
      * @param state
-     * @param nodeID
-     * @returns {Array}
+     * @returns {function(*): Array}
      */
-    nodeProperties(state, nodeID) {
-      const node = state.nodeShapes[nodeID];
+    nodeProperties: state => nodeID => {
+      let node;
+      for (const item of state.model) {
+        if (item["@id"] === nodeID) {
+          node = item;
+        }
+      }
+
       const propertyObjects =
         node["https://2019.summerofcode.be/unshacled#property"];
 
@@ -505,11 +510,9 @@ export default new Vuex.Store({
         "https://2019.summerofcode.be/unshacled#property",
         "https://2019.summerofcode.be/unshacled#targetNode"
       ];
-      for (const p of node) {
+      for (const p in node) {
         // TODO check if this works as intended
-        if (!ignored.includes(p)) {
-          properties.push(p[0]["@id"]);
-        }
+        if (!ignored.includes(p)) properties.push(p[0]["@id"]);
       }
       return properties;
     }

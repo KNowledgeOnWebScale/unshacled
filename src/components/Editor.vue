@@ -1,13 +1,13 @@
 <template>
   <v-stage ref="stage" :config="configKonva" @wheel="scroll">
     <v-layer>
-      <div v-for="(obj, key) in this.$store.state.getters.nodeShapes" :key="key">
+      <div v-for="(obj, key) in this.$store.getters.nodeShapes" :key="key">
         <node-shape :id="key" @click="print(key)"></node-shape>
       </div>
       <!--      <div v-for="(obj, key) in this.$store.state.relationships" :key="key">-->
       <!--        <relationship :coords="obj.coords"></relationship>-->
       <!--      </div>-->
-      <div v-for="(obj, key) in this.$store.state.propertyShapes" :key="key">
+      <div v-for="(obj, key) in this.$store.getters.propertyShapes" :key="key">
         <property-shape :id="key"></property-shape>
       </div>
     </v-layer>
@@ -33,6 +33,10 @@ export default {
     };
   },
 
+  beforeMount() {
+    console.log("nodeShapes", this.$store.getters.nodeShapes);
+    console.log("propertyShapes", this.$store.getters.propertyShapes);
+  },
   mounted() {
     this.$store.commit("setEditor", this.$refs.stage.getNode());
     window.addEventListener("resize", this.handleResize);
