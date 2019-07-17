@@ -1,4 +1,4 @@
-import { SHACLTranslator } from "./shacl-translator";
+import SHACLTranslator from "./shacl-translator";
 
 /**
  *  TranslatorManager assigns translation tasks to the correct translator
