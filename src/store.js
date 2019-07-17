@@ -16,7 +16,7 @@ export default new Vuex.Store({
     yValues: {},
     coordinates: {},
     showNodeShapeModal: false,
-    file: null
+    file: {}
   },
   mutations: {
     setEditor(state, reference) {

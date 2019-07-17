@@ -4,7 +4,7 @@
       <sui-dropdown item icon="file alternate" simple>
         <sui-dropdown-menu>
           <sui-dropdown-item
-            ><input id="file" type="file"  @change="readTextFile()"
+            ><input id="file" type="file" @change="readTextFile()"
           /></sui-dropdown-item>
           <sui-dropdown-item>Export</sui-dropdown-item>
           <sui-dropdown-divider></sui-dropdown-divider>
@@ -38,6 +38,7 @@
 import SuiDropdown from "semantic-ui-vue/dist/commonjs/modules/Dropdown/Dropdown";
 import SuiDropdownDivider from "semantic-ui-vue/dist/commonjs/modules/Dropdown/DropdownDivider";
 import NodeShapeModal from "./NodeShapeModal.vue";
+import
 
 export default {
   name: "NavBar",
@@ -67,9 +68,12 @@ export default {
       const file = document.getElementById("file").files[0];
       const reader = new FileReader();
       reader.readAsText(file);
+      const self = this;
       reader.onload = function(event) {
-        console.log(event.target.result);
+        self.$store.state.file.content = event.target.result;
+        self.$store.state.file.fileExtension = file.name.split(".").pop();
       };
+
     }
   }
 };
