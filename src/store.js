@@ -4,6 +4,7 @@ import { format } from "./util/enums/format";
 import { getConstraints } from "./util/constraintSelector";
 import { HEIGHT } from "./util/konvaConfigs";
 import EXAMPLE from "./util/examples";
+import urlToName from "./util/nameParser";
 
 Vue.use(Vuex);
 
@@ -33,11 +34,14 @@ export default new Vuex.Store({
       console.log("Loading example...");
 
       const example = EXAMPLE.model[0];
-      console.log("Example:", example);
       state.model = Vue.util.extend([], example); // Deep copy
 
-      // TODO update y values
-      // TODO update coordinates
+      // Update y values and set coordinates to zero
+      for (const shape of state.model) {
+        this.commit("updateYValues", shape["@id"]);
+        Vue.set(state.coordinates, shape["@id"], { x: 0, y: 0 }); // TODO change default coordinates
+      }
+      console.log("YValues updated:", state.yValues);
 
       /*
       const firstName = {
@@ -220,7 +224,7 @@ export default new Vuex.Store({
         const copied = Vue.util.extend({}, state.getters.propertyShapes[oldID]);
         copied["@id"] = newID;
 
-        const name = newID.splice(newID.substring(newID.lastIndex("#")));
+        const name = urlToName(newID);
         copied["https://2019.summerofcode.be/unshacled#path"][0][
           "@id"
         ] = `http://example.org/ns#${name}`;
@@ -263,7 +267,7 @@ export default new Vuex.Store({
       const shape = state.getters.shapeWithID(oldID);
       Vue.set(shape, "@id", newID);
       // Update the path with the new ID
-      const name = newID.splice(newID.substring(newID.lastIndex("#")));
+      const name = urlToName(newID);
       shape["https://2019.summerofcode.be/unshacled#path"][0][
         "@id"
       ] = `http://example.org/ns#${name}`;
@@ -360,8 +364,35 @@ export default new Vuex.Store({
     updateYValues(state, nodeID) {
       // Update the y values of the properties.
       Vue.set(state.yValues, nodeID, {});
+
+      let node;
+      for (const item of state.model) {
+        if (item["@id"] === nodeID) node = item;
+      }
+
+      // FIXME code duplication, find a way to use `nodeProperties` >.<
+      const propertyObjects =
+        node["https://2019.summerofcode.be/unshacled#property"];
+
+      // Get the references to property shapes
+      const properties = [];
+      if (propertyObjects) {
+        for (const p of propertyObjects) properties.push(p["@id"]);
+      }
+
+      // Get the other properties
+      const ignored = [
+        "@id",
+        "@type",
+        "https://2019.summerofcode.be/unshacled#property",
+        "https://2019.summerofcode.be/unshacled#targetNode"
+      ];
+      for (const p in node) {
+        if (!ignored.includes(p)) properties.push(p[0]["@id"]);
+      }
+
       let i = 1;
-      for (const prop of state.getters.properties(nodeID)) {
+      for (const prop of properties) {
         Vue.set(state.yValues[nodeID], prop, i * HEIGHT);
         i += 1;
       }

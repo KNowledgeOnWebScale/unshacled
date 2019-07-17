@@ -36,6 +36,7 @@
 <script>
 import NodeProperty from "./NodeProperty.vue";
 import ReactiveInput from "../ReactiveInput.vue";
+import urlToName from "../../util/nameParser";
 import {
   DELETE_NODE_CONFIG,
   DELETE_PROP_CONFIG,
@@ -68,7 +69,7 @@ export default {
       deleteNodeConfig: DELETE_NODE_CONFIG,
       idTextConfig: {
         ...ID_TEXT_CONFIG,
-        text: this.$props.id
+        text: urlToName(this.$props.id)
       },
       propertyConfig: PROPERTY_CONFIG,
       propTextConfig: {
@@ -91,16 +92,14 @@ export default {
      * @returns an object mapping every property name to a property object.
      */
     getProperties() {
-      console.log(this.$props.id);
-      console.log(this.$store.getters.nodeProperties(this.$props.id));
-      return this.$store.getters.nodeProperties(this.$props.id);
-      // const { id } = this.$props;
-      // const properties = {};
-      // for (const prop of this.$store.getters.nodeShapes[id].properties) {
-      //   properties[prop] = this.$store.getters.propertyShapes[prop];
-      // }
-      // this.setPropConfigs(properties);
-      // return properties;
+      const propNames = this.$store.getters.nodeProperties(this.$props.id);
+      const nodeObjects = this.$store.getters.nodeShapes;
+      const propObjects = {};
+      for (const prop of propNames) {
+        propObjects[prop] = nodeObjects[prop];
+      }
+      this.setPropConfigs(propObjects);
+      return propObjects;
     },
 
     /**
@@ -108,8 +107,10 @@ export default {
      * @param properties a dictionary containing the node shape's properties.
      */
     setPropConfigs(properties) {
+      // FIXME
       const { id } = this.$props;
       const ys = this.$store.state.yValues[id];
+      console.log(this);
       for (const prop of Object.keys(properties)) {
         // The properties should be listed below eachother.
         this.propertyConfigs[prop] = { ...this.propertyConfig, y: ys[prop] };

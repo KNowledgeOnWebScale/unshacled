@@ -4,7 +4,7 @@
       <sui-dropdown item icon="file alternate" simple>
         <sui-dropdown-menu>
           <sui-dropdown-item
-            ><input id="file" type="file"  @change="readTextFile()"
+            ><input id="file" type="file" @change="readTextFile()"
           /></sui-dropdown-item>
           <sui-dropdown-item>Export</sui-dropdown-item>
           <sui-dropdown-divider></sui-dropdown-divider>
