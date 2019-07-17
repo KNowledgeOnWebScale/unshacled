@@ -38,7 +38,7 @@
 import SuiDropdown from "semantic-ui-vue/dist/commonjs/modules/Dropdown/Dropdown";
 import SuiDropdownDivider from "semantic-ui-vue/dist/commonjs/modules/Dropdown/DropdownDivider";
 import NodeShapeModal from "./NodeShapeModal.vue";
-import { ParserManager } from "../parsing/parser-manager";
+import { ParserManager } from "../parsing/parserManager";
 
 export default {
   name: "NavBar",
