@@ -41,66 +41,6 @@ export default new Vuex.Store({
         this.commit("updateYValues", shape["@id"]);
         Vue.set(state.coordinates, shape["@id"], { x: 0, y: 0 }); // TODO change default coordinates
       }
-
-      /*
-      const firstName = {
-        path: "foaf:firstName",
-        maxCount: 1,
-        minCount: 1,
-        datatype: "xsd:string"
-      };
-      const lastName = {
-        path: "foaf:lastName",
-        maxCount: 1,
-        minCount: 1,
-        datatype: "xsd:string"
-      };
-
-      const idAlice = "ex:Alice";
-      const idBob = "ex:Bob";
-      const idFirstName = "foaf:firstName";
-      const idLastName = "foaf:lastName";
-
-      const alice = {
-        "@id": idAlice,
-        "@type": "ex:Person",
-        properties: [idFirstName, idLastName]
-      };
-      const bob = {
-        "@id": idBob,
-        "@type": "ex:Person",
-        properties: [idFirstName, idLastName]
-      };
-
-      state.nodeShapes = {};
-      state.nodeShapes[idBob] = bob;
-      state.nodeShapes[idAlice] = alice;
-
-      state.propertyShapes = {};
-      state.propertyShapes[idFirstName] = firstName;
-      state.propertyShapes[idLastName] = lastName;
-
-      // Update the y values of the properties.
-      state.yValues = {};
-      const people = [alice, bob];
-      for (const p in people) {
-        const ys = {};
-        let i = 1;
-        for (const prop of people[p].properties) {
-          ys[prop] = i * HEIGHT;
-          i += 1;
-        }
-        state.yValues[people[p]["@id"]] = ys;
-      }
-      state.coordinates[idAlice] = { x: 0, y: 0 };
-      state.coordinates[idBob] = { x: 200, y: 200 };
-      state.coordinates[idFirstName] = { x: 100, y: 350 };
-      state.coordinates[idLastName] = { x: 100, y: 400 };
-      this.commit("addRelationship", {
-        one: idAlice,
-        two: idBob
-      });
-      */
     },
 
     /* ADD ========================================================================================================== */
@@ -541,7 +481,6 @@ export default new Vuex.Store({
         "https://2019.summerofcode.be/unshacled#targetNode"
       ];
       for (const p in node) {
-        // TODO check if this works as intended
         if (!ignored.includes(p)) properties.push(p[0]["@id"]);
       }
       return properties;
