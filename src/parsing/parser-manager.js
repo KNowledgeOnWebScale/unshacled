@@ -10,16 +10,17 @@ export class ParserManager {
    * @returns {Promise<any>}
    */
   static parse(doc, type) {
-    switch (type) {
+    switch (type.toLowerCase()) {
       // TODO: Add RDF/XML and other formats
-      case "text/n3":
-      case "text/turtle":
-      case "application/ld+json":
-      case "application/nquads":
-      case "application/n-quads":
+      case "n3":
+      case "ttl":
+      case "json":
+      case "rdf":
+      case "nt":
+      case "nquads":
         return N3Parser.parse(doc, type);
       default:
-        console.log("UNSUPPORTED FORMAT");
+        console.log(`UNSUPPORTED FORMAT${type}`);
     }
   }
 }

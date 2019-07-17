@@ -4,7 +4,7 @@
       <sui-dropdown item icon="file alternate" simple>
         <sui-dropdown-menu>
           <sui-dropdown-item
-            ><input id="file" type="file"  @change="readTextFile()"
+            ><input id="file" type="file" @change="readTextFile()"
           /></sui-dropdown-item>
           <sui-dropdown-item>Export</sui-dropdown-item>
           <sui-dropdown-divider></sui-dropdown-divider>
@@ -38,6 +38,7 @@
 import SuiDropdown from "semantic-ui-vue/dist/commonjs/modules/Dropdown/Dropdown";
 import SuiDropdownDivider from "semantic-ui-vue/dist/commonjs/modules/Dropdown/DropdownDivider";
 import NodeShapeModal from "./NodeShapeModal.vue";
+import { ParserManager } from "../parsing/parser-manager";
 
 export default {
   name: "NavBar",
@@ -63,12 +64,24 @@ export default {
       this.$store.commit("toggleShapeModal");
     },
     readTextFile() {
-      console.log("called");
       const file = document.getElementById("file").files[0];
       const reader = new FileReader();
+      const fileExtension = file.name.split(".").pop();
+      const self = this;
       reader.readAsText(file);
       reader.onload = function(event) {
-        console.log(event.target.result);
+        self.$store.state.file.content = event.target.result;
+        self.$store.state.file.fileExtension = fileExtension;
+        ParserManager.parse(
+          self.$store.state.file.content,
+          self.$store.state.file.fileExtension
+        ).then(
+          // eslint-disable-next-line no-return-assign
+          e => {
+            self.$store.state.internalModel = e;
+            console.log(self.$store.state.internalModel);
+          }
+        );
       };
     }
   }
