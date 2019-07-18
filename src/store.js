@@ -16,8 +16,10 @@ export default new Vuex.Store({
     yValues: {},
     coordinates: {},
     showNodeShapeModal: false,
+    showValidationReportModal: true,
     file: {},
-    internalModel: {}
+    internalModel: {},
+    validationReport: "hello"
   },
   mutations: {
     setEditor(state, reference) {
@@ -190,6 +192,11 @@ export default new Vuex.Store({
       }
     },
 
+    toggleValidationReport(state) {
+      event.preventDefault();
+      state.showValidationReportModal = !state.showValidationReportModal;
+    },
+
     /**
      * Edit the ID of a property shape.
      * This will update the property list of every node shape that contains this property shape.
@@ -350,6 +357,9 @@ export default new Vuex.Store({
   getters: {
     getValidators: state => {
       return getConstraints(state.format);
+    },
+    getValidationReport: state => {
+      return state.ValidationReport;
     }
   }
 });
