@@ -3,6 +3,8 @@ import Vuex from "vuex";
 import { format } from "./util/enums/format";
 import { getConstraints } from "./util/constraintSelector";
 import { HEIGHT } from "./util/konvaConfigs";
+import { ParserManager } from "./parsing/parserManager";
+import { TranslatorManager } from "./translation/translatorManager";
 
 Vue.use(Vuex);
 
@@ -17,11 +19,41 @@ export default new Vuex.Store({
     coordinates: {},
     showNodeShapeModal: false,
     showValidationReportModal: true,
-    file: {},
     internalModel: {},
     validationReport: "hello"
+    dataFile: {},
   },
   mutations: {
+    /**
+     * Takes a file, reads the extension and depending on the format uses the correct parser to turn it into an intern model
+     * @param state
+     * @param file The uploaded file
+     * */
+    uploadSchemaFile(state, file) {
+      const reader = new FileReader();
+      const fileExtension = file.name.split(".").pop();
+      reader.readAsText(file);
+      reader.onload = function(event) {
+        ParserManager.parse(event.target.result, fileExtension).then(e => {
+          state.internalModel = `${e}`;
+        });
+      };
+    },
+
+    /**
+     * Recieves a datafile and takes its content to the state
+     * @param state
+     * @param file The file containing data to check on
+     * */
+    uploadDataFile(state, file) {
+      const reader = new FileReader();
+      reader.readAsText(file);
+      reader.onload = function(event) {
+        console.log(event.target.result);
+        state.dataFile = event.target.result;
+      };
+    },
+
     setEditor(state, reference) {
       state.editor = reference;
     },
@@ -359,7 +391,27 @@ export default new Vuex.Store({
       return getConstraints(state.format);
     },
     getValidationReport: state => {
-      return state.ValidationReport;
+      return state.ValidationReport;},
+    /**
+     * Returns the Json Internal model
+     * */
+    getInternalModelInJson: state => {
+      return state.internalModel;
+    },
+    /**
+     * Returns the internal model in ttl format
+     * */
+    getInternalModelInTurtle: state => {
+      return TranslatorManager.translateToLanguage(
+        state.internalModel,
+        state.format
+      );
+    },
+    /**
+     * Returns the data to validate.
+     * */
+    getDataFile: state => {
+      return state.dataFile;
     }
   }
 });
