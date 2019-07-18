@@ -3,6 +3,7 @@ import Vuex from "vuex";
 import { format } from "./util/enums/format";
 import { getConstraints } from "./util/constraintSelector";
 import { HEIGHT } from "./util/konvaConfigs";
+import { ParserManager } from "./parsing/parserManager";
 
 Vue.use(Vuex);
 
@@ -16,13 +17,26 @@ export default new Vuex.Store({
     yValues: {},
     coordinates: {},
     showNodeShapeModal: false,
-    file: {},
+    dataFile: {},
     internalModel: {}
   },
   mutations: {
+    uploadSchemaFile(state, file) {
+      const reader = new FileReader();
+      const fileExtension = file.name.split(".").pop();
+      reader.readAsText(file);
+      reader.onload = function(event) {
+        ParserManager.parse(event.target.result, fileExtension).then(e => {
+          state.internalModel = `${e}`;
+        });
+      };
+    },
+
     setEditor(state, reference) {
       state.editor = reference;
     },
+
+    uploadDataFile(state, contents) {},
 
     /**
      * Load in some example data

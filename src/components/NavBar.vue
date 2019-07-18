@@ -65,23 +65,7 @@ export default {
     },
     readTextFile() {
       const file = document.getElementById("file").files[0];
-      const reader = new FileReader();
-      const fileExtension = file.name.split(".").pop();
-      const self = this;
-      reader.readAsText(file);
-      reader.onload = function(event) {
-        self.$store.state.file.content = event.target.result;
-        self.$store.state.file.fileExtension = fileExtension;
-        ParserManager.parse(
-          self.$store.state.file.content,
-          self.$store.state.file.fileExtension
-        ).then(
-          // eslint-disable-next-line no-return-assign
-          e => {
-            self.$store.state.internalModel = `${e}`;
-          }
-        );
-      };
+      this.$store.commit("uploadSchemaFile", file);
     }
   }
 };
