@@ -52,6 +52,7 @@ export default new Vuex.Store({
      */
     addShape(state, object) {
       state.model.push(object);
+      console.log(object);
       Vue.set(state.coordinates, object["@id"], { x: 0, y: 0 });
     },
 
@@ -106,19 +107,15 @@ export default new Vuex.Store({
     updatePropertyShapeID(state, args) {
       const { shape, newID } = args;
       Vue.set(shape, "@id", newID);
-      console.log(shape["@id"]);
 
-      // Update the path with the new ID
+      // Update the path with the new ID.
       const name = urlToName(newID);
       shape["https://2019.summerofcode.be/unshacled#path"][0][
         "@id"
       ] = `http://example.org/ns#${name}`;
 
-      // Update the ID in every node
-
-      console.log(
-        shape["https://2019.summerofcode.be/unshacled#path"][0]["@id"]
-      );
+      // Update the ID in every node.
+      // for (const n of )
     },
 
     /**
@@ -279,9 +276,10 @@ export default new Vuex.Store({
      * @param id
      */
     addNodeShape(store, id) {
+      console.log("addNodeShape");
       this.commit("addShape", {
         "@id": id,
-        "@type:": ["https://2019.summerofcode.be/unshacled#NodeShape"],
+        "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [],
         "https://2019.summerofcode.be/unshacled#targetNode": []
       });
@@ -293,6 +291,7 @@ export default new Vuex.Store({
      * @param id
      */
     addPropertyShape(store, id) {
+      console.log("addPropertyShape");
       this.commit("addShape", {
         "@id": id,
         "https://2019.summerofcode.be/unshacled#path": [
@@ -400,7 +399,6 @@ export default new Vuex.Store({
       this.commit("deletePropertyFromShape", { shape, propertyID: oldID });
       // Update the y values
       this.commit("updateYValues", node);
-      console.log(store);
     },
 
     /**
@@ -422,6 +420,7 @@ export default new Vuex.Store({
           propertyID: oldID
         });
         this.commit("addPropertyIDToShape", { shape: node, propertyID: newID });
+        this.commit("deletePropertyFromShape", { shape: node, propertyID: oldID });
       }
       this.commit("updateLocations", { oldID, newID });
 
@@ -536,6 +535,7 @@ export default new Vuex.Store({
       const nodeShapes = {};
       for (const item of state.model) {
         if (item["@type"]) {
+          console.log(item["@id"]);
           nodeShapes[item["@id"]] = item;
         }
       }

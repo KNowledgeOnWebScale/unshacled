@@ -27,6 +27,7 @@
 
 <script>
 import ReactiveInput from "../ReactiveInput.vue";
+import { urlToName } from "../../util/nameParser";
 import {
   DELETE_NODE_CONFIG,
   ID_TEXT_CONFIG,
@@ -58,12 +59,12 @@ export default {
       deleteNodeConfig: DELETE_NODE_CONFIG,
       idTextConfig: {
         ...ID_TEXT_CONFIG,
-        text: this.$props.id
+        text: urlToName(this.$props.id)
       },
       propertyConfig: PROPERTY_CONFIG,
       propTextConfig: {
         ...PROP_TEXT_CONFIG,
-        text: this.$props.propKey
+        text: urlToName(this.$props.propKey)
       },
       deletePropConfig: DELETE_NODE_CONFIG
     };

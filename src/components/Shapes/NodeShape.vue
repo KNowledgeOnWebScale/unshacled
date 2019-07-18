@@ -74,7 +74,7 @@ export default {
       propertyConfig: PROPERTY_CONFIG,
       propTextConfig: {
         ...PROP_TEXT_CONFIG,
-        text: this.$props.propKey
+        text: urlToName(this.$props.propKey)
       },
       deletePropConfig: DELETE_PROP_CONFIG
     };

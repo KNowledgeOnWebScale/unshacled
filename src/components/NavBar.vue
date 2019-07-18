@@ -63,7 +63,7 @@ export default {
       this.$store.commit("toggleShapeModal");
     },
     readTextFile() {
-      console.log("called");
+      console.log("Reading text file...");
       const file = document.getElementById("file").files[0];
       const reader = new FileReader();
       reader.readAsText(file);

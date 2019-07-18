@@ -5,7 +5,7 @@
         Add a {{ isPropertyShapeModal ? "Property" : "Node" }} Shape
       </sui-modal-header>
       <sui-modal-content>
-        <sui-form v-on:submit.prevent="confirmNodeShape">
+        <sui-form @submit.prevent="confirmNodeShape">
           <sui-form-field id="shapeNodeField" inline>
             <label for="shapeNodeID">ID</label>
             <input id="shapeNodeID" v-model="id" placeholder="Unique ID" />
@@ -24,6 +24,8 @@
 </template>
 
 <script>
+import { createUrl } from "../util/nameParser";
+
 export default {
   name: "NodeShapeModal",
   props: {
@@ -52,7 +54,7 @@ export default {
   methods: {
     confirmNodeShape() {
       this.error = false;
-      const id = this.idString;
+      const id = createUrl(this.idString);
       // Checks if name is a unique key, also checking propertyshapes
       for (const prop in this.$store.getters.propertyShapes) {
         if (this.$store.getters.propertyShapes[prop]["@id"] === id)
@@ -65,9 +67,9 @@ export default {
       if (!this.error) {
         this.toggleShapeModal();
         this.idString = "";
-        if (this.$props.isPropertyShapeModal)
-          this.$store.dispatch("addPropertyShape", id);
-        else this.$store.dispatch("addNodeShape", id);
+        this.$props.isPropertyShapeModal
+          ? this.$store.dispatch("addPropertyShape", id)
+          : this.$store.dispatch("addNodeShape", id);
       }
     },
     toggleShapeModal() {

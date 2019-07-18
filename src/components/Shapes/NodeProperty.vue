@@ -60,8 +60,9 @@ export default {
      */
     stopEditing(newValue) {
       // Check if the new value is valid and unique.
-      const properties = this.$store.getters.nodeShapes[this.$props.node]["https://2019.summerofcode.be/unshacled#property"];
-      console.log(properties);
+      const properties = this.$store.getters.nodeShapes[this.$props.node][
+        "https://2019.summerofcode.be/unshacled#property"
+      ];
       if (newValue !== "" && properties.indexOf(newValue) === -1) {
         const args = {
           node: this.$props.node,
