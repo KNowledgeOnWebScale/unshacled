@@ -18,10 +18,10 @@ export default new Vuex.Store({
     yValues: {},
     coordinates: {},
     showNodeShapeModal: false,
-    showValidationReportModal: true,
+    showValidationReportModal: false,
     internalModel: {},
-    validationReport: "hello"
-    dataFile: {},
+    validationReport: "hello",
+    dataFile: {}
   },
   mutations: {
     /**

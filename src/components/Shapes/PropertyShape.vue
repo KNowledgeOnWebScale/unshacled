@@ -141,6 +141,7 @@ export default {
      */
     deletePropertyShape() {
       this.$store.commit("deletePropertyShape", this.$props.id);
+      this.$refs.reactiveInput.stopEditing();
     },
 
     /**

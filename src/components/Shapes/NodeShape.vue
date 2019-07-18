@@ -151,6 +151,7 @@ export default {
      */
     deleteNodeShape() {
       this.$store.commit("deleteNodeShape", this.$props.id);
+      this.$refs.reactiveInput.stopEditing();
     },
 
     /**
