@@ -5,6 +5,8 @@ import { getConstraints } from "./util/constraintSelector";
 import { HEIGHT } from "./util/konvaConfigs";
 import EXAMPLE from "./util/examples";
 import { urlToName, extractUrl } from "./util/nameParser";
+import { ParserManager } from "./parsing/parserManager";
+import { TranslatorManager } from "./translation/translatorManager";
 
 Vue.use(Vuex);
 
@@ -17,9 +19,42 @@ export default new Vuex.Store({
     yValues: {},
     coordinates: {},
     showNodeShapeModal: false,
-    file: null
+    showValidationReportModal: false,
+    internalModel: {},
+    validationReport: "hello",
+    dataFile: {}
   },
   mutations: {
+    /**
+     * Takes a file, reads the extension and depending on the format uses the correct parser to turn it into an intern model
+     * @param state
+     * @param file The uploaded file
+     * */
+    uploadSchemaFile(state, file) {
+      const reader = new FileReader();
+      const fileExtension = file.name.split(".").pop();
+      reader.readAsText(file);
+      reader.onload = function(event) {
+        ParserManager.parse(event.target.result, fileExtension).then(e => {
+          state.internalModel = `${e}`;
+        });
+      };
+    },
+
+    /**
+     * Recieves a datafile and takes its content to the state
+     * @param state
+     * @param file The file containing data to check on
+     * */
+    uploadDataFile(state, file) {
+      const reader = new FileReader();
+      reader.readAsText(file);
+      reader.onload = function(event) {
+        console.log(event.target.result);
+        state.dataFile = event.target.result;
+      };
+    },
+
     /**
      * Save a reference to the editor.
      * @param state
@@ -121,6 +156,11 @@ export default new Vuex.Store({
 
       // Update the ID in every node.
       // for (const n of )
+    },
+
+    toggleValidationReport(state) {
+      event.preventDefault();
+      state.showValidationReportModal = !state.showValidationReportModal;
     },
 
     /**
@@ -592,6 +632,45 @@ export default new Vuex.Store({
         if (!ignored.includes(p)) properties.push(p[0]["@id"]);
       }
       return properties;
+    },
+
+    /**
+     * TODO
+     * @param state
+     * @returns {string}
+     */
+    getValidationReport: state => {
+      return state.ValidationReport;
+    },
+
+    /**
+     * Returns the Json Internal model.
+     * @param state
+     * @returns {state.internalModel|{}|string}
+     */
+    getInternalModelInJson: state => {
+      return state.internalModel;
+    },
+
+    /**
+     * Returns the internal model in ttl format.
+     * @param state
+     * @returns {any}
+     */
+    getInternalModelInTurtle: state => {
+      return TranslatorManager.translateToLanguage(
+        state.internalModel,
+        state.format
+      );
+    },
+
+    /**
+     * Returns the data to validate.
+     * @param state
+     * @returns {state.dataFile|{}}
+     */
+    getDataFile: state => {
+      return state.dataFile;
     }
   }
 });

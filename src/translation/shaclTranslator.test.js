@@ -1,5 +1,5 @@
 import examples from "Examples";
-import SHACLTranslator from "./shacl-translator";
+import ShaclTranslator from "./shaclTranslator";
 
 /**
  * naiveCopy copies an object by serializing and parsing it, not efficient but good enough for unit tests
@@ -12,14 +12,14 @@ function naiveCopy(object) {
 
 test("translate SHACL to model", async () => {
   for (let i = 0; i < examples.shacl.length; ++i) {
-    const model = await SHACLTranslator.toModel(naiveCopy(examples.shacl[i]));
+    const model = await ShaclTranslator.toModel(naiveCopy(examples.shacl[i]));
     expect(JSON.stringify(model)).toBe(JSON.stringify(examples.model[i]));
   }
 });
 
 test("translate model to SHACL", async () => {
   for (let i = 0; i < examples.shacl.length; ++i) {
-    const shacl = await SHACLTranslator.toSHACL(naiveCopy(examples.model[i]));
+    const shacl = await ShaclTranslator.toSHACL(naiveCopy(examples.model[i]));
     expect(JSON.stringify(shacl)).toBe(JSON.stringify(examples.shacl[i]));
   }
 });
@@ -41,6 +41,6 @@ test("translate dictionary to model", async () => {
       "http://www.w3.org/ns/shacl#sparql",
     ]
   };
-  const translated = await SHACLTranslator.toModel(naiveCopy(shaclDictionary));
+  const translated = await ShaclTranslator.toModel(naiveCopy(shaclDictionary));
   expect(JSON.stringify(translated)).toBe(JSON.stringify(modelDictionary));
 });

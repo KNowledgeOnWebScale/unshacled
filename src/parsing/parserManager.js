@@ -1,16 +1,18 @@
-import { N3Parser, XMLParser } from "./parsers";
-
+import { N3Parser } from "./parsers";
+import { ETF } from "../util/enums/extensionToFormat";
 /**
  *  ParserManager retrieves the correct parser for the format of RDF (Turtle, RDF/XML, ...)
  */
 export class ParserManager {
   /**
+   * TODO
    * @param doc
    * @param type
    * @returns {Promise<any>}
    */
-  static parse(doc, type) {
-    switch (type) {
+  static parse(doc, extension) {
+    const type = ETF[extension];
+    switch (type.toLowerCase()) {
       // TODO: Add RDF/XML and other formats
       case "text/n3":
       case "text/turtle":
@@ -19,7 +21,9 @@ export class ParserManager {
       case "application/n-quads":
         return N3Parser.parse(doc, type);
       default:
-        console.log("UNSUPPORTED FORMAT");
+        console.log(`UNSUPPORTED FORMAT${type}`);
     }
   }
 }
+
+export { ParserManager as default };

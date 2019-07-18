@@ -1,4 +1,4 @@
-import SHACLTranslator from "./shacl-translator";
+import ShaclTranslator from "./shaclTranslator";
 
 /**
  *  TranslatorManager assigns translation tasks to the correct translator
@@ -14,7 +14,7 @@ export class TranslatorManager {
     switch (lang) {
       case "SHACL":
       case "shacl":
-        return SHACLTranslator.toModel(doc);
+        return ShaclTranslator.toModel(doc);
       case "ShEx":
       case "shex":
         console.log("SHEX IS NOT YET SUPPORTED");
@@ -34,7 +34,7 @@ export class TranslatorManager {
     switch (lang) {
       case "SHACL":
       case "shacl":
-        return SHACLTranslator.toSHACL(doc);
+        return ShaclTranslator.toSHACL(doc);
       case "ShEx":
       case "shex":
         console.log("SHEX IS NOT YET SUPPORTED");

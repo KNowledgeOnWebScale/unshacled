@@ -142,11 +142,12 @@ export default {
      * Delete this node shape.
      */
     deletePropertyShape() {
+      this.$refs.reactiveInput.stopEditing();
       this.$store.dispatch("deletePropertyShape", this.$props.id);
     },
 
     /**
-     * Takes the coördinates from this node shape and calls store to update them.
+     * Takes the coordinates from this node shape and calls store to update them.
      */
     updateCoordinates() {
       const pos = this.$refs.posRef.getNode().position();

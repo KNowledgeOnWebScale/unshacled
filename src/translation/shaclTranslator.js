@@ -1,16 +1,16 @@
 import traverse from "Traverse";
-import dictionary from "./shacl-dictionary";
+import dictionary from "./shaclDictionary";
 /**
  *  ShaclTranslator class translates SHACL JSON-LD to an internal model and back
  */
-export default class SHACLTranslator {
+export default class ShaclTranslator {
   /**
    * Replaces all SHACL URI's with model URI's
    * @param shacl SHACL in JSON-LD
    * @returns {any} Translated document
    */
   static toModel(shacl) {
-    return SHACLTranslator.translate(shacl, dictionary.MODEL);
+    return ShaclTranslator.translate(shacl, dictionary.MODEL);
   }
 
   /**
@@ -19,7 +19,7 @@ export default class SHACLTranslator {
    * @returns {any} Translated document
    */
   static toSHACL(model) {
-    return SHACLTranslator.translate(model, dictionary.SHACL);
+    return ShaclTranslator.translate(model, dictionary.SHACL);
   }
 
   /**
