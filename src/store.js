@@ -13,8 +13,6 @@ export default new Vuex.Store({
     editor: null,
     model: [],
     format: format.SHACL,
-    // nodeShapes: {}, // TODO remove this
-    // propertyShapes: {}, // TODO remove this
     // relationships: {}, // TODO remove this
     yValues: {},
     coordinates: {},
@@ -22,6 +20,11 @@ export default new Vuex.Store({
     file: null
   },
   mutations: {
+    /**
+     * Save a reference to the editor.
+     * @param state
+     * @param reference
+     */
     setEditor(state, reference) {
       state.editor = reference;
     },
@@ -34,7 +37,10 @@ export default new Vuex.Store({
       console.log("Loading example...");
 
       const example = EXAMPLE.model[0];
-      state.model = Vue.util.extend([], example); // Deep copy
+      state.model = [];
+      for (const element of example) {
+        state.model.push(Vue.util.extend({}, element)); // Deep copy
+      }
 
       // Update y values and set coordinates to zero
       for (const shape of state.model) {
@@ -52,7 +58,6 @@ export default new Vuex.Store({
      */
     addShape(state, object) {
       state.model.push(object);
-      console.log(object);
       Vue.set(state.coordinates, object["@id"], { x: 0, y: 0 });
     },
 
@@ -276,7 +281,6 @@ export default new Vuex.Store({
      * @param id
      */
     addNodeShape(store, id) {
-      console.log("addNodeShape");
       this.commit("addShape", {
         "@id": id,
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
@@ -291,7 +295,6 @@ export default new Vuex.Store({
      * @param id
      */
     addPropertyShape(store, id) {
-      console.log("addPropertyShape");
       this.commit("addShape", {
         "@id": id,
         "https://2019.summerofcode.be/unshacled#path": [
@@ -420,7 +423,10 @@ export default new Vuex.Store({
           propertyID: oldID
         });
         this.commit("addPropertyIDToShape", { shape: node, propertyID: newID });
-        this.commit("deletePropertyFromShape", { shape: node, propertyID: oldID });
+        this.commit("deletePropertyFromShape", {
+          shape: node,
+          propertyID: oldID
+        });
       }
       this.commit("updateLocations", { oldID, newID });
 
@@ -454,7 +460,7 @@ export default new Vuex.Store({
           shape["https://2019.summerofcode.be/unshacled#property"];
 
         for (const p in properties) {
-          if (properties[p]["@id"]) {
+          if (properties[p]["@id"] === id) {
             // Delete the property from the node and update the y values.
             properties.splice(p, 1);
             this.commit("updateYValues", shape["@id"]);
@@ -493,7 +499,7 @@ export default new Vuex.Store({
   },
   getters: {
     /**
-     * TODO
+     * Get all the constraints for the current format.
      * @param state
      * @returns {null}
      */
@@ -502,9 +508,8 @@ export default new Vuex.Store({
     },
 
     /**
-     * TODO
+     * Get the shape object with the given ID.
      * @param state
-     * @param id
      * @returns {null}
      */
     shapeWithID: state => id => {
@@ -515,9 +520,8 @@ export default new Vuex.Store({
     },
 
     /**
-     * TODO
+     * Get the index of the shape object with the given ID.
      * @param state
-     * @param id
      * @returns {string|number}
      */
     indexWithID: state => id => {
@@ -528,14 +532,13 @@ export default new Vuex.Store({
     },
 
     /**
-     * TODO
+     * Get a dictionary mapping ID's to the respective node shape objects.
      * @param state
      */
     nodeShapes: state => {
       const nodeShapes = {};
       for (const item of state.model) {
         if (item["@type"]) {
-          console.log(item["@id"]);
           nodeShapes[item["@id"]] = item;
         }
       }
@@ -543,7 +546,7 @@ export default new Vuex.Store({
     },
 
     /**
-     * TODO
+     * Get a dictionary mapping ID's to the respective property shape objects.
      * @param state
      */
     propertyShapes: state => {
@@ -557,7 +560,7 @@ export default new Vuex.Store({
     },
 
     /**
-     * TODO
+     * Get a list of property ID's for the node with the given ID.
      * @param state
      * @returns {function(*): Array}
      */
