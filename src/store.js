@@ -1,8 +1,12 @@
+import { clone } from "ramda";
 import Vue from "vue";
 import Vuex from "vuex";
+import EXAMPLE from "./util/examples";
+import { HEIGHT } from "./util/konvaConfigs";
 import { format } from "./util/enums/format";
 import { getConstraints } from "./util/constraintSelector";
-import { HEIGHT } from "./util/konvaConfigs";
+import { urlToName, extractUrl } from "./util/nameParser";
+import { getNonOverlappingCoordinates } from "./util";
 import { ParserManager } from "./parsing/parserManager";
 import { TranslatorManager } from "./translation/translatorManager";
 
@@ -11,10 +15,9 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     editor: null,
+    model: [],
     format: format.SHACL,
-    nodeShapes: {},
-    propertyShapes: {},
-    relationships: {},
+    // relationships: {}, // TODO remove this
     yValues: {},
     coordinates: {},
     showNodeShapeModal: false,
@@ -54,6 +57,11 @@ export default new Vuex.Store({
       };
     },
 
+    /**
+     * Save a reference to the editor.
+     * @param state
+     * @param reference
+     */
     setEditor(state, reference) {
       state.editor = reference;
     },
@@ -64,150 +72,163 @@ export default new Vuex.Store({
      */
     loadExample(state) {
       console.log("Loading example...");
-      const firstName = {
-        path: "foaf:firstName",
-        maxCount: 1,
-        minCount: 1,
-        datatype: "xsd:string"
-      };
-      const lastName = {
-        path: "foaf:lastName",
-        maxCount: 1,
-        minCount: 1,
-        datatype: "xsd:string"
-      };
+      this.commit("clear"); // Clear the existing data first.
 
-      const idAlice = "ex:Alice";
-      const idBob = "ex:Bob";
-      const idFirstName = "foaf:firstName";
-      const idLastName = "foaf:lastName";
-
-      const alice = {
-        "@id": idAlice,
-        "@type": "ex:Person",
-        properties: [idFirstName, idLastName]
-      };
-      const bob = {
-        "@id": idBob,
-        "@type": "ex:Person",
-        properties: [idFirstName, idLastName]
-      };
-
-      state.nodeShapes = {};
-      state.nodeShapes[idBob] = bob;
-      state.nodeShapes[idAlice] = alice;
-
-      state.propertyShapes = {};
-      state.propertyShapes[idFirstName] = firstName;
-      state.propertyShapes[idLastName] = lastName;
-
-      // Update the y values of the properties.
-      state.yValues = {};
-      const people = [alice, bob];
-      for (const p in people) {
-        const ys = {};
-        let i = 1;
-        for (const prop of people[p].properties) {
-          ys[prop] = i * HEIGHT;
-          i += 1;
-        }
-        state.yValues[people[p]["@id"]] = ys;
+      const example = EXAMPLE.model[0];
+      state.model = [];
+      for (const element of example) {
+        state.model.push(clone(element)); // Deep copy
       }
-      state.coordinates[idAlice] = { x: 0, y: 0 };
-      state.coordinates[idBob] = { x: 200, y: 200 };
-      state.coordinates[idFirstName] = { x: 100, y: 350 };
-      state.coordinates[idLastName] = { x: 100, y: 400 };
-      this.commit("addRelationship", {
-        one: idAlice,
-        two: idBob
-      });
+
+      // Update y values and set coordinates to zero
+      for (const shape of state.model) {
+        this.commit("updateYValues", shape["@id"]);
+        const { x, y } = getNonOverlappingCoordinates({
+          coordinates: state.coordinates
+        });
+        Vue.set(state.coordinates, shape["@id"], { x, y });
+      }
     },
 
+    /* ADD ========================================================================================================== */
+
     /**
-     * Add an empty node shape with the given id.
+     * Add the given shape to the state and set its coordinates to zero.
      * @param state
-     * @param id
+     * @param object
      */
-    addNodeShape(state, id) {
-      Vue.set(state.nodeShapes, id, {
-        "@id": id,
-        "@type:": null,
-        properties: []
+    addShape(state, object) {
+      state.model.push(object);
+      const { x, y } = getNonOverlappingCoordinates({
+        coordinates: state.coordinates
       });
+      Vue.set(state.coordinates, object["@id"], { x, y });
     },
 
     /**
-     * Edit the id of the given node shape.
+     * Add a property with the given ID and value to the node with the given ID.
      * @param state
      * @param args
-     *    oldID: the old ID we want to change.
-     *    newID: the new ID for the node shape.
      */
-    editNodeShape(state, args) {
+    addPropertyToShape(state, args) {
+      const { nodeID, propertyID, propertyValue } = args;
+      // FIXME should not be put in list if it is a list already
+      Vue.set(state.model[nodeID], propertyID, [propertyValue]);
+      // TODO complete this
+    },
+
+    /**
+     * Add the given property ID to the given shape.
+     * @param state
+     * @param args
+     *            propertyID the ID of the property that should be added.
+     *            shape the shape the property should be added to.
+     */
+    addPropertyIDToShape(state, args) {
+      const { propertyID, shape } = args;
+      // FIXME this assumes properties, not constraints or targetNodes or sth
+      shape["https://2019.summerofcode.be/unshacled#property"].push({
+        "@id": propertyID
+      });
+    },
+
+    /* EDIT ========================================================================================================= */
+
+    /**
+     * Update the shape's id.
+     * @param state
+     * @param args
+     *            index the index of the shape that should be updated.
+     *            newID the shape's new ID.
+     */
+    updateShapeID(state, args) {
+      const { index, newID } = args;
+      Vue.set(state.model[index], "@id", newID);
+    },
+
+    /**
+     * Update the given property shape's ID.
+     * @param state
+     * @param args
+     *            shape the property shape that should be updated,
+     *            newID the shape's new ID.
+     */
+    updatePropertyShapeID(state, args) {
+      const { shape, newID } = args;
+      Vue.set(shape, "@id", newID);
+
+      // Update the path with the new ID.
+      const name = urlToName(newID);
+      shape["https://2019.summerofcode.be/unshacled#path"][0][
+        "@id"
+      ] = `http://example.org/ns#${name}`;
+
+      // Update the ID in every node.
+      // for (const n of )
+    },
+
+    toggleValidationReport(state) {
+      event.preventDefault();
+      state.showValidationReportModal = !state.showValidationReportModal;
+    },
+
+    /**
+     * Update the coordinates and values of the given shape.
+     * @param state
+     * @param args
+     *            oldID the shape's old ID.
+     *            newID the shape's new ID.
+     */
+    updateLocations(state, args) {
       const { oldID, newID } = args;
-
-      // Update nodeShapes
-      Vue.set(state.nodeShapes, newID, state.nodeShapes[oldID]);
-      Vue.delete(state.nodeShapes, oldID);
-      state.nodeShapes[newID] = {
-        ...state.nodeShapes[newID],
-        "@id": newID
-      };
-
-      // Update Relationships
-      for (let prop in state.relationships) {
-        if (state.relationships[prop].one === oldID)
-          state.relationships[prop].one = newID;
-        if (state.relationships[prop].two === oldID)
-          state.relationships[prop].two = newID;
-        prop = state.relationships[prop].one + state.relationships[prop].two;
-      }
 
       // Update coordinates
       Vue.set(state.coordinates, newID, state.coordinates[oldID]);
       Vue.delete(state.coordinates, oldID);
-      state.coordinates[newID] = {
-        ...state.coordinates[newID],
-        "@id": newID
-      };
 
       // Update yValues
       Vue.set(state.yValues, newID, state.yValues[oldID]);
       Vue.delete(state.yValues, oldID);
     },
 
+    /* DELETE ======================================================================================================= */
+
     /**
-     * Delete the node shape with the given id.
+     * Delete the shape at the given index.
+     * @param state
+     * @param index
+     */
+    deleteShapeAtIndex(state, index) {
+      Vue.delete(state.model, index);
+    },
+
+    /**
+     * Delete the coordinates and y values of the shape with the given id.
      * @param state
      * @param id
      */
-    deleteNodeShape(state, id) {
-      Vue.delete(state.nodeShapes, id);
+    deleteShapeLocations(state, id) {
       Vue.delete(state.coordinates, id);
+      Vue.delete(state.yValues, id);
     },
 
     /**
-     * Edit the given property in the given node shape.
-     * If the new property ID already exists, this will make a copy
+     * Delete the property with the given ID from the given shape.
      * @param state
      * @param args
+     *            shape the shape from which the property should be removed..
+     *            propertyID the ID of the property that should be removed.
      */
-    editProperty(state, args) {
-      const { node, oldID, newID } = args;
-
-      const index = state.nodeShapes[node].properties.indexOf(oldID);
-      // Check if the new property name is already an existing PropertyShape.
-      if (!state.propertyShapes[newID]) {
-        // If not, create a new PropertyShape that's a copy of the original one.
-        const copied = { ...state.propertyShapes[oldID] };
-        Vue.set(state.propertyShapes, newID, copied);
-        Vue.set(state.coordinates, newID, { x: 0, y: 0 });
+    deletePropertyFromShape(state, args) {
+      const { shape, propertyID } = args;
+      const properties =
+        shape["https://2019.summerofcode.be/unshacled#property"];
+      for (const p in properties) {
+        if (properties[p]["@id"] === propertyID) Vue.delete(properties, p);
       }
-
-      // Remove the old value from the list of properties.
-      state.nodeShapes[node].properties.splice(index, 1, newID);
-      this.commit("updateYValues", node);
     },
+
+    /* HELPERS ====================================================================================================== */
 
     /**
      * Update the y values of the properties of the given node.
@@ -217,102 +238,38 @@ export default new Vuex.Store({
     updateYValues(state, nodeID) {
       // Update the y values of the properties.
       Vue.set(state.yValues, nodeID, {});
+
+      let node;
+      for (const item of state.model) {
+        if (item["@id"] === nodeID) node = item;
+      }
+
+      // FIXME code duplication, find a way to use `nodeProperties` >.<
+      const propertyObjects =
+        node["https://2019.summerofcode.be/unshacled#property"];
+
+      // Get the references to property shapes
+      const properties = [];
+      if (propertyObjects) {
+        for (const p of propertyObjects) properties.push(p["@id"]);
+      }
+
+      // Get the other properties
+      const ignored = [
+        "@id",
+        "@type",
+        "https://2019.summerofcode.be/unshacled#property",
+        "https://2019.summerofcode.be/unshacled#targetNode"
+      ];
+      for (const p in node) {
+        if (!ignored.includes(p)) properties.push(p[0]["@id"]);
+      }
+
       let i = 1;
-      for (const prop of state.nodeShapes[nodeID].properties) {
+      for (const prop of properties) {
         Vue.set(state.yValues[nodeID], prop, i * HEIGHT);
         i += 1;
       }
-    },
-
-    toggleValidationReport(state) {
-      event.preventDefault();
-      state.showValidationReportModal = !state.showValidationReportModal;
-    },
-
-    /**
-     * Edit the ID of a property shape.
-     * This will update the property list of every node shape that contains this property shape.
-     * @param state
-     * @param args
-     */
-    editPropertyShape(state, args) {
-      const { oldID, newID } = args;
-
-      // Update the state's list of propertyShapes.
-      Vue.set(state.propertyShapes, newID, state.propertyShapes[oldID]);
-      Vue.delete(state.propertyShapes, oldID);
-
-      // Update the coordinates.
-      Vue.set(state.coordinates, newID, state.coordinates[oldID]);
-      Vue.delete(state.coordinates, oldID);
-
-      // Update the property name in every node shape.
-      for (const n in state.nodeShapes) {
-        const currentNode = state.nodeShapes[n];
-        const index = currentNode.properties.indexOf(oldID);
-        if (index !== -1) {
-          state.nodeShapes[n].properties.splice(index, 1, newID);
-        }
-      }
-
-      // Update the y values of the properties.
-      for (const n in state.nodeShapes) {
-        this.commit("updateYValues", n);
-      }
-    },
-
-    /**
-     * Delete the given property from the given node shape.
-     * @param state
-     * @param args the id of the node shape and the id of the property that should be removed from the shape.
-     */
-    deletePropFromNode(state, args) {
-      const { node, prop } = args;
-      const newProperties = state.nodeShapes[node].properties.filter(
-        p => p !== prop
-      );
-      state.nodeShapes[node] = {
-        ...state.nodeShapes[node],
-        properties: newProperties
-      };
-      state.nodeShapes = {
-        ...state.nodeShapes
-      };
-
-      this.commit("updateYValues", node);
-    },
-
-    /**
-     * Add a property shape with the given id.
-     * @param state
-     * @param id
-     */
-    addPropertyShape(state, id) {
-      Vue.set(state.propertyShapes, id, {
-        "@id": id
-      });
-      Vue.set(state.coordinates, id, { x: 0, y: 0 });
-    },
-
-    /**
-     * Delete the property shape with the given id.
-     * @param state
-     * @param id
-     */
-    deletePropertyShape(state, id) {
-      // Check every nodeShape if it contains the given property.
-      for (const nodeID in state.nodeShapes) {
-        const node = state.nodeShapes[nodeID];
-        const index = node.properties.indexOf(id);
-        if (index !== -1) {
-          // Delete the property from the node and update the y values.
-          node.properties.splice(index, 1);
-          this.commit("updateYValues", nodeID);
-        }
-      }
-      // Remove the property from the state
-      Vue.delete(state.propertyShapes, id);
-      Vue.delete(state.coordinates, id);
     },
 
     /**
@@ -328,6 +285,7 @@ export default new Vuex.Store({
       const coords = { x, y };
       Vue.set(state.coordinates, node, coords);
 
+      /*
       for (const prop in state.relationships) {
         if (prop.includes(node)) {
           const changedKey = node;
@@ -340,25 +298,7 @@ export default new Vuex.Store({
           ];
         }
       }
-    },
-
-    /**
-     * Takes two keys from nodeshapes and uses them to add a relationship to the state
-     * @param state
-     * @param keys contains two keys, which can be queried using keys.one and keys.two.
-     */
-    addRelationship(state, keys) {
-      Vue.set(state.relationships, keys.one + keys.two, {
-        "@id": keys.one + keys.two,
-        one: keys.one,
-        two: keys.two,
-        coords: [
-          state.coordinates[keys.two].x,
-          state.coordinates[keys.two].y,
-          state.coordinates[keys.one].y,
-          state.coordinates[keys.one].x
-        ]
-      });
+       */
     },
 
     /**
@@ -376,40 +316,368 @@ export default new Vuex.Store({
      */
     clear(state) {
       console.log("Clear!");
-      state.nodeShapes = {};
-      state.propertyShapes = {};
-      state.relationships = {};
+      state.model = [];
       state.coordinates = {};
       state.yValues = {};
+    }
+  },
+  actions: {
+    /* ADD ========================================================================================================== */
+
+    /**
+     * Add an empty node shape with the given id.
+     * @param store
+     * @param id
+     */
+    addNodeShape(store, id) {
+      this.commit("addShape", {
+        "@id": id,
+        "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
+        "https://2019.summerofcode.be/unshacled#property": [],
+        "https://2019.summerofcode.be/unshacled#targetNode": []
+      });
     },
 
-    createProperty() {}
+    /**
+     * Add a property shape with the given id.
+     * @param store
+     * @param id
+     */
+    addPropertyShape(store, id) {
+      this.commit("addShape", {
+        "@id": id,
+        "https://2019.summerofcode.be/unshacled#path": [
+          `http://example.org/ns#${id}`
+        ]
+      });
+    },
+
+    /**
+     * Add a property with the given id and value to the node with the given id.
+     * @param store
+     * @param args
+     *              nodeID id of the node
+     *              propertyID id of the property we want to add
+     *              propertyValue object with the value of the property we want to add
+     */
+    addPropertyToNode(store, args) {
+      const { nodeID } = args;
+      // TODO complete this
+      this.commit("addPropertyToShape", args);
+      this.commit("updateYValues", nodeID);
+    },
+
+    /**
+     * Takes two keys from nodeshapes and uses them to add a relationship to the state
+     * @param state
+     * @param keys contains two keys, which can be queried using keys.one and keys.two.
+     */
+    /*
+    addRelationship(state, keys) {
+      Vue.set(state.relationships, keys.one + keys.two, {
+        "@id": keys.one + keys.two,
+        one: keys.one,
+        two: keys.two,
+        coords: [
+          state.coordinates[keys.two].x,
+          state.coordinates[keys.two].y,
+          state.coordinates[keys.one].y,
+          state.coordinates[keys.one].x
+        ]
+      });
+    },
+     */
+
+    /* EDIT ========================================================================================================= */
+
+    /**
+     * Edit the id of the given node shape.
+     * @param store
+     * @param args
+     *    oldID: the old ID we want to change.
+     *    newID: the new ID for the node shape.
+     */
+    editNodeShape(store, args) {
+      const { oldID, newID } = args;
+      const newURL = extractUrl(oldID) + newID;
+
+      // Update the shape's ID
+      const index = store.getters.indexWithID(oldID);
+      this.commit("updateShapeID", { index, newID: newURL }); // OK
+
+      // Update Relationships TODO
+      /*
+      for (let prop in state.relationships) {
+        if (state.relationships[prop].one === oldID)
+          state.relationships[prop].one = newID;
+        if (state.relationships[prop].two === oldID)
+          state.relationships[prop].two = newID;
+        prop = state.relationships[prop].one + state.relationships[prop].two;
+      }
+       */
+
+      // Update the coordinates and y values.
+      this.commit("updateLocations", { oldID, newID: newURL });
+    },
+
+    /**
+     * Edit the given property in the given node shape.
+     * If the new property ID already exists, this will make a copy
+     * @param store
+     * @param args
+     */
+    editPropertyInNode(store, args) {
+      const { node, oldID, newID } = args;
+
+      // Check if the new property name is already an existing PropertyShape.
+      if (!store.getters.propertyShapes[newID]) {
+        // If not, create a new PropertyShape that is a copy of the original one.
+        const copied = Vue.util.extend({}, store.getters.propertyShapes[oldID]);
+        copied["@id"] = newID;
+
+        const name = urlToName(newID);
+        copied["https://2019.summerofcode.be/unshacled#path"][0][
+          "@id"
+        ] = `http://example.org/ns#${name}`; // TODO dromedarisCaseOrSomething
+
+        // Add the shape to the state.
+        this.commit("addShape", copied);
+      }
+
+      const shape = store.getters.shapeWithID(node);
+      // Put the new value in the list of shape properties
+      this.commit("addPropertyIDToShape", { propertyID: newID, shape });
+      // Remove the old value from the list of shape properties.
+      this.commit("deletePropertyFromShape", { shape, propertyID: oldID });
+      // Update the y values
+      this.commit("updateYValues", node);
+    },
+
+    /**
+     * Edit the ID of a property shape.
+     * This will update the property list of every node shape that contains this property shape.
+     * @param store
+     * @param args
+     */
+    editPropertyShape(store, args) {
+      const { oldID, newID } = args;
+
+      // Update the state's shapes.
+      const shape = store.getters.shapeWithID(oldID);
+      this.commit("updatePropertyShapeID", { shape, newID });
+      for (const n in store.getters.nodeShapes) {
+        const node = store.getters.nodeShapes[n];
+        this.commit("deletePropertyFromShape", {
+          shape: node,
+          propertyID: oldID
+        });
+        this.commit("addPropertyIDToShape", { shape: node, propertyID: newID });
+        this.commit("deletePropertyFromShape", {
+          shape: node,
+          propertyID: oldID
+        });
+      }
+      this.commit("updateLocations", { oldID, newID });
+
+      // Update the y values of the properties.
+      for (const n in store.getters.nodeShapes) {
+        this.commit("updateYValues", n);
+      }
+    },
+
+    /* DELETE ======================================================================================================= */
+
+    /**
+     * Delete the node shape with the given id.
+     * @param store
+     * @param id
+     */
+    deleteNodeShape(store, id) {
+      this.commit("deleteShapeAtIndex", store.getters.indexWithID(id));
+      this.commit("deleteShapeLocations", id);
+    },
+
+    /**
+     * Delete the property shape with the given id.
+     * @param store
+     * @param id
+     */
+    deletePropertyShape(store, id) {
+      // Check every nodeShape if it contains the given property.
+      for (const shape of store.state.model) {
+        const properties =
+          shape["https://2019.summerofcode.be/unshacled#property"];
+
+        for (const p in properties) {
+          if (properties[p]["@id"] === id) {
+            // Delete the property from the node and update the y values.
+            properties.splice(p, 1);
+            this.commit("updateYValues", shape["@id"]);
+          }
+        }
+      }
+      // Remove the property from the state
+      this.commit("deleteShapeAtIndex", store.getters.indexWithID(id));
+      this.commit("deleteShapeLocations", id);
+    },
+
+    /**
+     * Delete the given property from the given node shape.
+     * @param store
+     * @param args
+     *            node the id of the node shape
+     *            prop the id of the property that should be removed from the shape
+     */
+    deletePropFromNode(store, args) {
+      const { node, prop } = args;
+
+      const shape = store.getters.shapeWithID(node);
+      const properties =
+        shape["https://2019.summerofcode.be/unshacled#property"];
+
+      for (const p in properties) {
+        if (properties[p]["@id"] === prop) {
+          // Delete the property from the node and update the y values.
+          properties.splice(p, 1);
+        }
+      }
+
+      // Update the y values
+      this.commit("updateYValues", node);
+    }
   },
-  actions: {},
   getters: {
-    getValidators: state => {
+    /**
+     * Get all the constraints for the current format.
+     * @param state
+     * @returns {null}
+     */
+    validators: state => {
       return getConstraints(state.format);
     },
-    getValidationReport: state => {
-      return state.ValidationReport;},
+
     /**
-     * Returns the Json Internal model
-     * */
+     * Get the shape object with the given ID.
+     * @param state
+     * @returns {null}
+     */
+    shapeWithID: state => id => {
+      for (const item of state.model) {
+        if (item["@id"] === id) return item;
+      }
+      return null;
+    },
+
+    /**
+     * Get the index of the shape object with the given ID.
+     * @param state
+     * @returns {string|number}
+     */
+    indexWithID: state => id => {
+      for (const i in state.model) {
+        if (state.model[i]["@id"] === id) return i;
+      }
+      return -1;
+    },
+
+    /**
+     * Get a dictionary mapping ID's to the respective node shape objects.
+     * @param state
+     */
+    nodeShapes: state => {
+      const nodeShapes = {};
+      for (const item of state.model) {
+        if (item["@type"]) {
+          nodeShapes[item["@id"]] = item;
+        }
+      }
+      return nodeShapes;
+    },
+
+    /**
+     * Get a dictionary mapping ID's to the respective property shape objects.
+     * @param state
+     */
+    propertyShapes: state => {
+      const propertyShapes = {};
+      for (const item of state.model) {
+        if (!item["@type"]) {
+          propertyShapes[item["@id"]] = item;
+        }
+      }
+      return propertyShapes;
+    },
+
+    /**
+     * Get a list of property ID's for the node with the given ID.
+     * @param state
+     * @returns {function(*): Array}
+     */
+    nodeProperties: state => nodeID => {
+      let node;
+      for (const item of state.model) {
+        if (item["@id"] === nodeID) {
+          node = item;
+        }
+      }
+
+      const propertyObjects =
+        node["https://2019.summerofcode.be/unshacled#property"];
+
+      // Get the references to property shapes
+      const properties = [];
+      for (const p of propertyObjects) {
+        properties.push(p["@id"]);
+      }
+
+      // Get the other properties
+      const ignored = [
+        "@id",
+        "@type",
+        "https://2019.summerofcode.be/unshacled#property",
+        "https://2019.summerofcode.be/unshacled#targetNode"
+      ];
+      for (const p in node) {
+        if (!ignored.includes(p)) properties.push(p[0]["@id"]);
+      }
+      return properties;
+    },
+
+    /**
+     * TODO
+     * @param state
+     * @returns {string}
+     */
+    getValidationReport: state => {
+      return state.ValidationReport;
+    },
+
+    /**
+     * Returns the Json Internal model.
+     * @param state
+     * @returns {state.internalModel|{}|string}
+     */
     getInternalModelInJson: state => {
       return state.internalModel;
     },
+
     /**
-     * Returns the internal model in ttl format
-     * */
+     * Returns the internal model in ttl format.
+     * @param state
+     * @returns {any}
+     */
     getInternalModelInTurtle: state => {
       return TranslatorManager.translateToLanguage(
         state.internalModel,
         state.format
       );
     },
+
     /**
      * Returns the data to validate.
-     * */
+     * @param state
+     * @returns {state.dataFile|{}}
+     */
     getDataFile: state => {
       return state.dataFile;
     }

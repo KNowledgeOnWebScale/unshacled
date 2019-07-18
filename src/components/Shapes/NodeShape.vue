@@ -36,6 +36,7 @@
 <script>
 import NodeProperty from "./NodeProperty.vue";
 import ReactiveInput from "../ReactiveInput.vue";
+import { urlToName } from "../../util/nameParser";
 import {
   DELETE_NODE_CONFIG,
   DELETE_PROP_CONFIG,
@@ -68,12 +69,12 @@ export default {
       deleteNodeConfig: DELETE_NODE_CONFIG,
       idTextConfig: {
         ...ID_TEXT_CONFIG,
-        text: this.$props.id
+        text: urlToName(this.$props.id)
       },
       propertyConfig: PROPERTY_CONFIG,
       propTextConfig: {
         ...PROP_TEXT_CONFIG,
-        text: this.$props.propKey
+        text: urlToName(this.$props.propKey)
       },
       deletePropConfig: DELETE_PROP_CONFIG
     };
@@ -91,13 +92,14 @@ export default {
      * @returns an object mapping every property name to a property object.
      */
     getProperties() {
-      const { id } = this.$props;
-      const properties = {};
-      for (const prop of this.$store.state.nodeShapes[id].properties) {
-        properties[prop] = this.$store.state.propertyShapes[prop];
+      const propNames = this.$store.getters.nodeProperties(this.$props.id);
+      const nodeObjects = this.$store.getters.nodeShapes;
+      const propObjects = {};
+      for (const prop of propNames) {
+        propObjects[prop] = nodeObjects[prop];
       }
-      this.setPropConfigs(properties);
-      return properties;
+      this.setPropConfigs(propObjects);
+      return propObjects;
     },
 
     /**
@@ -105,6 +107,7 @@ export default {
      * @param properties a dictionary containing the node shape's properties.
      */
     setPropConfigs(properties) {
+      // FIXME
       const { id } = this.$props;
       const ys = this.$store.state.yValues[id];
       for (const prop of Object.keys(properties)) {
@@ -137,12 +140,12 @@ export default {
      */
     stopEditing(newValue) {
       // Check if the new value is valid and unique.
-      if (newValue !== "" && !this.$store.state.nodeShapes[newValue]) {
+      if (newValue !== "" && !this.$store.getters.nodeShapes[newValue]) {
         const args = {
           oldID: this.$props.id,
           newID: newValue
         };
-        this.$store.commit("editNodeShape", args);
+        this.$store.dispatch("editNodeShape", args);
       }
     },
 
@@ -150,8 +153,8 @@ export default {
      * Delete this node shape.
      */
     deleteNodeShape() {
-      this.$store.commit("deleteNodeShape", this.$props.id);
       this.$refs.reactiveInput.stopEditing();
+      this.$store.dispatch("deleteNodeShape", this.$props.id);
     },
 
     /**

@@ -27,6 +27,7 @@
 
 <script>
 import ReactiveInput from "../ReactiveInput.vue";
+import { urlToName } from "../../util/nameParser";
 import {
   DELETE_NODE_CONFIG,
   ID_TEXT_CONFIG,
@@ -58,12 +59,12 @@ export default {
       deleteNodeConfig: DELETE_NODE_CONFIG,
       idTextConfig: {
         ...ID_TEXT_CONFIG,
-        text: this.$props.id
+        text: urlToName(this.$props.id)
       },
       propertyConfig: PROPERTY_CONFIG,
       propTextConfig: {
         ...PROP_TEXT_CONFIG,
-        text: this.$props.propKey
+        text: urlToName(this.$props.propKey)
       },
       deletePropConfig: DELETE_NODE_CONFIG
     };
@@ -81,10 +82,11 @@ export default {
      * @returns an object mapping every property name to a property object.
      */
     getProperties() {
+      console.log("getProperties");
       const { id } = this.$props;
       const properties = {};
-      for (const prop of this.$store.state.nodeShapes[id].properties) {
-        properties[prop] = this.$store.state.propertyShapes[prop];
+      for (const prop of this.$store.getters.nodeShapes[id].properties) {
+        properties[prop] = this.$store.getters.propertyShapes[prop];
       }
       this.setPropConfigs(properties);
       return properties;
@@ -127,12 +129,12 @@ export default {
      */
     stopEditing(newValue) {
       // Check if the new value is valid and unique.
-      if (newValue !== "" && !this.$store.state.propertyShapes[newValue]) {
+      if (newValue !== "" && !this.$store.getters.propertyShapes[newValue]) {
         const args = {
           oldID: this.$props.id,
           newID: newValue
         };
-        this.$store.commit("editPropertyShape", args);
+        this.$store.dispatch("editPropertyShape", args);
       }
     },
 
@@ -140,12 +142,12 @@ export default {
      * Delete this node shape.
      */
     deletePropertyShape() {
-      this.$store.commit("deletePropertyShape", this.$props.id);
       this.$refs.reactiveInput.stopEditing();
+      this.$store.dispatch("deletePropertyShape", this.$props.id);
     },
 
     /**
-     * Takes the coördinates from this node shape and calls store to update them.
+     * Takes the coordinates from this node shape and calls store to update them.
      */
     updateCoordinates() {
       const pos = this.$refs.posRef.getNode().position();

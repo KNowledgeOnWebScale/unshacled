@@ -1,10 +1,11 @@
-import { N3Parser, XMLParser } from "./parsers";
-import { ETF } from "../util/enums/extensionToFormat"
+import { N3Parser } from "./parsers";
+import { ETF } from "../util/enums/extensionToFormat";
 /**
  *  ParserManager retrieves the correct parser for the format of RDF (Turtle, RDF/XML, ...)
  */
 export class ParserManager {
   /**
+   * TODO
    * @param doc
    * @param type
    * @returns {Promise<any>}
@@ -24,3 +25,5 @@ export class ParserManager {
     }
   }
 }
+
+export { ParserManager as default };

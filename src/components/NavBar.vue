@@ -21,8 +21,15 @@
       </sui-menu-item>
       <sui-menu-item class="clickable">
         <div>
-          <label for="dataFile" style="cursor: pointer" icon="add" class="btn">Upload data</label>
-          <input id="dataFile" @change="uploadDataFile()" style="visibility:hidden;" type="file" />
+          <label for="dataFile" style="cursor: pointer" icon="add" class="btn"
+            >Upload data</label
+          >
+          <input
+            id="dataFile"
+            style="visibility:hidden;"
+            type="file"
+            @change="uploadDataFile()"
+          />
         </div>
       </sui-menu-item>
       <sui-menu-item
@@ -45,13 +52,16 @@
 import SuiDropdown from "semantic-ui-vue/dist/commonjs/modules/Dropdown/Dropdown";
 import SuiDropdownDivider from "semantic-ui-vue/dist/commonjs/modules/Dropdown/DropdownDivider";
 import NodeShapeModal from "./NodeShapeModal.vue";
-import { ParserManager } from "../parsing/parserManager";
 import ValidationReportModal from "./ValidationReportModal.vue";
-
 
 export default {
   name: "NavBar",
-  components: { NodeShapeModal, SuiDropdownDivider, SuiDropdown, ValidationReportModal },
+  components: {
+    NodeShapeModal,
+    SuiDropdownDivider,
+    SuiDropdown,
+    ValidationReportModal
+  },
   data() {
     return {
       createPropertyShape: false

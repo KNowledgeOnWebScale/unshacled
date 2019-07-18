@@ -60,14 +60,16 @@ export default {
      */
     stopEditing(newValue) {
       // Check if the new value is valid and unique.
-      const { properties } = this.$store.state.nodeShapes[this.$props.node];
+      const properties = this.$store.getters.nodeShapes[this.$props.node][
+        "https://2019.summerofcode.be/unshacled#property"
+      ];
       if (newValue !== "" && properties.indexOf(newValue) === -1) {
         const args = {
           node: this.$props.node,
           oldID: this.$props.propKey,
           newID: newValue
         };
-        this.$store.commit("editProperty", args);
+        this.$store.dispatch("editPropertyInNode", args);
       }
     },
 
@@ -79,7 +81,7 @@ export default {
         node: this.$props.node,
         prop: this.$props.propKey
       };
-      this.$store.commit("deletePropFromNode", args);
+      this.$store.dispatch("deletePropFromNode", args);
     }
   }
 };
