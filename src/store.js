@@ -233,64 +233,13 @@ export default new Vuex.Store({
 
     /* DELETE ======================================================================================================= */
 
-    /**
-     * Delete the node shape with the given id.
-     * @param state
-     * @param id
-     */
-    deleteNodeShape(state, id) {
-      Vue.delete(state.model, state.getters.indexWithID(id));
+    deleteShapeAtIndex(state, index) {
+      Vue.delete(state.model, index);
+    },
+
+    deleteShapeLocations(state, id) {
       Vue.delete(state.coordinates, id);
       Vue.delete(state.yValues, id);
-    },
-
-    /**
-     * Delete the property shape with the given id.
-     * @param state
-     * @param id
-     */
-    deletePropertyShape(state, id) {
-      // Check every nodeShape if it contains the given property.
-      for (const shape of state.model) {
-        const properties =
-          shape["https://2019.summerofcode.be/unshacled#property"];
-
-        for (const p in properties) {
-          if (properties[p]["@id"]) {
-            // Delete the property from the node and update the y values.
-            properties.splice(p, 1);
-            this.commit("updateYValues", shape["@id"]);
-          }
-        }
-      }
-      // Remove the property from the state
-      Vue.delete(state.propertyShapes, id);
-      Vue.delete(state.coordinates, id);
-    },
-
-    /**
-     * Delete the given property from the given node shape.
-     * @param state
-     * @param args
-     *            node the id of the node shape
-     *            prop the id of the property that should be removed from the shape
-     */
-    deletePropFromNode(state, args) {
-      const { node, prop } = args;
-
-      const shape = state.getters.shapeWithID(node);
-      const properties =
-        shape["https://2019.summerofcode.be/unshacled#property"];
-
-      for (const p in properties) {
-        if (properties[p]["@id"] === prop) {
-          // Delete the property from the node and update the y values.
-          properties.splice(p, 1);
-        }
-      }
-
-      // Update the y values
-      this.commit("updateYValues", node);
     },
 
     /* HELPERS ====================================================================================================== */
@@ -386,7 +335,66 @@ export default new Vuex.Store({
       state.yValues = {};
     }
   },
-  actions: {},
+  actions: {
+    /**
+     * Delete the node shape with the given id.
+     * @param state
+     * @param id
+     */
+    deleteNodeShape(state, id) {
+      this.commit("deleteShapeAtIndex", state.getters.indexWithID(id));
+      this.commit("deleteShapeLocations", id);
+    },
+
+    /**
+     * Delete the property shape with the given id.
+     * @param state
+     * @param id
+     */
+    deletePropertyShape(state, id) {
+      // Check every nodeShape if it contains the given property.
+      for (const shape of state.model) {
+        const properties =
+          shape["https://2019.summerofcode.be/unshacled#property"];
+
+        for (const p in properties) {
+          if (properties[p]["@id"]) {
+            // Delete the property from the node and update the y values.
+            properties.splice(p, 1);
+            this.commit("updateYValues", shape["@id"]);
+          }
+        }
+      }
+      // Remove the property from the state
+      this.commit("deleteShapeAtIndex", state.getters.indexWithID(id));
+      this.commit("deleteShapeLocations", id);
+    },
+
+    /**
+     * Delete the given property from the given node shape.
+     * @param state
+     * @param args
+     *            node the id of the node shape
+     *            prop the id of the property that should be removed from the shape
+     */
+    deletePropFromNode(state, args) {
+      const { node, prop } = args;
+
+      const shape = state.getters.shapeWithID(node);
+      const properties =
+        shape["https://2019.summerofcode.be/unshacled#property"];
+
+      for (const p in properties) {
+        if (properties[p]["@id"] === prop) {
+          // Delete the property from the node and update the y values.
+          properties.splice(p, 1);
+        }
+      }
+
+      // Update the y values
+      this.commit("updateYValues", node);
+    }
+  },
   getters: {
     /**
      * TODO

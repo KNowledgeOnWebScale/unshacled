@@ -79,7 +79,7 @@ export default {
         node: this.$props.node,
         prop: this.$props.propKey
       };
-      this.$store.commit("deletePropFromNode", args);
+      this.$store.dispatch("deletePropFromNode", args);
     }
   }
 };

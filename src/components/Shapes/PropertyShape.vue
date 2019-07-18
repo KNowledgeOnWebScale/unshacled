@@ -140,7 +140,7 @@ export default {
      * Delete this node shape.
      */
     deletePropertyShape() {
-      this.$store.commit("deletePropertyShape", this.$props.id);
+      this.$store.dispatch("deletePropertyShape", this.$props.id);
     },
 
     /**

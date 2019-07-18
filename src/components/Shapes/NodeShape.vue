@@ -153,7 +153,7 @@ export default {
      * Delete this node shape.
      */
     deleteNodeShape() {
-      this.$store.commit("deleteNodeShape", this.$props.id);
+      this.$store.dispatch("deleteNodeShape", this.$props.id);
     },
 
     /**
