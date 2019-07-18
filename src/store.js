@@ -348,11 +348,11 @@ export default new Vuex.Store({
      */
     editNodeShape(store, args) {
       const { oldID, newID } = args;
-      // const newURL = extractUrl(oldID) + newID;
+      const newURL = extractUrl(oldID) + newID;
 
       // Update the shape's ID
       const index = store.getters.indexWithID(oldID);
-      this.commit("updateShapeID", { index, newID });
+      this.commit("updateShapeID", { index, newID: newURL }); // OK
 
       // Update Relationships TODO
       /*
@@ -366,8 +366,7 @@ export default new Vuex.Store({
        */
 
       // Update the coordinates and y values.
-      this.commit("updateLocations", args);
-      console.log(store.getters.nodeShapes);
+      this.commit("updateLocations", { oldID, newID: newURL });
     },
 
     /**
