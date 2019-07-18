@@ -3,10 +3,27 @@
     <sui-menu ref="navbar" attached="top" inverted>
       <sui-dropdown item icon="file alternate" simple>
         <sui-dropdown-menu>
-          <sui-dropdown-item
-            ><input id="file" type="file" @change="readTextFile()"
-          /></sui-dropdown-item>
-          <sui-dropdown-item>Export</sui-dropdown-item>
+          <sui-dropdown-item @click="$refs.importShapes.click()">
+            <label for="importShapes">Import Shapes...</label>
+            <input
+              id="importShapes"
+              ref="importShapes"
+              type="file"
+              style="display: none"
+              @change="readTextFile()"
+            />
+          </sui-dropdown-item>
+          <sui-dropdown-item @click="$refs.importData.click()">
+            <label for="importData">Import Data...</label>
+            <input
+              id="importData"
+              ref="importData"
+              type="file"
+              style="display: none"
+              @change="uploadDataFile()"
+            />
+          </sui-dropdown-item>
+          <sui-dropdown-item>Export Shapes</sui-dropdown-item>
           <sui-dropdown-divider></sui-dropdown-divider>
           <sui-dropdown-item @click="loadExample">
             Load Example
@@ -18,12 +35,6 @@
       </sui-menu-item>
       <sui-menu-item class="clickable" icon="add" @click="togglePropertyModal">
         Property
-      </sui-menu-item>
-      <sui-menu-item class="clickable">
-        <div>
-          <label for="dataFile" style="cursor: pointer" icon="add" class="btn">Upload data</label>
-          <input id="dataFile" @change="uploadDataFile()" style="visibility:hidden;" type="file" />
-        </div>
       </sui-menu-item>
       <sui-menu-item
         class="clickable"
@@ -48,10 +59,14 @@ import NodeShapeModal from "./NodeShapeModal.vue";
 import { ParserManager } from "../parsing/parserManager";
 import ValidationReportModal from "./ValidationReportModal.vue";
 
-
 export default {
   name: "NavBar",
-  components: { NodeShapeModal, SuiDropdownDivider, SuiDropdown, ValidationReportModal },
+  components: {
+    NodeShapeModal,
+    SuiDropdownDivider,
+    SuiDropdown,
+    ValidationReportModal
+  },
   data() {
     return {
       createPropertyShape: false
