@@ -1,10 +1,11 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import EXAMPLE from "./util/examples";
+import { HEIGHT } from "./util/konvaConfigs";
 import { format } from "./util/enums/format";
 import { getConstraints } from "./util/constraintSelector";
-import { HEIGHT } from "./util/konvaConfigs";
-import EXAMPLE from "./util/examples";
 import { urlToName, extractUrl } from "./util/nameParser";
+import { getNonOverlappingCoordinates } from "./util";
 import { ParserManager } from "./parsing/parserManager";
 import { TranslatorManager } from "./translation/translatorManager";
 
@@ -70,6 +71,7 @@ export default new Vuex.Store({
      */
     loadExample(state) {
       console.log("Loading example...");
+      this.commit("clear"); // Clear the existing data first.
 
       const example = EXAMPLE.model[0];
       state.model = [];
@@ -80,7 +82,10 @@ export default new Vuex.Store({
       // Update y values and set coordinates to zero
       for (const shape of state.model) {
         this.commit("updateYValues", shape["@id"]);
-        Vue.set(state.coordinates, shape["@id"], { x: 0, y: 0 }); // TODO change default coordinates
+        const { x, y } = getNonOverlappingCoordinates({
+          coordinates: state.coordinates
+        });
+        Vue.set(state.coordinates, shape["@id"], { x, y });
       }
     },
 
@@ -93,7 +98,10 @@ export default new Vuex.Store({
      */
     addShape(state, object) {
       state.model.push(object);
-      Vue.set(state.coordinates, object["@id"], { x: 0, y: 0 });
+      const { x, y } = getNonOverlappingCoordinates({
+        coordinates: state.coordinates
+      });
+      Vue.set(state.coordinates, object["@id"], { x, y });
     },
 
     /**
