@@ -66,8 +66,8 @@ export default {
         this.toggleShapeModal();
         this.idString = "";
         if (this.$props.isPropertyShapeModal)
-          this.$store.commit("addPropertyShape", id);
-        else this.$store.commit("addNodeShape", id);
+          this.$store.dispatch("addPropertyShape", id);
+        else this.$store.dispatch("addNodeShape", id);
       }
     },
     toggleShapeModal() {

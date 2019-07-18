@@ -132,7 +132,7 @@ export default {
           oldID: this.$props.id,
           newID: newValue
         };
-        this.$store.commit("editPropertyShape", args);
+        this.$store.dispatch("editPropertyShape", args);
       }
     },
 

@@ -33,10 +33,6 @@ export default {
     };
   },
 
-  beforeMount() {
-    console.log("nodeShapes", this.$store.getters.nodeShapes);
-    console.log("propertyShapes", this.$store.getters.propertyShapes);
-  },
   mounted() {
     this.$store.commit("setEditor", this.$refs.stage.getNode());
     window.addEventListener("resize", this.handleResize);

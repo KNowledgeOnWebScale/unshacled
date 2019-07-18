@@ -67,7 +67,7 @@ export default {
           oldID: this.$props.propKey,
           newID: newValue
         };
-        this.$store.commit("editProperty", args);
+        this.$store.dispatch("editProperty", args);
       }
     },
 

@@ -145,7 +145,7 @@ export default {
           oldID: this.$props.id,
           newID: newValue
         };
-        this.$store.commit("editNodeShape", args);
+        this.$store.dispatch("editNodeShape", args);
       }
     },
 
