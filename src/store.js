@@ -4,6 +4,7 @@ import { format } from "./util/enums/format";
 import { getConstraints } from "./util/constraintSelector";
 import { HEIGHT } from "./util/konvaConfigs";
 import { ParserManager } from "./parsing/parserManager";
+import { TranslatorManager } from "./translation/translatorManager";
 
 Vue.use(Vuex);
 
@@ -364,6 +365,17 @@ export default new Vuex.Store({
   getters: {
     getValidators: state => {
       return getConstraints(state.format);
+    },
+
+    getInternalModelInJson: state => {
+      return state.internalModel;
+    },
+
+    getInternalModelInTurtle: state => {
+      return TranslatorManager.translateToLanguage(
+        state.internalModel,
+        state.format
+      );
     }
   }
 });
