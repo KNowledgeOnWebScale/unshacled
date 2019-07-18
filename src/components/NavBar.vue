@@ -19,6 +19,12 @@
       <sui-menu-item class="clickable" icon="add" @click="togglePropertyModal">
         Property
       </sui-menu-item>
+      <sui-menu-item class="clickable">
+        <div>
+          <label for="dataFile" style="cursor: pointer" icon="add" class="btn">Upload data</label>
+          <input id="dataFile" @change="uploadDataFile()" style="visibility:hidden;" type="file" />
+        </div>
+      </sui-menu-item>
       <sui-menu-item
         class="clickable"
         icon="trash"
@@ -66,6 +72,10 @@ export default {
     readTextFile() {
       const file = document.getElementById("file").files[0];
       this.$store.commit("uploadSchemaFile", file);
+    },
+    uploadDataFile() {
+      const file = document.getElementById("dataFile").files[0];
+      this.$store.commit("uploadDataFile", file);
     }
   }
 };

@@ -22,6 +22,11 @@ export default new Vuex.Store({
     internalModel: {}
   },
   mutations: {
+    /**
+     * Takes a file, reads the extension and depending on the format uses the correct parser to turn it into an intern model
+     * @param state
+     * @param file The uploaded file
+     * */
     uploadSchemaFile(state, file) {
       const reader = new FileReader();
       const fileExtension = file.name.split(".").pop();
@@ -33,11 +38,23 @@ export default new Vuex.Store({
       };
     },
 
+    /**
+     * Recieves a datafile and takes its content to the state
+     * @param state
+     * @param file The file containing data to check on
+     * */
+    uploadDataFile(state, file) {
+      const reader = new FileReader();
+      reader.readAsText(file);
+      reader.onload = function(event) {
+        console.log(event.target.result);
+        state.dataFile = event.target.result;
+      };
+    },
+
     setEditor(state, reference) {
       state.editor = reference;
     },
-
-    uploadDataFile(state, contents) {},
 
     /**
      * Load in some example data
@@ -367,15 +384,26 @@ export default new Vuex.Store({
       return getConstraints(state.format);
     },
 
+    /**
+     * Returns the Json Internal model
+     * */
     getInternalModelInJson: state => {
       return state.internalModel;
     },
-
+    /**
+     * Returns the internal model in ttl format
+     * */
     getInternalModelInTurtle: state => {
       return TranslatorManager.translateToLanguage(
         state.internalModel,
         state.format
       );
+    },
+    /**
+     * Returns the data to validate.
+     * */
+    getDataFile: state => {
+      return state.dataFile;
     }
   }
 });
