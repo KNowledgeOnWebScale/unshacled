@@ -37,6 +37,7 @@
     <node-shape-modal
       :is-property-shape-modal="createPropertyShape"
     ></node-shape-modal>
+    <validation-report-modal></validation-report-modal>
   </div>
 </template>
 
@@ -45,10 +46,12 @@ import SuiDropdown from "semantic-ui-vue/dist/commonjs/modules/Dropdown/Dropdown
 import SuiDropdownDivider from "semantic-ui-vue/dist/commonjs/modules/Dropdown/DropdownDivider";
 import NodeShapeModal from "./NodeShapeModal.vue";
 import { ParserManager } from "../parsing/parserManager";
+import ValidationReportModal from "./ValidationReportModal.vue";
+
 
 export default {
   name: "NavBar",
-  components: { NodeShapeModal, SuiDropdownDivider, SuiDropdown },
+  components: { NodeShapeModal, SuiDropdownDivider, SuiDropdown, ValidationReportModal },
   data() {
     return {
       createPropertyShape: false
