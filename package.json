@@ -10,11 +10,13 @@
   },
   "dependencies": {
     "@babel/runtime-corejs3": "^7.5.4",
+    "babel-plugin-ramda": "^2.0.0",
     "core-js": "^2.6.5",
     "jsonld": "^1.6.2",
     "konva": "^3.3.3",
     "n3": "^1.1.1",
     "portal-vue": "^2.1.5",
+    "ramda": "^0.26.1",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-vue": "^0.8.1",
     "shacl-js": "0.0.1",

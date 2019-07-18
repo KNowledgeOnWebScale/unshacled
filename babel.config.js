@@ -11,17 +11,19 @@ module.exports = {
     "@babel/plugin-proposal-throw-expressions",
     "@babel/plugin-proposal-object-rest-spread",
     "@babel/plugin-proposal-optional-chaining",
+    ["babel-plugin-ramda", { useES: true }],
     [
       "module-resolver",
       {
         /** Module aliases. */
         alias: {
           // Util
+          Util: "./src/util",
           Traverse: "./src/util/traverse",
           Examples: "./src/util/examples",
           // Translate
-          ShaclDictionary: "./src/translation/shacl-dictionary",
-          ShaclTranslator: "./src/translation/shacl-translator"
+          ShaclDictionary: "./src/translation/shaclDictionary",
+          ShaclTranslator: "./src/translation/shaclTranslator"
         }
       }
     ]
