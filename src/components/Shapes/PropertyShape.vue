@@ -81,6 +81,7 @@ export default {
      * @returns an object mapping every property name to a property object.
      */
     getProperties() {
+      console.log("getProperties");
       const { id } = this.$props;
       const properties = {};
       for (const prop of this.$store.getters.nodeShapes[id].properties) {

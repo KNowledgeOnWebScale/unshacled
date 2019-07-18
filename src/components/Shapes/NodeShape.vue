@@ -36,7 +36,7 @@
 <script>
 import NodeProperty from "./NodeProperty.vue";
 import ReactiveInput from "../ReactiveInput.vue";
-import urlToName from "../../util/nameParser";
+import { urlToName } from "../../util/nameParser";
 import {
   DELETE_NODE_CONFIG,
   DELETE_PROP_CONFIG,

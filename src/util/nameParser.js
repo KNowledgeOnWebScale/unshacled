@@ -4,9 +4,16 @@
  * @param url
  * @returns {*}
  */
-function urlToName(url) {
+export function urlToName(url) {
   if (url.indexOf("#") < 0) return url;
   return url.substring(url.indexOf("#") + 1);
 }
 
-export { urlToName as default };
+/**
+ * Get the base url from a string.
+ * @param string
+ * @returns {*}
+ */
+export function extractUrl(string) {
+  return string.slice(0, string.indexOf("#") + 1);
+}

@@ -4,7 +4,7 @@ import { format } from "./util/enums/format";
 import { getConstraints } from "./util/constraintSelector";
 import { HEIGHT } from "./util/konvaConfigs";
 import EXAMPLE from "./util/examples";
-import urlToName from "./util/nameParser";
+import { urlToName, extractUrl } from "./util/nameParser";
 
 Vue.use(Vuex);
 
@@ -348,6 +348,7 @@ export default new Vuex.Store({
      */
     editNodeShape(store, args) {
       const { oldID, newID } = args;
+      // const newURL = extractUrl(oldID) + newID;
 
       // Update the shape's ID
       const index = store.getters.indexWithID(oldID);
@@ -366,8 +367,7 @@ export default new Vuex.Store({
 
       // Update the coordinates and y values.
       this.commit("updateLocations", args);
-
-      console.log(store);
+      console.log(store.getters.nodeShapes);
     },
 
     /**
@@ -398,7 +398,7 @@ export default new Vuex.Store({
       // Put the new value in the list of shape properties
       this.commit("addPropertyIDToShape", { propertyID: newID, shape });
       // Remove the old value from the list of shape properties.
-      this.commit("deletePropertyFromNode", { shape, oldID });
+      this.commit("deletePropertyFromShape", { shape, propertyID: oldID });
       // Update the y values
       this.commit("updateYValues", node);
       console.log(store);
@@ -416,6 +416,14 @@ export default new Vuex.Store({
       // Update the state's shapes.
       const shape = store.getters.shapeWithID(oldID);
       this.commit("updatePropertyShapeID", { shape, newID });
+      for (const n in store.getters.nodeShapes) {
+        const node = store.getters.nodeShapes[n];
+        this.commit("deletePropertyFromShape", {
+          shape: node,
+          propertyID: oldID
+        });
+        this.commit("addPropertyIDToShape", { shape: node, propertyID: newID });
+      }
       this.commit("updateLocations", { oldID, newID });
 
       // Update the y values of the properties.
