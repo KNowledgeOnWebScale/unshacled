@@ -8,6 +8,9 @@ import { urlToName, extractUrl } from "./util/nameParser";
 import { getNonOverlappingCoordinates } from "./util";
 import { ParserManager } from "./parsing/parserManager";
 import { TranslatorManager } from "./translation/translatorManager";
+import ValidatorManager from "./validation/validatorManager";
+import { SerializerManager } from "./parsing/serializerManager";
+import { ETF } from "./util/enums/extensionToFormat";
 
 Vue.use(Vuex);
 
@@ -21,7 +24,6 @@ export default new Vuex.Store({
     coordinates: {},
     showNodeShapeModal: false,
     showValidationReportModal: false,
-    internalModel: {},
     validationReport: "hello",
     dataFile: {}
   },
@@ -37,7 +39,7 @@ export default new Vuex.Store({
       reader.readAsText(file);
       reader.onload = function(event) {
         ParserManager.parse(event.target.result, fileExtension).then(e => {
-          state.internalModel = `${e}`;
+          state.model = e;
         });
       };
     },
@@ -657,7 +659,7 @@ export default new Vuex.Store({
      * @returns {state.internalModel|{}|string}
      */
     getInternalModelInJson: state => {
-      return state.internalModel;
+      return state.model;
     },
 
     /**
@@ -666,10 +668,7 @@ export default new Vuex.Store({
      * @returns {any}
      */
     getInternalModelInTurtle: state => {
-      return TranslatorManager.translateToLanguage(
-        state.internalModel,
-        state.format
-      );
+      return TranslatorManager.translateToLanguage(state.model, state.format);
     },
 
     /**

@@ -1,5 +1,5 @@
 import ShaclTranslator from "./shaclTranslator";
-
+import { format } from "../util/enums/format";
 /**
  *  TranslatorManager assigns translation tasks to the correct translator
  */
@@ -12,7 +12,7 @@ export class TranslatorManager {
    */
   static translateToModel(doc, lang) {
     switch (lang) {
-      case "SHACL":
+      case format.SHACL:
       case "shacl":
         return ShaclTranslator.toModel(doc);
       case "ShEx":
@@ -31,8 +31,10 @@ export class TranslatorManager {
    * @returns {any}
    */
   static translateToLanguage(doc, lang) {
+    console.log(doc)
+    console.log(lang)
     switch (lang) {
-      case "SHACL":
+      case format.SHACL:
       case "shacl":
         return ShaclTranslator.toSHACL(doc);
       case "ShEx":

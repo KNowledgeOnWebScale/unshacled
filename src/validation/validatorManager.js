@@ -1,5 +1,5 @@
 import ShaclValidator from "./shaclValidator";
-
+import { format } from "../util/enums/format";
 /**
  *  ValidatorManager assigns validation tasks to the correct translator
  */
@@ -13,7 +13,7 @@ export default class ValidatorManager {
    */
   static validate(data, shapes, language) {
     switch (language) {
-      case "SHACL":
+      case format.SHACL:
       case "shacl":
         return ShaclValidator.validate(data, shapes);
       case "ShEx":
