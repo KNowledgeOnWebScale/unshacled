@@ -36,6 +36,22 @@
       <sui-menu-item class="clickable" icon="add" @click="togglePropertyModal">
         Property
       </sui-menu-item>
+      <sui-menu-item class="clickable">
+        <div>
+          <label for="dataFile" style="cursor: pointer" icon="add" class="btn"
+            >Upload data</label
+          >
+          <input
+            id="dataFile"
+            style="display: none;"
+            type="file"
+            @change="uploadDataFile()"
+          />
+        </div>
+      </sui-menu-item>
+      <sui-menu-item class="clickable" icon="check" @click="validate">
+        Validate
+      </sui-menu-item>
       <sui-menu-item
         class="clickable"
         icon="trash"
@@ -96,6 +112,9 @@ export default {
     uploadDataFile() {
       const file = document.getElementById("dataFile").files[0];
       this.$store.commit("uploadDataFile", file);
+    },
+    validate() {
+      this.$store.commit("validate");
     }
   }
 };
