@@ -3,15 +3,19 @@
     <sui-modal v-model="this.$store.state.predicateModal.show">
       <sui-modal-header> Add Predicate Report </sui-modal-header>
       <sui-modal-content>
-        <select>
+        <select v-model="predicate" @change="selectPredicate()">
           <option
             v-for="obj in predicates"
             id="Preds"
             :key="obj"
-            value="key"
-            @change="selectPredicate"
+            :value="obj"
             >{{ obj }}</option
           >
+        </select>
+        <select v-if="objects">
+          <option v-for="obj in objects" id="Objects" :key="obj" :value="obj">{{
+            obj
+          }}</option>
         </select>
       </sui-modal-content>
       <sui-modal-actions>
@@ -26,17 +30,34 @@
 export default {
   name: "AddPredicateModal",
   props: ["type", "id"],
+  data() {
+    return {
+      predicate: "",
+      urls: {}
+    };
+  },
+
   computed: {
     predicates() {
       const predsWithoutUrl = [];
+
       if (this.type) {
         const preds = this.$store.getters.predicates(this.type);
+        console.log(preds);
         if (preds)
           preds.forEach(pred => {
-            predsWithoutUrl.push(pred.split("#")[1]);
+            const value = pred.split("#")[1];
+            this.urls[value] = pred.split("#")[0];
+            predsWithoutUrl.push(value);
           });
       }
       return predsWithoutUrl;
+    },
+
+    objects() {
+      const { objects } = this.$store.getters;
+      console.log(objects);
+      return objects;
     }
   },
   methods: {
@@ -45,10 +66,10 @@ export default {
       this.$store.commit("togglePredicateModal", args);
     },
     selectPredicate() {
-      const val = document.getElementById("Preds");
+      console.log(this.urls);
       this.$store.commit(
         "changePredicate",
-        val.options(val.selectedIndex).value
+        `${this.urls[this.predicate]}#${this.predicate}`
       );
     }
   }

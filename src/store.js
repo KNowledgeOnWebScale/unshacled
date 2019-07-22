@@ -714,6 +714,9 @@ export default new Vuex.Store({
       return possiblePredicates(ShaclDictionary.TERM[type]);
     },
     objects: state => {
+      console.log(state.predicateModal.predicate)
+      console.log(possibleObjects(state.predicateModal.predicate))
+
       return possibleObjects(state.predicateModal.predicate);
     }
   }
