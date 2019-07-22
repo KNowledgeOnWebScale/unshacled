@@ -117,11 +117,9 @@ export default {
      */
     getProperties() {
       const propNames = this.$store.getters.nodeProperties(this.$props.id);
-      const nodeObjects = this.$store.getters.nodeShapes;
+      const propertyObjects = this.$store.getters.propertyShapes;
       const propObjects = {};
-      for (const prop of propNames) {
-        propObjects[prop] = nodeObjects[prop];
-      }
+      for (const prop of propNames) propObjects[prop] = propertyObjects[prop];
       this.setPropConfigs(propObjects);
       return propObjects;
     },
@@ -149,14 +147,14 @@ export default {
 
       // Set y values for the button and text for adding a new property.
       this.propertyConfigs[NEW_PROPERTY_TEXT] = {
-        ...this.propTextConfig,
+        ...this.propertyConfig,
         y: ys[NEW_PROPERTY_TEXT]
       };
       // This text is not visible, but is used to position the input field.
       this.propTextConfigs[NEW_PROPERTY_TEXT] = {
         ...this.propTextConfig,
         y: ys[NEW_PROPERTY_TEXT] + DELTA_Y_TEXT,
-        text: NEW_PROPERTY_TEXT,
+        text: "",
         fill: "transparent"
       };
       this.addPropConfig.y = ys["addButton"];

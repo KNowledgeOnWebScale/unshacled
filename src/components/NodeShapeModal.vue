@@ -54,11 +54,11 @@ export default {
   methods: {
     confirmNodeShape() {
       this.error = this.idString === "";
+      const id = this.$props.isPropertyShapeModal
+        ? this.idString
+        : createUrl(this.idString);
 
       if (!this.error) {
-        const id = this.$props.isPropertyShapeModal
-          ? this.idString
-          : createUrl(this.idString);
         // Checks if name is a unique key, also checking propertyshapes
         for (const prop in this.$store.getters.propertyShapes) {
           if (this.$store.getters.propertyShapes[prop]["@id"] === id)

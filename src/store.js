@@ -162,9 +162,6 @@ export default new Vuex.Store({
       shape["https://2019.summerofcode.be/unshacled#path"][0][
         "@id"
       ] = `http://example.org/ns#${name}`;
-
-      // Update the ID in every node.
-      // for (const n of )
     },
 
     toggleValidationReport(state) {
@@ -365,28 +362,27 @@ export default new Vuex.Store({
     addPropertyToNode(store, args) {
       const { nodeID, propertyID } = args;
 
-      // Check if the new property name is already an existing PropertyShape.
-      if (!store.getters.propertyShapes[propertyID]) {
-        // If not, create a new PropertyShape that is a copy of the original one.
-        console.log(store.getters.propertyShapes);
-        const property = {
-          "@id": propertyID,
-          "https://2019.summerofcode.be/unshacled#path": [
-            { "@id": `http://example.org/ns#${urlToName(propertyID)}` } // TODO PascalCase
-          ]
-        };
+      if (propertyID !== "newProperty" && propertyID !== "") {
+        // Check if the new property name is already an existing PropertyShape.
+        if (!store.getters.propertyShapes[propertyID]) {
+          // If not, create a new PropertyShape that is a copy of the original one.
+          const property = {
+            "@id": propertyID,
+            "https://2019.summerofcode.be/unshacled#path": [
+              { "@id": `http://example.org/ns#${propertyID}` } // TODO PascalCase
+            ]
+          };
 
-        // Add the shape to the state.
-        this.commit("addShape", property);
+          // Add the shape to the state.
+          this.commit("addShape", property); // this works as intended
+        }
+
+        const shape = store.getters.shapeWithID(nodeID);
+        // Put the new value in the list of shape properties
+        this.commit("addPropertyIDToShape", { propertyID, shape });
+        // Update the y values
+        this.commit("updateYValues", nodeID);
       }
-
-      const shape = store.getters.shapeWithID(nodeID);
-      // Put the new value in the list of shape properties
-      this.commit("addPropertyIDToShape", { propertyID, shape });
-      // Remove the old value from the list of shape properties.
-      this.commit("deletePropertyFromShape", { shape, propertyID });
-      // Update the y values
-      this.commit("updateYValues", nodeID);
     },
 
     /**
@@ -457,7 +453,6 @@ export default new Vuex.Store({
       // Check if the new property name is already an existing PropertyShape.
       if (!store.getters.propertyShapes[newID]) {
         // If not, create a new PropertyShape that is a copy of the original one.
-        console.log(store.getters.propertyShapes);
         const copied = Vue.util.extend({}, store.getters.propertyShapes[oldID]);
         copied["@id"] = newID;
 
@@ -486,6 +481,7 @@ export default new Vuex.Store({
      * @param args
      */
     editPropertyShape(store, args) {
+      console.log("editPropertyShape");
       const { oldID, newID } = args;
 
       // Update the state's shapes.
