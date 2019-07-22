@@ -18,12 +18,6 @@
 <script>
 export default {
   name: "ValidationReportModal",
-  data() {
-    return {};
-  },
-  mounted() {
-    console.log("Validation report was mounted");
-  },
   methods: {
     toggleModal() {
       this.$store.commit("toggleValidationReport");

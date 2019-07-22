@@ -11,6 +11,8 @@ import { TranslatorManager } from "./translation/translatorManager";
 import ValidatorManager from "./validation/validatorManager";
 import { SerializerManager } from "./parsing/serializerManager";
 import { ETF } from "./util/enums/extensionToFormat";
+import ShaclDictionary from "./translation/shaclDictionary";
+import { possiblePredicates, possibleObjects } from "./util/vocabulary";
 
 Vue.use(Vuex);
 
@@ -24,6 +26,12 @@ export default new Vuex.Store({
     coordinates: {},
     showNodeShapeModal: false,
     showValidationReportModal: false,
+    predicateModal: {
+      show: false,
+      id: String,
+      type: String,
+      predicate: String
+    },
     validationReport: "hello",
     dataFile: {},
     dataFileExtension: String
@@ -43,6 +51,16 @@ export default new Vuex.Store({
           state.model = e;
         });
       };
+    },
+
+    togglePredicateModal(state, args) {
+      state.predicateModal.show = !state.predicateModal.show;
+      state.predicateModal.id = args.id;
+      state.predicateModal.type = args.type;
+    },
+
+    changePredicate(state, pred) {
+      state.predicateModal.predicate = pred;
     },
 
     /**
@@ -690,6 +708,13 @@ export default new Vuex.Store({
      */
     getDataFile: state => {
       return state.dataFile;
+    },
+
+    predicates: () => type => {
+      return possiblePredicates(ShaclDictionary.TERM[type]);
+    },
+    objects: state => {
+      return possibleObjects(state.predicateModal.predicate);
     }
   }
 });

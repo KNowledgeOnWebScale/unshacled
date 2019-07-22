@@ -14,10 +14,16 @@
         :config="idTextConfig"
         @click="startEditing"
       ></v-text>
-      <v-circle
+       <v-circle
         v-if="hover"
         :config="deleteNodeConfig"
         @mousedown="deletePropertyShape"
+      ></v-circle>
+
+      <v-circle
+        v-if="hover"
+        :config="addPredConfig"
+        @mousedown="addPredicate"
       ></v-circle>
 
       <!-- TODO add button for adding property -->
@@ -29,6 +35,7 @@
 import ReactiveInput from "../ReactiveInput.vue";
 import { urlToName } from "../../util/nameParser";
 import {
+  ADD_PRED_CONFIG,
   DELETE_NODE_CONFIG,
   ID_TEXT_CONFIG,
   PROP_TEXT_CONFIG,
@@ -57,6 +64,7 @@ export default {
       deletePropConfigs: {},
       shapeConfig: PROPERTY_SHAPE_CONFIG,
       deleteNodeConfig: DELETE_NODE_CONFIG,
+      addPredConfig: ADD_PRED_CONFIG,
       idTextConfig: {
         ...ID_TEXT_CONFIG,
         text: urlToName(this.$props.id)
@@ -151,12 +159,20 @@ export default {
      */
     updateCoordinates() {
       const pos = this.$refs.posRef.getNode().position();
-      const args = {
-        node: this.$props.id,
-        x: pos.x,
-        y: pos.y
-      };
-      this.$store.commit("updateCoordinates", args);
+      if (pos) {
+        const args = {
+          node: this.$props.id,
+          x: pos.x,
+          y: pos.y
+        };
+        this.$store.commit("updateCoordinates", args);
+      }
+    },
+
+    addPredicate() {
+      const args = { id: this.id, type: "PropertyShape" };
+      console.log(args);
+      this.$store.commit("togglePredicateModal", args);
     }
   }
 };

@@ -31,6 +31,13 @@ export const DELETE_NODE_CONFIG = {
   fill: "red"
 };
 
+export const ADD_PRED_CONFIG = {
+  x: BUTTON_OFFSET - 20,
+  y: 10,
+  radius: 6,
+  fill: "green"
+}
+
 export const ID_TEXT_CONFIG = {
   x: X,
   y: 15,

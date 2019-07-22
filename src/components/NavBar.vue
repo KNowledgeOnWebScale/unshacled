@@ -48,6 +48,10 @@
       :is-property-shape-modal="createPropertyShape"
     ></node-shape-modal>
     <validation-report-modal></validation-report-modal>
+    <add-predicate-modal
+      v-bind:id="this.$store.state.predicateModal.id"
+      v-bind:type="this.$store.state.predicateModal.type"
+    ></add-predicate-modal>
   </div>
 </template>
 
@@ -56,6 +60,7 @@ import SuiDropdown from "semantic-ui-vue/dist/commonjs/modules/Dropdown/Dropdown
 import SuiDropdownDivider from "semantic-ui-vue/dist/commonjs/modules/Dropdown/DropdownDivider";
 import NodeShapeModal from "./NodeShapeModal.vue";
 import ValidationReportModal from "./ValidationReportModal.vue";
+import AddPredicateModal from "./AddPredicateModal.vue";
 
 export default {
   name: "NavBar",
@@ -63,7 +68,8 @@ export default {
     NodeShapeModal,
     SuiDropdownDivider,
     SuiDropdown,
-    ValidationReportModal
+    ValidationReportModal,
+    AddPredicateModal
   },
   data() {
     return {
