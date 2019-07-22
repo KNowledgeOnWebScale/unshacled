@@ -9,6 +9,9 @@ import { urlToName, extractUrl } from "./util/nameParser";
 import { getNonOverlappingCoordinates } from "./util";
 import { ParserManager } from "./parsing/parserManager";
 import { TranslatorManager } from "./translation/translatorManager";
+import ValidatorManager from "./validation/validatorManager";
+import { SerializerManager } from "./parsing/serializerManager";
+import { ETF } from "./util/enums/extensionToFormat";
 
 Vue.use(Vuex);
 
@@ -21,10 +24,11 @@ export default new Vuex.Store({
     yValues: {},
     coordinates: {},
     showNodeShapeModal: false,
+    showClearModal: false,
     showValidationReportModal: false,
-    internalModel: {},
     validationReport: "hello",
-    dataFile: {}
+    dataFile: {},
+    dataFileExtension: String
   },
   mutations: {
     /**
@@ -38,7 +42,7 @@ export default new Vuex.Store({
       reader.readAsText(file);
       reader.onload = function(event) {
         ParserManager.parse(event.target.result, fileExtension).then(e => {
-          state.internalModel = `${e}`;
+          state.model = e;
         });
       };
     },
@@ -50,11 +54,22 @@ export default new Vuex.Store({
      * */
     uploadDataFile(state, file) {
       const reader = new FileReader();
+      state.dataFileExtension = file.name.split(".").pop();
       reader.readAsText(file);
       reader.onload = function(event) {
-        console.log(event.target.result);
         state.dataFile = event.target.result;
       };
+    },
+
+    validate(state) {
+      SerializerManager.serialize(state.model, ETF.ttl).then(e => {
+        ValidatorManager.validate(state.dataFile, e, state.format)
+          .then(e => {
+            state.validationReport = e;
+            state.showValidationReportModal = true;
+          })
+          .catch(e => console.log(`failure : ${e}`));
+      });
     },
 
     /**
@@ -312,6 +327,15 @@ export default new Vuex.Store({
     toggleShapeModal(state) {
       event.preventDefault();
       state.showNodeShapeModal = !state.showNodeShapeModal;
+    },
+
+    /**
+     * Toggle the visibility of the clear modal.
+     * @param state
+     */
+    toggleClearModal(state) {
+      event.preventDefault();
+      state.showClearModal = !state.showClearModal;
     },
 
     /**
@@ -689,7 +713,7 @@ export default new Vuex.Store({
      * @returns {state.internalModel|{}|string}
      */
     getInternalModelInJson: state => {
-      return state.internalModel;
+      return state.model;
     },
 
     /**
@@ -698,10 +722,7 @@ export default new Vuex.Store({
      * @returns {any}
      */
     getInternalModelInTurtle: state => {
-      return TranslatorManager.translateToLanguage(
-        state.internalModel,
-        state.format
-      );
+      return TranslatorManager.translateToLanguage(state.model, state.format);
     },
 
     /**
