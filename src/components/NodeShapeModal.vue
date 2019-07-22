@@ -53,19 +53,23 @@ export default {
   },
   methods: {
     confirmNodeShape() {
-      this.error = false;
-      const id = this.$props.isPropertyShapeModal
-        ? this.idString
-        : createUrl(this.idString);
-      // Checks if name is a unique key, also checking propertyshapes
-      for (const prop in this.$store.getters.propertyShapes) {
-        if (this.$store.getters.propertyShapes[prop]["@id"] === id)
+      this.error = this.idString === "";
+
+      if (!this.error) {
+        const id = this.$props.isPropertyShapeModal
+          ? this.idString
+          : createUrl(this.idString);
+        // Checks if name is a unique key, also checking propertyshapes
+        for (const prop in this.$store.getters.propertyShapes) {
+          if (this.$store.getters.propertyShapes[prop]["@id"] === id)
+            this.error = true;
+        }
+        // Only commit if the name is unique. Otherwise, show an error message.
+        if (this.$store.getters.nodeShapes[id]) {
           this.error = true;
+        }
       }
-      // Only commit if the name is unique. Otherwise, show an error message.
-      if (id === "" || this.$store.getters.nodeShapes[id]) {
-        this.error = true;
-      }
+
       if (!this.error) {
         this.toggleShapeModal();
         this.idString = "";
