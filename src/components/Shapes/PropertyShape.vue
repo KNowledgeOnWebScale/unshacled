@@ -21,7 +21,7 @@
       <v-circle
         v-if="hover"
         :config="deleteNodeConfig"
-        @mousedown="deletePropertyShape"
+        @click="deletePropertyShape"
       ></v-circle>
 
       <!-- TODO add button for adding property -->

@@ -1,8 +1,8 @@
 <template>
   <div>
     <input ref="input" type="text" @blur="stopEditing" />
-    <input ref="listInput" type="text" list="datalist" @blur="stopEditing">
-    <datalist id="datalist" ref="datalist" type="text" @blur="stopEditing">
+    <input ref="listInput" type="text" list="datalist" @blur="stopEditing" />
+    <datalist id="datalist" ref="datalist" type="text">
       <option
         v-for="key in getSelectOptions()"
         :key="getOptionID(key)"

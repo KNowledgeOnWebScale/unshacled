@@ -14,7 +14,7 @@
       ></v-text>
       <v-circle
         :config="this.$props.deletePropConfig"
-        @mousedown="deleteProperty"
+        @click="deleteProperty"
       ></v-circle>
     </v-group>
   </div>
@@ -73,7 +73,7 @@ export default {
       ];
       if (newValue !== "" && properties.indexOf(newValue) === -1) {
         const args = {
-          node: this.$props.node,
+          nodeID: this.$props.node,
           oldID: this.$props.propKey,
           newID: newValue
         };
