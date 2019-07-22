@@ -7,7 +7,7 @@ import { format } from "./util/enums/format";
 import { getConstraints } from "./util/constraintSelector";
 import { urlToName, extractUrl } from "./util/nameParser";
 import { getNonOverlappingCoordinates } from "./util";
-import { ParserManager } from "./parsing/parserManager";
+import ParserManager from "./parsing/parserManager";
 import { TranslatorManager } from "./translation/translatorManager";
 import ValidatorManager from "./validation/validatorManager";
 import { SerializerManager } from "./parsing/serializerManager";
@@ -39,9 +39,10 @@ export default new Vuex.Store({
     uploadSchemaFile(state, file) {
       const reader = new FileReader();
       const fileExtension = file.name.split(".").pop();
+      const type = ETF[fileExtension];
       reader.readAsText(file);
       reader.onload = function(event) {
-        ParserManager.parse(event.target.result, fileExtension).then(e => {
+        ParserManager.parse(event.target.result, type).then(e => {
           state.model = e;
         });
       };
