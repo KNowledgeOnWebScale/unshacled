@@ -1,6 +1,10 @@
 <template>
   <div>
-    <reactive-input ref="reactiveInput" :on-exit="stopEditing"></reactive-input>
+    <reactive-input
+      ref="reactiveInput"
+      :is-datalist="false"
+      :on-exit="stopEditing"
+    ></reactive-input>
     <v-group
       ref="posRef"
       :draggable="true"
@@ -35,7 +39,7 @@
 
 <script>
 import NodeProperty from "./NodeProperty.vue";
-import ReactiveInput from "../ReactiveInput.vue";
+import ReactiveInput from "../FormElements/ReactiveInput.vue";
 import { urlToName } from "../../util/nameParser";
 import {
   DELETE_NODE_CONFIG,
@@ -124,6 +128,8 @@ export default {
         };
       }
     },
+
+    addProperty() {},
 
     /**
      * Call the ReactiveInput component to start editing using the given text node.

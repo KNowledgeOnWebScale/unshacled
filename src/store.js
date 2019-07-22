@@ -184,11 +184,11 @@ export default new Vuex.Store({
 
       // Update coordinates
       Vue.set(state.coordinates, newID, state.coordinates[oldID]);
-      Vue.delete(state.coordinates, oldID);
+      if (oldID !== newID) Vue.delete(state.coordinates, oldID);
 
       // Update yValues
       Vue.set(state.yValues, newID, state.yValues[oldID]);
-      Vue.delete(state.yValues, oldID);
+      if (oldID !== newID) Vue.delete(state.yValues, oldID);
     },
 
     /* DELETE ======================================================================================================= */
@@ -401,23 +401,26 @@ export default new Vuex.Store({
       const { oldID, newID } = args;
       const newURL = extractUrl(oldID) + newID;
 
-      // Update the shape's ID
-      const index = store.getters.indexWithID(oldID);
-      this.commit("updateShapeID", { index, newID: newURL }); // OK
+      // If the ID has changed
+      if (oldID !== newURL) {
+        // Update the shape's ID
+        const index = store.getters.indexWithID(oldID);
+        this.commit("updateShapeID", { index, newID: newURL }); // OK
 
-      // Update Relationships TODO
-      /*
-      for (let prop in state.relationships) {
-        if (state.relationships[prop].one === oldID)
-          state.relationships[prop].one = newID;
-        if (state.relationships[prop].two === oldID)
-          state.relationships[prop].two = newID;
-        prop = state.relationships[prop].one + state.relationships[prop].two;
+        // Update Relationships TODO
+        /*
+        for (let prop in state.relationships) {
+          if (state.relationships[prop].one === oldID)
+            state.relationships[prop].one = newID;
+          if (state.relationships[prop].two === oldID)
+            state.relationships[prop].two = newID;
+          prop = state.relationships[prop].one + state.relationships[prop].two;
+        }
+         */
+
+        // Update the coordinates and y values.
+        this.commit("updateLocations", { oldID, newID: newURL });
       }
-       */
-
-      // Update the coordinates and y values.
-      this.commit("updateLocations", { oldID, newID: newURL });
     },
 
     /**

@@ -1,6 +1,10 @@
 <template>
   <div>
-    <reactive-input ref="reactiveInput" :on-exit="stopEditing"></reactive-input>
+    <reactive-input
+      ref="reactiveInput"
+      :is-datalist="true"
+      :on-exit="stopEditing"
+    ></reactive-input>
     <v-group>
       <v-rect :config="this.$props.propertyConfig"></v-rect>
       <v-text
@@ -17,7 +21,7 @@
 </template>
 
 <script>
-import ReactiveInput from "../ReactiveInput.vue";
+import ReactiveInput from "../FormElements/ReactiveInput.vue";
 
 export default {
   name: "NodeProperty",
@@ -49,8 +53,12 @@ export default {
      * Call the ReactiveInput component to start editing using the given text node.
      */
     startEditing() {
-      if (this.$refs.reactiveInput)
-        this.$refs.reactiveInput.startEditing(this.$refs.propKey.getNode());
+      if (this.$refs.reactiveInput) {
+        this.$refs.reactiveInput.startEditing(
+          this.$refs.propKey.getNode(),
+          this.$props.propKey
+        );
+      }
     },
 
     /**
