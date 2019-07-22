@@ -103,6 +103,7 @@ export default new Vuex.Store({
         coordinates: state.coordinates
       });
       Vue.set(state.coordinates, object["@id"], { x, y });
+      this.commit("updateYValues", object["@id"]);
     },
 
     /**
@@ -164,6 +165,10 @@ export default new Vuex.Store({
       ] = `http://example.org/ns#${name}`;
     },
 
+    /**
+     * TODO
+     * @param state
+     */
     toggleValidationReport(state) {
       event.preventDefault();
       state.showValidationReportModal = !state.showValidationReportModal;
@@ -481,7 +486,6 @@ export default new Vuex.Store({
      * @param args
      */
     editPropertyShape(store, args) {
-      console.log("editPropertyShape");
       const { oldID, newID } = args;
 
       // Update the state's shapes.

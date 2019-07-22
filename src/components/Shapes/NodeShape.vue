@@ -228,6 +228,7 @@ export default {
         x: pos.x,
         y: pos.y
       };
+      this.$store.commit("updateYValues", this.$props.id);
       this.$store.commit("updateCoordinates", args);
     }
   }
