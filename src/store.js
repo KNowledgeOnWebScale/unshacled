@@ -21,6 +21,7 @@ export default new Vuex.Store({
     yValues: {},
     coordinates: {},
     showNodeShapeModal: false,
+    showClearModal: false,
     showValidationReportModal: false,
     internalModel: {},
     validationReport: "hello",
@@ -308,6 +309,15 @@ export default new Vuex.Store({
     toggleShapeModal(state) {
       event.preventDefault();
       state.showNodeShapeModal = !state.showNodeShapeModal;
+    },
+
+    /**
+     * Toggle the visibility of the clear modal.
+     * @param state
+     */
+    toggleClearModal(state) {
+      event.preventDefault();
+      state.showClearModal = !state.showClearModal;
     },
 
     /**

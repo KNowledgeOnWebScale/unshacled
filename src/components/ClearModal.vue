@@ -1,0 +1,33 @@
+<template>
+  <div>
+    <sui-modal v-model="this.$store.state.showClearModal">
+      <sui-modal-header>
+        Delete document?
+      </sui-modal-header>
+      <sui-modal-actions>
+        <sui-button negative @click="confirm">Delete</sui-button>
+        <sui-button @click="cancel">Cancel</sui-button>
+      </sui-modal-actions>
+    </sui-modal>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "ClearModal",
+  methods: {
+    confirm() {
+      this.$store.commit("clear");
+      this.toggleClearModal();
+    },
+    cancel() {
+      this.toggleClearModal();
+    },
+    toggleClearModal() {
+      this.$store.commit("toggleClearModal");
+    }
+  }
+};
+</script>
+
+<style scoped></style>
