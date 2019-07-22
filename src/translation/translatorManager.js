@@ -31,8 +31,6 @@ export class TranslatorManager {
    * @returns {any}
    */
   static translateToLanguage(doc, lang) {
-    console.log(doc)
-    console.log(lang)
     switch (lang) {
       case format.SHACL:
       case "shacl":

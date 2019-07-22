@@ -25,7 +25,8 @@ export default new Vuex.Store({
     showNodeShapeModal: false,
     showValidationReportModal: false,
     validationReport: "hello",
-    dataFile: {}
+    dataFile: {},
+    dataFileExtension: String
   },
   mutations: {
     /**
@@ -51,11 +52,22 @@ export default new Vuex.Store({
      * */
     uploadDataFile(state, file) {
       const reader = new FileReader();
+      state.dataFileExtension = file.name.split(".").pop();
       reader.readAsText(file);
       reader.onload = function(event) {
-        console.log(event.target.result);
         state.dataFile = event.target.result;
       };
+    },
+
+    validate(state) {
+      SerializerManager.serialize(state.model, ETF.ttl).then(e => {
+        ValidatorManager.validate(state.dataFile, e, state.format)
+          .then(e => {
+            state.validationReport = e;
+            state.showValidationReportModal = true;
+          })
+          .catch(e => console.log(`failure : ${e}`));
+      });
     },
 
     /**
