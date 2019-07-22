@@ -26,11 +26,14 @@
           >
           <input
             id="dataFile"
-            style="visibility:hidden;"
+            style="display: none;"
             type="file"
             @change="uploadDataFile()"
           />
         </div>
+      </sui-menu-item>
+      <sui-menu-item class="clickable" icon="check" @click="validate">
+        Validate
       </sui-menu-item>
       <sui-menu-item
         class="clickable"
@@ -89,6 +92,9 @@ export default {
     uploadDataFile() {
       const file = document.getElementById("dataFile").files[0];
       this.$store.commit("uploadDataFile", file);
+    },
+    validate() {
+      this.$store.commit("validate");
     }
   }
 };
