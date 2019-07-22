@@ -39,7 +39,7 @@
       <sui-menu-item
         class="clickable"
         icon="trash"
-        @click="clear"
+        @click="toggleClearModal"
       ></sui-menu-item>
       <sui-menu-menu position="right">
         <sui-menu-item class="clickable" icon="user"></sui-menu-item>
@@ -48,6 +48,7 @@
     <node-shape-modal
       :is-property-shape-modal="createPropertyShape"
     ></node-shape-modal>
+    <clear-modal></clear-modal>
     <validation-report-modal></validation-report-modal>
   </div>
 </template>
@@ -55,12 +56,14 @@
 <script>
 import SuiDropdown from "semantic-ui-vue/dist/commonjs/modules/Dropdown/Dropdown";
 import SuiDropdownDivider from "semantic-ui-vue/dist/commonjs/modules/Dropdown/DropdownDivider";
+import ClearModal from "./ClearModal.vue";
 import NodeShapeModal from "./NodeShapeModal.vue";
 import ValidationReportModal from "./ValidationReportModal.vue";
 
 export default {
   name: "NavBar",
   components: {
+    ClearModal,
     NodeShapeModal,
     SuiDropdownDivider,
     SuiDropdown,
@@ -72,15 +75,15 @@ export default {
     };
   },
   methods: {
-    clear() {
-      this.$store.commit("clear");
-    },
     loadExample() {
       this.$store.commit("loadExample");
     },
     toggleShapeModal() {
       this.createPropertyShape = false;
       this.$store.commit("toggleShapeModal");
+    },
+    toggleClearModal() {
+      this.$store.commit("toggleClearModal");
     },
     togglePropertyModal() {
       this.createPropertyShape = true;
