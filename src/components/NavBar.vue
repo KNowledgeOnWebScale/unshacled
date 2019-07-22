@@ -3,10 +3,27 @@
     <sui-menu ref="navbar" attached="top" inverted>
       <sui-dropdown item icon="file alternate" simple>
         <sui-dropdown-menu>
-          <sui-dropdown-item
-            ><input id="file" type="file" @change="readTextFile()"
-          /></sui-dropdown-item>
-          <sui-dropdown-item>Export</sui-dropdown-item>
+          <sui-dropdown-item @click="$refs.importShapes.click()">
+            <label for="importShapes">Import Shapes...</label>
+            <input
+              id="importShapes"
+              ref="importShapes"
+              type="file"
+              style="display: none"
+              @change="readTextFile()"
+            />
+          </sui-dropdown-item>
+          <sui-dropdown-item @click="$refs.importData.click()">
+            <label for="importData">Import Data...</label>
+            <input
+              id="importData"
+              ref="importData"
+              type="file"
+              style="display: none"
+              @change="uploadDataFile()"
+            />
+          </sui-dropdown-item>
+          <sui-dropdown-item>Export Shapes</sui-dropdown-item>
           <sui-dropdown-divider></sui-dropdown-divider>
           <sui-dropdown-item @click="loadExample">
             Load Example

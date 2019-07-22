@@ -1,3 +1,4 @@
+import { clone } from "ramda";
 import Vue from "vue";
 import Vuex from "vuex";
 import EXAMPLE from "./util/examples";
@@ -90,7 +91,7 @@ export default new Vuex.Store({
       const example = EXAMPLE.model[0];
       state.model = [];
       for (const element of example) {
-        state.model.push(Vue.util.extend({}, element)); // Deep copy
+        state.model.push(clone(element)); // Deep copy
       }
 
       // Update y values and set coordinates to zero
