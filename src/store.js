@@ -489,15 +489,20 @@ export default new Vuex.Store({
       this.commit("updatePropertyShapeID", { shape, newID });
       for (const n in store.getters.nodeShapes) {
         const node = store.getters.nodeShapes[n];
-        this.commit("deletePropertyFromShape", {
-          shape: node,
-          propertyID: oldID
-        });
-        this.commit("addPropertyIDToShape", { shape: node, propertyID: newID });
-        this.commit("deletePropertyFromShape", {
-          shape: node,
-          propertyID: oldID
-        });
+        if (store.getters.nodeProperties(n).indexOf(oldID) !== -1) {
+          this.commit("deletePropertyFromShape", {
+            shape: node,
+            propertyID: oldID
+          });
+          this.commit("addPropertyIDToShape", {
+            shape: node,
+            propertyID: newID
+          });
+          this.commit("deletePropertyFromShape", {
+            shape: node,
+            propertyID: oldID
+          });
+        }
       }
       this.commit("updateLocations", { oldID, newID });
 
