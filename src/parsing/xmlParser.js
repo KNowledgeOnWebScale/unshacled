@@ -5,7 +5,7 @@ export default class XMLParser {
   /**
    * Takes a RDF document and its format type, returns the document as JSON-LD.
    * @param doc RDF document
-   * @param type Format type e.g. "text/turtle" Accepted types include: Turtle, TriG, N-Triples, N-Quads, and Notation3
+   * @param type Format type e.g. "application/rdf+xml" Accepted types include: RDF/XML
    * @returns {Promise<Object>} Promise which resolves to JSON-LD Object
    */
   static parse(doc, type) {

@@ -10,7 +10,7 @@ import { getNonOverlappingCoordinates } from "./util";
 import ParserManager from "./parsing/parserManager";
 import { TranslatorManager } from "./translation/translatorManager";
 import ValidatorManager from "./validation/validatorManager";
-import { SerializerManager } from "./parsing/serializerManager";
+import SerializerManager from "./parsing/serializerManager";
 import { ETF } from "./util/enums/extensionToFormat";
 
 Vue.use(Vuex);

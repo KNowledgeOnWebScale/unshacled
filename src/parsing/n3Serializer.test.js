@@ -1,4 +1,4 @@
-import * as Serializers from "./serializers";
+import N3Serializer from "./n3Serializer";
 
 const ttlShacl = `_:b0 <http://www.w3.org/ns/shacl#class> <http://example.org/ns#PostalAddress>;
     <http://www.w3.org/ns/shacl#path> <http://example.org/ns#address>.
@@ -29,7 +29,7 @@ const jsonldSHACL = [
 ];
 
 test("json-ld to turtle", async () => {
-  const turtle = await Serializers.N3Serializer.serialize(
+  const turtle = await N3Serializer.serialize(
     jsonldSHACL,
     "text/turtle"
   );
