@@ -6,6 +6,7 @@
  */
 export default function traverse(o, func, ...args) {
   for (const i in o) {
+    // eslint-disable-next-line babel/no-invalid-this
     func.apply(this, [i, o[i], ...args]);
     if (o[i] !== null && typeof o[i] === "object") {
       traverse(o[i], func, ...args);

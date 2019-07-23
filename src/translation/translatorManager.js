@@ -1,5 +1,5 @@
 import ShaclTranslator from "./shaclTranslator";
-import { format } from "../util/enums/format";
+import language from "../util/enums/languages";
 /**
  *  TranslatorManager assigns translation tasks to the correct translator
  */
@@ -12,11 +12,9 @@ export class TranslatorManager {
    */
   static translateToModel(doc, lang) {
     switch (lang) {
-      case format.SHACL:
-      case "shacl":
+      case language.SHACL:
         return ShaclTranslator.toModel(doc);
-      case "ShEx":
-      case "shex":
+      case language.SHEX:
         console.log("SHEX IS NOT YET SUPPORTED");
         break;
       default:
@@ -32,11 +30,9 @@ export class TranslatorManager {
    */
   static translateToLanguage(doc, lang) {
     switch (lang) {
-      case format.SHACL:
-      case "shacl":
+      case language.SHACL:
         return ShaclTranslator.toSHACL(doc);
-      case "ShEx":
-      case "shex":
+      case language.SHEX:
         console.log("SHEX IS NOT YET SUPPORTED");
         break;
       default:

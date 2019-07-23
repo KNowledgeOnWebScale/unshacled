@@ -3,7 +3,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import EXAMPLE from "./util/examples";
 import { HEIGHT } from "./util/konvaConfigs";
-import { format } from "./util/enums/format";
+import language from "./util/enums/languages";
 import { getConstraints } from "./util/constraintSelector";
 import { urlToName, extractUrl } from "./util/nameParser";
 import { getNonOverlappingCoordinates } from "./util";
@@ -19,7 +19,7 @@ export default new Vuex.Store({
   state: {
     editor: null,
     model: [],
-    format: format.SHACL,
+    format: language.SHACL,
     // relationships: {}, // TODO remove this
     yValues: {},
     coordinates: {},
