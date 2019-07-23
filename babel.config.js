@@ -22,8 +22,8 @@ module.exports = {
           Traverse: "./src/util/traverse",
           Examples: "./src/util/examples",
           // Translate
-          ShaclDictionary: "./src/translation/shacl-dictionary",
-          ShaclTranslator: "./src/translation/shacl-translator"
+          ShaclDictionary: "./src/translation/shaclDictionary",
+          ShaclTranslator: "./src/translation/shaclTranslator"
         }
       }
     ]

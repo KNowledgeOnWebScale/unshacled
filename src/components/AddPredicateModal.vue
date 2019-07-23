@@ -3,8 +3,12 @@
     <sui-modal v-model="this.$store.state.predicateModal.show">
       <sui-modal-header> Add Predicate Report {{ input }}</sui-modal-header>
       <sui-modal-content>
-        Predicate:
-        <select v-model="predicate" @change="selectPredicate()">
+        <label for="selectPreds">Predicate:</label>
+        <select
+          id="selectPreds"
+          v-model="predicate"
+          @change="selectPredicate()"
+        >
           <option
             v-for="obj in predicates"
             id="Preds"
@@ -14,8 +18,8 @@
           >
         </select>
         <br />
-        Object:
-        <select v-model="object" v-if="objects">
+        <label for="selectObjects">Object:</label>
+        <select v-if="objects" id="selectObjects" v-model="object">
           <option v-for="obj in objects" id="Objects" :key="obj" :value="obj">{{
             obj
           }}</option>
@@ -36,6 +40,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 import ValueType from "../util/enums/ValueType";
 
 export default {
@@ -60,7 +65,7 @@ export default {
         if (preds)
           preds.forEach(pred => {
             const value = pred.split("#")[1];
-            this.urls[value] = pred.split("#")[0];
+            Vue.set(this.urls, value, pred.split("#")[0]);
             predsWithoutUrl.push(value);
           });
       }
@@ -87,14 +92,15 @@ export default {
     addPredicate() {
       const pred = this.$store.state.predicateModal.predicate;
       const val = ValueType(pred);
-      if (val === undefined)
-        this.error = true;
-      else
-        this.error = false;
-      console.log(val)
-      const args = { pred, id: this.id, vt: val, input: this.input, object: this.object };
-      if(!this.error)
-      this.$store.commit("addPredicate", args);
+      this.error = val === undefined;
+      const args = {
+        pred,
+        id: this.id,
+        vt: val,
+        input: this.input,
+        object: this.object
+      };
+      if (!this.error) this.$store.commit("addPredicate", args);
     }
   }
 };

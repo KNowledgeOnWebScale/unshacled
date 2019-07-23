@@ -1,3 +1,4 @@
+import { clone } from "ramda";
 import Vue from "vue";
 import Vuex from "vuex";
 import EXAMPLE from "./util/examples";
@@ -25,6 +26,7 @@ export default new Vuex.Store({
     yValues: {},
     coordinates: {},
     showNodeShapeModal: false,
+    showClearModal: false,
     showValidationReportModal: false,
     predicateModal: {
       show: false,
@@ -54,26 +56,24 @@ export default new Vuex.Store({
     },
 
     addPredicate(state, args) {
-      console.log(state.model);
       const propertyShapeId = args.id;
       const predicate = args.pred;
       const valueType = args.vt;
       const obj = state.model.filter(e => e["@id"] === propertyShapeId).pop();
-      if(valueType === "id"){
+      if (valueType === "id") {
         obj[predicate] = [];
         obj[predicate].push({ "@id": args.input });
       }
-      if(valueType === "type"){
+      if (valueType === "type") {
         obj[predicate] = [];
         obj[predicate].push({ "@type": args.object, "@value": args.input });
       }
-      if(valueType === "lists"){
+      if (valueType === "lists") {
         obj[predicate] = [];
-        obj[predicate].push({ "@id": args.input});
+        obj[predicate].push({ "@id": args.input });
       }
-      console.log(state.model);
       state.predicateModal.show = !state.predicateModal.show;
-      },
+    },
 
     togglePredicateModal(state, args) {
       state.predicateModal.show = !state.predicateModal.show;
@@ -130,7 +130,7 @@ export default new Vuex.Store({
       const example = EXAMPLE.model[0];
       state.model = [];
       for (const element of example) {
-        state.model.push(Vue.util.extend({}, element)); // Deep copy
+        state.model.push(clone(element)); // Deep copy
       }
 
       // Update y values and set coordinates to zero
@@ -156,6 +156,7 @@ export default new Vuex.Store({
         coordinates: state.coordinates
       });
       Vue.set(state.coordinates, object["@id"], { x, y });
+      this.commit("updateYValues", object["@id"]);
     },
 
     /**
@@ -180,6 +181,10 @@ export default new Vuex.Store({
     addPropertyIDToShape(state, args) {
       const { propertyID, shape } = args;
       // FIXME this assumes properties, not constraints or targetNodes or sth
+      const p = shape["https://2019.summerofcode.be/unshacled#property"];
+      if (!p) {
+        shape["https://2019.summerofcode.be/unshacled#property"] = [];
+      }
       shape["https://2019.summerofcode.be/unshacled#property"].push({
         "@id": propertyID
       });
@@ -215,11 +220,12 @@ export default new Vuex.Store({
       shape["https://2019.summerofcode.be/unshacled#path"][0][
         "@id"
       ] = `http://example.org/ns#${name}`;
-
-      // Update the ID in every node.
-      // for (const n of )
     },
 
+    /**
+     * TODO
+     * @param state
+     */
     toggleValidationReport(state) {
       event.preventDefault();
       state.showValidationReportModal = !state.showValidationReportModal;
@@ -237,11 +243,11 @@ export default new Vuex.Store({
 
       // Update coordinates
       Vue.set(state.coordinates, newID, state.coordinates[oldID]);
-      Vue.delete(state.coordinates, oldID);
+      if (oldID !== newID) Vue.delete(state.coordinates, oldID);
 
       // Update yValues
       Vue.set(state.yValues, newID, state.yValues[oldID]);
-      Vue.delete(state.yValues, oldID);
+      if (oldID !== newID) Vue.delete(state.yValues, oldID);
     },
 
     /* DELETE ======================================================================================================= */
@@ -297,32 +303,47 @@ export default new Vuex.Store({
         if (item["@id"] === nodeID) node = item;
       }
 
-      // FIXME code duplication, find a way to use `nodeProperties` >.<
+      // FIXME code duplication, find a way to use `shapeProperties` >.<
       const propertyObjects =
         node["https://2019.summerofcode.be/unshacled#property"];
 
-      // Get the references to property shapes
+      // Get the references to property shapes.
       const properties = [];
       if (propertyObjects) {
         for (const p of propertyObjects) properties.push(p["@id"]);
       }
 
-      // Get the other properties
+      // The other properties.
       const ignored = [
         "@id",
         "@type",
-        "https://2019.summerofcode.be/unshacled#property",
-        "https://2019.summerofcode.be/unshacled#targetNode"
+        "https://2019.summerofcode.be/unshacled#property"
       ];
+
+      // Get the IDs form all the constraints.
+      const constraints = [];
+      for (const c in node) {
+        if (!ignored.includes(c)) constraints.push(c);
+      }
+
+      // Get the IDs from all the properties.
       for (const p in node) {
         if (!ignored.includes(p)) properties.push(p[0]["@id"]);
       }
 
+      // Calculate their y values.
       let i = 1;
+      for (const con of constraints) {
+        Vue.set(state.yValues[nodeID], con, i * HEIGHT);
+        i += 2; // Constraints need twice the height.
+      }
       for (const prop of properties) {
         Vue.set(state.yValues[nodeID], prop, i * HEIGHT);
         i += 1;
       }
+      // Add y values for the add button.
+      Vue.set(state.yValues[nodeID], "newProperty", i * HEIGHT);
+      Vue.set(state.yValues[nodeID], "addButton", i * HEIGHT + HEIGHT / 4);
     },
 
     /**
@@ -361,6 +382,15 @@ export default new Vuex.Store({
     toggleShapeModal(state) {
       event.preventDefault();
       state.showNodeShapeModal = !state.showNodeShapeModal;
+    },
+
+    /**
+     * Toggle the visibility of the clear modal.
+     * @param state
+     */
+    toggleClearModal(state) {
+      event.preventDefault();
+      state.showClearModal = !state.showClearModal;
     },
 
     /**
@@ -414,10 +444,29 @@ export default new Vuex.Store({
      *              propertyValue object with the value of the property we want to add
      */
     addPropertyToNode(store, args) {
-      const { nodeID } = args;
-      // TODO complete this
-      this.commit("addPropertyToShape", args);
-      this.commit("updateYValues", nodeID);
+      const { nodeID, propertyID } = args;
+
+      if (propertyID !== "newProperty" && propertyID !== "") {
+        // Check if the new property name is already an existing PropertyShape.
+        if (!store.getters.propertyShapes[propertyID]) {
+          // If not, create a new PropertyShape that is a copy of the original one.
+          const property = {
+            "@id": propertyID,
+            "https://2019.summerofcode.be/unshacled#path": [
+              { "@id": `http://example.org/ns#${propertyID}` } // TODO PascalCase
+            ]
+          };
+
+          // Add the shape to the state.
+          this.commit("addShape", property); // this works as intended
+        }
+
+        const shape = store.getters.shapeWithID(nodeID);
+        // Put the new value in the list of shape properties
+        this.commit("addPropertyIDToShape", { propertyID, shape });
+        // Update the y values
+        this.commit("updateYValues", nodeID);
+      }
     },
 
     /**
@@ -454,23 +503,26 @@ export default new Vuex.Store({
       const { oldID, newID } = args;
       const newURL = extractUrl(oldID) + newID;
 
-      // Update the shape's ID
-      const index = store.getters.indexWithID(oldID);
-      this.commit("updateShapeID", { index, newID: newURL }); // OK
+      // If the ID has changed
+      if (oldID !== newURL) {
+        // Update the shape's ID
+        const index = store.getters.indexWithID(oldID);
+        this.commit("updateShapeID", { index, newID: newURL }); // OK
 
-      // Update Relationships TODO
-      /*
-      for (let prop in state.relationships) {
-        if (state.relationships[prop].one === oldID)
-          state.relationships[prop].one = newID;
-        if (state.relationships[prop].two === oldID)
-          state.relationships[prop].two = newID;
-        prop = state.relationships[prop].one + state.relationships[prop].two;
+        // Update Relationships TODO
+        /*
+        for (let prop in state.relationships) {
+          if (state.relationships[prop].one === oldID)
+            state.relationships[prop].one = newID;
+          if (state.relationships[prop].two === oldID)
+            state.relationships[prop].two = newID;
+          prop = state.relationships[prop].one + state.relationships[prop].two;
+        }
+         */
+
+        // Update the coordinates and y values.
+        this.commit("updateLocations", { oldID, newID: newURL });
       }
-       */
-
-      // Update the coordinates and y values.
-      this.commit("updateLocations", { oldID, newID: newURL });
     },
 
     /**
@@ -480,7 +532,7 @@ export default new Vuex.Store({
      * @param args
      */
     editPropertyInNode(store, args) {
-      const { node, oldID, newID } = args;
+      const { nodeID, oldID, newID } = args;
 
       // Check if the new property name is already an existing PropertyShape.
       if (!store.getters.propertyShapes[newID]) {
@@ -497,13 +549,13 @@ export default new Vuex.Store({
         this.commit("addShape", copied);
       }
 
-      const shape = store.getters.shapeWithID(node);
+      const shape = store.getters.shapeWithID(nodeID);
       // Put the new value in the list of shape properties
       this.commit("addPropertyIDToShape", { propertyID: newID, shape });
       // Remove the old value from the list of shape properties.
       this.commit("deletePropertyFromShape", { shape, propertyID: oldID });
       // Update the y values
-      this.commit("updateYValues", node);
+      this.commit("updateYValues", nodeID);
     },
 
     /**
@@ -518,23 +570,27 @@ export default new Vuex.Store({
       // Update the state's shapes.
       const shape = store.getters.shapeWithID(oldID);
       this.commit("updatePropertyShapeID", { shape, newID });
-      for (const n in store.getters.nodeShapes) {
-        const node = store.getters.nodeShapes[n];
-        this.commit("deletePropertyFromShape", {
-          shape: node,
-          propertyID: oldID
-        });
-        this.commit("addPropertyIDToShape", { shape: node, propertyID: newID });
-        this.commit("deletePropertyFromShape", {
-          shape: node,
-          propertyID: oldID
-        });
+      for (const node of store.state.model) {
+        if (store.getters.shapeProperties(node["@id"]).indexOf(oldID) !== -1) {
+          this.commit("deletePropertyFromShape", {
+            shape: node,
+            propertyID: oldID
+          });
+          this.commit("addPropertyIDToShape", {
+            shape: node,
+            propertyID: newID
+          });
+          this.commit("deletePropertyFromShape", {
+            shape: node,
+            propertyID: oldID
+          });
+        }
       }
       this.commit("updateLocations", { oldID, newID });
 
       // Update the y values of the properties.
-      for (const n in store.getters.nodeShapes) {
-        this.commit("updateYValues", n);
+      for (const node of store.state.model) {
+        this.commit("updateYValues", node["@id"]);
       }
     },
 
@@ -597,6 +653,17 @@ export default new Vuex.Store({
 
       // Update the y values
       this.commit("updateYValues", node);
+    },
+
+    /**
+     * TODO
+     * @param store
+     * @param args
+     */
+    deleteConstraintFromShape(store, args) {
+      const { shapeID, constraint } = args;
+      const shape = this.getters.shapeWithID(shapeID);
+      Vue.delete(shape, constraint);
     }
   },
   getters: {
@@ -634,6 +701,18 @@ export default new Vuex.Store({
     },
 
     /**
+     * Returns a map of the shape ID's to their respective objects.
+     * @param state
+     */
+    shapes: state => {
+      const shapes = {};
+      for (const item of state.model) {
+        shapes[item["@id"]] = item;
+      }
+      return shapes;
+    },
+
+    /**
      * Get a dictionary mapping ID's to the respective node shape objects.
      * @param state
      */
@@ -666,34 +745,60 @@ export default new Vuex.Store({
      * @param state
      * @returns {function(*): Array}
      */
-    nodeProperties: state => nodeID => {
+    shapeProperties: state => shapeID => {
       let node;
-      for (const item of state.model) {
-        if (item["@id"] === nodeID) {
-          node = item;
+      for (const shape of state.model) {
+        if (shape["@id"] === shapeID) {
+          node = shape;
         }
       }
 
       const propertyObjects =
         node["https://2019.summerofcode.be/unshacled#property"];
-
-      // Get the references to property shapes
       const properties = [];
-      for (const p of propertyObjects) {
-        properties.push(p["@id"]);
+
+      if (propertyObjects) {
+        // Get the references to property shapes
+        for (const p of propertyObjects) {
+          properties.push(p["@id"]);
+        }
+        // Get the other properties
+        const ignored = [
+          "@id",
+          "@type",
+          "https://2019.summerofcode.be/unshacled#property",
+          "https://2019.summerofcode.be/unshacled#targetNode"
+        ];
+        for (const p in node) {
+          if (!ignored.includes(p)) properties.push(p[0]["@id"]);
+        }
+      }
+      return properties;
+    },
+
+    /**
+     * Get a map of the constraints of the shape with the given ID.
+     * @param state
+     * @returns {Function}
+     */
+    shapeConstraints: state => shapeID => {
+      const constraints = {};
+      let node;
+      for (const shape of state.model) {
+        if (shape["@id"] === shapeID) {
+          node = shape;
+        }
       }
 
-      // Get the other properties
       const ignored = [
         "@id",
         "@type",
-        "https://2019.summerofcode.be/unshacled#property",
-        "https://2019.summerofcode.be/unshacled#targetNode"
+        "https://2019.summerofcode.be/unshacled#property"
       ];
-      for (const p in node) {
-        if (!ignored.includes(p)) properties.push(p[0]["@id"]);
+      for (const prop in node) {
+        if (ignored.indexOf(prop) < 0) constraints[prop] = node[prop];
       }
-      return properties;
+      return constraints;
     },
 
     /**
