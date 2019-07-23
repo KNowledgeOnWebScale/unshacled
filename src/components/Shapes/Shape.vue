@@ -21,7 +21,7 @@
       <v-circle
         v-if="hover"
         :config="deleteNodeConfig"
-        @click="deletePropertyShape"
+        @click="deleteShape"
       ></v-circle>
 
       <div v-for="(prop, key) in getProperties()" :key="key">
@@ -63,6 +63,7 @@ import {
   ID_TEXT_CONFIG,
   PROP_TEXT_CONFIG,
   PROPERTY_CONFIG,
+  NODE_SHAPE_CONFIG,
   PROPERTY_SHAPE_CONFIG
 } from "../../util/konvaConfigs";
 
@@ -71,11 +72,15 @@ const DELTA_Y_DELETE = 20;
 const NEW_PROPERTY_TEXT = "newProperty";
 
 export default {
-  name: "PropertyShape",
+  name: "Shape",
   components: { ReactiveInput, NodeProperty },
   props: {
     id: {
       type: String,
+      required: true
+    },
+    nodeShape: {
+      type: Boolean,
       required: true
     }
   },
@@ -87,7 +92,9 @@ export default {
       propertyConfigs: {},
       propTextConfigs: {},
       deletePropConfigs: {},
-      shapeConfig: PROPERTY_SHAPE_CONFIG,
+      shapeConfig: this.$props.nodeShape
+        ? NODE_SHAPE_CONFIG
+        : PROPERTY_SHAPE_CONFIG,
       deleteNodeConfig: DELETE_NODE_CONFIG,
       idTextConfig: {
         ...ID_TEXT_CONFIG,
@@ -116,7 +123,7 @@ export default {
      */
     getProperties() {
       const propNames = this.$store.getters.nodeProperties(this.$props.id);
-      const propertyObjects = this.$store.getters.propertyShapes;
+      const propertyObjects = this.$store.getters.shapes;
       const propObjects = {};
       for (const prop of propNames) {
         // FIXME here's some undefined stuff going on, hence the if
@@ -163,7 +170,7 @@ export default {
     },
 
     /**
-     * TODO
+     * Start adding a new property to the current node.
      */
     addNewProperty() {
       const { addPropInput, addPropText } = this.$refs;
@@ -177,8 +184,8 @@ export default {
     },
 
     /**
-     * TODO
-     * @param value
+     * Call the store to add a property with the given ID to the current node.
+     * @param value the ID of the property that has to be added.
      */
     stopAddingProperty(value) {
       this.adding = false;
@@ -203,21 +210,29 @@ export default {
      */
     stopEditing(newValue) {
       // Check if the new value is valid and unique.
-      if (newValue !== "" && !this.$store.getters.propertyShapes[newValue]) {
+      if (newValue !== "" && !this.$store.getters.shapes[newValue]) {
         const args = {
           oldID: this.$props.id,
           newID: newValue
         };
-        this.$store.dispatch("editPropertyShape", args);
+        if (this.$props.nodeShape) {
+          this.$store.dispatch("editNodeShape", args);
+        } else {
+          this.$store.dispatch("editPropertyShape", args);
+        }
       }
     },
 
     /**
      * Delete this node shape.
      */
-    deletePropertyShape() {
+    deleteShape() {
       this.$refs.reactiveInput.stopEditing();
-      this.$store.dispatch("deletePropertyShape", this.$props.id);
+      if (this.$props.nodeShape) {
+        this.$store.dispatch("deleteNodeShape", this.$props.id);
+      } else {
+        this.$store.dispatch("deletePropertyShape", this.$props.id);
+      }
     },
 
     /**

@@ -639,6 +639,18 @@ export default new Vuex.Store({
     },
 
     /**
+     * Returns a map of the shape ID's to their respective objects.
+     * @param state
+     */
+    shapes: state => {
+      const shapes = {};
+      for (const item of state.model) {
+        shapes[item["@id"]] = item;
+      }
+      return shapes;
+    },
+
+    /**
      * Get a dictionary mapping ID's to the respective node shape objects.
      * @param state
      */

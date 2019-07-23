@@ -2,25 +2,26 @@
   <v-stage ref="stage" :config="configKonva" @wheel="scroll">
     <v-layer>
       <div v-for="(obj, key) in this.$store.getters.nodeShapes" :key="key">
-        <node-shape :id="key" @click="print(key)"></node-shape>
+        <shape :id="key" :node-shape="true"></shape>
+        <!--        <node-shape :id="key" @click="print(key)"></node-shape>-->
       </div>
       <!--      <div v-for="(obj, key) in this.$store.state.relationships" :key="key">-->
       <!--        <relationship :coords="obj.coords"></relationship>-->
       <!--      </div>-->
       <div v-for="(obj, key) in this.$store.getters.propertyShapes" :key="key">
-        <property-shape :id="key"></property-shape>
+        <!--        <property-shape :id="key"></property-shape>-->
+        <shape :id="key" :node-shape="false"></shape>
       </div>
     </v-layer>
   </v-stage>
 </template>
 
 <script>
-import NodeShape from "./Shapes/NodeShape.vue";
-import PropertyShape from "./Shapes/PropertyShape.vue";
+import Shape from "./Shapes/Shape.vue";
 
 export default {
   name: "Editor",
-  components: { NodeShape, PropertyShape },
+  components: { Shape },
 
   data() {
     const marginTop = 40;
