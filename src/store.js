@@ -53,6 +53,28 @@ export default new Vuex.Store({
       };
     },
 
+    addPredicate(state, args) {
+      console.log(state.model);
+      const propertyShapeId = args.id;
+      const predicate = args.pred;
+      const valueType = args.vt;
+      const obj = state.model.filter(e => e["@id"] === propertyShapeId).pop();
+      if(valueType === "id"){
+        obj[predicate] = [];
+        obj[predicate].push({ "@id": args.input });
+      }
+      if(valueType === "type"){
+        obj[predicate] = [];
+        obj[predicate].push({ "@type": args.object, "@value": args.input });
+      }
+      if(valueType === "lists"){
+        obj[predicate] = [];
+        obj[predicate].push({ "@id": args.input});
+      }
+      console.log(state.model);
+      state.predicateModal.show = !state.predicateModal.show;
+      },
+
     togglePredicateModal(state, args) {
       state.predicateModal.show = !state.predicateModal.show;
       state.predicateModal.id = args.id;
@@ -714,9 +736,6 @@ export default new Vuex.Store({
       return possiblePredicates(ShaclDictionary.TERM[type]);
     },
     objects: state => {
-      console.log(state.predicateModal.predicate)
-      console.log(possibleObjects(state.predicateModal.predicate))
-
       return possibleObjects(state.predicateModal.predicate);
     }
   }

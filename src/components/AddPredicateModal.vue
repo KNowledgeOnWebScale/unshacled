@@ -1,8 +1,9 @@
 <template>
   <div>
     <sui-modal v-model="this.$store.state.predicateModal.show">
-      <sui-modal-header> Add Predicate Report </sui-modal-header>
+      <sui-modal-header> Add Predicate Report {{ input }}</sui-modal-header>
       <sui-modal-content>
+        Predicate:
         <select v-model="predicate" @change="selectPredicate()">
           <option
             v-for="obj in predicates"
@@ -12,14 +13,22 @@
             >{{ obj }}</option
           >
         </select>
-        <select v-if="objects">
+        <br />
+        Object:
+        <select v-model="object" v-if="objects">
           <option v-for="obj in objects" id="Objects" :key="obj" :value="obj">{{
             obj
           }}</option>
         </select>
+        <br />
+        Value:
+        <input v-model="input" />
+        <sui-segment v-if="error" color="red">
+          Some constraints aren't supported yet by the internal model.
+        </sui-segment>
       </sui-modal-content>
       <sui-modal-actions>
-        <sui-button positive>add</sui-button>
+        <sui-button positive @click="addPredicate">add</sui-button>
         <sui-button negative @click="toggleModal">Cancel</sui-button>
       </sui-modal-actions>
     </sui-modal>
@@ -27,13 +36,18 @@
 </template>
 
 <script>
+import ValueType from "../util/enums/ValueType";
+
 export default {
   name: "AddPredicateModal",
   props: ["type", "id"],
   data() {
     return {
       predicate: "",
-      urls: {}
+      urls: {},
+      input: "",
+      object: "",
+      error: false
     };
   },
 
@@ -43,7 +57,6 @@ export default {
 
       if (this.type) {
         const preds = this.$store.getters.predicates(this.type);
-        console.log(preds);
         if (preds)
           preds.forEach(pred => {
             const value = pred.split("#")[1];
@@ -56,7 +69,6 @@ export default {
 
     objects() {
       const { objects } = this.$store.getters;
-      console.log(objects);
       return objects;
     }
   },
@@ -64,13 +76,25 @@ export default {
     toggleModal() {
       const args = { id: null, type: null };
       this.$store.commit("togglePredicateModal", args);
+      this.error = false;
     },
     selectPredicate() {
-      console.log(this.urls);
       this.$store.commit(
         "changePredicate",
         `${this.urls[this.predicate]}#${this.predicate}`
       );
+    },
+    addPredicate() {
+      const pred = this.$store.state.predicateModal.predicate;
+      const val = ValueType(pred);
+      if (val === undefined)
+        this.error = true;
+      else
+        this.error = false;
+      console.log(val)
+      const args = { pred, id: this.id, vt: val, input: this.input, object: this.object };
+      if(!this.error)
+      this.$store.commit("addPredicate", args);
     }
   }
 };

@@ -90,7 +90,6 @@ export default {
      * @returns an object mapping every property name to a property object.
      */
     getProperties() {
-      console.log("getProperties");
       const { id } = this.$props;
       const properties = {};
       for (const prop of this.$store.getters.nodeShapes[id].properties) {
@@ -171,7 +170,6 @@ export default {
 
     addPredicate() {
       const args = { id: this.id, type: "PropertyShape" };
-      console.log(args);
       this.$store.commit("togglePredicateModal", args);
     }
   }
