@@ -142,7 +142,12 @@ export default new Vuex.Store({
      */
     addPropertyIDToShape(state, args) {
       const { propertyID, shape } = args;
+      console.log("addPropertyIDToShape", propertyID, shape["@id"]);
       // FIXME this assumes properties, not constraints or targetNodes or sth
+      const p = shape["https://2019.summerofcode.be/unshacled#property"];
+      if (!p) {
+        shape["https://2019.summerofcode.be/unshacled#property"] = [];
+      }
       shape["https://2019.summerofcode.be/unshacled#property"].push({
         "@id": propertyID
       });
@@ -390,6 +395,7 @@ export default new Vuex.Store({
      */
     addPropertyToNode(store, args) {
       const { nodeID, propertyID } = args;
+      console.log("addPropertyToNode", nodeID, propertyID);
 
       if (propertyID !== "newProperty" && propertyID !== "") {
         // Check if the new property name is already an existing PropertyShape.
@@ -409,6 +415,7 @@ export default new Vuex.Store({
         const shape = store.getters.shapeWithID(nodeID);
         // Put the new value in the list of shape properties
         this.commit("addPropertyIDToShape", { propertyID, shape });
+        // console.log(store.getters.nodeProperties(shape));
         // Update the y values
         this.commit("updateYValues", nodeID);
       }
@@ -678,22 +685,23 @@ export default new Vuex.Store({
 
       const propertyObjects =
         node["https://2019.summerofcode.be/unshacled#property"];
-
-      // Get the references to property shapes
       const properties = [];
-      for (const p of propertyObjects) {
-        properties.push(p["@id"]);
-      }
 
-      // Get the other properties
-      const ignored = [
-        "@id",
-        "@type",
-        "https://2019.summerofcode.be/unshacled#property",
-        "https://2019.summerofcode.be/unshacled#targetNode"
-      ];
-      for (const p in node) {
-        if (!ignored.includes(p)) properties.push(p[0]["@id"]);
+      if (propertyObjects) {
+        // Get the references to property shapes
+        for (const p of propertyObjects) {
+          properties.push(p["@id"]);
+        }
+        // Get the other properties
+        const ignored = [
+          "@id",
+          "@type",
+          "https://2019.summerofcode.be/unshacled#property",
+          "https://2019.summerofcode.be/unshacled#targetNode"
+        ];
+        for (const p in node) {
+          if (!ignored.includes(p)) properties.push(p[0]["@id"]);
+        }
       }
       return properties;
     },

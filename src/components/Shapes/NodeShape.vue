@@ -37,7 +37,6 @@
         ref="addPropText"
         :config="propTextConfigs['newProperty']"
       ></v-text>
-      <!-- FIXME this rectangle does not show up -->
       <v-rect v-if="adding" :config="propertyConfigs['newProperty']"></v-rect>
       <v-circle
         v-if="!adding"
