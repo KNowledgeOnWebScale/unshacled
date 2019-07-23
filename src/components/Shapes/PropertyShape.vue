@@ -1,6 +1,10 @@
 <template>
   <div>
-    <reactive-input ref="reactiveInput" :on-exit="stopEditing"></reactive-input>
+    <reactive-input
+      ref="reactiveInput"
+      :is-datalist="false"
+      :on-exit="stopEditing"
+    ></reactive-input>
     <v-group
       ref="posRef"
       :draggable="true"
@@ -17,7 +21,7 @@
       <v-circle
         v-if="hover"
         :config="deleteNodeConfig"
-        @mousedown="deletePropertyShape"
+        @click="deletePropertyShape"
       ></v-circle>
 
       <!-- TODO add button for adding property -->
@@ -26,7 +30,7 @@
 </template>
 
 <script>
-import ReactiveInput from "../ReactiveInput.vue";
+import ReactiveInput from "../FormElements/ReactiveInput.vue";
 import { urlToName } from "../../util/nameParser";
 import {
   DELETE_NODE_CONFIG,
@@ -82,7 +86,6 @@ export default {
      * @returns an object mapping every property name to a property object.
      */
     getProperties() {
-      console.log("getProperties");
       const { id } = this.$props;
       const properties = {};
       for (const prop of this.$store.getters.nodeShapes[id].properties) {
@@ -156,6 +159,7 @@ export default {
         x: pos.x,
         y: pos.y
       };
+      this.$store.commit("updateYValues", this.$props.id);
       this.$store.commit("updateCoordinates", args);
     }
   }

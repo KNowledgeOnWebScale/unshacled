@@ -1,6 +1,10 @@
 <template>
   <div>
-    <reactive-input ref="reactiveInput" :on-exit="stopEditing"></reactive-input>
+    <reactive-input
+      ref="reactiveInput"
+      :is-datalist="false"
+      :on-exit="stopEditing"
+    ></reactive-input>
     <v-group
       ref="posRef"
       :draggable="true"
@@ -17,7 +21,7 @@
       <v-circle
         v-if="hover"
         :config="deleteNodeConfig"
-        @mousedown="deleteNodeShape"
+        @click="deleteNodeShape"
       ></v-circle>
       <div v-for="(prop, key) in getProperties()" :key="key">
         <node-property
@@ -28,18 +32,35 @@
           :delete-prop-config="deletePropConfigs[key]"
         ></node-property>
       </div>
-      <!-- TODO add button for adding property -->
+
+      <v-text
+        ref="addPropText"
+        :config="propTextConfigs['newProperty']"
+      ></v-text>
+      <!-- FIXME this rectangle does not show up -->
+      <v-rect v-if="adding" :config="propertyConfigs['newProperty']"></v-rect>
+      <v-circle
+        v-if="!adding"
+        :config="addPropConfig"
+        @click="addNewProperty"
+      ></v-circle>
     </v-group>
+    <reactive-input
+      ref="addPropInput"
+      :is-datalist="true"
+      :on-exit="stopAddingProperty"
+    ></reactive-input>
   </div>
 </template>
 
 <script>
 import NodeProperty from "./NodeProperty.vue";
-import ReactiveInput from "../ReactiveInput.vue";
+import ReactiveInput from "../FormElements/ReactiveInput.vue";
 import { urlToName } from "../../util/nameParser";
 import {
   DELETE_NODE_CONFIG,
   DELETE_PROP_CONFIG,
+  ADD_PROP_CONFIG,
   ID_TEXT_CONFIG,
   PROP_TEXT_CONFIG,
   PROPERTY_CONFIG,
@@ -48,6 +69,7 @@ import {
 
 const DELTA_Y_TEXT = 15;
 const DELTA_Y_DELETE = 20;
+const NEW_PROPERTY_TEXT = "newProperty";
 
 export default {
   name: "NodeShape",
@@ -62,6 +84,7 @@ export default {
     return {
       hover: false,
       editing: false,
+      adding: false,
       propertyConfigs: {},
       propTextConfigs: {},
       deletePropConfigs: {},
@@ -76,7 +99,8 @@ export default {
         ...PROP_TEXT_CONFIG,
         text: urlToName(this.$props.propKey)
       },
-      deletePropConfig: DELETE_PROP_CONFIG
+      deletePropConfig: DELETE_PROP_CONFIG,
+      addPropConfig: ADD_PROP_CONFIG
     };
   },
   mounted() {
@@ -93,11 +117,9 @@ export default {
      */
     getProperties() {
       const propNames = this.$store.getters.nodeProperties(this.$props.id);
-      const nodeObjects = this.$store.getters.nodeShapes;
+      const propertyObjects = this.$store.getters.propertyShapes;
       const propObjects = {};
-      for (const prop of propNames) {
-        propObjects[prop] = nodeObjects[prop];
-      }
+      for (const prop of propNames) propObjects[prop] = propertyObjects[prop];
       this.setPropConfigs(propObjects);
       return propObjects;
     },
@@ -107,7 +129,6 @@ export default {
      * @param properties a dictionary containing the node shape's properties.
      */
     setPropConfigs(properties) {
-      // FIXME
       const { id } = this.$props;
       const ys = this.$store.state.yValues[id];
       for (const prop of Object.keys(properties)) {
@@ -123,6 +144,46 @@ export default {
           y: ys[prop] + DELTA_Y_DELETE
         };
       }
+
+      // Set y values for the button and text for adding a new property.
+      this.propertyConfigs[NEW_PROPERTY_TEXT] = {
+        ...this.propertyConfig,
+        y: ys[NEW_PROPERTY_TEXT]
+      };
+      // This text is not visible, but is used to position the input field.
+      this.propTextConfigs[NEW_PROPERTY_TEXT] = {
+        ...this.propTextConfig,
+        y: ys[NEW_PROPERTY_TEXT] + DELTA_Y_TEXT,
+        text: "",
+        fill: "transparent"
+      };
+      this.addPropConfig.y = ys["addButton"];
+    },
+
+    /**
+     * TODO
+     */
+    addNewProperty() {
+      const { addPropInput, addPropText } = this.$refs;
+      if (addPropInput) {
+        this.adding = true;
+        addPropInput.startEditing(
+          addPropText.getNode(),
+          addPropText.getNode().text()
+        );
+      }
+    },
+
+    /**
+     * TODO
+     * @param value
+     */
+    stopAddingProperty(value) {
+      this.adding = false;
+      this.$store.dispatch("addPropertyToNode", {
+        propertyID: value,
+        nodeID: this.$props.id
+      });
     },
 
     /**
@@ -167,6 +228,7 @@ export default {
         x: pos.x,
         y: pos.y
       };
+      this.$store.commit("updateYValues", this.$props.id);
       this.$store.commit("updateCoordinates", args);
     }
   }

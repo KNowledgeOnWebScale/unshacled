@@ -118,6 +118,7 @@ export default new Vuex.Store({
         coordinates: state.coordinates
       });
       Vue.set(state.coordinates, object["@id"], { x, y });
+      this.commit("updateYValues", object["@id"]);
     },
 
     /**
@@ -177,11 +178,12 @@ export default new Vuex.Store({
       shape["https://2019.summerofcode.be/unshacled#path"][0][
         "@id"
       ] = `http://example.org/ns#${name}`;
-
-      // Update the ID in every node.
-      // for (const n of )
     },
 
+    /**
+     * TODO
+     * @param state
+     */
     toggleValidationReport(state) {
       event.preventDefault();
       state.showValidationReportModal = !state.showValidationReportModal;
@@ -199,11 +201,11 @@ export default new Vuex.Store({
 
       // Update coordinates
       Vue.set(state.coordinates, newID, state.coordinates[oldID]);
-      Vue.delete(state.coordinates, oldID);
+      if (oldID !== newID) Vue.delete(state.coordinates, oldID);
 
       // Update yValues
       Vue.set(state.yValues, newID, state.yValues[oldID]);
-      Vue.delete(state.yValues, oldID);
+      if (oldID !== newID) Vue.delete(state.yValues, oldID);
     },
 
     /* DELETE ======================================================================================================= */
@@ -285,6 +287,8 @@ export default new Vuex.Store({
         Vue.set(state.yValues[nodeID], prop, i * HEIGHT);
         i += 1;
       }
+      Vue.set(state.yValues[nodeID], "newProperty", i * HEIGHT);
+      Vue.set(state.yValues[nodeID], "addButton", i * HEIGHT + HEIGHT / 4);
     },
 
     /**
@@ -385,10 +389,29 @@ export default new Vuex.Store({
      *              propertyValue object with the value of the property we want to add
      */
     addPropertyToNode(store, args) {
-      const { nodeID } = args;
-      // TODO complete this
-      this.commit("addPropertyToShape", args);
-      this.commit("updateYValues", nodeID);
+      const { nodeID, propertyID } = args;
+
+      if (propertyID !== "newProperty" && propertyID !== "") {
+        // Check if the new property name is already an existing PropertyShape.
+        if (!store.getters.propertyShapes[propertyID]) {
+          // If not, create a new PropertyShape that is a copy of the original one.
+          const property = {
+            "@id": propertyID,
+            "https://2019.summerofcode.be/unshacled#path": [
+              { "@id": `http://example.org/ns#${propertyID}` } // TODO PascalCase
+            ]
+          };
+
+          // Add the shape to the state.
+          this.commit("addShape", property); // this works as intended
+        }
+
+        const shape = store.getters.shapeWithID(nodeID);
+        // Put the new value in the list of shape properties
+        this.commit("addPropertyIDToShape", { propertyID, shape });
+        // Update the y values
+        this.commit("updateYValues", nodeID);
+      }
     },
 
     /**
@@ -425,23 +448,26 @@ export default new Vuex.Store({
       const { oldID, newID } = args;
       const newURL = extractUrl(oldID) + newID;
 
-      // Update the shape's ID
-      const index = store.getters.indexWithID(oldID);
-      this.commit("updateShapeID", { index, newID: newURL }); // OK
+      // If the ID has changed
+      if (oldID !== newURL) {
+        // Update the shape's ID
+        const index = store.getters.indexWithID(oldID);
+        this.commit("updateShapeID", { index, newID: newURL }); // OK
 
-      // Update Relationships TODO
-      /*
-      for (let prop in state.relationships) {
-        if (state.relationships[prop].one === oldID)
-          state.relationships[prop].one = newID;
-        if (state.relationships[prop].two === oldID)
-          state.relationships[prop].two = newID;
-        prop = state.relationships[prop].one + state.relationships[prop].two;
+        // Update Relationships TODO
+        /*
+        for (let prop in state.relationships) {
+          if (state.relationships[prop].one === oldID)
+            state.relationships[prop].one = newID;
+          if (state.relationships[prop].two === oldID)
+            state.relationships[prop].two = newID;
+          prop = state.relationships[prop].one + state.relationships[prop].two;
+        }
+         */
+
+        // Update the coordinates and y values.
+        this.commit("updateLocations", { oldID, newID: newURL });
       }
-       */
-
-      // Update the coordinates and y values.
-      this.commit("updateLocations", { oldID, newID: newURL });
     },
 
     /**
@@ -451,7 +477,7 @@ export default new Vuex.Store({
      * @param args
      */
     editPropertyInNode(store, args) {
-      const { node, oldID, newID } = args;
+      const { nodeID, oldID, newID } = args;
 
       // Check if the new property name is already an existing PropertyShape.
       if (!store.getters.propertyShapes[newID]) {
@@ -468,13 +494,13 @@ export default new Vuex.Store({
         this.commit("addShape", copied);
       }
 
-      const shape = store.getters.shapeWithID(node);
+      const shape = store.getters.shapeWithID(nodeID);
       // Put the new value in the list of shape properties
       this.commit("addPropertyIDToShape", { propertyID: newID, shape });
       // Remove the old value from the list of shape properties.
       this.commit("deletePropertyFromShape", { shape, propertyID: oldID });
       // Update the y values
-      this.commit("updateYValues", node);
+      this.commit("updateYValues", nodeID);
     },
 
     /**
@@ -491,15 +517,20 @@ export default new Vuex.Store({
       this.commit("updatePropertyShapeID", { shape, newID });
       for (const n in store.getters.nodeShapes) {
         const node = store.getters.nodeShapes[n];
-        this.commit("deletePropertyFromShape", {
-          shape: node,
-          propertyID: oldID
-        });
-        this.commit("addPropertyIDToShape", { shape: node, propertyID: newID });
-        this.commit("deletePropertyFromShape", {
-          shape: node,
-          propertyID: oldID
-        });
+        if (store.getters.nodeProperties(n).indexOf(oldID) !== -1) {
+          this.commit("deletePropertyFromShape", {
+            shape: node,
+            propertyID: oldID
+          });
+          this.commit("addPropertyIDToShape", {
+            shape: node,
+            propertyID: newID
+          });
+          this.commit("deletePropertyFromShape", {
+            shape: node,
+            propertyID: oldID
+          });
+        }
       }
       this.commit("updateLocations", { oldID, newID });
 
