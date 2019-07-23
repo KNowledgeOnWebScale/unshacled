@@ -265,32 +265,45 @@ export default new Vuex.Store({
         if (item["@id"] === nodeID) node = item;
       }
 
-      // FIXME code duplication, find a way to use `nodeProperties` >.<
+      // FIXME code duplication, find a way to use `shapeProperties` >.<
       const propertyObjects =
         node["https://2019.summerofcode.be/unshacled#property"];
 
-      // Get the references to property shapes
+      // Get the references to property shapes.
       const properties = [];
       if (propertyObjects) {
         for (const p of propertyObjects) properties.push(p["@id"]);
       }
 
-      // Get the other properties
+      // The other properties.
       const ignored = [
         "@id",
         "@type",
-        "https://2019.summerofcode.be/unshacled#property",
-        "https://2019.summerofcode.be/unshacled#targetNode"
+        "https://2019.summerofcode.be/unshacled#property"
       ];
+
+      // Get the IDs form all the constraints.
+      const constraints = [];
+      for (const c in node) {
+        if (!ignored.includes(c)) constraints.push(c);
+      }
+
+      // Get the IDs from all the properties.
       for (const p in node) {
         if (!ignored.includes(p)) properties.push(p[0]["@id"]);
       }
 
+      // Calculate their y values.
       let i = 1;
+      for (const con of constraints) {
+        Vue.set(state.yValues[nodeID], con, i * HEIGHT);
+        i += 2; // Constraints need twice the height.
+      }
       for (const prop of properties) {
         Vue.set(state.yValues[nodeID], prop, i * HEIGHT);
         i += 1;
       }
+      // Add y values for the add button.
       Vue.set(state.yValues[nodeID], "newProperty", i * HEIGHT);
       Vue.set(state.yValues[nodeID], "addButton", i * HEIGHT + HEIGHT / 4);
     },
@@ -520,7 +533,7 @@ export default new Vuex.Store({
       const shape = store.getters.shapeWithID(oldID);
       this.commit("updatePropertyShapeID", { shape, newID });
       for (const node of store.state.model) {
-        if (store.getters.nodeProperties(node["@id"]).indexOf(oldID) !== -1) {
+        if (store.getters.shapeProperties(node["@id"]).indexOf(oldID) !== -1) {
           this.commit("deletePropertyFromShape", {
             shape: node,
             propertyID: oldID
@@ -602,6 +615,17 @@ export default new Vuex.Store({
 
       // Update the y values
       this.commit("updateYValues", node);
+    },
+
+    /**
+     * TODO
+     * @param store
+     * @param args
+     */
+    deleteConstraintFromShape(store, args) {
+      const { shapeID, constraint } = args;
+      const shape = this.getters.shapeWithID(shapeID);
+      Vue.delete(shape, constraint);
     }
   },
   getters: {
@@ -683,11 +707,11 @@ export default new Vuex.Store({
      * @param state
      * @returns {function(*): Array}
      */
-    nodeProperties: state => nodeID => {
+    shapeProperties: state => shapeID => {
       let node;
-      for (const item of state.model) {
-        if (item["@id"] === nodeID) {
-          node = item;
+      for (const shape of state.model) {
+        if (shape["@id"] === shapeID) {
+          node = shape;
         }
       }
 
@@ -712,6 +736,31 @@ export default new Vuex.Store({
         }
       }
       return properties;
+    },
+
+    /**
+     * Get a map of the constraints of the shape with the given ID.
+     * @param state
+     * @returns {Function}
+     */
+    shapeConstraints: state => shapeID => {
+      const constraints = {};
+      let node;
+      for (const shape of state.model) {
+        if (shape["@id"] === shapeID) {
+          node = shape;
+        }
+      }
+
+      const ignored = [
+        "@id",
+        "@type",
+        "https://2019.summerofcode.be/unshacled#property"
+      ];
+      for (const prop in node) {
+        if (ignored.indexOf(prop) < 0) constraints[prop] = node[prop];
+      }
+      return constraints;
     },
 
     /**
