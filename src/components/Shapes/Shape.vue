@@ -83,7 +83,7 @@ import {
   PROPERTY_CONFIG,
   NODE_SHAPE_CONFIG,
   PROPERTY_SHAPE_CONFIG,
-  CONSTRAINT_CONFIG
+  CONSTRAINT_CONFIG, ADD_PRED_CONFIG
 } from "../../util/konvaConfigs";
 
 const DELTA_Y_TEXT = 15;
@@ -126,7 +126,8 @@ export default {
       },
       constraintConfig: CONSTRAINT_CONFIG,
       deletePropConfig: DELETE_BUTTON_CONFIG,
-      addPropConfig: ADD_PROP_CONFIG
+      addPropConfig: ADD_PROP_CONFIG,
+      addPredConfig: ADD_PRED_CONFIG
     };
   },
   mounted() {

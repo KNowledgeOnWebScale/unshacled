@@ -32,7 +32,7 @@
         </sui-segment>
       </sui-modal-content>
       <sui-modal-actions>
-        <sui-button positive @click="addPredicate">add</sui-button>
+        <sui-button positive @click="addPredicate">Add</sui-button>
         <sui-button negative @click="toggleModal">Cancel</sui-button>
       </sui-modal-actions>
     </sui-modal>

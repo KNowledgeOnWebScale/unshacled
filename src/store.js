@@ -796,7 +796,9 @@ export default new Vuex.Store({
         "https://2019.summerofcode.be/unshacled#property"
       ];
       for (const prop in node) {
-        if (ignored.indexOf(prop) < 0) constraints[prop] = node[prop];
+        if (ignored.indexOf(prop) < 0) {
+          constraints[prop] = node[prop];
+        }
       }
       return constraints;
     },
