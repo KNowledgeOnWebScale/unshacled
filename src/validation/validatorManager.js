@@ -1,13 +1,14 @@
 import ShaclValidator from "./shaclValidator";
 import languages from "../util/enums/languages";
+
 /**
  *  ValidatorManager assigns validation tasks to the correct translator
  */
 export default class ValidatorManager {
   /**
    * TODO support multiple formats (ttl, n3, ...)
-   * @param data Data as ttl file
-   * @param shapes Constraint shapes as ttl file
+   * @param data Data in turtle
+   * @param shapes Constraint shapes in turtle
    * @param language Constraint language e.g. SHACL
    * @returns {Promise<any>}
    */
@@ -19,7 +20,7 @@ export default class ValidatorManager {
         console.log("SHEX IS NOT YET SUPPORTED");
         break;
       default:
-        console.log("UNSUPPORTED CONSTRAINT LANGUAGE");
+        console.log(`UNSUPPORTED CONSTRAINT LANGUAGE ${language}`);
     }
   }
 }

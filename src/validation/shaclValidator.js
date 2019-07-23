@@ -1,14 +1,14 @@
 const SHACLValidator = require("shacl-js");
 
 /**
- *  TODO
+ *  Validator class for SHACL
  */
 export default class ShaclValidator {
   /**
-   * TODO introduce support for different formats
-   * @param data
-   * @param shapes
-   * @returns {Promise<any>}
+   * Validates SHACL data using shapes
+   * @param data Data in turtle
+   * @param shapes Shapes in turtle
+   * @returns {Promise<Object>} Returns a promise which resolves to a SHACL report
    */
   static validate(data, shapes) {
     return new Promise((resolve, reject) => {
