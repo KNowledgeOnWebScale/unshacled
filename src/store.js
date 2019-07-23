@@ -142,7 +142,6 @@ export default new Vuex.Store({
      */
     addPropertyIDToShape(state, args) {
       const { propertyID, shape } = args;
-      console.log("addPropertyIDToShape", propertyID, shape["@id"]);
       // FIXME this assumes properties, not constraints or targetNodes or sth
       const p = shape["https://2019.summerofcode.be/unshacled#property"];
       if (!p) {
@@ -395,7 +394,6 @@ export default new Vuex.Store({
      */
     addPropertyToNode(store, args) {
       const { nodeID, propertyID } = args;
-      console.log("addPropertyToNode", nodeID, propertyID);
 
       if (propertyID !== "newProperty" && propertyID !== "") {
         // Check if the new property name is already an existing PropertyShape.
@@ -415,7 +413,6 @@ export default new Vuex.Store({
         const shape = store.getters.shapeWithID(nodeID);
         // Put the new value in the list of shape properties
         this.commit("addPropertyIDToShape", { propertyID, shape });
-        // console.log(store.getters.nodeProperties(shape));
         // Update the y values
         this.commit("updateYValues", nodeID);
       }
@@ -522,9 +519,8 @@ export default new Vuex.Store({
       // Update the state's shapes.
       const shape = store.getters.shapeWithID(oldID);
       this.commit("updatePropertyShapeID", { shape, newID });
-      for (const n in store.getters.nodeShapes) {
-        const node = store.getters.nodeShapes[n];
-        if (store.getters.nodeProperties(n).indexOf(oldID) !== -1) {
+      for (const node of store.state.model) {
+        if (store.getters.nodeProperties(node["@id"]).indexOf(oldID) !== -1) {
           this.commit("deletePropertyFromShape", {
             shape: node,
             propertyID: oldID
@@ -542,8 +538,8 @@ export default new Vuex.Store({
       this.commit("updateLocations", { oldID, newID });
 
       // Update the y values of the properties.
-      for (const n in store.getters.nodeShapes) {
-        this.commit("updateYValues", n);
+      for (const node of store.state.model) {
+        this.commit("updateYValues", node["@id"]);
       }
     },
 
