@@ -143,6 +143,10 @@ export default new Vuex.Store({
     addPropertyIDToShape(state, args) {
       const { propertyID, shape } = args;
       // FIXME this assumes properties, not constraints or targetNodes or sth
+      const p = shape["https://2019.summerofcode.be/unshacled#property"];
+      if (!p) {
+        shape["https://2019.summerofcode.be/unshacled#property"] = [];
+      }
       shape["https://2019.summerofcode.be/unshacled#property"].push({
         "@id": propertyID
       });
@@ -515,9 +519,8 @@ export default new Vuex.Store({
       // Update the state's shapes.
       const shape = store.getters.shapeWithID(oldID);
       this.commit("updatePropertyShapeID", { shape, newID });
-      for (const n in store.getters.nodeShapes) {
-        const node = store.getters.nodeShapes[n];
-        if (store.getters.nodeProperties(n).indexOf(oldID) !== -1) {
+      for (const node of store.state.model) {
+        if (store.getters.nodeProperties(node["@id"]).indexOf(oldID) !== -1) {
           this.commit("deletePropertyFromShape", {
             shape: node,
             propertyID: oldID
@@ -535,8 +538,8 @@ export default new Vuex.Store({
       this.commit("updateLocations", { oldID, newID });
 
       // Update the y values of the properties.
-      for (const n in store.getters.nodeShapes) {
-        this.commit("updateYValues", n);
+      for (const node of store.state.model) {
+        this.commit("updateYValues", node["@id"]);
       }
     },
 
@@ -636,6 +639,18 @@ export default new Vuex.Store({
     },
 
     /**
+     * Returns a map of the shape ID's to their respective objects.
+     * @param state
+     */
+    shapes: state => {
+      const shapes = {};
+      for (const item of state.model) {
+        shapes[item["@id"]] = item;
+      }
+      return shapes;
+    },
+
+    /**
      * Get a dictionary mapping ID's to the respective node shape objects.
      * @param state
      */
@@ -678,22 +693,23 @@ export default new Vuex.Store({
 
       const propertyObjects =
         node["https://2019.summerofcode.be/unshacled#property"];
-
-      // Get the references to property shapes
       const properties = [];
-      for (const p of propertyObjects) {
-        properties.push(p["@id"]);
-      }
 
-      // Get the other properties
-      const ignored = [
-        "@id",
-        "@type",
-        "https://2019.summerofcode.be/unshacled#property",
-        "https://2019.summerofcode.be/unshacled#targetNode"
-      ];
-      for (const p in node) {
-        if (!ignored.includes(p)) properties.push(p[0]["@id"]);
+      if (propertyObjects) {
+        // Get the references to property shapes
+        for (const p of propertyObjects) {
+          properties.push(p["@id"]);
+        }
+        // Get the other properties
+        const ignored = [
+          "@id",
+          "@type",
+          "https://2019.summerofcode.be/unshacled#property",
+          "https://2019.summerofcode.be/unshacled#targetNode"
+        ];
+        for (const p in node) {
+          if (!ignored.includes(p)) properties.push(p[0]["@id"]);
+        }
       }
       return properties;
     },

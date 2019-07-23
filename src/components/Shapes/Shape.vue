@@ -21,34 +21,66 @@
       <v-circle
         v-if="hover"
         :config="deleteNodeConfig"
-        @click="deletePropertyShape"
+        @click="deleteShape"
       ></v-circle>
 
-      <!-- TODO add button for adding property -->
+      <div v-for="(prop, key) in getProperties()" :key="key">
+        <node-property
+          :prop-key="key"
+          :node="$props.id"
+          :property-config="propertyConfigs[key]"
+          :prop-text-config="propTextConfigs[key]"
+          :delete-prop-config="deletePropConfigs[key]"
+        ></node-property>
+      </div>
+
+      <v-text
+        ref="addPropText"
+        :config="propTextConfigs['newProperty']"
+      ></v-text>
+      <v-rect v-if="adding" :config="propertyConfigs['newProperty']"></v-rect>
+      <v-circle
+        v-if="!adding"
+        :config="addPropConfig"
+        @click="addNewProperty"
+      ></v-circle>
     </v-group>
+    <reactive-input
+      ref="addPropInput"
+      :is-datalist="true"
+      :on-exit="stopAddingProperty"
+    ></reactive-input>
   </div>
 </template>
 
 <script>
 import ReactiveInput from "../FormElements/ReactiveInput.vue";
+import NodeProperty from "./NodeProperty.vue";
 import { urlToName } from "../../util/nameParser";
 import {
   DELETE_NODE_CONFIG,
+  ADD_PROP_CONFIG,
   ID_TEXT_CONFIG,
   PROP_TEXT_CONFIG,
   PROPERTY_CONFIG,
+  NODE_SHAPE_CONFIG,
   PROPERTY_SHAPE_CONFIG
 } from "../../util/konvaConfigs";
 
 const DELTA_Y_TEXT = 15;
 const DELTA_Y_DELETE = 20;
+const NEW_PROPERTY_TEXT = "newProperty";
 
 export default {
-  name: "PropertyShape",
-  components: { ReactiveInput },
+  name: "Shape",
+  components: { ReactiveInput, NodeProperty },
   props: {
     id: {
       type: String,
+      required: true
+    },
+    nodeShape: {
+      type: Boolean,
       required: true
     }
   },
@@ -56,10 +88,13 @@ export default {
     return {
       hover: false,
       editing: false,
+      adding: false,
       propertyConfigs: {},
       propTextConfigs: {},
       deletePropConfigs: {},
-      shapeConfig: PROPERTY_SHAPE_CONFIG,
+      shapeConfig: this.$props.nodeShape
+        ? NODE_SHAPE_CONFIG
+        : PROPERTY_SHAPE_CONFIG,
       deleteNodeConfig: DELETE_NODE_CONFIG,
       idTextConfig: {
         ...ID_TEXT_CONFIG,
@@ -70,7 +105,8 @@ export default {
         ...PROP_TEXT_CONFIG,
         text: urlToName(this.$props.propKey)
       },
-      deletePropConfig: DELETE_NODE_CONFIG
+      deletePropConfig: DELETE_NODE_CONFIG,
+      addPropConfig: ADD_PROP_CONFIG
     };
   },
   mounted() {
@@ -86,13 +122,15 @@ export default {
      * @returns an object mapping every property name to a property object.
      */
     getProperties() {
-      const { id } = this.$props;
-      const properties = {};
-      for (const prop of this.$store.getters.nodeShapes[id].properties) {
-        properties[prop] = this.$store.getters.propertyShapes[prop];
+      const propNames = this.$store.getters.nodeProperties(this.$props.id);
+      const propertyObjects = this.$store.getters.shapes;
+      const propObjects = {};
+      for (const prop of propNames) {
+        // FIXME here's some undefined stuff going on, hence the if
+        if (prop) propObjects[prop] = propertyObjects[prop];
       }
-      this.setPropConfigs(properties);
-      return properties;
+      this.setPropConfigs(propObjects);
+      return propObjects;
     },
 
     /**
@@ -115,6 +153,46 @@ export default {
           y: ys[prop] + DELTA_Y_DELETE
         };
       }
+
+      // Set y values for the button and text for adding a new property.
+      this.propertyConfigs[NEW_PROPERTY_TEXT] = {
+        ...this.propertyConfig,
+        y: ys[NEW_PROPERTY_TEXT]
+      };
+      // This text is not visible, but is used to position the input field.
+      this.propTextConfigs[NEW_PROPERTY_TEXT] = {
+        ...this.propTextConfig,
+        y: ys[NEW_PROPERTY_TEXT] + DELTA_Y_TEXT,
+        text: "",
+        fill: "transparent"
+      };
+      this.addPropConfig.y = ys["addButton"];
+    },
+
+    /**
+     * Start adding a new property to the current node.
+     */
+    addNewProperty() {
+      const { addPropInput, addPropText } = this.$refs;
+      if (addPropInput) {
+        this.adding = true;
+        addPropInput.startEditing(
+          addPropText.getNode(),
+          addPropText.getNode().text()
+        );
+      }
+    },
+
+    /**
+     * Call the store to add a property with the given ID to the current node.
+     * @param value the ID of the property that has to be added.
+     */
+    stopAddingProperty(value) {
+      this.adding = false;
+      this.$store.dispatch("addPropertyToNode", {
+        propertyID: value,
+        nodeID: this.$props.id
+      });
     },
 
     /**
@@ -132,21 +210,29 @@ export default {
      */
     stopEditing(newValue) {
       // Check if the new value is valid and unique.
-      if (newValue !== "" && !this.$store.getters.propertyShapes[newValue]) {
+      if (newValue !== "" && !this.$store.getters.shapes[newValue]) {
         const args = {
           oldID: this.$props.id,
           newID: newValue
         };
-        this.$store.dispatch("editPropertyShape", args);
+        if (this.$props.nodeShape) {
+          this.$store.dispatch("editNodeShape", args);
+        } else {
+          this.$store.dispatch("editPropertyShape", args);
+        }
       }
     },
 
     /**
      * Delete this node shape.
      */
-    deletePropertyShape() {
+    deleteShape() {
       this.$refs.reactiveInput.stopEditing();
-      this.$store.dispatch("deletePropertyShape", this.$props.id);
+      if (this.$props.nodeShape) {
+        this.$store.dispatch("deleteNodeShape", this.$props.id);
+      } else {
+        this.$store.dispatch("deletePropertyShape", this.$props.id);
+      }
     },
 
     /**
