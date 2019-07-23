@@ -5,6 +5,12 @@
       :is-datalist="false"
       :on-exit="stopEditing"
     ></reactive-input>
+    <reactive-input
+      ref="addPropInput"
+      :is-datalist="true"
+      :on-exit="stopAddingProperty"
+    ></reactive-input>
+
     <v-group
       ref="posRef"
       :draggable="true"
@@ -34,6 +40,16 @@
         ></node-property>
       </div>
 
+      <div v-for="(prop, key) in getConstraints()" :key="key">
+        <constraint
+          :constraint-i-d="key"
+          :shape="$props.id"
+          :constraint-config="propertyConfigs[key]"
+          :prop-text-config="propTextConfigs[key]"
+          :delete-prop-config="deletePropConfigs[key]"
+        ></constraint>
+      </div>
+
       <v-text
         ref="addPropText"
         :config="propTextConfigs['newProperty']"
@@ -45,26 +61,23 @@
         @click="addNewProperty"
       ></v-circle>
     </v-group>
-    <reactive-input
-      ref="addPropInput"
-      :is-datalist="true"
-      :on-exit="stopAddingProperty"
-    ></reactive-input>
   </div>
 </template>
 
 <script>
 import ReactiveInput from "../FormElements/ReactiveInput.vue";
 import NodeProperty from "./NodeProperty.vue";
+import Constraint from "./Constraint.vue";
 import { urlToName } from "../../util/nameParser";
 import {
-  DELETE_NODE_CONFIG,
+  DELETE_BUTTON_CONFIG,
   ADD_PROP_CONFIG,
   ID_TEXT_CONFIG,
   PROP_TEXT_CONFIG,
   PROPERTY_CONFIG,
   NODE_SHAPE_CONFIG,
-  PROPERTY_SHAPE_CONFIG
+  PROPERTY_SHAPE_CONFIG,
+  CONSTRAINT_CONFIG
 } from "../../util/konvaConfigs";
 
 const DELTA_Y_TEXT = 15;
@@ -73,7 +86,7 @@ const NEW_PROPERTY_TEXT = "newProperty";
 
 export default {
   name: "Shape",
-  components: { ReactiveInput, NodeProperty },
+  components: { ReactiveInput, NodeProperty, Constraint },
   props: {
     id: {
       type: String,
@@ -95,7 +108,7 @@ export default {
       shapeConfig: this.$props.nodeShape
         ? NODE_SHAPE_CONFIG
         : PROPERTY_SHAPE_CONFIG,
-      deleteNodeConfig: DELETE_NODE_CONFIG,
+      deleteNodeConfig: DELETE_BUTTON_CONFIG,
       idTextConfig: {
         ...ID_TEXT_CONFIG,
         text: urlToName(this.$props.id)
@@ -105,7 +118,8 @@ export default {
         ...PROP_TEXT_CONFIG,
         text: urlToName(this.$props.propKey)
       },
-      deletePropConfig: DELETE_NODE_CONFIG,
+      constraintConfig: CONSTRAINT_CONFIG,
+      deletePropConfig: DELETE_BUTTON_CONFIG,
       addPropConfig: ADD_PROP_CONFIG
     };
   },
@@ -122,27 +136,45 @@ export default {
      * @returns an object mapping every property name to a property object.
      */
     getProperties() {
-      const propNames = this.$store.getters.nodeProperties(this.$props.id);
+      const propNames = this.$store.getters.shapeProperties(this.$props.id);
       const propertyObjects = this.$store.getters.shapes;
       const propObjects = {};
       for (const prop of propNames) {
         // FIXME here's some undefined stuff going on, hence the if
         if (prop) propObjects[prop] = propertyObjects[prop];
       }
-      this.setPropConfigs(propObjects);
+      this.setConfigs(propObjects, false);
       return propObjects;
     },
 
     /**
-     * Set the configurations of its children using the updated y values from the state.
-     * @param properties a dictionary containing the node shape's properties.
+     * Get an object containing all the constraints and set their y values.
+     * @returns an object mapping every constraint name to a (list of) values.
      */
-    setPropConfigs(properties) {
+    getConstraints() {
+      const constraints = this.$store.getters.shapeConstraints(this.$props.id);
+      this.setConfigs(constraints, true);
+      return constraints;
+    },
+
+    /**
+     * Set the configurations of its children using the updated y values from the state.
+     * @param elements a dictionary containing the node shape's elements.
+     * @param constraints boolean value which indicates if the given elements are constraints.
+     */
+    setConfigs(elements, constraints) {
       const { id } = this.$props;
       const ys = this.$store.state.yValues[id];
-      for (const prop of Object.keys(properties)) {
+      for (const prop of Object.keys(elements)) {
         // The properties should be listed below eachother.
-        this.propertyConfigs[prop] = { ...this.propertyConfig, y: ys[prop] };
+        if (constraints) {
+          this.propertyConfigs[prop] = {
+            ...this.constraintConfig,
+            y: ys[prop]
+          };
+        } else {
+          this.propertyConfigs[prop] = { ...this.propertyConfig, y: ys[prop] };
+        }
         this.propTextConfigs[prop] = {
           ...this.propTextConfig,
           y: ys[prop] + DELTA_Y_TEXT,

@@ -41,10 +41,6 @@ export default {
   },
 
   methods: {
-    print(sth) {
-      console.log(sth);
-    },
-
     /**
      * Resize the canvas on resizing of the window.
      */
