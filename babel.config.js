@@ -1,5 +1,5 @@
 module.exports = {
-  presets: ["@vue/app"],
+  presets: ["airbnb", ["@vue/app", { useBuiltIns: "entry" }]],
   plugins: [
     ["@babel/plugin-transform-runtime", { corejs: 3 }],
     "@babel/plugin-transform-async-to-generator",
