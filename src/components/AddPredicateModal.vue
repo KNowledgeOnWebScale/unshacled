@@ -3,30 +3,44 @@
     <sui-modal v-model="this.$store.state.predicateModal.show">
       <sui-modal-header> Add Predicate Report {{ input }}</sui-modal-header>
       <sui-modal-content>
-        <label for="selectPreds">Predicate:</label>
-        <select
-          id="selectPreds"
-          v-model="predicate"
-          @change="selectPredicate()"
-        >
-          <option
-            v-for="obj in predicates"
-            id="Preds"
-            :key="obj"
-            :value="obj"
-            >{{ obj }}</option
-          >
-        </select>
-        <br />
-        <label for="selectObjects">Object:</label>
-        <select v-if="objects" id="selectObjects" v-model="object">
-          <option v-for="obj in objects" id="Objects" :key="obj" :value="obj">{{
-            obj
-          }}</option>
-        </select>
-        <br />
-        Value:
-        <input v-model="input" />
+        <div class="ui form">
+          <div class="field">
+            <label for="selectPreds">Predicate</label>
+            <select
+              id="selectPreds"
+              v-model="predicate"
+              @change="selectPredicate()"
+            >
+              <option
+                v-for="obj in predicates"
+                id="Preds"
+                :key="obj"
+                :value="obj"
+                >{{ obj }}</option
+              >
+            </select>
+          </div>
+
+          <div v-if="predicate !== ''" class="field">
+            <label for="selectObjects">Object</label>
+            <select v-if="objects" id="selectObjects" v-model="object">
+              <option
+                v-for="obj in objects"
+                id="Objects"
+                :key="obj"
+                :value="obj"
+              >
+                {{ obj }}
+              </option>
+            </select>
+          </div>
+
+          <div v-if="object !== ''" class="field">
+            <label for="valueInput">Value</label>
+            <input id="valueInput" v-model="input" />
+          </div>
+        </div>
+
         <sui-segment v-if="error" color="red">
           Some constraints aren't supported yet by the internal model.
         </sui-segment>
@@ -79,9 +93,18 @@ export default {
   },
   methods: {
     toggleModal() {
+      // Arguments
       const args = { id: null, type: null };
-      this.$store.commit("togglePredicateModal", args);
+
+      // Reset modal values
+      this.predicate = "";
+      this.urls = {};
+      this.input = "";
+      this.object = "";
       this.error = false;
+
+      // Toggle modal
+      this.$store.commit("togglePredicateModal", args);
     },
     selectPredicate() {
       this.$store.commit(
