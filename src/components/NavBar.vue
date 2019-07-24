@@ -64,9 +64,9 @@
 import SuiDropdown from "semantic-ui-vue/dist/commonjs/modules/Dropdown/Dropdown";
 import SuiDropdownDivider from "semantic-ui-vue/dist/commonjs/modules/Dropdown/DropdownDivider";
 import ClearModal from "./ClearModal.vue";
-import NodeShapeModal from "./NodeShapeModal.vue";
-import ValidationReportModal from "./ValidationReportModal.vue";
-import AddPredicateModal from "./AddPredicateModal.vue";
+import NodeShapeModal from "./Modals/NodeShapeModal.vue";
+import ValidationReportModal from "./Modals/ValidationReportModal.vue";
+import AddPredicateModal from "./Modals/AddPredicateModal.vue";
 
 export default {
   name: "NavBar",

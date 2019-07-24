@@ -62,7 +62,7 @@
 
 <script>
 import Vue from "vue";
-import ValueType from "../util/enums/ValueType";
+import ValueType from "../../util/enums/ValueType";
 
 export default {
   name: "AddPredicateModal",
