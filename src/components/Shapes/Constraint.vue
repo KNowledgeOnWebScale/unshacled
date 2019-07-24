@@ -4,6 +4,7 @@
     <v-text ref="key" :config="keyConfig"></v-text>
     <v-text ref="value" :config="valueConfig"></v-text>
     <v-circle
+      v-if="this.$props.hover"
       :config="this.$props.deletePropConfig"
       @click="deleteConstraint"
     ></v-circle>
@@ -23,6 +24,10 @@ export default {
     },
     constraintID: {
       type: String,
+      required: true
+    },
+    hover: {
+      type: Boolean,
       required: true
     },
     constraintConfig: {
@@ -53,6 +58,9 @@ export default {
     };
   },
   methods: {
+    /**
+     * Delete the current constraint from its shape.
+     */
     deleteConstraint() {
       const args = {
         shapeID: this.$props.shape,
@@ -60,11 +68,35 @@ export default {
       };
       this.$store.dispatch("deleteConstraintFromShape", args);
     },
+
+    /**
+     * Get the value of the current constraint.
+     * @returns {[]|*} array or string, depending to the number of values.
+     */
     getConstraintValue() {
-      const constraints = this.$store.getters.shapeConstraints(
-        this.$props.shape
-      );
-      return urlToName(constraints[this.$props.constraintID][0]["@id"]);
+      const value = this.$store.getters.shapeConstraints(this.$props.shape)[
+        this.$props.constraintID
+      ];
+
+      // Check if there is more than one value.
+      if (value.length > 1) {
+        // Transform the list.
+        const output = [];
+        for (const element of value) {
+          // Extract each element's name.
+          output.push(urlToName(element));
+        }
+        return output;
+      } else if (value.length === 0) {
+        // The constraint has no value.
+        return "(empty)";
+      } else if (value[0]["@id"]) {
+        // Get the ID and extract the name.
+        return urlToName(value[0]["@id"]);
+      } else if (value[0]["@value"]) {
+        // Get the value.
+        return value[0]["@value"];
+      }
     }
   }
 };

@@ -5,11 +5,6 @@
       :is-datalist="false"
       :on-exit="stopEditing"
     ></reactive-input>
-    <reactive-input
-      ref="addPropInput"
-      :is-datalist="true"
-      :on-exit="stopAddingProperty"
-    ></reactive-input>
 
     <v-group
       ref="posRef"
@@ -30,10 +25,17 @@
         @click="deleteShape"
       ></v-circle>
 
+      <v-circle
+        v-if="hover && !adding"
+        :config="addPredConfig"
+        @mousedown="addPredicate"
+      ></v-circle>
+
       <div v-for="(prop, key) in getProperties()" :key="key">
         <node-property
           :prop-key="key"
           :node="$props.id"
+          :hover="hover"
           :property-config="propertyConfigs[key]"
           :prop-text-config="propTextConfigs[key]"
           :delete-prop-config="deletePropConfigs[key]"
@@ -44,22 +46,12 @@
         <constraint
           :constraint-i-d="key"
           :shape="$props.id"
+          :hover="hover"
           :constraint-config="propertyConfigs[key]"
           :prop-text-config="propTextConfigs[key]"
           :delete-prop-config="deletePropConfigs[key]"
         ></constraint>
       </div>
-
-      <v-text
-        ref="addPropText"
-        :config="propTextConfigs['newProperty']"
-      ></v-text>
-      <v-rect v-if="adding" :config="propertyConfigs['newProperty']"></v-rect>
-      <v-circle
-        v-if="!adding"
-        :config="addPropConfig"
-        @click="addNewProperty"
-      ></v-circle>
     </v-group>
   </div>
 </template>
@@ -77,7 +69,8 @@ import {
   PROPERTY_CONFIG,
   NODE_SHAPE_CONFIG,
   PROPERTY_SHAPE_CONFIG,
-  CONSTRAINT_CONFIG
+  CONSTRAINT_CONFIG,
+  ADD_PRED_CONFIG
 } from "../../util/konvaConfigs";
 
 const DELTA_Y_TEXT = 15;
@@ -120,7 +113,8 @@ export default {
       },
       constraintConfig: CONSTRAINT_CONFIG,
       deletePropConfig: DELETE_BUTTON_CONFIG,
-      addPropConfig: ADD_PROP_CONFIG
+      addPropConfig: ADD_PROP_CONFIG,
+      addPredConfig: ADD_PRED_CONFIG
     };
   },
   mounted() {
@@ -202,29 +196,11 @@ export default {
     },
 
     /**
-     * Start adding a new property to the current node.
+     * TODO
      */
-    addNewProperty() {
-      const { addPropInput, addPropText } = this.$refs;
-      if (addPropInput) {
-        this.adding = true;
-        addPropInput.startEditing(
-          addPropText.getNode(),
-          addPropText.getNode().text()
-        );
-      }
-    },
-
-    /**
-     * Call the store to add a property with the given ID to the current node.
-     * @param value the ID of the property that has to be added.
-     */
-    stopAddingProperty(value) {
-      this.adding = false;
-      this.$store.dispatch("addPropertyToNode", {
-        propertyID: value,
-        nodeID: this.$props.id
-      });
+    addPredicate() {
+      const args = { id: this.id, type: "PropertyShape" };
+      this.$store.commit("togglePredicateModal", args);
     },
 
     /**

@@ -1747,4 +1747,20 @@ const EXAMPLES = {
   ]
 };
 
+const lists = {};
+const types = new Set();
+const ids = new Set();
+EXAMPLES.model.forEach(e =>
+  e.forEach(array => {
+    for (const property in array) {
+      const value = array[property];
+      if (typeof value === "object") {
+        const innervalue = value[0];
+        if (innervalue["@id"]) ids[property] = true;
+        if (innervalue["@type"]) types[property] = true;
+        if (innervalue["@list"]) lists[property] = true;
+      }
+    }
+  })
+);
 export { EXAMPLES as default };
