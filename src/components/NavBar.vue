@@ -54,8 +54,8 @@
     <clear-modal></clear-modal>
     <validation-report-modal></validation-report-modal>
     <add-predicate-modal
-      v-bind:id="this.$store.state.predicateModal.id"
-      v-bind:type="this.$store.state.predicateModal.type"
+      :id="this.$store.state.predicateModal.id"
+      :type="this.$store.state.predicateModal.type"
     ></add-predicate-modal>
   </div>
 </template>

@@ -60,8 +60,8 @@ export default new Vuex.Store({
       const predicate = args.pred;
       const valueType = args.vt;
 
-      if(predicate.includes("property")){
-        const argument = { nodeID: propertyShapeId, propertyID: args.input};
+      if (predicate.includes("property")) {
+        const argument = { nodeID: propertyShapeId, propertyID: args.input };
         this.dispatch("addPropertyToNode", argument);
       }
       const obj = state.model.filter(e => e["@id"] === propertyShapeId).pop();
@@ -471,6 +471,11 @@ export default new Vuex.Store({
         this.commit("addPropertyIDToShape", { propertyID, shape });
         // Update the y values
         this.commit("updateYValues", nodeID);
+      }
+      for (const prop of store.getters.shapeWithID(nodeID)[
+        "https://2019.summerofcode.be/unshacled#property"
+      ]) {
+        console.log(prop, prop["@id"]);
       }
     },
 

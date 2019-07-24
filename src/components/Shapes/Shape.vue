@@ -52,12 +52,6 @@
           :delete-prop-config="deletePropConfigs[key]"
         ></constraint>
       </div>
-
-      <v-text
-        ref="addPropText"
-        :config="propTextConfigs['newProperty']"
-      ></v-text>
-      <v-rect v-if="adding" :config="propertyConfigs['newProperty']"></v-rect>
     </v-group>
   </div>
 </template>
@@ -202,37 +196,11 @@ export default {
     },
 
     /**
-     * Start adding a new property to the current node.
-     */
-    addNewProperty() {
-      const { addPropInput, addPropText } = this.$refs;
-      if (addPropInput) {
-        this.adding = true;
-        addPropInput.startEditing(
-          addPropText.getNode(),
-          addPropText.getNode().text()
-        );
-      }
-    },
-
-    /**
      * TODO
      */
     addPredicate() {
       const args = { id: this.id, type: "PropertyShape" };
       this.$store.commit("togglePredicateModal", args);
-    },
-
-    /**
-     * Call the store to add a property with the given ID to the current node.
-     * @param value the ID of the property that has to be added.
-     */
-    stopAddingProperty(value) {
-      this.adding = false;
-      this.$store.dispatch("addPropertyToNode", {
-        propertyID: value,
-        nodeID: this.$props.id
-      });
     },
 
     /**

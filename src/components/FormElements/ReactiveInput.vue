@@ -1,6 +1,13 @@
 <template>
   <div>
-    <input ref="input" type="text" @blur="stopEditing" />
+    <input ref="input" type="text" list="datalist" @blur="stopEditing" />
+    <datalist id="datalist" ref="datalist" type="text">
+      <option
+        v-for="key in getOptions()"
+        :key="getOptionID(key)"
+        :value="getOptionID(key)"
+      ></option>
+    </datalist>
   </div>
 </template>
 
@@ -34,9 +41,9 @@ export default {
      * @param textNode the Konva node which contains the text we need to edit.
      */
     startEditing(textNode) {
-      const { input } = this.$refs;
+      const { input, datalist } = this.$refs;
       const bool = this.$props.isDatalist;
-      const field = input;
+      const field = bool ? input : datalist;
       const stage = this.$store.state.editor;
 
       // Get the position of the original text node to put the field on top.
@@ -52,11 +59,9 @@ export default {
 
       // Set the field properties.
       field.id = "reactiveInput";
-      if (!bool) {
-        // Properties specific to the simple input.
-        input.type = "text";
-        input.value = textNode.text();
-      }
+      // Properties specific to the simple input.
+      input.type = "text";
+      input.value = textNode.text();
       field.style.position = "absolute";
       field.style.top = `${fieldPosition.y - MARGIN_TOP}px`;
       field.style.left = `${fieldPosition.x + MARGIN_LEFT}px`;
@@ -80,6 +85,23 @@ export default {
         this.$props.onExit(this.$refs.input.value);
         document.getElementById("app").removeChild(this.$refs.input);
       }
+    },
+
+    /**
+     * Get the possible options for the datalist object.
+     * @returns {getters.propertyShapes}
+     */
+    getOptions() {
+      return this.$store.getters.propertyShapes;
+    },
+
+    /**
+     * Get the ID of the given option.
+     * @param key
+     * @returns {*}
+     */
+    getOptionID(key) {
+      return key["@id"];
     }
   }
 };
