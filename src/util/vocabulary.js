@@ -1,5 +1,5 @@
 import ShaclDictionary from "../translation/shaclDictionary";
-import SHACLTranslator from "../translation/shaclTranslator"; // "../translation/shacl-translator";
+import SHACLTranslator from "../translation/ShaclTranslator"; // "../translation/shacl-translator";
 import shacl from "./shacl";
 
 /** Dictionary with distinct Types
