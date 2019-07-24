@@ -24,7 +24,7 @@ module.exports = {
           ResolveRDFJSTerm: "./src/util/resolveRDFJSTerm",
           // Translate
           ShaclDictionary: "./src/translation/shaclDictionary",
-          ShaclTranslator: "./src/translation/ShaclTranslator"
+          ShaclTranslator: "./src/translation/shaclTranslator"
         }
       }
     ]
