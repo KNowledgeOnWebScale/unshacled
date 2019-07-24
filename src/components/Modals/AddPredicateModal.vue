@@ -104,11 +104,7 @@ export default {
       const args = { id: null, type: null };
 
       // Reset modal values
-      this.predicate = "";
-      this.urls = {};
-      this.input = "";
-      this.object = "";
-      this.error = false;
+      this.reset();
 
       // Toggle modal
       this.$store.commit("togglePredicateModal", args);
@@ -130,7 +126,21 @@ export default {
         input: this.input,
         object: this.object
       };
-      if (!this.error) this.$store.commit("addPredicate", args);
+      if (!this.error) {
+        this.$store.commit("addPredicate", args);
+        this.reset();
+      }
+    },
+
+    /**
+     * Reset the data from the modal.
+     */
+    reset() {
+      this.predicate = "";
+      this.urls = {};
+      this.input = "";
+      this.object = "";
+      this.error = false;
     },
 
     /**

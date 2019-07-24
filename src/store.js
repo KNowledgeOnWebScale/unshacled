@@ -56,27 +56,22 @@ export default new Vuex.Store({
     },
 
     addPredicate(state, args) {
-      const propertyShapeId = args.id;
+      const shapeId = args.id;
       const predicate = args.pred;
       const valueType = args.vt;
 
       if (predicate.includes("property")) {
-        const argument = { nodeID: propertyShapeId, propertyID: args.input };
+        const argument = { nodeID: shapeId, propertyID: args.input };
         this.dispatch("addPropertyToNode", argument);
       }
-      const obj = state.model.filter(e => e["@id"] === propertyShapeId).pop();
-      if (valueType === "id") {
-        obj[predicate] = [];
-        obj[predicate].push({ "@id": args.input });
+      const obj = state.model.filter(e => e["@id"] === shapeId)[0];
+      if (valueType === "id" || valueType === "lists") {
+        obj[predicate] = [{ "@id": args.input }];
       }
       if (valueType === "type") {
-        obj[predicate] = [];
-        obj[predicate].push({ "@type": args.object, "@value": args.input });
+        obj[predicate] = [{ "@type": args.object, "@value": args.input }];
       }
-      if (valueType === "lists") {
-        obj[predicate] = [];
-        obj[predicate].push({ "@id": args.input });
-      }
+      this.commit("updateYValues", shapeId);
       state.predicateModal.show = !state.predicateModal.show;
     },
 
