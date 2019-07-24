@@ -59,6 +59,11 @@ export default new Vuex.Store({
       const propertyShapeId = args.id;
       const predicate = args.pred;
       const valueType = args.vt;
+
+      if(predicate.includes("property")){
+        const argument = { nodeID: propertyShapeId, propertyID: args.input};
+        this.dispatch("addPropertyToNode", argument);
+      }
       const obj = state.model.filter(e => e["@id"] === propertyShapeId).pop();
       if (valueType === "id") {
         obj[predicate] = [];
