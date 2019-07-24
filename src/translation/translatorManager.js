@@ -1,4 +1,4 @@
-import ShaclTranslator from "./shaclTranslator";
+import ShaclTranslator from "./ShaclTranslator";
 import language from "../util/enums/languages";
 /**
  *  TranslatorManager assigns translation tasks to the correct translator
