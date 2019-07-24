@@ -83,16 +83,19 @@ export default {
         // Transform the list.
         const output = [];
         for (const element of value) {
-          // Extract each elemet's name.
+          // Extract each element's name.
           output.push(urlToName(element));
         }
         return output;
       } else if (value.length === 0) {
         // The constraint has no value.
         return "(empty)";
-      } else {
+      } else if (value[0]["@id"]) {
         // Get the ID and extract the name.
         return urlToName(value[0]["@id"]);
+      } else if (value[0]["@value"]) {
+        // Get the value.
+        return value[0]["@value"];
       }
     }
   }
