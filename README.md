@@ -2,8 +2,11 @@
 Visual editor for shape constraint languages.
 ## Contents
 [Overview](#Overview)
+
 [Setup](#Setup)
+
 [Concepts](#Concepts)
+
 [Contribute](#Contribute)
 
 ## Overview
