@@ -87,6 +87,9 @@ export default {
           output.push(urlToName(element));
         }
         return output;
+      } else if (value.length === 0) {
+        // The constraint has no value.
+        return "(empty)";
       } else {
         // Get the ID and extract the name.
         return urlToName(value[0]["@id"]);
