@@ -12,6 +12,8 @@ import { TranslatorManager } from "./translation/translatorManager";
 import ValidatorManager from "./validation/validatorManager";
 import { SerializerManager } from "./parsing/serializerManager";
 import { ETF } from "./util/enums/extensionToFormat";
+import ShaclDictionary from "./translation/shaclDictionary";
+import { possiblePredicates, possibleObjects } from "./util/vocabulary";
 
 Vue.use(Vuex);
 
@@ -26,6 +28,12 @@ export default new Vuex.Store({
     showNodeShapeModal: false,
     showClearModal: false,
     showValidationReportModal: false,
+    predicateModal: {
+      show: false,
+      id: String,
+      type: String,
+      predicate: String
+    },
     validationReport: "hello",
     dataFile: {},
     dataFileExtension: String
@@ -45,6 +53,36 @@ export default new Vuex.Store({
           state.model = e;
         });
       };
+    },
+
+    addPredicate(state, args) {
+      const shapeId = args.id;
+      const predicate = args.pred;
+      const valueType = args.vt;
+
+      if (predicate.includes("property")) {
+        const argument = { nodeID: shapeId, propertyID: args.input };
+        this.dispatch("addPropertyToNode", argument);
+      }
+      const obj = state.model.filter(e => e["@id"] === shapeId)[0];
+      if (valueType === "id" || valueType === "lists") {
+        obj[predicate] = [{ "@id": args.input }];
+      }
+      if (valueType === "type") {
+        obj[predicate] = [{ "@type": args.object, "@value": args.input }];
+      }
+      this.commit("updateYValues", shapeId);
+      state.predicateModal.show = !state.predicateModal.show;
+    },
+
+    togglePredicateModal(state, args) {
+      state.predicateModal.show = !state.predicateModal.show;
+      state.predicateModal.id = args.id;
+      state.predicateModal.type = args.type;
+    },
+
+    changePredicate(state, pred) {
+      state.predicateModal.predicate = pred;
     },
 
     /**
@@ -429,6 +467,11 @@ export default new Vuex.Store({
         // Update the y values
         this.commit("updateYValues", nodeID);
       }
+      for (const prop of store.getters.shapeWithID(nodeID)[
+        "https://2019.summerofcode.be/unshacled#property"
+      ]) {
+        console.log(prop, prop["@id"]);
+      }
     },
 
     /**
@@ -758,7 +801,19 @@ export default new Vuex.Store({
         "https://2019.summerofcode.be/unshacled#property"
       ];
       for (const prop in node) {
-        if (ignored.indexOf(prop) < 0) constraints[prop] = node[prop];
+        // Only handle the constraints that are not ignored
+        if (ignored.indexOf(prop) < 0) {
+          if (node[prop].length > 1) {
+            // Get the ID of every element in the list
+            const properties = [];
+            for (const p of node[prop]) {
+              properties.push(p["@id"]);
+            }
+            constraints[prop] = properties;
+          } else {
+            constraints[prop] = node[prop];
+          }
+        }
       }
       return constraints;
     },
@@ -797,6 +852,13 @@ export default new Vuex.Store({
      */
     getDataFile: state => {
       return state.dataFile;
+    },
+
+    predicates: () => type => {
+      return possiblePredicates(ShaclDictionary.TERM[type]);
+    },
+    objects: state => {
+      return possibleObjects(state.predicateModal.predicate);
     }
   }
 });

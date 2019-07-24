@@ -4,9 +4,9 @@
       <sui-dropdown item icon="file alternate" simple>
         <sui-dropdown-menu>
           <sui-dropdown-item @click="$refs.importShapes.click()">
-            <label for="importShapes">Import Shapes...</label>
+            <label for="file">Import Shapes...</label>
             <input
-              id="importShapes"
+              id="file"
               ref="importShapes"
               type="file"
               style="display: none"
@@ -14,9 +14,9 @@
             />
           </sui-dropdown-item>
           <sui-dropdown-item @click="$refs.importData.click()">
-            <label for="importData">Import Data...</label>
+            <label for="dataFile">Import Data...</label>
             <input
-              id="importData"
+              id="dataFile"
               ref="importData"
               type="file"
               style="display: none"
@@ -36,19 +36,6 @@
       <sui-menu-item class="clickable" icon="add" @click="togglePropertyModal">
         Property
       </sui-menu-item>
-      <sui-menu-item class="clickable">
-        <div>
-          <label for="dataFile" style="cursor: pointer" icon="add" class="btn"
-            >Upload data</label
-          >
-          <input
-            id="dataFile"
-            style="display: none;"
-            type="file"
-            @change="uploadDataFile()"
-          />
-        </div>
-      </sui-menu-item>
       <sui-menu-item class="clickable" icon="check" @click="validate">
         Validate
       </sui-menu-item>
@@ -66,15 +53,20 @@
     ></node-shape-modal>
     <clear-modal></clear-modal>
     <validation-report-modal></validation-report-modal>
+    <add-predicate-modal
+      :id="this.$store.state.predicateModal.id"
+      :type="this.$store.state.predicateModal.type"
+    ></add-predicate-modal>
   </div>
 </template>
 
 <script>
 import SuiDropdown from "semantic-ui-vue/dist/commonjs/modules/Dropdown/Dropdown";
 import SuiDropdownDivider from "semantic-ui-vue/dist/commonjs/modules/Dropdown/DropdownDivider";
-import ClearModal from "./ClearModal.vue";
-import NodeShapeModal from "./NodeShapeModal.vue";
-import ValidationReportModal from "./ValidationReportModal.vue";
+import ClearModal from "./Modals/ClearModal.vue";
+import NodeShapeModal from "./Modals/NodeShapeModal.vue";
+import ValidationReportModal from "./Modals/ValidationReportModal.vue";
+import AddPredicateModal from "./Modals/AddPredicateModal.vue";
 
 export default {
   name: "NavBar",
@@ -83,7 +75,8 @@ export default {
     NodeShapeModal,
     SuiDropdownDivider,
     SuiDropdown,
-    ValidationReportModal
+    ValidationReportModal,
+    AddPredicateModal
   },
   data() {
     return {
