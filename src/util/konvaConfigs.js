@@ -33,8 +33,8 @@ export const DELETE_BUTTON_CONFIG = {
 };
 
 export const ADD_PRED_CONFIG = {
-  x: ADD_BUTTON_OFFSET - HEIGHT / 2,
-  y: 10,
+  x: DEL_BUTTON_OFFSET,
+  y: 10 + HEIGHT / 2,
   radius: 6,
   fill: "green"
 };
