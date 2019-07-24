@@ -1,8 +1,8 @@
 <template>
   <div>
     <sui-modal v-model="this.$store.state.predicateModal.show">
-      <sui-modal-header> Add Predicate Report {{ input }}</sui-modal-header>
-      <sui-modal-content>
+      <sui-modal-header> Add Predicate</sui-modal-header>
+      <sui-modal-content @submit.prevent="confirmNodeShape">
         <div class="ui form">
           <div class="field">
             <label for="selectPreds">Predicate</label>

@@ -4,9 +4,9 @@
       <sui-dropdown item icon="file alternate" simple>
         <sui-dropdown-menu>
           <sui-dropdown-item @click="$refs.importShapes.click()">
-            <label for="importShapes">Import Shapes...</label>
+            <label for="file">Import Shapes...</label>
             <input
-              id="importShapes"
+              id="file"
               ref="importShapes"
               type="file"
               style="display: none"
@@ -14,9 +14,9 @@
             />
           </sui-dropdown-item>
           <sui-dropdown-item @click="$refs.importData.click()">
-            <label for="importData">Import Data...</label>
+            <label for="dataFile">Import Data...</label>
             <input
-              id="importData"
+              id="dataFile"
               ref="importData"
               type="file"
               style="display: none"
@@ -35,19 +35,6 @@
       </sui-menu-item>
       <sui-menu-item class="clickable" icon="add" @click="togglePropertyModal">
         Property
-      </sui-menu-item>
-      <sui-menu-item class="clickable">
-        <div>
-          <label for="dataFile" style="cursor: pointer" icon="add" class="btn"
-            >Upload data</label
-          >
-          <input
-            id="dataFile"
-            style="display: none;"
-            type="file"
-            @change="uploadDataFile()"
-          />
-        </div>
       </sui-menu-item>
       <sui-menu-item class="clickable" icon="check" @click="validate">
         Validate
