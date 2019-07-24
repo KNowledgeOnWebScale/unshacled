@@ -13,6 +13,7 @@
         @click="startEditing"
       ></v-text>
       <v-circle
+        v-if="this.$props.hover"
         :config="this.$props.deletePropConfig"
         @click="deleteProperty"
       ></v-circle>
@@ -34,6 +35,10 @@ export default {
     propKey: {
       required: true,
       type: String
+    },
+    hover: {
+      required: true,
+      type: Boolean
     },
     propertyConfig: {
       required: true,

@@ -40,6 +40,7 @@
         <node-property
           :prop-key="key"
           :node="$props.id"
+          :hover="hover"
           :property-config="propertyConfigs[key]"
           :prop-text-config="propTextConfigs[key]"
           :delete-prop-config="deletePropConfigs[key]"
@@ -50,6 +51,7 @@
         <constraint
           :constraint-i-d="key"
           :shape="$props.id"
+          :hover="hover"
           :constraint-config="propertyConfigs[key]"
           :prop-text-config="propTextConfigs[key]"
           :delete-prop-config="deletePropConfigs[key]"
@@ -227,7 +229,6 @@ export default {
      */
     addPredicate() {
       const args = { id: this.id, type: "PropertyShape" };
-      console.log("ID:", this.id);
       this.$store.commit("togglePredicateModal", args);
     },
 

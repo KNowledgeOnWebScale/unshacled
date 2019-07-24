@@ -4,6 +4,7 @@
     <v-text ref="key" :config="keyConfig"></v-text>
     <v-text ref="value" :config="valueConfig"></v-text>
     <v-circle
+      v-if="this.$props.hover"
       :config="this.$props.deletePropConfig"
       @click="deleteConstraint"
     ></v-circle>
@@ -23,6 +24,10 @@ export default {
     },
     constraintID: {
       type: String,
+      required: true
+    },
+    hover: {
+      type: Boolean,
       required: true
     },
     constraintConfig: {
