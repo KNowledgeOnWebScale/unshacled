@@ -796,8 +796,18 @@ export default new Vuex.Store({
         "https://2019.summerofcode.be/unshacled#property"
       ];
       for (const prop in node) {
+        // Only handle the constraints that are not ignored
         if (ignored.indexOf(prop) < 0) {
-          constraints[prop] = node[prop];
+          if (node[prop].length > 1) {
+            // Get the ID of every element in the list
+            const properties = [];
+            for (const p of node[prop]) {
+              properties.push(p["@id"]);
+            }
+            constraints[prop] = properties;
+          } else {
+            constraints[prop] = node[prop];
+          }
         }
       }
       return constraints;

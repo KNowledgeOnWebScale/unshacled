@@ -58,6 +58,9 @@ export default {
     };
   },
   methods: {
+    /**
+     * Delete the current constraint from its shape.
+     */
     deleteConstraint() {
       const args = {
         shapeID: this.$props.shape,
@@ -65,11 +68,29 @@ export default {
       };
       this.$store.dispatch("deleteConstraintFromShape", args);
     },
+
+    /**
+     * Get the value of the current constraint.
+     * @returns {[]|*} array or string, depending to the number of values.
+     */
     getConstraintValue() {
-      const constraints = this.$store.getters.shapeConstraints(
-        this.$props.shape
-      );
-      return urlToName(constraints[this.$props.constraintID][0]["@id"]);
+      const value = this.$store.getters.shapeConstraints(this.$props.shape)[
+        this.$props.constraintID
+      ];
+
+      // Check if there is more than one value.
+      if (value.length > 1) {
+        // Transform the list.
+        const output = [];
+        for (const element of value) {
+          // Extract each elemet's name.
+          output.push(urlToName(element));
+        }
+        return output;
+      } else {
+        // Get the ID and extract the name.
+        return urlToName(value[0]["@id"]);
+      }
     }
   }
 };
