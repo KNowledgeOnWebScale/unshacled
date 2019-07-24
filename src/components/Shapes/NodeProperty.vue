@@ -1,6 +1,10 @@
 <template>
   <div>
-    <reactive-input ref="reactiveInput" :on-exit="stopEditing"></reactive-input>
+    <reactive-input
+      ref="reactiveInput"
+      :is-datalist="true"
+      :on-exit="stopEditing"
+    ></reactive-input>
     <v-group>
       <v-rect :config="this.$props.propertyConfig"></v-rect>
       <v-text
@@ -9,15 +13,16 @@
         @click="startEditing"
       ></v-text>
       <v-circle
+        v-if="this.$props.hover"
         :config="this.$props.deletePropConfig"
-        @mousedown="deleteProperty"
+        @click="deleteProperty"
       ></v-circle>
     </v-group>
   </div>
 </template>
 
 <script>
-import ReactiveInput from "../ReactiveInput.vue";
+import ReactiveInput from "../FormElements/ReactiveInput.vue";
 
 export default {
   name: "NodeProperty",
@@ -30,6 +35,10 @@ export default {
     propKey: {
       required: true,
       type: String
+    },
+    hover: {
+      required: true,
+      type: Boolean
     },
     propertyConfig: {
       required: true,
@@ -49,8 +58,12 @@ export default {
      * Call the ReactiveInput component to start editing using the given text node.
      */
     startEditing() {
-      if (this.$refs.reactiveInput)
-        this.$refs.reactiveInput.startEditing(this.$refs.propKey.getNode());
+      if (this.$refs.reactiveInput) {
+        this.$refs.reactiveInput.startEditing(
+          this.$refs.propKey.getNode(),
+          this.$props.propKey
+        );
+      }
     },
 
     /**
@@ -65,7 +78,7 @@ export default {
       ];
       if (newValue !== "" && properties.indexOf(newValue) === -1) {
         const args = {
-          node: this.$props.node,
+          nodeID: this.$props.node,
           oldID: this.$props.propKey,
           newID: newValue
         };

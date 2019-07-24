@@ -2,10 +2,10 @@
   <div>
     <sui-modal v-model="this.$store.state.showClearModal">
       <sui-modal-header>
-        Delete document?
+        Clear page
       </sui-modal-header>
       <sui-modal-actions>
-        <sui-button negative @click="confirm">Delete</sui-button>
+        <sui-button negative @click="confirm">Clear</sui-button>
         <sui-button @click="cancel">Cancel</sui-button>
       </sui-modal-actions>
     </sui-modal>

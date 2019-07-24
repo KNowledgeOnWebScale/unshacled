@@ -2,7 +2,8 @@ const X = 0;
 export const WIDTH = 250;
 export const HEIGHT = 40;
 const TEXT_SIZE = HEIGHT / 2;
-const BUTTON_OFFSET = 240;
+const DEL_BUTTON_OFFSET = 240;
+const ADD_BUTTON_OFFSET = 130;
 
 export const SHAPE_CONFIG = {
   x: X,
@@ -24,11 +25,18 @@ export const PROPERTY_SHAPE_CONFIG = {
   stroke: "blue"
 };
 
-export const DELETE_NODE_CONFIG = {
-  x: BUTTON_OFFSET,
+export const DELETE_BUTTON_CONFIG = {
+  x: DEL_BUTTON_OFFSET,
   y: 10,
   radius: 6,
   fill: "red"
+};
+
+export const ADD_PRED_CONFIG = {
+  x: DEL_BUTTON_OFFSET,
+  y: 10 + HEIGHT / 2,
+  radius: 6,
+  fill: "green"
 };
 
 export const ID_TEXT_CONFIG = {
@@ -58,8 +66,13 @@ export const PROP_TEXT_CONFIG = {
   align: "center"
 };
 
-export const DELETE_PROP_CONFIG = {
-  x: BUTTON_OFFSET,
+export const ADD_PROP_CONFIG = {
+  x: ADD_BUTTON_OFFSET,
   radius: 6,
-  fill: "red"
+  fill: "green"
+};
+
+export const CONSTRAINT_CONFIG = {
+  ...PROPERTY_CONFIG,
+  height: 2 * HEIGHT
 };
