@@ -1,4 +1,4 @@
-export const format = {
+export default {
   SHACL: "SHACL",
   SHEX: "SHEX"
 };

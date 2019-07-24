@@ -21,6 +21,7 @@ module.exports = {
           Util: "./src/util",
           Traverse: "./src/util/traverse",
           Examples: "./src/util/examples",
+          ResolveRDFJSTerm: "./src/util/resolveRDFJSTerm",
           // Translate
           ShaclDictionary: "./src/translation/shaclDictionary",
           ShaclTranslator: "./src/translation/shaclTranslator"

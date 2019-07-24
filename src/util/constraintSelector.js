@@ -1,11 +1,16 @@
 import { groupedConstraints } from "./shaclConstraints";
-import { format } from "./enums/format";
+import language from "./enums/languages";
 
+/**
+ * Currently not used.
+ * @param input
+ * @returns {*}
+ */
 export function getConstraints(input) {
   switch (input) {
-    case format.SHACL:
+    case language.SHACL:
       return groupedConstraints;
-    case format.SHEX:
+    case language.SHEX:
       return null; // replace with shex constraints when  finished
   }
 }

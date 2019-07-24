@@ -1,21 +1,28 @@
-import { N3Serializer, XMLSerializer } from "./serializers";
-import { ETF } from "../util/enums/extensionToFormat.js";
+import N3Serializer from "./n3Serializer";
+import XMLSerializer from "./xmlSerializer";
+
 /**
  *  SerializerManager retrieves the correct serializer for the format of RDF (Turtle, RDF/XML, ...)
  */
-export class SerializerManager {
+export default class SerializerManager {
+  /**
+   * Takes a JSON-LD document and a desired format type, returns the document in given format type.
+   * @param doc RDF document in JSON-LD
+   * @param type Format type e.g. "text/turtle"
+   * @returns {Promise<Object>} Promise which resolves to RDF in given format type
+   */
   static serialize(doc, type) {
     switch (type) {
-      // TODO: Add RDF/XML and other formats
       case "text/n3":
-      case ETF.ttl:
+      case "text/turtle":
       case "application/nquads":
       case "application/n-quads":
-        return N3Serializer.serialize(doc, type);
       case "application/ld+json":
-        return doc;
+        return N3Serializer.serialize(doc, type);
+      case "application/rdf+xml":
+        return XMLSerializer.serialize(doc, type);
       default:
-        console.log("UNSUPPORTED FORMAT");
+        console.log(`UNSUPPORTED FORMAT ${type}`);
     }
   }
 }

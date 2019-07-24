@@ -3,14 +3,14 @@ import Vue from "vue";
 import Vuex from "vuex";
 import EXAMPLE from "./util/examples";
 import { HEIGHT } from "./util/konvaConfigs";
-import { format } from "./util/enums/format";
+import language from "./util/enums/languages";
 import { getConstraints } from "./util/constraintSelector";
 import { urlToName, extractUrl } from "./util/nameParser";
 import { getNonOverlappingCoordinates } from "./util";
-import { ParserManager } from "./parsing/parserManager";
+import ParserManager from "./parsing/parserManager";
 import { TranslatorManager } from "./translation/translatorManager";
 import ValidatorManager from "./validation/validatorManager";
-import { SerializerManager } from "./parsing/serializerManager";
+import SerializerManager from "./parsing/serializerManager";
 import { ETF } from "./util/enums/extensionToFormat";
 import ShaclDictionary from "./translation/shaclDictionary";
 import { possiblePredicates, possibleObjects } from "./util/vocabulary";
@@ -21,7 +21,7 @@ export default new Vuex.Store({
   state: {
     editor: null,
     model: [],
-    format: format.SHACL,
+    format: language.SHACL,
     // relationships: {}, // TODO remove this
     yValues: {},
     coordinates: {},
@@ -47,9 +47,10 @@ export default new Vuex.Store({
     uploadSchemaFile(state, file) {
       const reader = new FileReader();
       const fileExtension = file.name.split(".").pop();
+      const type = ETF[fileExtension];
       reader.readAsText(file);
       reader.onload = function(event) {
-        ParserManager.parse(event.target.result, fileExtension).then(e => {
+        ParserManager.parse(event.target.result, type).then(e => {
           state.model = e;
         });
       };

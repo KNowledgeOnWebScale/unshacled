@@ -1,5 +1,5 @@
-import ShaclDictionary from "../translation/shaclDictionary";
-import SHACLTranslator from "../translation/ShaclTranslator"; // "../translation/shacl-translator";
+import ShaclDictionary from "ShaclDictionary";
+import SHACLTranslator from "ShaclTranslator";
 import shacl from "./shacl";
 
 /** Dictionary with distinct Types
@@ -16,7 +16,7 @@ import shacl from "./shacl";
  */
 const Types = listDistinctTypes(shacl);
 
-/** INFORMATION BUILD UP */
+/** GATHERING INFORMATION FROM SHACL.JS */
 const Shape = "http://www.w3.org/ns/shacl#Shape";
 const NodeShape = "http://www.w3.org/ns/shacl#NodeShape";
 const PropertyShape = "http://www.w3.org/ns/shacl#PropertyShape";
@@ -42,9 +42,9 @@ const Constraints = findObjectsWithType(shacl, Types.Parameter).map(
   obj => obj["http://www.w3.org/ns/shacl#path"][0]["@id"]
 );
 Dictionary[NodeShape].push(...Constraints);
-Dictionary[NodeShape] = removeDoubles(Dictionary[NodeShape]);
+Dictionary[NodeShape] = removeDuplicates(Dictionary[NodeShape]);
 Dictionary[PropertyShape].push(...Constraints);
-Dictionary[PropertyShape] = removeDoubles(Dictionary[PropertyShape]);
+Dictionary[PropertyShape] = removeDuplicates(Dictionary[PropertyShape]);
 
 // Add possible values for predicates
 Dictionary[PropertyShape].forEach(predicate => {
@@ -63,7 +63,7 @@ Dictionary[PropertyShape].forEach(predicate => {
 // Translate to internal terminology
 Dictionary = SHACLTranslator.toModel(Dictionary);
 
-/** FUNCTIONS TO GATHER INFORMATION */
+/** FUNCTIONS TO GATHER INFORMATION FROM SHACL.JS */
 
 /**
  * Returns first object with a matching @id from document
@@ -116,11 +116,11 @@ function listDistinctTypes(doc) {
 }
 
 /**
- * Removes double entries from array
+ * Removes duplicate entries from array of strings
  * @param array
  * @returns {string[]}
  */
-function removeDoubles(array) {
+function removeDuplicates(array) {
   const dictionary = array.reduce((dict, entry) => {
     dict[entry] = true;
     return dict;
@@ -128,7 +128,7 @@ function removeDoubles(array) {
   return Object.keys(dictionary);
 }
 
-/** FUNCTIONS TO GIVE INFORMATION   */
+/** EXPORTED FUNCTIONS TO USE */
 
 /**
  * Checks whether uri is of a class
@@ -153,7 +153,7 @@ export function isPredicate(uri) {
 }
 
 /**
- * TODO
+ * Check whether uri is known in dictionary
  * @param id
  * @returns {boolean}
  */
@@ -162,12 +162,12 @@ export function isInDictionary(id) {
 }
 
 /**
- * TODO
- * @param predicate
- * @param state
- * @returns {null}
+ * Returns array of possible entries for a list with specified predicate
+ * @param predicate Predicate
+ * @param state State is required as for certain list entries might be existing shapes that are kept in the state
+ * @returns {Object[]} Array with possible values for the list
  */
-export function listType(predicate, state) {
+export function listValues(predicate, state) {
   // The (single) value of this property must be a list of path elements, representing the elements of alternative paths.
   if (predicate === ShaclDictionary.TERM.alternativePath) {
     return null; // TODO
@@ -201,7 +201,7 @@ export function listType(predicate, state) {
 /**
  * Returns URI's of all possible predicates for given subject
  * @param subject
- * @returns {*}
+ * @returns {string[]}
  */
 export function possiblePredicates(subject) {
   return Dictionary[subject];
@@ -210,7 +210,7 @@ export function possiblePredicates(subject) {
 /**
  * Returns URI's of all possible objects for given predicate
  * @param predicate
- * @returns {*}
+ * @returns {string[]}
  */
 export function possibleObjects(predicate) {
   return Dictionary[predicate];
