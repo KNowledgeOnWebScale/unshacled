@@ -1,14 +1,6 @@
 <template>
   <div>
     <input ref="input" type="text" @blur="stopEditing" />
-    <input ref="listInput" type="text" list="datalist" @blur="stopEditing" />
-    <datalist id="datalist" ref="datalist" type="text">
-      <option
-        v-for="key in getSelectOptions()"
-        :key="getOptionID(key)"
-        :value="getOptionID(key)"
-      ></option>
-    </datalist>
   </div>
 </template>
 
@@ -34,21 +26,17 @@ export default {
       editing: false
     };
   },
-  mounted() {
-    this.getSelectOptions();
-  },
   methods: {
     /**
      * Start editing using the given text.
      * Create an input field on top of the text node.
      * Add an event listener to stop editing when pressing the ENTER key.
      * @param textNode the Konva node which contains the text we need to edit.
-     * @param propKey the id of the property we need to edit.
      */
-    startEditing(textNode, propKey) {
-      const { input, datalist, listInput } = this.$refs;
+    startEditing(textNode) {
+      const { input } = this.$refs;
       const bool = this.$props.isDatalist;
-      const field = bool ? listInput : input;
+      const field = input;
       const stage = this.$store.state.editor;
 
       // Get the position of the original text node to put the field on top.
@@ -61,11 +49,6 @@ export default {
 
       // Add the field to the document.
       document.getElementById("app").appendChild(field);
-      if (bool) {
-        // Add the datalist object if needed.
-        document.getElementById("app").appendChild(datalist);
-        listInput.value = propKey;
-      }
 
       // Set the field properties.
       field.id = "reactiveInput";
@@ -94,23 +77,9 @@ export default {
     stopEditing() {
       if (this.editing) {
         this.editing = false;
-        if (this.$props.isDatalist) {
-          this.$props.onExit(this.$refs.listInput.value);
-          document.getElementById("app").removeChild(this.$refs.datalist);
-          document.getElementById("app").removeChild(this.$refs.listInput);
-        } else {
-          this.$props.onExit(this.$refs.input.value);
-          document.getElementById("app").removeChild(this.$refs.input);
-        }
+        this.$props.onExit(this.$refs.input.value);
+        document.getElementById("app").removeChild(this.$refs.input);
       }
-    },
-
-    getSelectOptions() {
-      return this.$store.getters.propertyShapes;
-    },
-
-    getOptionID(key) {
-      return key["@id"];
     }
   }
 };

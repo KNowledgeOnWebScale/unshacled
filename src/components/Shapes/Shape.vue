@@ -5,11 +5,6 @@
       :is-datalist="false"
       :on-exit="stopEditing"
     ></reactive-input>
-    <reactive-input
-      ref="addPropInput"
-      :is-datalist="true"
-      :on-exit="stopAddingProperty"
-    ></reactive-input>
 
     <v-group
       ref="posRef"
@@ -63,11 +58,6 @@
         :config="propTextConfigs['newProperty']"
       ></v-text>
       <v-rect v-if="adding" :config="propertyConfigs['newProperty']"></v-rect>
-      <v-circle
-        v-if="!adding"
-        :config="addPropConfig"
-        @click="addNewProperty"
-      ></v-circle>
     </v-group>
   </div>
 </template>
@@ -85,7 +75,8 @@ import {
   PROPERTY_CONFIG,
   NODE_SHAPE_CONFIG,
   PROPERTY_SHAPE_CONFIG,
-  CONSTRAINT_CONFIG, ADD_PRED_CONFIG
+  CONSTRAINT_CONFIG,
+  ADD_PRED_CONFIG
 } from "../../util/konvaConfigs";
 
 const DELTA_Y_TEXT = 15;

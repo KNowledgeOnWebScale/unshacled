@@ -37,7 +37,14 @@
 
           <div v-if="object !== ''" class="field">
             <label for="valueInput">Value</label>
-            <input id="valueInput" v-model="input" />
+            <input id="valueInput" v-model="input" list="datalist" />
+            <datalist v-if="predicate === 'property'" id="datalist" type="text">
+              <option
+                v-for="key in getOptions()"
+                :key="getOptionID(key)"
+                :value="getOptionID(key)"
+              ></option>
+            </datalist>
           </div>
         </div>
 
@@ -124,6 +131,23 @@ export default {
         object: this.object
       };
       if (!this.error) this.$store.commit("addPredicate", args);
+    },
+
+    /**
+     * Get the possible options for the datalist object.
+     * @returns {getters.propertyShapes}
+     */
+    getOptions() {
+      return this.$store.getters.propertyShapes;
+    },
+
+    /**
+     * Get the ID of the given option.
+     * @param key
+     * @returns {*}
+     */
+    getOptionID(key) {
+      return key["@id"];
     }
   }
 };
