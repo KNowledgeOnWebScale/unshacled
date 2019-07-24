@@ -63,7 +63,7 @@
 <script>
 import SuiDropdown from "semantic-ui-vue/dist/commonjs/modules/Dropdown/Dropdown";
 import SuiDropdownDivider from "semantic-ui-vue/dist/commonjs/modules/Dropdown/DropdownDivider";
-import ClearModal from "./ClearModal.vue";
+import ClearModal from "./Modals/ClearModal.vue";
 import NodeShapeModal from "./Modals/NodeShapeModal.vue";
 import ValidationReportModal from "./Modals/ValidationReportModal.vue";
 import AddPredicateModal from "./Modals/AddPredicateModal.vue";
