@@ -85,7 +85,7 @@ export default {
   },
   methods: {
     loadExample() {
-      this.$store.commit("loadExample");
+      this.$store.dispatch("loadExample");
     },
     toggleShapeModal() {
       this.createPropertyShape = false;
@@ -107,7 +107,7 @@ export default {
       this.$store.commit("uploadDataFile", file);
     },
     validate() {
-      this.$store.commit("validate");
+      this.$store.dispatch("validate");
     }
   }
 };

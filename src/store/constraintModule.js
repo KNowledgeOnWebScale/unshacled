@@ -22,7 +22,7 @@ const constraintModule = {
     addPropertyToNode({ getters, commit, rootState }, args) {
       const { nodeID, propertyID } = args;
 
-      if (propertyID !== "newProperty" && propertyID !== "") {
+      if (propertyID !== "") {
         // Check if the new property name is already an existing PropertyShape.
         if (!getters.propertyShapes[propertyID]) {
           // If not, create a new PropertyShape that is a copy of the original one.
@@ -47,6 +47,32 @@ const constraintModule = {
           { root: true }
         );
       }
+    },
+
+    addPredicate({ getters, commit, rootState }, args) {
+      const { shapeID, predicate, valueType } = args;
+
+      if (predicate.includes("property")) {
+        const argument = { nodeID: shapeID, propertyID: args.input };
+        this.dispatch("addPropertyToNode", argument);
+      }
+      const obj = getters.shapeWithID(shapeID);
+
+      if (valueType === "id" || valueType === "lists") {
+        obj[predicate] = [{ "@id": args.input }];
+      }
+      if (valueType === "type") {
+        obj[predicate] = [{ "@type": args.object, "@value": args.input }];
+      }
+
+      // Update the y values.
+      commit(
+        "updateYValues",
+        { nodeID: shapeID, model: rootState.model },
+        { root: true }
+      );
+      // Toggle the predicate modal.
+      commit("togglePredicateModal", undefined, { root: true });
     },
 
     /* EDIT ========================================================================================================= */
@@ -132,12 +158,19 @@ const constraintModule = {
      * @param store
      * @param args
      */
-    deleteConstraintFromShape({ getters, commit }, args) {
+    deleteConstraintFromShape({ getters, commit, rootState }, args) {
       const { shapeID, constraint } = args;
       const shape = getters.shapeWithID(shapeID);
       commit(
         "deleteConstraintFromShape",
         { shape, constraint },
+        { root: true }
+      );
+
+      // Update the y values
+      commit(
+        "updateYValues",
+        { nodeID: shapeID, model: rootState.model },
         { root: true }
       );
     }

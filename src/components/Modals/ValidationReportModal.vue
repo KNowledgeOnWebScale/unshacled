@@ -1,7 +1,7 @@
 <template>
   <div>
     <sui-modal
-      v-model="this.$store.state.showValidationReportModal"
+      v-model="this.$store.state.dataModule.showValidationReportModal"
       @submit.prevent="confirmNodeShape"
     >
       <sui-modal-header>

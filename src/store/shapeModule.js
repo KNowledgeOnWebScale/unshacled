@@ -99,8 +99,6 @@ const shapeModule = {
         i += 1;
       }
       // Add y values for the add button.
-      Vue.set(state.yValues[nodeID], "newProperty", i * HEIGHT);
-      Vue.set(state.yValues[nodeID], "addButton", i * HEIGHT + HEIGHT / 4);
     },
 
     /**

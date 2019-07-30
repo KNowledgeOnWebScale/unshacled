@@ -6,18 +6,12 @@ import Vuex from "vuex";
 // Util imports
 import { getNonOverlappingCoordinates } from "./util";
 import EXAMPLE from "./util/examples";
-import language from "./util/enums/languages";
-import { getConstraints } from "./util/constraintSelector";
-import { ETF } from "./util/enums/extensionToFormat";
 import { urlToName } from "./util/nameParser";
 import { possiblePredicates, possibleObjects } from "./util/vocabulary";
 
 // Parsing, translation and validation imports
-import ParserManager from "./parsing/parserManager";
-import SerializerManager from "./parsing/serializerManager";
 import { TranslatorManager } from "./translation/translatorManager";
 import ShaclDictionary from "./translation/shaclDictionary";
-import ValidatorManager from "./validation/validatorManager";
 
 // Modules
 import shapeModule from "./store/shapeModule";
@@ -29,90 +23,23 @@ export default new Vuex.Store({
   state: {
     editor: null,
     model: [],
-    format: language.SHACL,
     // relationships: {}, // TODO remove this
     showNodeShapeModal: false,
     showClearModal: false,
-    showValidationReportModal: false,
     predicateModal: {
       show: false,
       id: String,
       type: String,
       predicate: String
-    },
-    validationReport: "hello",
-    dataFile: {},
-    dataFileExtension: String
+    }
   },
   modules: {
     shapeModule,
     dataModule
   },
   mutations: {
-    /**
-     * Takes a file, reads the extension and depending on the format uses the correct parser to turn it into an intern model
-     * @param state
-     * @param file The uploaded file
-     * */
-    uploadSchemaFile(state, file) {
-      const reader = new FileReader();
-      const fileExtension = file.name.split(".").pop();
-      const type = ETF[fileExtension];
-      reader.readAsText(file);
-      reader.onload = function(event) {
-        ParserManager.parse(event.target.result, type).then(e => {
-          state.model = e;
-        });
-      };
-    },
-
-    addPredicate(state, args) {
-      const shapeId = args.id;
-      const predicate = args.pred;
-      const valueType = args.vt;
-
-      if (predicate.includes("property")) {
-        const argument = { nodeID: shapeId, propertyID: args.input };
-        this.dispatch("addPropertyToNode", argument);
-      }
-      const obj = state.model.filter(e => e["@id"] === shapeId)[0];
-      if (valueType === "id" || valueType === "lists") {
-        obj[predicate] = [{ "@id": args.input }];
-      }
-      if (valueType === "type") {
-        obj[predicate] = [{ "@type": args.object, "@value": args.input }];
-      }
-      this.commit("updateYValues", { nodeID: shapeId, model: state.model });
-      state.predicateModal.show = !state.predicateModal.show;
-    },
-
     changePredicate(state, pred) {
-      state.predicateModal.predicate = pred;
-    },
-
-    /**
-     * Recieves a datafile and takes its content to the state
-     * @param state
-     * @param file The file containing data to check on
-     * */
-    uploadDataFile(state, file) {
-      const reader = new FileReader();
-      state.dataFileExtension = file.name.split(".").pop();
-      reader.readAsText(file);
-      reader.onload = function(event) {
-        state.dataFile = event.target.result;
-      };
-    },
-
-    validate(state) {
-      SerializerManager.serialize(state.model, ETF.ttl).then(e => {
-        ValidatorManager.validate(state.dataFile, e, state.format)
-          .then(e => {
-            state.validationReport = e;
-            state.showValidationReportModal = true;
-          })
-          .catch(e => console.log(`failure : ${e}`));
-      });
+      Vue.set(state.predicateModal, "predicate", pred);
     },
 
     /**
@@ -125,30 +52,13 @@ export default new Vuex.Store({
     },
 
     /**
-     * Load in some example data
-     * @param state
+     * Clear all shapes and properties from the current state.
+     * @param state the current state
      */
-    loadExample(state) {
-      console.log("Loading example...");
-      this.commit("clear"); // Clear the existing data first.
-
-      const example = EXAMPLE.model[0];
+    clear(state) {
+      console.log("Clear!");
       state.model = [];
-      for (const element of example) {
-        state.model.push(clone(element)); // Deep copy
-      }
-
-      // Update y values and set coordinates to zero
-      for (const shape of state.model) {
-        this.commit("updateYValues", {
-          nodeID: shape["@id"],
-          model: state.model
-        });
-        const { x, y } = getNonOverlappingCoordinates({
-          coordinates: state.coordinates
-        });
-        Vue.set(state.shapeModule.coordinates, shape["@id"], { x, y });
-      }
+      this.commit("clearLocations");
     },
 
     /* ADD ========================================================================================================== */
@@ -161,7 +71,7 @@ export default new Vuex.Store({
     addShape(state, object) {
       state.model.push(object);
       const { x, y } = getNonOverlappingCoordinates({
-        coordinates: state.coordinates
+        coordinates: state.shapeModule.coordinates
       });
       Vue.set(state.coordinates, object["@id"], { x, y });
       this.commit("updateYValues", {
@@ -234,12 +144,24 @@ export default new Vuex.Store({
     },
 
     /**
-     * TODO
+     * Set the model to the given value.
      * @param state
+     * @param model
      */
-    toggleValidationReport(state) {
-      event.preventDefault();
-      state.showValidationReportModal = !state.showValidationReportModal;
+    setModel(state, model) {
+      state.model = model;
+
+      // Update y values and set coordinates to zero
+      for (const shape of state.model) {
+        this.commit("updateYValues", {
+          nodeID: shape["@id"],
+          model: state.model
+        });
+        const { x, y } = getNonOverlappingCoordinates({
+          coordinates: state.shapeModule.coordinates
+        });
+        Vue.set(state.shapeModule.coordinates, shape["@id"], { x, y });
+      }
     },
 
     /* DELETE ======================================================================================================= */
@@ -267,6 +189,11 @@ export default new Vuex.Store({
       for (const p in properties) {
         if (properties[p]["@id"] === propertyID) Vue.delete(properties, p);
       }
+      Vue.set(
+        shape,
+        "https://2019.summerofcode.be/unshacled#property",
+        properties
+      );
     },
 
     /**
@@ -279,7 +206,17 @@ export default new Vuex.Store({
       Vue.delete(shape, constraint);
     },
 
-    /* HELPERS ====================================================================================================== */
+    /* MODALS ======================================================================================================= */
+
+    /**
+     * TODO
+     * @param state
+     */
+    toggleValidationReport(state) {
+      event.preventDefault();
+      state.dataModule.showValidationReportModal = !state.dataModule
+        .showValidationReportModal;
+    },
 
     /**
      * Toggle the visibility of the node shape modal.
@@ -302,21 +239,14 @@ export default new Vuex.Store({
     /**
      * Toggle the visibility of the predicate modal.
      * @param state
+     * @param args
      */
     togglePredicateModal(state, args) {
-      state.predicateModal.show = !state.predicateModal.show;
-      state.predicateModal.id = args.id;
-      state.predicateModal.type = args.type;
-    },
+      if (!args) args = { id: null, type: null };
 
-    /**
-     * Clear all shapes and properties from the current state.
-     * @param state the current state
-     */
-    clear(state) {
-      console.log("Clear!");
-      state.model = [];
-      this.commit("clearLocations");
+      Vue.set(state.predicateModal, "show", !state.predicateModal.show);
+      Vue.set(state.predicateModal, "id", args.id);
+      Vue.set(state.predicateModal, "type", args.type);
     }
   },
   actions: {
@@ -340,32 +270,29 @@ export default new Vuex.Store({
       });
     },
      */
+
+    /**
+     * Load in some example data.
+     */
+    loadExample() {
+      console.log("Loading example...");
+      this.commit("clear"); // Clear the existing data first.
+
+      const example = EXAMPLE.model[0];
+      const newModel = [];
+      for (const element of example) {
+        newModel.push(clone(element)); // Deep copy
+      }
+      this.commit("setModel", newModel);
+    }
   },
   getters: {
     /**
-     * Get all the constraints for the current format.
-     * @param state
-     * @returns {null}
-     */
-    validators: state => {
-      return getConstraints(state.format);
-    },
-
-    /**
-     * TODO
-     * @param state
-     * @returns {string}
-     */
-    getValidationReport: state => {
-      return state.ValidationReport;
-    },
-
-    /**
      * Returns the Json Internal model.
      * @param state
-     * @returns {state.internalModel|{}|string}
+     * @returns {*}
      */
-    getInternalModelInJson: state => {
+    internalModelToJson: state => {
       return state.model;
     },
 
@@ -374,17 +301,8 @@ export default new Vuex.Store({
      * @param state
      * @returns {any}
      */
-    getInternalModelInTurtle: state => {
+    internalModelToTurtle: state => {
       return TranslatorManager.translateToLanguage(state.model, state.format);
-    },
-
-    /**
-     * Returns the data to validate.
-     * @param state
-     * @returns {state.dataFile|{}}
-     */
-    getDataFile: state => {
-      return state.dataFile;
     },
 
     /**
