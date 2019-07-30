@@ -120,7 +120,9 @@ export default {
     // Move the shape to the defined coordinate.
     this.$refs.posRef
       .getNode()
-      .setPosition(this.$store.state.mShape.mCoordinate.coordinates[this.$props.id]);
+      .setPosition(
+        this.$store.state.mShape.mCoordinate.coordinates[this.$props.id]
+      );
     this.updateCoordinates();
   },
   methods: {
@@ -240,7 +242,10 @@ export default {
         x: pos.x,
         y: pos.y
       };
-      this.$store.commit("updateYValues", { nodeID: this.$props.id, shapes: this.$store.state.mShape.model });
+      this.$store.commit("updateYValues", {
+        nodeID: this.$props.id,
+        shapes: this.$store.state.mShape.model
+      });
       this.$store.commit("updateCoordinates", args);
     }
   }

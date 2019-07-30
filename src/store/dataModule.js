@@ -59,18 +59,23 @@ const dataModule = {
      * @param model
      */
     validateWithModel(state, model) {
-      SerializerManager.serialize(model, ETF.ttl).then(e => {
-        if (e.length === 0) {
-          this.commit("toggleNoDataFilePopup");
-        } else {
-          ValidatorManager.validate(state.dataFile, e, state.format)
-            .then(e => {
-              state.validationReport = e;
-              state.showValidationReportModal = true;
-            })
-            .catch(e => console.log(`failure : ${e}`));
-        }
-      });
+      if (state.dataFile.length === 0) {
+        this.commit("toggleNoDataFilePopup");
+      } else {
+        console.log("Serializing...");
+        SerializerManager.serialize(model, ETF.ttl)
+          .then(e => {
+            console.log("Validating...");
+            ValidatorManager.validate(state.dataFile, e, state.format)
+              .then(e => {
+                console.log("validationReport", e);
+                state.validationReport = e;
+                state.showValidationReportModal = true;
+              })
+              .catch(e => console.log(`Error while validating: ${e}`));
+          })
+          .catch(e => console.log(`Error while serializing: ${e}`));
+      }
     },
 
     toggleNoDataFilePopup(state) {

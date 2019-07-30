@@ -78,7 +78,7 @@ import ClearModal from "./Modals/ClearModal.vue";
 import NodeShapeModal from "./Modals/NodeShapeModal.vue";
 import ValidationReportModal from "./Modals/ValidationReportModal.vue";
 import AddPredicateModal from "./Modals/AddPredicateModal.vue";
-import NoDataFileModal from "./Modals/NoDataFileModal";
+import NoDataFileModal from "./Modals/NoDataFileModal.vue";
 
 export default {
   name: "NavBar",
