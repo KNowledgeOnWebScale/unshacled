@@ -1,19 +1,28 @@
+// Vue imports
 import { clone } from "ramda";
 import Vue from "vue";
 import Vuex from "vuex";
+
+// Util imports
+import { getNonOverlappingCoordinates } from "./util";
 import EXAMPLE from "./util/examples";
 import { HEIGHT } from "./util/konvaConfigs";
 import language from "./util/enums/languages";
 import { getConstraints } from "./util/constraintSelector";
-import { urlToName, extractUrl } from "./util/nameParser";
-import { getNonOverlappingCoordinates } from "./util";
-import ParserManager from "./parsing/parserManager";
-import { TranslatorManager } from "./translation/translatorManager";
-import ValidatorManager from "./validation/validatorManager";
-import SerializerManager from "./parsing/serializerManager";
 import { ETF } from "./util/enums/extensionToFormat";
-import ShaclDictionary from "./translation/shaclDictionary";
+import { urlToName } from "./util/nameParser";
 import { possiblePredicates, possibleObjects } from "./util/vocabulary";
+
+// Parsing, translation and validation imports
+import ParserManager from "./parsing/parserManager";
+import SerializerManager from "./parsing/serializerManager";
+import { TranslatorManager } from "./translation/translatorManager";
+import ShaclDictionary from "./translation/shaclDictionary";
+import ValidatorManager from "./validation/validatorManager";
+
+// Modules
+import shapeModule from "./store/shapeModule";
+import dataModule from "./store/dataModule";
 
 Vue.use(Vuex);
 
@@ -37,6 +46,10 @@ export default new Vuex.Store({
     validationReport: "hello",
     dataFile: {},
     dataFileExtension: String
+  },
+  modules: {
+    shape: shapeModule,
+    data: dataModule
   },
   mutations: {
     /**
@@ -288,6 +301,16 @@ export default new Vuex.Store({
       }
     },
 
+    /**
+     * TODO
+     * @param store
+     * @param args
+     */
+    deleteConstraintFromShape(state, args) {
+      const { shape, constraint } = args;
+      Vue.delete(shape, constraint);
+    },
+
     /* HELPERS ====================================================================================================== */
 
     /**
@@ -406,75 +429,6 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    /* ADD ========================================================================================================== */
-
-    /**
-     * Add an empty node shape with the given id.
-     * @param store
-     * @param id
-     */
-    addNodeShape(store, id) {
-      this.commit("addShape", {
-        "@id": id,
-        "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
-        "https://2019.summerofcode.be/unshacled#property": [],
-        "https://2019.summerofcode.be/unshacled#targetNode": []
-      });
-    },
-
-    /**
-     * Add a property shape with the given id.
-     * @param store
-     * @param id
-     */
-    addPropertyShape(store, id) {
-      this.commit("addShape", {
-        "@id": id,
-        "https://2019.summerofcode.be/unshacled#path": [
-          `http://example.org/ns#${id}`
-        ]
-      });
-    },
-
-    /**
-     * Add a property with the given id and value to the node with the given id.
-     * @param store
-     * @param args
-     *              nodeID id of the node
-     *              propertyID id of the property we want to add
-     *              propertyValue object with the value of the property we want to add
-     */
-    addPropertyToNode(store, args) {
-      const { nodeID, propertyID } = args;
-
-      if (propertyID !== "newProperty" && propertyID !== "") {
-        // Check if the new property name is already an existing PropertyShape.
-        if (!store.getters.propertyShapes[propertyID]) {
-          // If not, create a new PropertyShape that is a copy of the original one.
-          const property = {
-            "@id": propertyID,
-            "https://2019.summerofcode.be/unshacled#path": [
-              { "@id": `http://example.org/ns#${propertyID}` } // TODO PascalCase
-            ]
-          };
-
-          // Add the shape to the state.
-          this.commit("addShape", property); // this works as intended
-        }
-
-        const shape = store.getters.shapeWithID(nodeID);
-        // Put the new value in the list of shape properties
-        this.commit("addPropertyIDToShape", { propertyID, shape });
-        // Update the y values
-        this.commit("updateYValues", nodeID);
-      }
-      for (const prop of store.getters.shapeWithID(nodeID)[
-        "https://2019.summerofcode.be/unshacled#property"
-      ]) {
-        console.log(prop, prop["@id"]);
-      }
-    },
-
     /**
      * Takes two keys from nodeshapes and uses them to add a relationship to the state
      * @param state
@@ -495,182 +449,6 @@ export default new Vuex.Store({
       });
     },
      */
-
-    /* EDIT ========================================================================================================= */
-
-    /**
-     * Edit the id of the given node shape.
-     * @param store
-     * @param args
-     *    oldID: the old ID we want to change.
-     *    newID: the new ID for the node shape.
-     */
-    editNodeShape(store, args) {
-      const { oldID, newID } = args;
-      const newURL = extractUrl(oldID) + newID;
-
-      // If the ID has changed
-      if (oldID !== newURL) {
-        // Update the shape's ID
-        const index = store.getters.indexWithID(oldID);
-        this.commit("updateShapeID", { index, newID: newURL }); // OK
-
-        // Update Relationships TODO
-        /*
-        for (let prop in state.relationships) {
-          if (state.relationships[prop].one === oldID)
-            state.relationships[prop].one = newID;
-          if (state.relationships[prop].two === oldID)
-            state.relationships[prop].two = newID;
-          prop = state.relationships[prop].one + state.relationships[prop].two;
-        }
-         */
-
-        // Update the coordinates and y values.
-        this.commit("updateLocations", { oldID, newID: newURL });
-      }
-    },
-
-    /**
-     * Edit the given property in the given node shape.
-     * If the new property ID already exists, this will make a copy
-     * @param store
-     * @param args
-     */
-    editPropertyInNode(store, args) {
-      const { nodeID, oldID, newID } = args;
-
-      // Check if the new property name is already an existing PropertyShape.
-      if (!store.getters.propertyShapes[newID]) {
-        // If not, create a new PropertyShape that is a copy of the original one.
-        const copied = Vue.util.extend({}, store.getters.propertyShapes[oldID]);
-        copied["@id"] = newID;
-
-        const name = urlToName(newID);
-        copied["https://2019.summerofcode.be/unshacled#path"][0][
-          "@id"
-        ] = `http://example.org/ns#${name}`; // TODO dromedarisCaseOrSomething
-
-        // Add the shape to the state.
-        this.commit("addShape", copied);
-      }
-
-      const shape = store.getters.shapeWithID(nodeID);
-      // Put the new value in the list of shape properties
-      this.commit("addPropertyIDToShape", { propertyID: newID, shape });
-      // Remove the old value from the list of shape properties.
-      this.commit("deletePropertyFromShape", { shape, propertyID: oldID });
-      // Update the y values
-      this.commit("updateYValues", nodeID);
-    },
-
-    /**
-     * Edit the ID of a property shape.
-     * This will update the property list of every node shape that contains this property shape.
-     * @param store
-     * @param args
-     */
-    editPropertyShape(store, args) {
-      const { oldID, newID } = args;
-
-      // Update the state's shapes.
-      const shape = store.getters.shapeWithID(oldID);
-      this.commit("updatePropertyShapeID", { shape, newID });
-      for (const node of store.state.model) {
-        if (store.getters.shapeProperties(node["@id"]).indexOf(oldID) !== -1) {
-          this.commit("deletePropertyFromShape", {
-            shape: node,
-            propertyID: oldID
-          });
-          this.commit("addPropertyIDToShape", {
-            shape: node,
-            propertyID: newID
-          });
-          this.commit("deletePropertyFromShape", {
-            shape: node,
-            propertyID: oldID
-          });
-        }
-      }
-      this.commit("updateLocations", { oldID, newID });
-
-      // Update the y values of the properties.
-      for (const node of store.state.model) {
-        this.commit("updateYValues", node["@id"]);
-      }
-    },
-
-    /* DELETE ======================================================================================================= */
-
-    /**
-     * Delete the node shape with the given id.
-     * @param store
-     * @param id
-     */
-    deleteNodeShape(store, id) {
-      this.commit("deleteShapeAtIndex", store.getters.indexWithID(id));
-      this.commit("deleteShapeLocations", id);
-    },
-
-    /**
-     * Delete the property shape with the given id.
-     * @param store
-     * @param id
-     */
-    deletePropertyShape(store, id) {
-      // Check every nodeShape if it contains the given property.
-      for (const shape of store.state.model) {
-        const properties =
-          shape["https://2019.summerofcode.be/unshacled#property"];
-
-        for (const p in properties) {
-          if (properties[p]["@id"] === id) {
-            // Delete the property from the node and update the y values.
-            properties.splice(p, 1);
-            this.commit("updateYValues", shape["@id"]);
-          }
-        }
-      }
-      // Remove the property from the state
-      this.commit("deleteShapeAtIndex", store.getters.indexWithID(id));
-      this.commit("deleteShapeLocations", id);
-    },
-
-    /**
-     * Delete the given property from the given node shape.
-     * @param store
-     * @param args
-     *            node the id of the node shape
-     *            prop the id of the property that should be removed from the shape
-     */
-    deletePropFromNode(store, args) {
-      const { node, prop } = args;
-
-      const shape = store.getters.shapeWithID(node);
-      const properties =
-        shape["https://2019.summerofcode.be/unshacled#property"];
-
-      for (const p in properties) {
-        if (properties[p]["@id"] === prop) {
-          // Delete the property from the node and update the y values.
-          properties.splice(p, 1);
-        }
-      }
-
-      // Update the y values
-      this.commit("updateYValues", node);
-    },
-
-    /**
-     * TODO
-     * @param store
-     * @param args
-     */
-    deleteConstraintFromShape(store, args) {
-      const { shapeID, constraint } = args;
-      const shape = this.getters.shapeWithID(shapeID);
-      Vue.delete(shape, constraint);
-    }
   },
   getters: {
     /**
@@ -680,143 +458,6 @@ export default new Vuex.Store({
      */
     validators: state => {
       return getConstraints(state.format);
-    },
-
-    /**
-     * Get the shape object with the given ID.
-     * @param state
-     * @returns {null}
-     */
-    shapeWithID: state => id => {
-      for (const item of state.model) {
-        if (item["@id"] === id) return item;
-      }
-      return null;
-    },
-
-    /**
-     * Get the index of the shape object with the given ID.
-     * @param state
-     * @returns {string|number}
-     */
-    indexWithID: state => id => {
-      for (const i in state.model) {
-        if (state.model[i]["@id"] === id) return i;
-      }
-      return -1;
-    },
-
-    /**
-     * Returns a map of the shape ID's to their respective objects.
-     * @param state
-     */
-    shapes: state => {
-      const shapes = {};
-      for (const item of state.model) {
-        shapes[item["@id"]] = item;
-      }
-      return shapes;
-    },
-
-    /**
-     * Get a dictionary mapping ID's to the respective node shape objects.
-     * @param state
-     */
-    nodeShapes: state => {
-      const nodeShapes = {};
-      for (const item of state.model) {
-        if (item["@type"]) {
-          nodeShapes[item["@id"]] = item;
-        }
-      }
-      return nodeShapes;
-    },
-
-    /**
-     * Get a dictionary mapping ID's to the respective property shape objects.
-     * @param state
-     */
-    propertyShapes: state => {
-      const propertyShapes = {};
-      for (const item of state.model) {
-        if (!item["@type"]) {
-          propertyShapes[item["@id"]] = item;
-        }
-      }
-      return propertyShapes;
-    },
-
-    /**
-     * Get a list of property ID's for the node with the given ID.
-     * @param state
-     * @returns {function(*): Array}
-     */
-    shapeProperties: state => shapeID => {
-      let node;
-      for (const shape of state.model) {
-        if (shape["@id"] === shapeID) {
-          node = shape;
-        }
-      }
-
-      const propertyObjects =
-        node["https://2019.summerofcode.be/unshacled#property"];
-      const properties = [];
-
-      if (propertyObjects) {
-        // Get the references to property shapes
-        for (const p of propertyObjects) {
-          properties.push(p["@id"]);
-        }
-        // Get the other properties
-        const ignored = [
-          "@id",
-          "@type",
-          "https://2019.summerofcode.be/unshacled#property",
-          "https://2019.summerofcode.be/unshacled#targetNode"
-        ];
-        for (const p in node) {
-          if (!ignored.includes(p)) properties.push(p[0]["@id"]);
-        }
-      }
-      return properties;
-    },
-
-    /**
-     * Get a map of the constraints of the shape with the given ID.
-     * @param state
-     * @returns {Function}
-     */
-    shapeConstraints: state => shapeID => {
-      const constraints = {};
-      let node;
-      for (const shape of state.model) {
-        if (shape["@id"] === shapeID) {
-          node = shape;
-        }
-      }
-
-      const ignored = [
-        "@id",
-        "@type",
-        "https://2019.summerofcode.be/unshacled#property"
-      ];
-      for (const prop in node) {
-        // Only handle the constraints that are not ignored
-        if (ignored.indexOf(prop) < 0) {
-          if (node[prop].length > 1) {
-            // Get the ID of every element in the list
-            const properties = [];
-            for (const p of node[prop]) {
-              properties.push(p["@id"]);
-            }
-            constraints[prop] = properties;
-          } else {
-            constraints[prop] = node[prop];
-          }
-        }
-      }
-      return constraints;
     },
 
     /**
@@ -855,9 +496,19 @@ export default new Vuex.Store({
       return state.dataFile;
     },
 
+    /**
+     * TODO
+     * @returns {function(*): string[]}
+     */
     predicates: () => type => {
       return possiblePredicates(ShaclDictionary.TERM[type]);
     },
+
+    /**
+     * TODO
+     * @param state
+     * @returns {string[]}
+     */
     objects: state => {
       return possibleObjects(state.predicateModal.predicate);
     }
