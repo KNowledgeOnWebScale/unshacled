@@ -8,8 +8,9 @@ export const EXAMPLE_URL = "http://example.org/ns#";
  */
 export function urlToName(url) {
   if (!url) return "(undefined)";
-  if (url.indexOf("#") < 0) return url;
-  return url.substring(url.indexOf("#") + 1);
+  if (url.indexOf("#") !== -1) return url.substring(url.indexOf("#") + 1);
+  if (url.indexOf("/") !== -1) return url.substring(url.lastIndexOf("/") + 1);
+  return url;
 }
 
 /**
