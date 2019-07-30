@@ -19,7 +19,7 @@ const constraintModule = {
      *              propertyID id of the property we want to add
      *              propertyValue object with the value of the property we want to add
      */
-    addPropertyToNode({ getters, commit }, args) {
+    addPropertyToNode({ getters, commit, rootState }, args) {
       const { nodeID, propertyID } = args;
 
       if (propertyID !== "newProperty" && propertyID !== "") {
@@ -41,7 +41,11 @@ const constraintModule = {
         // Put the new value in the list of shape properties
         commit("addPropertyIDToShape", { propertyID, shape }, { root: true });
         // Update the y values
-        commit("updateYValues", nodeID, { root: true });
+        commit(
+          "updateYValues",
+          { nodeID, model: rootState.model },
+          { root: true }
+        );
       }
     },
 
@@ -53,7 +57,7 @@ const constraintModule = {
      * @param store
      * @param args
      */
-    editPropertyInNode({ getters, commit }, args) {
+    editPropertyInNode({ getters, commit, rootState }, args) {
       const { nodeID, oldID, newID } = args;
 
       // Check if the new property name is already an existing PropertyShape.
@@ -85,7 +89,11 @@ const constraintModule = {
         { root: true }
       );
       // Update the y values
-      commit("updateYValues", nodeID, { root: true });
+      commit(
+        "updateYValues",
+        { nodeID, model: rootState.model },
+        { root: true }
+      );
     },
 
     /* DELETE ======================================================================================================= */
@@ -97,7 +105,7 @@ const constraintModule = {
      *            node the id of the node shape
      *            prop the id of the property that should be removed from the shape
      */
-    deletePropFromNode({ getters, commit }, args) {
+    deletePropFromNode({ getters, commit, rootState }, args) {
       const { node, prop } = args;
 
       const shape = getters.shapeWithID(node);
@@ -112,7 +120,11 @@ const constraintModule = {
       }
 
       // Update the y values
-      commit("updateYValues", node, { root: true });
+      commit(
+        "updateYValues",
+        { nodeID: node, model: rootState.model },
+        { root: true }
+      );
     },
 
     /**

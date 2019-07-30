@@ -6,7 +6,6 @@ import Vuex from "vuex";
 // Util imports
 import { getNonOverlappingCoordinates } from "./util";
 import EXAMPLE from "./util/examples";
-import { HEIGHT } from "./util/konvaConfigs";
 import language from "./util/enums/languages";
 import { getConstraints } from "./util/constraintSelector";
 import { ETF } from "./util/enums/extensionToFormat";
@@ -32,8 +31,6 @@ export default new Vuex.Store({
     model: [],
     format: language.SHACL,
     // relationships: {}, // TODO remove this
-    yValues: {},
-    coordinates: {},
     showNodeShapeModal: false,
     showClearModal: false,
     showValidationReportModal: false,
@@ -48,8 +45,8 @@ export default new Vuex.Store({
     dataFileExtension: String
   },
   modules: {
-    shape: shapeModule,
-    data: dataModule
+    shapeModule,
+    dataModule
   },
   mutations: {
     /**
@@ -85,14 +82,8 @@ export default new Vuex.Store({
       if (valueType === "type") {
         obj[predicate] = [{ "@type": args.object, "@value": args.input }];
       }
-      this.commit("updateYValues", shapeId);
+      this.commit("updateYValues", { nodeID: shapeId, model: state.model });
       state.predicateModal.show = !state.predicateModal.show;
-    },
-
-    togglePredicateModal(state, args) {
-      state.predicateModal.show = !state.predicateModal.show;
-      state.predicateModal.id = args.id;
-      state.predicateModal.type = args.type;
     },
 
     changePredicate(state, pred) {
@@ -149,11 +140,14 @@ export default new Vuex.Store({
 
       // Update y values and set coordinates to zero
       for (const shape of state.model) {
-        this.commit("updateYValues", shape["@id"]);
+        this.commit("updateYValues", {
+          nodeID: shape["@id"],
+          model: state.model
+        });
         const { x, y } = getNonOverlappingCoordinates({
           coordinates: state.coordinates
         });
-        Vue.set(state.coordinates, shape["@id"], { x, y });
+        Vue.set(state.shapeModule.coordinates, shape["@id"], { x, y });
       }
     },
 
@@ -170,7 +164,10 @@ export default new Vuex.Store({
         coordinates: state.coordinates
       });
       Vue.set(state.coordinates, object["@id"], { x, y });
-      this.commit("updateYValues", object["@id"]);
+      this.commit("updateYValues", {
+        nodeID: object["@id"],
+        model: state.model
+      });
     },
 
     /**
@@ -245,25 +242,6 @@ export default new Vuex.Store({
       state.showValidationReportModal = !state.showValidationReportModal;
     },
 
-    /**
-     * Update the coordinates and values of the given shape.
-     * @param state
-     * @param args
-     *            oldID the shape's old ID.
-     *            newID the shape's new ID.
-     */
-    updateLocations(state, args) {
-      const { oldID, newID } = args;
-
-      // Update coordinates
-      Vue.set(state.coordinates, newID, state.coordinates[oldID]);
-      if (oldID !== newID) Vue.delete(state.coordinates, oldID);
-
-      // Update yValues
-      Vue.set(state.yValues, newID, state.yValues[oldID]);
-      if (oldID !== newID) Vue.delete(state.yValues, oldID);
-    },
-
     /* DELETE ======================================================================================================= */
 
     /**
@@ -273,16 +251,6 @@ export default new Vuex.Store({
      */
     deleteShapeAtIndex(state, index) {
       Vue.delete(state.model, index);
-    },
-
-    /**
-     * Delete the coordinates and y values of the shape with the given id.
-     * @param state
-     * @param id
-     */
-    deleteShapeLocations(state, id) {
-      Vue.delete(state.coordinates, id);
-      Vue.delete(state.yValues, id);
     },
 
     /**
@@ -314,92 +282,6 @@ export default new Vuex.Store({
     /* HELPERS ====================================================================================================== */
 
     /**
-     * Update the y values of the properties of the given node.
-     * @param state
-     * @param nodeID
-     */
-    updateYValues(state, nodeID) {
-      // Update the y values of the properties.
-      Vue.set(state.yValues, nodeID, {});
-
-      let node;
-      for (const item of state.model) {
-        if (item["@id"] === nodeID) node = item;
-      }
-
-      // FIXME code duplication, find a way to use `shapeProperties` >.<
-      const propertyObjects =
-        node["https://2019.summerofcode.be/unshacled#property"];
-
-      // Get the references to property shapes.
-      const properties = [];
-      if (propertyObjects) {
-        for (const p of propertyObjects) properties.push(p["@id"]);
-      }
-
-      // The other properties.
-      const ignored = [
-        "@id",
-        "@type",
-        "https://2019.summerofcode.be/unshacled#property"
-      ];
-
-      // Get the IDs form all the constraints.
-      const constraints = [];
-      for (const c in node) {
-        if (!ignored.includes(c)) constraints.push(c);
-      }
-
-      // Get the IDs from all the properties.
-      for (const p in node) {
-        if (!ignored.includes(p)) properties.push(p[0]["@id"]);
-      }
-
-      // Calculate their y values.
-      let i = 1;
-      for (const con of constraints) {
-        Vue.set(state.yValues[nodeID], con, i * HEIGHT);
-        i += 2; // Constraints need twice the height.
-      }
-      for (const prop of properties) {
-        Vue.set(state.yValues[nodeID], prop, i * HEIGHT);
-        i += 1;
-      }
-      // Add y values for the add button.
-      Vue.set(state.yValues[nodeID], "newProperty", i * HEIGHT);
-      Vue.set(state.yValues[nodeID], "addButton", i * HEIGHT + HEIGHT / 4);
-    },
-
-    /**
-     * Update the coordinates of the given shape.
-     * @param state
-     * @param args
-     *    node: the ID of the node shape whose location should be updated.
-     *    x: the new x coordinate.
-     *    y: the new y coordinate.
-     */
-    updateCoordinates(state, args) {
-      const { node, x, y } = args;
-      const coords = { x, y };
-      Vue.set(state.coordinates, node, coords);
-
-      /*
-      for (const prop in state.relationships) {
-        if (prop.includes(node)) {
-          const changedKey = node;
-          const otherKey = prop.replace(changedKey, "");
-          state.relationships[prop].coords = [
-            state.coordinates[otherKey].x,
-            state.coordinates[otherKey].y,
-            state.coordinates[changedKey].x,
-            state.coordinates[changedKey].y
-          ];
-        }
-      }
-       */
-    },
-
-    /**
      * Toggle the visibility of the node shape modal.
      * @param state
      */
@@ -418,14 +300,23 @@ export default new Vuex.Store({
     },
 
     /**
+     * Toggle the visibility of the predicate modal.
+     * @param state
+     */
+    togglePredicateModal(state, args) {
+      state.predicateModal.show = !state.predicateModal.show;
+      state.predicateModal.id = args.id;
+      state.predicateModal.type = args.type;
+    },
+
+    /**
      * Clear all shapes and properties from the current state.
      * @param state the current state
      */
     clear(state) {
       console.log("Clear!");
       state.model = [];
-      state.coordinates = {};
-      state.yValues = {};
+      this.commit("clearLocations");
     }
   },
   actions: {

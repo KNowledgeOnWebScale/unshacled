@@ -3,7 +3,10 @@
  * @type {{mutations: {}, state: {}, getters: {}, actions: {}}}
  */
 const dataModule = {
-  state: {},
+  state: {
+    dataFile: {},
+    dataFileExtension: String
+  },
   mutations: {},
   actions: {},
   getters: {}
