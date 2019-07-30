@@ -43,7 +43,7 @@ const constraintModule = {
         // Update the y values
         commit(
           "updateYValues",
-          { nodeID, model: rootState.model },
+          { nodeID, shapes: rootState.mShape.model },
           { root: true }
         );
       }
@@ -68,7 +68,7 @@ const constraintModule = {
       // Update the y values.
       commit(
         "updateYValues",
-        { nodeID: shapeID, model: rootState.model },
+        { nodeID: shapeID, shapes: rootState.mShape.model },
         { root: true }
       );
       // Toggle the predicate modal.
@@ -117,7 +117,7 @@ const constraintModule = {
       // Update the y values
       commit(
         "updateYValues",
-        { nodeID, model: rootState.model },
+        { nodeID, shapes: rootState.mShape.model },
         { root: true }
       );
     },
@@ -148,7 +148,7 @@ const constraintModule = {
       // Update the y values
       commit(
         "updateYValues",
-        { nodeID: node, model: rootState.model },
+        { nodeID: node, shapes: rootState.mShape.model },
         { root: true }
       );
     },
@@ -170,7 +170,7 @@ const constraintModule = {
       // Update the y values
       commit(
         "updateYValues",
-        { nodeID: shapeID, model: rootState.model },
+        { nodeID: shapeID, shapes: rootState.mShape.model },
         { root: true }
       );
     }
@@ -185,7 +185,7 @@ const constraintModule = {
      */
     shapeProperties: (state, getters, rootState) => shapeID => {
       let node;
-      for (const shape of rootState.model) {
+      for (const shape of rootState.mShape.model) {
         if (shape["@id"] === shapeID) {
           node = shape;
         }
@@ -224,7 +224,7 @@ const constraintModule = {
     shapeConstraints: (state, getters, rootState) => shapeID => {
       const constraints = {};
       let node;
-      for (const shape of rootState.model) {
+      for (const shape of rootState.mShape.model) {
         if (shape["@id"] === shapeID) {
           node = shape;
         }

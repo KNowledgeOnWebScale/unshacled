@@ -1,15 +1,13 @@
-// Vue imports
+// Vue
 import { clone } from "ramda";
 import Vue from "vue";
 import Vuex from "vuex";
 
-// Util imports
-import { getNonOverlappingCoordinates } from "./util";
+// Util
 import EXAMPLE from "./util/examples";
-import { urlToName } from "./util/nameParser";
 import { possiblePredicates, possibleObjects } from "./util/vocabulary";
 
-// Parsing, translation and validation imports
+// Translation
 import { TranslatorManager } from "./translation/translatorManager";
 import ShaclDictionary from "./translation/shaclDictionary";
 
@@ -22,7 +20,6 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     editor: null,
-    model: [],
     // relationships: {}, // TODO remove this
     showNodeShapeModal: false,
     showClearModal: false,
@@ -34,8 +31,8 @@ export default new Vuex.Store({
     }
   },
   modules: {
-    shapeModule,
-    dataModule
+    mShape: shapeModule,
+    mData: dataModule
   },
   mutations: {
     changePredicate(state, pred) {
@@ -51,161 +48,6 @@ export default new Vuex.Store({
       state.editor = reference;
     },
 
-    /**
-     * Clear all shapes and properties from the current state.
-     * @param state the current state
-     */
-    clear(state) {
-      console.log("Clear!");
-      state.model = [];
-      this.commit("clearLocations");
-    },
-
-    /* ADD ========================================================================================================== */
-
-    /**
-     * Add the given shape to the state and set its coordinates to zero.
-     * @param state
-     * @param object
-     */
-    addShape(state, object) {
-      state.model.push(object);
-      const { x, y } = getNonOverlappingCoordinates({
-        coordinates: state.shapeModule.coordinates
-      });
-      Vue.set(state.coordinates, object["@id"], { x, y });
-      this.commit("updateYValues", {
-        nodeID: object["@id"],
-        model: state.model
-      });
-    },
-
-    /**
-     * Add a property with the given ID and value to the node with the given ID.
-     * @param state
-     * @param args
-     */
-    addPropertyToShape(state, args) {
-      const { nodeID, propertyID, propertyValue } = args;
-      // FIXME should not be put in list if it is a list already
-      Vue.set(state.model[nodeID], propertyID, [propertyValue]);
-      // TODO complete this
-    },
-
-    /**
-     * Add the given property ID to the given shape.
-     * @param state
-     * @param args
-     *            propertyID the ID of the property that should be added.
-     *            shape the shape the property should be added to.
-     */
-    addPropertyIDToShape(state, args) {
-      const { propertyID, shape } = args;
-      // FIXME this assumes properties, not constraints or targetNodes or sth
-      const p = shape["https://2019.summerofcode.be/unshacled#property"];
-      if (!p) {
-        shape["https://2019.summerofcode.be/unshacled#property"] = [];
-      }
-      shape["https://2019.summerofcode.be/unshacled#property"].push({
-        "@id": propertyID
-      });
-    },
-
-    /* EDIT ========================================================================================================= */
-
-    /**
-     * Update the shape's id.
-     * @param state
-     * @param args
-     *            index the index of the shape that should be updated.
-     *            newID the shape's new ID.
-     */
-    updateShapeID(state, args) {
-      const { index, newID } = args;
-      Vue.set(state.model[index], "@id", newID);
-    },
-
-    /**
-     * Update the given property shape's ID.
-     * @param state
-     * @param args
-     *            shape the property shape that should be updated,
-     *            newID the shape's new ID.
-     */
-    updatePropertyShapeID(state, args) {
-      const { shape, newID } = args;
-      Vue.set(shape, "@id", newID);
-
-      // Update the path with the new ID.
-      const name = urlToName(newID);
-      shape["https://2019.summerofcode.be/unshacled#path"][0][
-        "@id"
-      ] = `http://example.org/ns#${name}`;
-    },
-
-    /**
-     * Set the model to the given value.
-     * @param state
-     * @param model
-     */
-    setModel(state, model) {
-      state.model = model;
-
-      // Update y values and set coordinates to zero
-      for (const shape of state.model) {
-        this.commit("updateYValues", {
-          nodeID: shape["@id"],
-          model: state.model
-        });
-        const { x, y } = getNonOverlappingCoordinates({
-          coordinates: state.shapeModule.coordinates
-        });
-        Vue.set(state.shapeModule.coordinates, shape["@id"], { x, y });
-      }
-    },
-
-    /* DELETE ======================================================================================================= */
-
-    /**
-     * Delete the shape at the given index.
-     * @param state
-     * @param index
-     */
-    deleteShapeAtIndex(state, index) {
-      Vue.delete(state.model, index);
-    },
-
-    /**
-     * Delete the property with the given ID from the given shape.
-     * @param state
-     * @param args
-     *            shape the shape from which the property should be removed..
-     *            propertyID the ID of the property that should be removed.
-     */
-    deletePropertyFromShape(state, args) {
-      const { shape, propertyID } = args;
-      const properties =
-        shape["https://2019.summerofcode.be/unshacled#property"];
-      for (const p in properties) {
-        if (properties[p]["@id"] === propertyID) Vue.delete(properties, p);
-      }
-      Vue.set(
-        shape,
-        "https://2019.summerofcode.be/unshacled#property",
-        properties
-      );
-    },
-
-    /**
-     * TODO
-     * @param store
-     * @param args
-     */
-    deleteConstraintFromShape(state, args) {
-      const { shape, constraint } = args;
-      Vue.delete(shape, constraint);
-    },
-
     /* MODALS ======================================================================================================= */
 
     /**
@@ -214,7 +56,7 @@ export default new Vuex.Store({
      */
     toggleValidationReport(state) {
       event.preventDefault();
-      state.dataModule.showValidationReportModal = !state.dataModule
+      state.mData.showValidationReportModal = !state.mData
         .showValidationReportModal;
     },
 
@@ -293,7 +135,7 @@ export default new Vuex.Store({
      * @returns {*}
      */
     internalModelToJson: state => {
-      return state.model;
+      return state.mShape.model;
     },
 
     /**
@@ -302,7 +144,10 @@ export default new Vuex.Store({
      * @returns {any}
      */
     internalModelToTurtle: state => {
-      return TranslatorManager.translateToLanguage(state.model, state.format);
+      return TranslatorManager.translateToLanguage(
+        state.mShape.model,
+        state.format
+      );
     },
 
     /**

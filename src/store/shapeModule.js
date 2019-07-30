@@ -1,7 +1,8 @@
 import Vue from "vue";
 import constraintModule from "./constraintModule";
-import { extractUrl } from "../util/nameParser";
-import { HEIGHT } from "../util/konvaConfigs";
+import { extractUrl, urlToName } from "../util/nameParser";
+import { getNonOverlappingCoordinates } from "../util";
+import coordinateModule from "./coordinateModule";
 
 /**
  * This module contains everything to change the shapes.
@@ -9,134 +10,166 @@ import { HEIGHT } from "../util/konvaConfigs";
  */
 const shapeModule = {
   state: {
-    yValues: {},
-    coordinates: {}
+    model: []
   },
   modules: {
-    constraint: constraintModule
+    mConstraint: constraintModule,
+    mCoordinate: coordinateModule
   },
   mutations: {
     /**
-     * Update the coordinates and values of the given shape.
+     * Clear all shapes and properties from the current state.
+     * @param state the current state
+     */
+    clear(state) {
+      console.log("Clear!");
+      state.model = [];
+      this.commit("clearLocations");
+    },
+
+    /**
+     * Set the model to the given value.
+     * @param state
+     * @param model
+     */
+    setModel(state, model) {
+      state.model = model;
+
+      // Update y values and set coordinates to zero
+      for (const shape of state.model) {
+        this.commit("updateYValues", {
+          nodeID: shape["@id"],
+          shapes: state.model
+        });
+        const { x, y } = getNonOverlappingCoordinates({
+          coordinates: state.mCoordinate.coordinates
+        });
+        this.commit("updateCoordinates", { node: shape["@id"], x, y });
+      }
+    },
+
+    /* ADD ========================================================================================================== */
+
+    /**
+     * Add the given shape to the state and set its coordinates to zero.
+     * @param state
+     * @param object
+     */
+    addShape(state, object) {
+      state.model.push(object);
+      const { x, y } = getNonOverlappingCoordinates({
+        coordinates: state.mCoordinate.coordinates
+      });
+      Vue.set(state.mCoordinate.coordinates, object["@id"], { x, y });
+      this.commit("updateYValues", {
+        nodeID: object["@id"],
+        shapes: state.model
+      });
+    },
+
+    /**
+     * Add a property with the given ID and value to the node with the given ID.
      * @param state
      * @param args
-     *            oldID the shape's old ID.
+     */
+    addPropertyToShape(state, args) {
+      const { nodeID, propertyID, propertyValue } = args;
+      // FIXME should not be put in list if it is a list already
+      Vue.set(state.model[nodeID], propertyID, [propertyValue]);
+      // TODO complete this
+    },
+
+    /**
+     * Add the given property ID to the given shape.
+     * @param state
+     * @param args
+     *            propertyID the ID of the property that should be added.
+     *            shape the shape the property should be added to.
+     */
+    addPropertyIDToShape(state, args) {
+      const { propertyID, shape } = args;
+      // FIXME this assumes properties, not constraints or targetNodes or sth
+      const p = shape["https://2019.summerofcode.be/unshacled#property"];
+      if (!p) {
+        shape["https://2019.summerofcode.be/unshacled#property"] = [];
+      }
+      shape["https://2019.summerofcode.be/unshacled#property"].push({
+        "@id": propertyID
+      });
+    },
+
+    /* EDIT ========================================================================================================= */
+
+    /**
+     * Update the shape's id.
+     * @param state
+     * @param args
+     *            index the index of the shape that should be updated.
      *            newID the shape's new ID.
      */
-    updateLocations(state, args) {
-      const { oldID, newID } = args;
-
-      // Update coordinates
-      Vue.set(state.coordinates, newID, state.coordinates[oldID]);
-      if (oldID !== newID) Vue.delete(state.coordinates, oldID);
-
-      // Update yValues
-      Vue.set(state.yValues, newID, state.yValues[oldID]);
-      if (oldID !== newID) Vue.delete(state.yValues, oldID);
+    updateShapeID(state, args) {
+      const { index, newID } = args;
+      Vue.set(state.model[index], "@id", newID);
     },
 
     /**
-     * Delete the coordinates and y values of the shape with the given id.
-     * @param state
-     * @param id
-     */
-    deleteShapeLocations(state, id) {
-      Vue.delete(state.coordinates, id);
-      Vue.delete(state.yValues, id);
-    },
-
-    /**
-     * Update the y values of the properties of the given node.
+     * Update the given property shape's ID.
      * @param state
      * @param args
+     *            shape the property shape that should be updated,
+     *            newID the shape's new ID.
      */
-    updateYValues(state, args) {
-      const { model, nodeID } = args;
-      // Update the y values of the properties.
-      Vue.set(state.yValues, nodeID, {});
+    updatePropertyShapeID(state, args) {
+      const { shape, newID } = args;
+      Vue.set(shape, "@id", newID);
 
-      let node;
-      for (const item of model) {
-        if (item["@id"] === nodeID) node = item;
-      }
+      // Update the path with the new ID.
+      const name = urlToName(newID);
+      shape["https://2019.summerofcode.be/unshacled#path"][0][
+        "@id"
+      ] = `http://example.org/ns#${name}`;
+    },
 
-      // FIXME code duplication, find a way to use `shapeProperties` >.<
-      const propertyObjects =
-        node["https://2019.summerofcode.be/unshacled#property"];
+    /* DELETE ======================================================================================================= */
 
-      // Get the references to property shapes.
-      const properties = [];
-      if (propertyObjects) {
-        for (const p of propertyObjects) properties.push(p["@id"]);
-      }
-
-      // The other properties.
-      const ignored = [
-        "@id",
-        "@type",
-        "https://2019.summerofcode.be/unshacled#property"
-      ];
-
-      // Get the IDs form all the constraints.
-      const constraints = [];
-      for (const c in node) {
-        if (!ignored.includes(c)) constraints.push(c);
-      }
-
-      // Get the IDs from all the properties.
-      for (const p in node) {
-        if (!ignored.includes(p)) properties.push(p[0]["@id"]);
-      }
-
-      // Calculate their y values.
-      let i = 1;
-      for (const con of constraints) {
-        Vue.set(state.yValues[nodeID], con, i * HEIGHT);
-        i += 2; // Constraints need twice the height.
-      }
-      for (const prop of properties) {
-        Vue.set(state.yValues[nodeID], prop, i * HEIGHT);
-        i += 1;
-      }
-      // Add y values for the add button.
+    /**
+     * Delete the shape at the given index.
+     * @param state
+     * @param index
+     */
+    deleteShapeAtIndex(state, index) {
+      Vue.delete(state.model, index);
     },
 
     /**
-     * Update the coordinates of the given shape.
+     * Delete the property with the given ID from the given shape.
      * @param state
      * @param args
-     *    node: the ID of the node shape whose location should be updated.
-     *    x: the new x coordinate.
-     *    y: the new y coordinate.
+     *            shape the shape from which the property should be removed..
+     *            propertyID the ID of the property that should be removed.
      */
-    updateCoordinates(state, args) {
-      const { node, x, y } = args;
-      const coords = { x, y };
-      Vue.set(state.coordinates, node, coords);
-
-      /*
-      for (const prop in state.relationships) {
-        if (prop.includes(node)) {
-          const changedKey = node;
-          const otherKey = prop.replace(changedKey, "");
-          state.relationships[prop].coords = [
-            state.coordinates[otherKey].x,
-            state.coordinates[otherKey].y,
-            state.coordinates[changedKey].x,
-            state.coordinates[changedKey].y
-          ];
-        }
+    deletePropertyFromShape(state, args) {
+      const { shape, propertyID } = args;
+      const properties =
+        shape["https://2019.summerofcode.be/unshacled#property"];
+      for (const p in properties) {
+        if (properties[p]["@id"] === propertyID) Vue.delete(properties, p);
       }
-       */
+      Vue.set(
+        shape,
+        "https://2019.summerofcode.be/unshacled#property",
+        properties
+      );
     },
 
     /**
      * TODO
-     * @param state
+     * @param store
+     * @param args
      */
-    clearLocations(state) {
-      state.coordinates = {};
-      state.yValues = {};
+    deleteConstraintFromShape(state, args) {
+      const { shape, constraint } = args;
+      Vue.delete(shape, constraint);
     }
   },
   actions: {
@@ -219,37 +252,24 @@ const shapeModule = {
      * @param store
      * @param args
      */
-    editPropertyShape({ getters, commit, rootState }, args) {
+    editPropertyShape({ state, getters, commit }, args) {
       const { oldID, newID } = args;
 
       // Update the state's shapes.
       const shape = getters.shapeWithID(oldID);
-      commit("updatePropertyShapeID", { shape, newID }, { root: true });
-      for (const node of rootState.model) {
+      commit("updatePropertyShapeID", { shape, newID });
+      for (const node of state.model) {
         if (getters.shapeProperties(node["@id"]).indexOf(oldID) !== -1) {
-          commit(
-            "deletePropertyFromShape",
-            { shape: node, propertyID: oldID },
-            { root: true }
-          );
-          commit(
-            "addPropertyIDToShape",
-            { shape: node, propertyID: newID },
-            { root: true }
-          );
-          commit(
-            "deletePropertyFromShape",
-            { shape: node, propertyID: oldID },
-            { root: true }
-          );
+          commit("deletePropertyFromShape", { shape: node, propertyID: oldID });
+          commit("addPropertyIDToShape", { shape: node, propertyID: newID });
         }
       }
       commit("updateLocations", { oldID, newID }, { root: true });
       // Update the y values of the properties.
-      for (const node of rootState.model) {
+      for (const node of state.model) {
         commit(
           "updateYValues",
-          { nodeID: node["@id"], model: rootState.model },
+          { nodeID: node["@id"], shapes: state.model },
           { root: true }
         );
       }
@@ -272,9 +292,9 @@ const shapeModule = {
      * @param store
      * @param id
      */
-    deletePropertyShape({ getters, commit, rootState }, id) {
+    deletePropertyShape({ state, getters, commit }, id) {
       // Check every nodeShape if it contains the given property.
-      for (const shape of rootState.model) {
+      for (const shape of state.model) {
         const properties =
           shape["https://2019.summerofcode.be/unshacled#property"];
 
@@ -284,7 +304,7 @@ const shapeModule = {
             properties.splice(p, 1);
             commit(
               "updateYValues",
-              { nodeID: shape["@id"], model: rootState.model },
+              { nodeID: shape["@id"], shapes: state.model },
               { root: true }
             );
           }
@@ -299,12 +319,10 @@ const shapeModule = {
     /**
      * Returns a map of the shape ID's to their respective objects.
      * @param state
-     * @param getters
-     * @param rootState
      */
-    shapes(state, getters, rootState) {
+    shapes(state) {
       const shapes = {};
-      for (const item of rootState.model) {
+      for (const item of state.model) {
         shapes[item["@id"]] = item;
       }
       return shapes;
@@ -313,12 +331,10 @@ const shapeModule = {
     /**
      * Get a dictionary mapping ID's to the respective node shape objects.
      * @param state
-     * @param getters
-     * @param rootState
      */
-    nodeShapes(state, getters, rootState) {
+    nodeShapes(state) {
       const nodeShapes = {};
-      for (const item of rootState.model) {
+      for (const item of state.model) {
         if (item["@type"]) {
           nodeShapes[item["@id"]] = item;
         }
@@ -329,12 +345,10 @@ const shapeModule = {
     /**
      * Get a dictionary mapping ID's to the respective property shape objects.
      * @param state
-     * @param getters
-     * @param rootState
      */
-    propertyShapes(state, getters, rootState) {
+    propertyShapes(state) {
       const propertyShapes = {};
-      for (const item of rootState.model) {
+      for (const item of state.model) {
         if (!item["@type"]) {
           propertyShapes[item["@id"]] = item;
         }
@@ -345,12 +359,10 @@ const shapeModule = {
     /**
      * Get the shape object with the given ID.
      * @param state
-     * @param getters
-     * @param rootState
      * @returns {null}
      */
-    shapeWithID: (state, getters, rootState) => id => {
-      for (const item of rootState.model) {
+    shapeWithID: state => id => {
+      for (const item of state.model) {
         if (item["@id"] === id) return item;
       }
       return null;
@@ -359,13 +371,11 @@ const shapeModule = {
     /**
      * Get the index of the shape object with the given ID.
      * @param state
-     * @param getters
-     * @param rootState
      * @returns {string|number}
      */
-    indexWithID: (state, getters, rootState) => id => {
-      for (const i in rootState.model) {
-        if (rootState.model[i]["@id"] === id) return i;
+    indexWithID: state => id => {
+      for (const i in state.model) {
+        if (state.model[i]["@id"] === id) return i;
       }
       return -1;
     }
