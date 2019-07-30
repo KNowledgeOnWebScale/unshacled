@@ -4,16 +4,16 @@ import Vue from "vue";
 import Vuex from "vuex";
 
 // Util
-import EXAMPLE from "./util/examples";
-import { possiblePredicates, possibleObjects } from "./util/vocabulary";
+import EXAMPLE from "../util/examples";
+import { possiblePredicates, possibleObjects } from "../util/vocabulary";
 
 // Translation
-import { TranslatorManager } from "./translation/translatorManager";
-import ShaclDictionary from "./translation/shaclDictionary";
+import { TranslatorManager } from "../translation/translatorManager";
+import ShaclDictionary from "../translation/shaclDictionary";
 
 // Modules
-import shapeModule from "./store/shapeModule";
-import dataModule from "./store/dataModule";
+import shapeModule from "./shapeModule";
+import dataModule from "./dataModule";
 
 Vue.use(Vuex);
 

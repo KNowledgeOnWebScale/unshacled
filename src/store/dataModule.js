@@ -1,9 +1,10 @@
+import Vue from "vue";
 import { ETF } from "../util/enums/extensionToFormat";
 import ParserManager from "../parsing/parserManager";
 import SerializerManager from "../parsing/serializerManager";
 import ValidatorManager from "../validation/validatorManager";
 import language from "../util/enums/languages";
-import {getConstraints} from "../util/constraintSelector";
+import { getConstraints } from "../util/constraintSelector";
 
 /**
  * This module contains everything to handle data imports/exports and validation.
@@ -15,7 +16,8 @@ const dataModule = {
     dataFile: {},
     dataFileExtension: String,
     validationReport: "hello",
-    showValidationReportModal: false
+    showValidationReportModal: false,
+    showNoDataFileModal: false
   },
   mutations: {
     /**
@@ -54,16 +56,25 @@ const dataModule = {
     /**
      * TODO
      * @param state
+     * @param model
      */
     validateWithModel(state, model) {
       SerializerManager.serialize(model, ETF.ttl).then(e => {
-        ValidatorManager.validate(state.dataFile, e, state.format)
-          .then(e => {
-            state.validationReport = e;
-            state.showValidationReportModal = true;
-          })
-          .catch(e => console.log(`failure : ${e}`));
+        if (e.length === 0) {
+          this.commit("toggleNoDataFilePopup");
+        } else {
+          ValidatorManager.validate(state.dataFile, e, state.format)
+            .then(e => {
+              state.validationReport = e;
+              state.showValidationReportModal = true;
+            })
+            .catch(e => console.log(`failure : ${e}`));
+        }
       });
+    },
+
+    toggleNoDataFilePopup(state) {
+      Vue.set(state, "showNoDataFileModal", !state.showNoDataFileModal);
     }
   },
   actions: {
