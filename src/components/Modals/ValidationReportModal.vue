@@ -1,14 +1,14 @@
 <template>
   <div>
     <sui-modal
-      v-model="this.$store.state.showValidationReportModal"
+      v-model="this.$store.state.mData.showValidationReportModal"
       @submit.prevent="confirmNodeShape"
     >
       <sui-modal-header>
         Validation report
       </sui-modal-header>
       <sui-modal-content>
-        {{ this.$store.state.validationReport }}
+        {{ this.$store.state.mData.validationReport }}
       </sui-modal-content>
       <sui-modal-actions>
         <sui-button negative @click="toggleModal">Cancel</sui-button>

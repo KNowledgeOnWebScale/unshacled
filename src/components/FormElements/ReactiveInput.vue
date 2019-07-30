@@ -1,7 +1,7 @@
 <template>
   <div>
     <input ref="input" type="text" list="datalist" @blur="stopEditing" />
-    <datalist id="datalist" ref="datalist" type="text">
+    <datalist v-if="isDatalist" id="datalist" ref="datalist" type="text">
       <option
         v-for="key in getOptions()"
         :key="getOptionID(key)"
@@ -43,7 +43,7 @@ export default {
     startEditing(textNode) {
       const { input, datalist } = this.$refs;
       const bool = this.$props.isDatalist;
-      const field = bool ? input : datalist;
+      const field = bool ? datalist : input;
       const stage = this.$store.state.editor;
 
       // Get the position of the original text node to put the field on top.

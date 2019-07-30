@@ -13,6 +13,7 @@
               @change="readTextFile()"
             />
           </sui-dropdown-item>
+
           <sui-dropdown-item @click="$refs.importData.click()">
             <label for="dataFile">Import Data...</label>
             <input
@@ -23,8 +24,11 @@
               @change="uploadDataFile()"
             />
           </sui-dropdown-item>
+
           <sui-dropdown-item>Export Shapes</sui-dropdown-item>
+
           <sui-dropdown-divider></sui-dropdown-divider>
+
           <sui-dropdown-item @click="loadExample">
             Load Example
           </sui-dropdown-item>
@@ -36,23 +40,30 @@
       <sui-menu-item class="clickable" icon="add" @click="togglePropertyModal">
         Property
       </sui-menu-item>
+
       <sui-menu-item class="clickable" icon="check" @click="validate">
         Validate
       </sui-menu-item>
+
       <sui-menu-item
         class="clickable"
         icon="trash"
         @click="toggleClearModal"
       ></sui-menu-item>
+
       <sui-menu-menu position="right">
         <sui-menu-item class="clickable" icon="user"></sui-menu-item>
       </sui-menu-menu>
     </sui-menu>
+
     <node-shape-modal
       :is-property-shape-modal="createPropertyShape"
     ></node-shape-modal>
+
     <clear-modal></clear-modal>
+    <no-data-file-modal></no-data-file-modal>
     <validation-report-modal></validation-report-modal>
+
     <add-predicate-modal
       :id="this.$store.state.predicateModal.id"
       :type="this.$store.state.predicateModal.type"
@@ -67,10 +78,12 @@ import ClearModal from "./Modals/ClearModal.vue";
 import NodeShapeModal from "./Modals/NodeShapeModal.vue";
 import ValidationReportModal from "./Modals/ValidationReportModal.vue";
 import AddPredicateModal from "./Modals/AddPredicateModal.vue";
+import NoDataFileModal from "./Modals/NoDataFileModal.vue";
 
 export default {
   name: "NavBar",
   components: {
+    NoDataFileModal,
     ClearModal,
     NodeShapeModal,
     SuiDropdownDivider,
@@ -85,7 +98,7 @@ export default {
   },
   methods: {
     loadExample() {
-      this.$store.commit("loadExample");
+      this.$store.dispatch("loadExample");
     },
     toggleShapeModal() {
       this.createPropertyShape = false;
@@ -107,7 +120,7 @@ export default {
       this.$store.commit("uploadDataFile", file);
     },
     validate() {
-      this.$store.commit("validate");
+      this.$store.dispatch("validate");
     }
   }
 };

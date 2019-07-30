@@ -75,7 +75,6 @@ import {
 
 const DELTA_Y_TEXT = 15;
 const DELTA_Y_DELETE = 20;
-const NEW_PROPERTY_TEXT = "newProperty";
 
 export default {
   name: "Shape",
@@ -121,7 +120,9 @@ export default {
     // Move the shape to the defined coordinate.
     this.$refs.posRef
       .getNode()
-      .setPosition(this.$store.state.coordinates[this.$props.id]);
+      .setPosition(
+        this.$store.state.mShape.mCoordinate.coordinates[this.$props.id]
+      );
     this.updateCoordinates();
   },
   methods: {
@@ -158,7 +159,7 @@ export default {
      */
     setConfigs(elements, constraints) {
       const { id } = this.$props;
-      const ys = this.$store.state.yValues[id];
+      const ys = this.$store.state.mShape.mCoordinate.yValues[id];
       for (const prop of Object.keys(elements)) {
         // The properties should be listed below eachother.
         if (constraints) {
@@ -179,28 +180,16 @@ export default {
           y: ys[prop] + DELTA_Y_DELETE
         };
       }
-
-      // Set y values for the button and text for adding a new property.
-      this.propertyConfigs[NEW_PROPERTY_TEXT] = {
-        ...this.propertyConfig,
-        y: ys[NEW_PROPERTY_TEXT]
-      };
-      // This text is not visible, but is used to position the input field.
-      this.propTextConfigs[NEW_PROPERTY_TEXT] = {
-        ...this.propTextConfig,
-        y: ys[NEW_PROPERTY_TEXT] + DELTA_Y_TEXT,
-        text: "",
-        fill: "transparent"
-      };
-      this.addPropConfig.y = ys["addButton"];
     },
 
     /**
      * TODO
      */
     addPredicate() {
-      const args = { id: this.id, type: "PropertyShape" };
-      this.$store.commit("togglePredicateModal", args);
+      this.$store.commit("togglePredicateModal", {
+        id: this.id,
+        type: "PropertyShape"
+      });
     },
 
     /**
@@ -253,7 +242,10 @@ export default {
         x: pos.x,
         y: pos.y
       };
-      this.$store.commit("updateYValues", this.$props.id);
+      this.$store.commit("updateYValues", {
+        nodeID: this.$props.id,
+        shapes: this.$store.state.mShape.model
+      });
       this.$store.commit("updateCoordinates", args);
     }
   }

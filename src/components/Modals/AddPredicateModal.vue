@@ -99,35 +99,42 @@ export default {
     }
   },
   methods: {
+    /**
+     * Toggle the visibility of the modal.
+     */
     toggleModal() {
-      // Arguments
-      const args = { id: null, type: null };
-
-      // Reset modal values
-      this.reset();
-
-      // Toggle modal
-      this.$store.commit("togglePredicateModal", args);
+      this.reset(); // Reset modal values
+      this.$store.commit("togglePredicateModal");
     },
+
+    /**
+     * Select the given predicate.
+     */
     selectPredicate() {
       this.$store.commit(
         "changePredicate",
         `${this.urls[this.predicate]}#${this.predicate}`
       );
     },
+
+    /**
+     * Add the predicate that's been filled out in the modal.
+     */
     addPredicate() {
-      const pred = this.$store.state.predicateModal.predicate;
-      const val = ValueType(pred);
-      this.error = val === undefined;
+      const { predicate } = this.$store.state.predicateModal;
+      const valueType = ValueType(predicate);
+      this.error = valueType === undefined;
+
       const args = {
-        pred,
-        id: this.id,
-        vt: val,
+        predicate,
+        valueType,
+        shapeID: this.id,
         input: this.input,
         object: this.object
       };
+
       if (!this.error) {
-        this.$store.commit("addPredicate", args);
+        this.$store.dispatch("addPredicate", args);
         this.reset();
       }
     },
