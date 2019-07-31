@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { urlToName } from "../util/nameParser";
+import { urlToName } from "../util/urlParser";
 
 /**
  * This module contains everything to change the shape constraints.
@@ -34,7 +34,11 @@ const constraintModule = {
           };
 
           // Add the shape to the state.
-          commit("addShape", property, { root: true }); // this works as intended
+          commit(
+            "addShape",
+            { object: property, bottomLefts: getters.allbottomLefts },
+            { root: true }
+          ); // this works as intended
         }
 
         const shape = getters.shapeWithID(nodeID);
@@ -98,7 +102,11 @@ const constraintModule = {
         ] = `http://example.org/ns#${name}`; // TODO dromedarisCaseOrSomething
 
         // Add the shape to the state.
-        commit("addShape", copied, { root: true });
+        commit(
+          "addShape",
+          { object: copied, bottomLefts: getters.allbottomLefts },
+          { root: true }
+        );
       }
 
       const shape = getters.shapeWithID(nodeID);

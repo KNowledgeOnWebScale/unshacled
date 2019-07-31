@@ -86,10 +86,11 @@ const dataModule = {
     /**
      * TODO
      * @param commit
+     * @param getters
      * @param model
      */
-    updateModel({ commit }, model) {
-      commit("setModel", model, { root: true });
+    updateModel({ commit, rootGetters }, model) {
+      commit("setModel", { model, getters: rootGetters }, { root: true });
     },
 
     /**

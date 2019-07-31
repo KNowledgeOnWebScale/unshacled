@@ -35,7 +35,7 @@ export default new Vuex.Store({
     mData: dataModule
   },
   mutations: {
-    changePredicate(state, pred) {
+    updatePredicateInModal(state, pred) {
       Vue.set(state.predicateModal, "predicate", pred);
     },
 
@@ -116,7 +116,7 @@ export default new Vuex.Store({
     /**
      * Load in some example data.
      */
-    loadExample() {
+    loadExample({ getters }) {
       console.log("Loading example...");
       this.commit("clear"); // Clear the existing data first.
 
@@ -125,7 +125,7 @@ export default new Vuex.Store({
       for (const element of example) {
         newModel.push(clone(element)); // Deep copy
       }
-      this.commit("setModel", newModel);
+      this.commit("setModel", { model: newModel, getters });
     }
   },
   getters: {

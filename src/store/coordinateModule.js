@@ -4,7 +4,8 @@ import { HEIGHT } from "../util/konvaConfigs";
 const coordinateModule = {
   state: {
     yValues: {},
-    coordinates: {}
+    coordinates: {},
+    bottom: {}
   },
   mutations: {
     /**
@@ -51,7 +52,7 @@ const coordinateModule = {
         if (item["@id"] === nodeID) node = item;
       }
 
-      // FIXME code duplication, find a way to use `shapeProperties` >.<
+      // FIXME code duplication, find a way to use `shapeProperties`
       const propertyObjects =
         node["https://2019.summerofcode.be/unshacled#property"];
 
@@ -89,7 +90,8 @@ const coordinateModule = {
         Vue.set(state.yValues[nodeID], prop, i * HEIGHT);
         i += 1;
       }
-      // Add y values for the add button.
+      // Set the bottom right coordinate.
+      state.bottom[nodeID] = i * HEIGHT;
     },
 
     /**
@@ -131,7 +133,32 @@ const coordinateModule = {
     }
   },
   actions: {},
-  getters: {}
+  getters: {
+    /**
+     * Get the bottom right coordinate of the shape with the given ID.
+     * @param state
+     * @returns {function(*): {x: *, y: *}}
+     */
+    bottomLeft: state => shapeID => {
+      return {
+        x: state.coordinates[shapeID].x,
+        y: state.bottom[shapeID]
+      };
+    },
+
+    /**
+     * Get the bottom right coordinates of all the shapes.
+     * @param state
+     * @param getters
+     */
+    allbottomLefts: (state, getters) => {
+      const output = {};
+      for (const key of Object.keys(state.coordinates)) {
+        output[key] = getters.bottomLeft(key);
+      }
+      return output;
+    }
+  }
 };
 
 export { coordinateModule as default };
