@@ -3,13 +3,8 @@
     <v-layer>
       <div v-for="(obj, key) in this.$store.getters.nodeShapes" :key="key">
         <shape :id="key" :node-shape="true"></shape>
-        <!--        <node-shape :id="key" @click="print(key)"></node-shape>-->
       </div>
-      <!--      <div v-for="(obj, key) in this.$store.state.relationships" :key="key">-->
-      <!--        <relationship :coords="obj.coords"></relationship>-->
-      <!--      </div>-->
       <div v-for="(obj, key) in this.$store.getters.propertyShapes" :key="key">
-        <!--        <property-shape :id="key"></property-shape>-->
         <shape :id="key" :node-shape="false"></shape>
       </div>
     </v-layer>

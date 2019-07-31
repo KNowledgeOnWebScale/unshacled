@@ -25,6 +25,7 @@
             />
           </sui-dropdown-item>
 
+          <!-- TODO this has no function yet -->
           <sui-dropdown-item>Export Shapes</sui-dropdown-item>
 
           <sui-dropdown-divider></sui-dropdown-divider>

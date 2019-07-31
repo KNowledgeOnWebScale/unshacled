@@ -2,7 +2,8 @@ import { values } from "ramda";
 import { HEIGHT, WIDTH } from "./konvaConfigs";
 
 /** @returns {x: number, y: number} the coordinates for a newly added shape */
-export default ({ coordinates }) => {
+export default ({ coordinates, bottomLefts }) => {
+  // TODO use bottomLefts for this
   const MARGIN = 16;
   const { innerWidth } = window;
 

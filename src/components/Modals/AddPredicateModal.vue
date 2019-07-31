@@ -112,7 +112,7 @@ export default {
      */
     selectPredicate() {
       this.$store.commit(
-        "changePredicate",
+        "updatePredicateInModal",
         `${this.urls[this.predicate]}#${this.predicate}`
       );
     },
