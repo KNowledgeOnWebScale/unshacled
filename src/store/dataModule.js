@@ -5,6 +5,8 @@ import SerializerManager from "../parsing/serializerManager";
 import ValidatorManager from "../validation/validatorManager";
 import language from "../util/enums/languages";
 import getConstraints from "../util/constraintSelector";
+import shaclToInternal from "../parsing/internalParser";
+import {SHACL_URI} from "../util/constants";
 
 /**
  * This module contains everything to handle data imports/exports and validation.
@@ -49,7 +51,6 @@ const dataModule = {
       reader.onload = function(event) {
         // TODO File to intermediate format
         ParserManager.parse(event.target.result, type).then(e => {
-          console.log(JSON.stringify(e, null, 2));
           self.dispatch("updateModel", e);
         });
       };
@@ -86,7 +87,7 @@ const dataModule = {
   },
   actions: {
     /**
-     * TODO
+     * Set the model to the given one.
      * @param commit
      * @param getters
      * @param model

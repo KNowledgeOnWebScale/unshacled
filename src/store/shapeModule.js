@@ -3,7 +3,8 @@ import constraintModule from "./constraintModule";
 import { extractUrl, urlToName } from "../parsing/urlParser";
 import { getNonOverlappingCoordinates } from "../util";
 import coordinateModule from "./coordinateModule";
-import { CUSTOM_URI, EXAMPLE_URI } from "../util/constants";
+import {CUSTOM_URI, EXAMPLE_URI, SHACL_URI} from "../util/constants";
+import shaclToInternal from "../parsing/internalParser";
 
 /**
  * This module contains everything to change the shapes.
@@ -29,12 +30,20 @@ const shapeModule = {
     },
 
     /**
-     * Set the model to the given value.
+     * Set the model to the given value. Parse to internal value if necessary.
      * @param state
      * @param args
      */
     setModel(state, args) {
-      const { model, getters } = args;
+      let { model } = args;
+      const { getters } = args;
+
+      // Parse the model if necessary.
+      if (JSON.stringify(model).indexOf(SHACL_URI) !== -1) {
+        model = shaclToInternal(model);
+      }
+      console.log(JSON.stringify(model, null, 2));
+
       state.model = model;
 
       // Update y values and set coordinates to zero
@@ -293,7 +302,6 @@ const shapeModule = {
     deletePropertyShape({ state, getters, commit }, id) {
       // Check every nodeShape if it contains the given property.
       for (const shape of state.model) {
-        console.log(shape);
         const properties = shape[`${CUSTOM_URI}property`];
 
         for (const p in properties) {
@@ -307,7 +315,6 @@ const shapeModule = {
             );
           }
         }
-        console.log(properties);
       }
       // Remove the property from the state
       commit("deleteShapeAtIndex", getters.indexWithID(id), { root: true });
