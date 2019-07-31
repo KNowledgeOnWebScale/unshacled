@@ -24,6 +24,13 @@ export const PROPERTY_SHAPE_CONFIG = {
   stroke: "blue"
 };
 
+export const CONSTRAINT_SEPARATION_LINE = {
+  points: [0, HEIGHT, WIDTH, HEIGHT], // x y values
+  stroke: "lightgrey",
+  strokewidth: 1,
+  dash: [10, 10] // Segments with a length of 20px with a gap of 10px
+};
+
 export const DELETE_BUTTON_CONFIG = {
   x: DELETE_BUTTON_OFFSET,
   y: 10,

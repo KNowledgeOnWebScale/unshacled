@@ -2,6 +2,7 @@
   <v-group>
     <v-rect :config="this.$props.constraintConfig"></v-rect>
     <v-text ref="key" :config="keyConfig"></v-text>
+    <v-line :config="lineConfig"></v-line>
     <v-text ref="value" :config="valueConfig"></v-text>
     <v-circle
       v-if="this.$props.hover"
@@ -12,7 +13,11 @@
 </template>
 
 <script>
-import { HEIGHT } from "../../util/konvaConfigs";
+import {
+  HEIGHT,
+  CONSTRAINT_SEPARATION_LINE,
+  WIDTH
+} from "../../util/konvaConfigs";
 import { urlToName } from "../../parsing/urlParser";
 
 export default {
@@ -44,7 +49,12 @@ export default {
     }
   },
   data() {
+    const { x, y } = this.$props.constraintConfig;
     return {
+      lineConfig: {
+        ...CONSTRAINT_SEPARATION_LINE,
+        points: [x, y + HEIGHT, x + WIDTH, y + HEIGHT]
+      },
       keyConfig: {
         ...this.$props.constraintTextConfig,
         fontStyle: "italic",
