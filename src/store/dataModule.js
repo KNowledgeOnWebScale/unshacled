@@ -4,7 +4,7 @@ import ParserManager from "../parsing/parserManager";
 import SerializerManager from "../parsing/serializerManager";
 import ValidatorManager from "../validation/validatorManager";
 import language from "../util/enums/languages";
-import { getConstraints } from "../util/constraintSelector";
+import getConstraints from "../util/constraintSelector";
 
 /**
  * This module contains everything to handle data imports/exports and validation.
@@ -47,7 +47,9 @@ const dataModule = {
 
       reader.readAsText(file);
       reader.onload = function(event) {
+        // TODO File to intermediate format
         ParserManager.parse(event.target.result, type).then(e => {
+          console.log(JSON.stringify(e, null, 2));
           self.dispatch("updateModel", e);
         });
       };

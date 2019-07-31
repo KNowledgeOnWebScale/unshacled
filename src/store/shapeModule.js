@@ -1,8 +1,9 @@
 import Vue from "vue";
 import constraintModule from "./constraintModule";
-import { extractUrl, urlToName } from "../util/urlParser";
+import { extractUrl, urlToName } from "../parsing/urlParser";
 import { getNonOverlappingCoordinates } from "../util";
 import coordinateModule from "./coordinateModule";
+import { CUSTOM_URI, EXAMPLE_URI } from "../util/constants";
 
 /**
  * This module contains everything to change the shapes.
@@ -93,13 +94,11 @@ const shapeModule = {
     addPropertyIDToShape(state, args) {
       const { propertyID, shape } = args;
       // FIXME this assumes properties, not constraints or targetNodes or sth
-      const p = shape["https://2019.summerofcode.be/unshacled#property"];
+      const p = shape[`${CUSTOM_URI}property`];
       if (!p) {
-        shape["https://2019.summerofcode.be/unshacled#property"] = [];
+        shape[`${CUSTOM_URI}property`] = [];
       }
-      shape["https://2019.summerofcode.be/unshacled#property"].push({
-        "@id": propertyID
-      });
+      shape[`${CUSTOM_URI}property`].push({ "@id": propertyID });
     },
 
     /* EDIT ========================================================================================================= */
@@ -129,9 +128,7 @@ const shapeModule = {
 
       // Update the path with the new ID.
       const name = urlToName(newID);
-      shape["https://2019.summerofcode.be/unshacled#path"][0][
-        "@id"
-      ] = `http://example.org/ns#${name}`;
+      shape[`${CUSTOM_URI}path`][0]["@id"] = `${EXAMPLE_URI}${name}`;
     },
 
     /* DELETE ======================================================================================================= */
@@ -154,16 +151,13 @@ const shapeModule = {
      */
     deletePropertyFromShape(state, args) {
       const { shape, propertyID } = args;
-      const properties =
-        shape["https://2019.summerofcode.be/unshacled#property"];
+      const key = `${CUSTOM_URI}property`;
+
+      const properties = shape[key];
       for (const p in properties) {
         if (properties[p]["@id"] === propertyID) Vue.delete(properties, p);
       }
-      Vue.set(
-        shape,
-        "https://2019.summerofcode.be/unshacled#property",
-        properties
-      );
+      Vue.set(shape, key, properties);
     },
 
     /**
@@ -186,17 +180,16 @@ const shapeModule = {
      */
     addNodeShape({ commit, getters }, id) {
       console.log(getters);
+      const object = {
+        "@id": id,
+        "@type": [`${CUSTOM_URI}NodeShape`]
+      };
+      object[`${CUSTOM_URI}property`] = [];
+      object[`${CUSTOM_URI}targetNode`] = [];
+
       commit(
         "addShape",
-        {
-          object: {
-            "@id": id,
-            "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
-            "https://2019.summerofcode.be/unshacled#property": [],
-            "https://2019.summerofcode.be/unshacled#targetNode": []
-          },
-          bottomLefts: getters.allbottomLefts
-        },
+        { object, bottomLefts: getters.allbottomLefts },
         { root: true }
       );
     },
@@ -207,17 +200,11 @@ const shapeModule = {
      * @param id
      */
     addPropertyShape({ commit, getters }, id) {
+      const object = { "@id": id };
+      object[`${CUSTOM_URI}path`] = [`${EXAMPLE_URI}${id}`];
       commit(
         "addShape",
-        {
-          object: {
-            "@id": id,
-            "https://2019.summerofcode.be/unshacled#path": [
-              `http://example.org/ns#${id}`
-            ]
-          },
-          bottomLefts: getters.allbottomLefts
-        },
+        { object, bottomLefts: getters.allbottomLefts },
         { root: true }
       );
     },
@@ -307,8 +294,7 @@ const shapeModule = {
       // Check every nodeShape if it contains the given property.
       for (const shape of state.model) {
         console.log(shape);
-        const properties =
-          shape["https://2019.summerofcode.be/unshacled#property"];
+        const properties = shape[`${CUSTOM_URI}property`];
 
         for (const p in properties) {
           if (properties[p]["@id"] === id) {

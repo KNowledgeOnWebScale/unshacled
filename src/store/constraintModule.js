@@ -1,5 +1,6 @@
 import Vue from "vue";
-import { urlToName } from "../util/urlParser";
+import { urlToName } from "../parsing/urlParser";
+import { CUSTOM_URI, EXAMPLE_URI } from "../util/constants";
 
 /**
  * This module contains everything to change the shape constraints.
@@ -26,12 +27,10 @@ const constraintModule = {
         // Check if the new property name is already an existing PropertyShape.
         if (!getters.propertyShapes[propertyID]) {
           // If not, create a new PropertyShape that is a copy of the original one.
-          const property = {
-            "@id": propertyID,
-            "https://2019.summerofcode.be/unshacled#path": [
-              { "@id": `http://example.org/ns#${propertyID}` }
-            ]
-          };
+          const property = { "@id": propertyID };
+          property[`${CUSTOM_URI}path`] = [
+            { "@id": `${EXAMPLE_URI}${propertyID}` }
+          ];
 
           // Add the shape to the state.
           commit(
@@ -97,9 +96,7 @@ const constraintModule = {
         copied["@id"] = newID;
 
         const name = urlToName(newID);
-        copied["https://2019.summerofcode.be/unshacled#path"][0][
-          "@id"
-        ] = `http://example.org/ns#${name}`; // TODO dromedarisCaseOrSomething
+        copied[`${CUSTOM_URI}path`][0]["@id"] = `${EXAMPLE_URI}${name}`;
 
         // Add the shape to the state.
         commit(
@@ -143,8 +140,7 @@ const constraintModule = {
       const { node, prop } = args;
 
       const shape = getters.shapeWithID(node);
-      const properties =
-        shape["https://2019.summerofcode.be/unshacled#property"];
+      const properties = shape[`${CUSTOM_URI}property`];
 
       for (const p in properties) {
         if (properties[p]["@id"] === prop) {
@@ -199,8 +195,7 @@ const constraintModule = {
         }
       }
 
-      const propertyObjects =
-        node["https://2019.summerofcode.be/unshacled#property"];
+      const propertyObjects = node[`${CUSTOM_URI}property`];
       const properties = [];
 
       if (propertyObjects) {
@@ -212,8 +207,8 @@ const constraintModule = {
         const ignored = [
           "@id",
           "@type",
-          "https://2019.summerofcode.be/unshacled#property",
-          "https://2019.summerofcode.be/unshacled#targetNode"
+          `${CUSTOM_URI}property`,
+          `${CUSTOM_URI}targetNode`
         ];
         for (const p in node) {
           if (!ignored.includes(p)) properties.push(p[0]["@id"]);
@@ -238,11 +233,7 @@ const constraintModule = {
         }
       }
 
-      const ignored = [
-        "@id",
-        "@type",
-        "https://2019.summerofcode.be/unshacled#property"
-      ];
+      const ignored = ["@id", "@type", `${CUSTOM_URI}property`];
       for (const prop in node) {
         // Only handle the constraints that are not ignored
         if (ignored.indexOf(prop) < 0) {

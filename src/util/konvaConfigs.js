@@ -1,6 +1,6 @@
-const X = 0;
 export const WIDTH = 250;
 export const HEIGHT = 40;
+const X = 0;
 const TEXT_SIZE = HEIGHT / 2;
 const DEL_BUTTON_OFFSET = 240;
 const ADD_BUTTON_OFFSET = 130;

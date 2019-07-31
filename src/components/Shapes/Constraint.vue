@@ -13,7 +13,7 @@
 
 <script>
 import { HEIGHT } from "../../util/konvaConfigs";
-import { urlToName } from "../../util/urlParser";
+import { urlToName } from "../../parsing/urlParser";
 
 export default {
   name: "Constraint",

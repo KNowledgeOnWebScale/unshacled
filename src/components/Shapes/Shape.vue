@@ -60,7 +60,7 @@
 import ReactiveInput from "../FormElements/ReactiveInput.vue";
 import NodeProperty from "./NodeProperty.vue";
 import Constraint from "./Constraint.vue";
-import { urlToName } from "../../util/urlParser";
+import { urlToName } from "../../parsing/urlParser";
 import {
   DELETE_BUTTON_CONFIG,
   ADD_PROP_CONFIG,
