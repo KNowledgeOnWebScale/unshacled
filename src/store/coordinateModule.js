@@ -52,32 +52,13 @@ const coordinateModule = {
         if (item["@id"] === nodeID) node = item;
       }
 
-      // FIXME code duplication, find a way to use `shapeProperties`
-      const propertyObjects =
-        node["https://2019.summerofcode.be/unshacled#property"];
-
-      // Get the references to property shapes.
-      const properties = [];
-      if (propertyObjects) {
-        for (const p of propertyObjects) properties.push(p["@id"]);
-      }
-
       // The other properties.
-      const ignored = [
-        "@id",
-        "@type",
-        "https://2019.summerofcode.be/unshacled#property"
-      ];
+      const ignored = ["@id", "@type"];
 
       // Get the IDs form all the constraints.
       const constraints = [];
       for (const c in node) {
         if (!ignored.includes(c)) constraints.push(c);
-      }
-
-      // Get the IDs from all the properties.
-      for (const p in node) {
-        if (!ignored.includes(p)) properties.push(p[0]["@id"]);
       }
 
       // Calculate their y values.
@@ -86,10 +67,7 @@ const coordinateModule = {
         Vue.set(state.yValues[nodeID], con, i * HEIGHT);
         i += 2; // Constraints need twice the height.
       }
-      for (const prop of properties) {
-        Vue.set(state.yValues[nodeID], prop, i * HEIGHT);
-        i += 1;
-      }
+
       // Set the bottom right coordinate.
       state.bottom[nodeID] = i * HEIGHT;
     },

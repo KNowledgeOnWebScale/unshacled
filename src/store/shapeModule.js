@@ -3,7 +3,7 @@ import constraintModule from "./constraintModule";
 import { extractUrl, urlToName } from "../parsing/urlParser";
 import { getNonOverlappingCoordinates } from "../util";
 import coordinateModule from "./coordinateModule";
-import {CUSTOM_URI, EXAMPLE_URI, SHACL_URI} from "../util/constants";
+import { CUSTOM_URI, EXAMPLE_URI, SHACL_URI } from "../util/constants";
 import shaclToInternal from "../parsing/internalParser";
 
 /**

@@ -1,11 +1,5 @@
 <template>
   <div>
-    <reactive-input
-      ref="reactiveInput"
-      :is-datalist="false"
-      :on-exit="stopEditing"
-    ></reactive-input>
-
     <v-group
       ref="posRef"
       :draggable="true"
@@ -27,29 +21,18 @@
 
       <v-circle
         v-if="hover && !adding"
-        :config="addPredConfig"
+        :config="addPredicateConfig"
         @mousedown="addPredicate"
       ></v-circle>
-
-      <div v-for="(prop, key) in getProperties()" :key="key">
-        <node-property
-          :prop-key="key"
-          :node="$props.id"
-          :hover="hover"
-          :property-config="propertyConfigs[key]"
-          :prop-text-config="propTextConfigs[key]"
-          :delete-prop-config="deletePropConfigs[key]"
-        ></node-property>
-      </div>
 
       <div v-for="(prop, key) in getConstraints()" :key="key">
         <constraint
           :constraint-i-d="key"
           :shape="$props.id"
           :hover="hover"
-          :constraint-config="propertyConfigs[key]"
-          :prop-text-config="propTextConfigs[key]"
-          :delete-prop-config="deletePropConfigs[key]"
+          :constraint-config="constraintConfigs[key]"
+          :constraint-text-config="constraintTextConfigs[key]"
+          :delete-constraint-config="deleteConstrConfigs[key]"
         ></constraint>
       </div>
     </v-group>
@@ -57,20 +40,16 @@
 </template>
 
 <script>
-import ReactiveInput from "../FormElements/ReactiveInput.vue";
-import NodeProperty from "./NodeProperty.vue";
 import Constraint from "./Constraint.vue";
 import { urlToName } from "../../parsing/urlParser";
 import {
   DELETE_BUTTON_CONFIG,
-  ADD_PROP_CONFIG,
   ID_TEXT_CONFIG,
-  PROP_TEXT_CONFIG,
-  PROPERTY_CONFIG,
+  CONSTRAINT_TEXT_CONFIG,
+  CONSTRAINT_CONFIG,
   NODE_SHAPE_CONFIG,
   PROPERTY_SHAPE_CONFIG,
-  CONSTRAINT_CONFIG,
-  ADD_PRED_CONFIG
+  ADD_PREDICATE_CONFIG
 } from "../../util/konvaConfigs";
 
 const DELTA_Y_TEXT = 15;
@@ -78,7 +57,7 @@ const DELTA_Y_DELETE = 20;
 
 export default {
   name: "Shape",
-  components: { ReactiveInput, NodeProperty, Constraint },
+  components: { Constraint },
   props: {
     id: {
       type: String,
@@ -94,9 +73,9 @@ export default {
       hover: false,
       editing: false,
       adding: false,
-      propertyConfigs: {},
-      propTextConfigs: {},
-      deletePropConfigs: {},
+      constraintConfigs: {},
+      constraintTextConfigs: {},
+      deleteConstrConfigs: {},
       shapeConfig: this.$props.nodeShape
         ? NODE_SHAPE_CONFIG
         : PROPERTY_SHAPE_CONFIG,
@@ -105,15 +84,13 @@ export default {
         ...ID_TEXT_CONFIG,
         text: urlToName(this.$props.id)
       },
-      propertyConfig: PROPERTY_CONFIG,
-      propTextConfig: {
-        ...PROP_TEXT_CONFIG,
+      constraintConfig: CONSTRAINT_CONFIG,
+      constraintTextConfig: {
+        ...CONSTRAINT_TEXT_CONFIG,
         text: urlToName(this.$props.propKey)
       },
-      constraintConfig: CONSTRAINT_CONFIG,
-      deletePropConfig: DELETE_BUTTON_CONFIG,
-      addPropConfig: ADD_PROP_CONFIG,
-      addPredConfig: ADD_PRED_CONFIG
+      deleteConstraintConfig: DELETE_BUTTON_CONFIG,
+      addPredicateConfig: ADD_PREDICATE_CONFIG
     };
   },
   mounted() {
@@ -126,22 +103,6 @@ export default {
     this.updateCoordinates();
   },
   methods: {
-    /**
-     * Get an object containing all the properties and set their y values.
-     * @returns an object mapping every property name to a property object.
-     */
-    getProperties() {
-      const propNames = this.$store.getters.shapeProperties(this.$props.id);
-      const propertyObjects = this.$store.getters.shapes;
-      const propObjects = {};
-      for (const prop of propNames) {
-        // FIXME here's some undefined stuff going on, hence the if
-        if (prop) propObjects[prop] = propertyObjects[prop];
-      }
-      this.setConfigs(propObjects, false);
-      return propObjects;
-    },
-
     /**
      * Get an object containing all the constraints and set their y values.
      * @returns an object mapping every constraint name to a (list of) values.
@@ -163,20 +124,23 @@ export default {
       for (const prop of Object.keys(elements)) {
         // The properties should be listed below eachother.
         if (constraints) {
-          this.propertyConfigs[prop] = {
+          this.constraintConfigs[prop] = {
             ...this.constraintConfig,
             y: ys[prop]
           };
         } else {
-          this.propertyConfigs[prop] = { ...this.propertyConfig, y: ys[prop] };
+          this.constraintConfigs[prop] = {
+            ...this.constraintConfig,
+            y: ys[prop]
+          };
         }
-        this.propTextConfigs[prop] = {
-          ...this.propTextConfig,
+        this.constraintTextConfigs[prop] = {
+          ...this.constraintTextConfig,
           y: ys[prop] + DELTA_Y_TEXT,
           text: prop
         };
-        this.deletePropConfigs[prop] = {
-          ...this.deletePropConfig,
+        this.deleteConstrConfigs[prop] = {
+          ...this.deleteConstraintConfig,
           y: ys[prop] + DELTA_Y_DELETE
         };
       }

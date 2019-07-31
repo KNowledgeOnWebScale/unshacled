@@ -44,11 +44,11 @@ export default {
       required: true,
       type: Object
     },
-    propTextConfig: {
+    constraintTextConfig: {
       required: true,
       type: Object
     },
-    deletePropConfig: {
+    deleteConstraintConfig: {
       required: true,
       type: Object
     }

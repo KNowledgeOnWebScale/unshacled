@@ -5,7 +5,7 @@
     <v-text ref="value" :config="valueConfig"></v-text>
     <v-circle
       v-if="this.$props.hover"
-      :config="this.$props.deletePropConfig"
+      :config="this.$props.deleteConstraintConfig"
       @click="deleteConstraint"
     ></v-circle>
   </v-group>
@@ -34,11 +34,11 @@ export default {
       type: Object,
       required: true
     },
-    propTextConfig: {
+    constraintTextConfig: {
       type: Object,
       required: true
     },
-    deletePropConfig: {
+    deleteConstraintConfig: {
       type: Object,
       required: true
     }
@@ -46,13 +46,13 @@ export default {
   data() {
     return {
       keyConfig: {
-        ...this.$props.propTextConfig,
+        ...this.$props.constraintTextConfig,
         fontStyle: "italic",
         text: urlToName(this.$props.constraintID)
       },
       valueConfig: {
-        ...this.$props.propTextConfig,
-        y: this.$props.propTextConfig.y + HEIGHT,
+        ...this.$props.constraintTextConfig,
+        y: this.$props.constraintTextConfig.y + HEIGHT,
         text: this.getConstraintValue()
       }
     };

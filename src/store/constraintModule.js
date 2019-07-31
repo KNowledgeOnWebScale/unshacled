@@ -54,6 +54,8 @@ const constraintModule = {
 
     addPredicate({ getters, commit, rootState }, args) {
       const { shapeID, predicate, valueType } = args;
+      console.log("valueType", valueType);
+      // TODO if the value type is a list, then create a list if necessary and add the value to the list
 
       if (predicate.includes("property")) {
         const argument = { nodeID: shapeID, propertyID: args.input };
@@ -233,7 +235,7 @@ const constraintModule = {
         }
       }
 
-      const ignored = ["@id", "@type", `${CUSTOM_URI}property`];
+      const ignored = ["@id", "@type"];
       for (const prop in node) {
         // Only handle the constraints that are not ignored
         if (ignored.indexOf(prop) < 0) {
