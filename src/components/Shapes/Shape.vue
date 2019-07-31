@@ -1,5 +1,11 @@
 <template>
   <div>
+    <reactive-input
+      ref="reactiveInput"
+      :is-datalist="false"
+      :on-exit="stopEditing"
+    ></reactive-input>
+
     <v-group
       ref="posRef"
       :draggable="true"
@@ -41,6 +47,7 @@
 
 <script>
 import Constraint from "./Constraint.vue";
+import ReactiveInput from "../FormElements/ReactiveInput.vue";
 import { urlToName } from "../../parsing/urlParser";
 import {
   DELETE_BUTTON_CONFIG,
@@ -57,7 +64,7 @@ const DELTA_Y_DELETE = 20;
 
 export default {
   name: "Shape",
-  components: { Constraint },
+  components: { ReactiveInput, Constraint },
   props: {
     id: {
       type: String,
@@ -109,6 +116,7 @@ export default {
      */
     getConstraints() {
       const constraints = this.$store.getters.shapeConstraints(this.$props.id);
+      console.log("getConstraints", JSON.stringify(constraints, null, 2));
       this.setConfigs(constraints, true);
       return constraints;
     },
@@ -188,11 +196,12 @@ export default {
      * Delete this node shape.
      */
     deleteShape() {
-      this.$refs.reactiveInput.stopEditing();
+      if (this.$refs.reactiveInput) this.$refs.reactiveInput.stopEditing();
       if (this.$props.nodeShape) {
         this.$store.dispatch("deleteNodeShape", this.$props.id);
       } else {
         this.$store.dispatch("deletePropertyShape", this.$props.id);
+        console.log(JSON.stringify(this.$store.state.mShape, null, 2));
       }
     },
 

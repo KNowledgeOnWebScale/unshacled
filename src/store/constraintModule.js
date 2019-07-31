@@ -1,5 +1,3 @@
-import Vue from "vue";
-import { urlToName } from "../parsing/urlParser";
 import { CUSTOM_URI, EXAMPLE_URI } from "../util/constants";
 
 /**
@@ -83,81 +81,24 @@ const constraintModule = {
     /* EDIT ========================================================================================================= */
 
     /**
-     * Edit the given property in the given node shape.
-     * If the new property ID already exists, this will make a copy
-     * @param store
+     * Update the constraint value of the given node.
+     * @param rootGetters
+     * @param commit
      * @param args
+     *            shapeID the ID of the shape.
+     *            constraintID the ID of the constraint we want to update.
+     *            value the new value of the given constraint.
      */
-    editPropertyInNode({ getters, commit, rootState }, args) {
-      const { nodeID, oldID, newID } = args;
-
-      // Check if the new property name is already an existing PropertyShape.
-      if (!getters.propertyShapes[newID]) {
-        // If not, create a new PropertyShape that is a copy of the original one.
-        const copied = Vue.util.extend({}, getters.propertyShapes[oldID]);
-        copied["@id"] = newID;
-
-        const name = urlToName(newID);
-        copied[`${CUSTOM_URI}path`][0]["@id"] = `${EXAMPLE_URI}${name}`;
-
-        // Add the shape to the state.
-        commit(
-          "addShape",
-          { object: copied, bottomLefts: getters.allbottomLefts },
-          { root: true }
-        );
-      }
-
-      const shape = getters.shapeWithID(nodeID);
-      // Put the new value in the list of shape properties
-      commit(
-        "addPropertyIDToShape",
-        { propertyID: newID, shape },
-        { root: true }
-      );
-      // Remove the old value from the list of shape properties.
-      commit(
-        "deletePropertyFromShape",
-        { shape, propertyID: oldID },
-        { root: true }
-      );
-      // Update the y values
-      commit(
-        "updateYValues",
-        { nodeID, shapes: rootState.mShape.model },
-        { root: true }
-      );
+    updateConstraint({ rootGetters, commit }, args) {
+      const { shapeID, constraintID, value } = args;
+      commit("setConstraintValue", {
+        shape: rootGetters.shapeWithID(shapeID),
+        constraintID,
+        value
+      });
     },
 
     /* DELETE ======================================================================================================= */
-
-    /**
-     * Delete the given property from the given node shape.
-     * @param store
-     * @param args
-     *            node the id of the node shape
-     *            prop the id of the property that should be removed from the shape
-     */
-    deletePropFromNode({ getters, commit, rootState }, args) {
-      const { node, prop } = args;
-
-      const shape = getters.shapeWithID(node);
-      const properties = shape[`${CUSTOM_URI}property`];
-
-      for (const p in properties) {
-        if (properties[p]["@id"] === prop) {
-          // Delete the property from the node and update the y values.
-          properties.splice(p, 1);
-        }
-      }
-
-      // Update the y values
-      commit(
-        "updateYValues",
-        { nodeID: node, shapes: rootState.mShape.model },
-        { root: true }
-      );
-    },
 
     /**
      * TODO

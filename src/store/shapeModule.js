@@ -82,18 +82,6 @@ const shapeModule = {
     },
 
     /**
-     * Add a property with the given ID and value to the node with the given ID.
-     * @param state
-     * @param args
-     */
-    addPropertyToShape(state, args) {
-      const { nodeID, propertyID, propertyValue } = args;
-      // FIXME should not be put in list if it is a list already
-      Vue.set(state.model[nodeID], propertyID, [propertyValue]);
-      // TODO complete this
-    },
-
-    /**
      * Add the given property ID to the given shape.
      * @param state
      * @param args
@@ -104,9 +92,7 @@ const shapeModule = {
       const { propertyID, shape } = args;
       // FIXME this assumes properties, not constraints or targetNodes or sth
       const p = shape[`${CUSTOM_URI}property`];
-      if (!p) {
-        shape[`${CUSTOM_URI}property`] = [];
-      }
+      if (!p) shape[`${CUSTOM_URI}property`] = [];
       shape[`${CUSTOM_URI}property`].push({ "@id": propertyID });
     },
 
@@ -140,6 +126,16 @@ const shapeModule = {
       shape[`${CUSTOM_URI}path`][0]["@id"] = `${EXAMPLE_URI}${name}`;
     },
 
+    /**
+     * TODO
+     * @param state
+     * @param args
+     */
+    setConstraintValue(state, args) {
+      const { shape, constraintID, value } = args;
+      Vue.set(shape, constraintID, value);
+    },
+
     /* DELETE ======================================================================================================= */
 
     /**
@@ -161,22 +157,42 @@ const shapeModule = {
     deletePropertyFromShape(state, args) {
       const { shape, propertyID } = args;
       const key = `${CUSTOM_URI}property`;
-
-      const properties = shape[key];
-      for (const p in properties) {
-        if (properties[p]["@id"] === propertyID) Vue.delete(properties, p);
-      }
-      Vue.set(shape, key, properties);
+      this.commit("deleteConstraintValue", {
+        shape,
+        constraintID: key,
+        constraintValue: propertyID
+      });
     },
 
     /**
      * TODO
-     * @param store
+     * @param state
      * @param args
      */
     deleteConstraintFromShape(state, args) {
       const { shape, constraint } = args;
+      console.log("deleteConstraintFromShape", shape["@id"], constraint);
       Vue.delete(shape, constraint);
+    },
+
+    /**
+     * TODO
+     * @param state
+     * @param args
+     */
+    deleteConstraintValue(state, args) {
+      const { shape, constraintID, constraintValue } = args;
+      const values = shape[constraintID];
+      for (const v in values) {
+        if (values[v]["@id"] === constraintValue) values.splice(v, 1);
+      }
+
+      // Delete the constraint from the shape if there are no values left. Otherwise, update the constraint value.
+      if (values.length === 0) {
+        Vue.delete(shape, constraintID);
+      } else {
+        this.commit("setConstraintValue", { shape, constraintID, value: values });
+      }
     }
   },
   actions: {
@@ -196,11 +212,7 @@ const shapeModule = {
       object[`${CUSTOM_URI}property`] = [];
       object[`${CUSTOM_URI}targetNode`] = [];
 
-      commit(
-        "addShape",
-        { object, bottomLefts: getters.allbottomLefts },
-        { root: true }
-      );
+      commit("addShape", { object, bottomLefts: getters.allbottomLefts });
     },
 
     /**
@@ -211,11 +223,7 @@ const shapeModule = {
     addPropertyShape({ commit, getters }, id) {
       const object = { "@id": id };
       object[`${CUSTOM_URI}path`] = [`${EXAMPLE_URI}${id}`];
-      commit(
-        "addShape",
-        { object, bottomLefts: getters.allbottomLefts },
-        { root: true }
-      );
+      commit("addShape", { object, bottomLefts: getters.allbottomLefts });
     },
 
     /* EDIT ========================================================================================================= */
@@ -235,7 +243,7 @@ const shapeModule = {
       if (oldID !== newURL) {
         // Update the shape's ID
         const index = getters.indexWithID(oldID);
-        commit("updateShapeID", { index, newID: newURL }, { root: true });
+        commit("updateShapeID", { index, newID: newURL });
 
         // Update Relationships TODO
         /*
@@ -249,7 +257,7 @@ const shapeModule = {
          */
 
         // Update the coordinates and y values.
-        commit("updateLocations", { oldID, newID: newURL }, { root: true });
+        commit("updateLocations", { oldID, newID: newURL });
       }
     },
 
@@ -265,20 +273,16 @@ const shapeModule = {
       // Update the state's shapes.
       const shape = getters.shapeWithID(oldID);
       commit("updatePropertyShapeID", { shape, newID });
-      for (const node of state.model) {
-        if (getters.shapeProperties(node["@id"]).indexOf(oldID) !== -1) {
-          commit("deletePropertyFromShape", { shape: node, propertyID: oldID });
-          commit("addPropertyIDToShape", { shape: node, propertyID: newID });
+      for (const shape of state.model) {
+        if (getters.shapeProperties(shape["@id"]).indexOf(oldID) !== -1) {
+          commit("deletePropertyFromShape", { shape, propertyID: oldID });
+          commit("addPropertyIDToShape", { shape, propertyID: newID });
         }
       }
-      commit("updateLocations", { oldID, newID }, { root: true });
+      commit("updateLocations", { oldID, newID });
       // Update the y values of the properties.
       for (const node of state.model) {
-        commit(
-          "updateYValues",
-          { nodeID: node["@id"], shapes: state.model },
-          { root: true }
-        );
+        commit("updateYValues", { nodeID: node["@id"], shapes: state.model });
       }
     },
 
@@ -290,8 +294,8 @@ const shapeModule = {
      * @param id
      */
     deleteNodeShape({ getters, commit }, id) {
-      commit("deleteShapeAtIndex", getters.indexWithID(id), { root: true });
-      commit("deleteShapeLocations", id, { root: true });
+      commit("deleteShapeAtIndex", getters.indexWithID(id));
+      commit("deleteShapeLocations", id);
     },
 
     /**
@@ -302,23 +306,13 @@ const shapeModule = {
     deletePropertyShape({ state, getters, commit }, id) {
       // Check every nodeShape if it contains the given property.
       for (const shape of state.model) {
-        const properties = shape[`${CUSTOM_URI}property`];
-
-        for (const p in properties) {
-          if (properties[p]["@id"] === id) {
-            // Delete the property from the node and update the y values.
-            properties.splice(p, 1);
-            commit(
-              "updateYValues",
-              { nodeID: shape["@id"], shapes: state.model },
-              { root: true }
-            );
-          }
+        if (getters.shapeProperties(shape["@id"]).indexOf(id) !== -1) {
+          commit("deletePropertyFromShape", { shape, propertyID: id });
         }
       }
       // Remove the property from the state
-      commit("deleteShapeAtIndex", getters.indexWithID(id), { root: true });
-      commit("deleteShapeLocations", id, { root: true });
+      commit("deleteShapeAtIndex", getters.indexWithID(id));
+      commit("deleteShapeLocations", id);
     }
   },
   getters: {
