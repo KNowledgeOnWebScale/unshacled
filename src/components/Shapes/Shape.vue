@@ -15,7 +15,7 @@
     >
       <v-rect :config="shapeConfig"></v-rect>
       <v-text
-        ref="nodeID"
+        ref="shapeID"
         :config="idTextConfig"
         @click="startEditing"
       ></v-text>
@@ -36,9 +36,10 @@
           :constraint-i-d="key"
           :shape="$props.id"
           :hover="hover"
+          :stroke="shapeConfig.stroke"
           :constraint-config="constraintConfigs[key]"
           :constraint-text-config="constraintTextConfigs[key]"
-          :delete-constraint-config="deleteConstrConfigs[key]"
+          :delete-constraint-config="deleteConstraintConfigs[key]"
         ></constraint>
       </div>
     </v-group>
@@ -46,6 +47,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 import Constraint from "./Constraint.vue";
 import ReactiveInput from "../FormElements/ReactiveInput.vue";
 import { urlToName } from "../../parsing/urlParser";
@@ -82,7 +84,7 @@ export default {
       adding: false,
       constraintConfigs: {},
       constraintTextConfigs: {},
-      deleteConstrConfigs: {},
+      deleteConstraintConfigs: {},
       shapeConfig: this.$props.nodeShape
         ? NODE_SHAPE_CONFIG
         : PROPERTY_SHAPE_CONFIG,
@@ -116,38 +118,47 @@ export default {
      */
     getConstraints() {
       const constraints = this.$store.getters.shapeConstraints(this.$props.id);
-      console.log("getConstraints", JSON.stringify(constraints, null, 2));
-      this.setConfigs(constraints, true);
+      this.setConfigs(constraints);
       return constraints;
+    },
+
+    /**
+     * Takes the coordinates from this node shape and calls store to update them.
+     */
+    updateCoordinates() {
+      const pos = this.$refs.posRef.getNode().position();
+      const args = {
+        node: this.$props.id,
+        x: pos.x,
+        y: pos.y
+      };
+      this.$store.commit("updateYValues", {
+        shapeID: this.$props.id,
+        shapes: this.$store.state.mShape.model
+      });
+      this.$store.commit("updateCoordinates", args);
     },
 
     /**
      * Set the configurations of its children using the updated y values from the state.
      * @param elements a dictionary containing the node shape's elements.
-     * @param constraints boolean value which indicates if the given elements are constraints.
      */
-    setConfigs(elements, constraints) {
+    setConfigs(elements) {
       const { id } = this.$props;
       const ys = this.$store.state.mShape.mCoordinate.yValues[id];
+
+      // FIXME
       for (const prop of Object.keys(elements)) {
-        // The properties should be listed below eachother.
-        if (constraints) {
-          this.constraintConfigs[prop] = {
-            ...this.constraintConfig,
-            y: ys[prop]
-          };
-        } else {
-          this.constraintConfigs[prop] = {
-            ...this.constraintConfig,
-            y: ys[prop]
-          };
-        }
+        this.constraintConfigs[prop] = {
+          ...this.constraintConfig,
+          y: ys[prop]
+        };
         this.constraintTextConfigs[prop] = {
           ...this.constraintTextConfig,
           y: ys[prop] + DELTA_Y_TEXT,
           text: prop
         };
-        this.deleteConstrConfigs[prop] = {
+        this.deleteConstraintConfigs[prop] = {
           ...this.deleteConstraintConfig,
           y: ys[prop] + DELTA_Y_DELETE
         };
@@ -169,7 +180,7 @@ export default {
      */
     startEditing() {
       if (this.$refs.reactiveInput)
-        this.$refs.reactiveInput.startEditing(this.$refs.nodeID.getNode());
+        this.$refs.reactiveInput.startEditing(this.$refs.shapeID.getNode());
     },
 
     /**
@@ -197,29 +208,10 @@ export default {
      */
     deleteShape() {
       if (this.$refs.reactiveInput) this.$refs.reactiveInput.stopEditing();
-      if (this.$props.nodeShape) {
-        this.$store.dispatch("deleteNodeShape", this.$props.id);
-      } else {
-        this.$store.dispatch("deletePropertyShape", this.$props.id);
-        console.log(JSON.stringify(this.$store.state.mShape, null, 2));
-      }
-    },
-
-    /**
-     * Takes the coordinates from this node shape and calls store to update them.
-     */
-    updateCoordinates() {
-      const pos = this.$refs.posRef.getNode().position();
-      const args = {
-        node: this.$props.id,
-        x: pos.x,
-        y: pos.y
-      };
-      this.$store.commit("updateYValues", {
-        nodeID: this.$props.id,
-        shapes: this.$store.state.mShape.model
-      });
-      this.$store.commit("updateCoordinates", args);
+      const action = this.$props.nodeShape
+        ? "deleteNodeShape"
+        : "deletePropertyShape";
+      this.$store.dispatch(action, this.$props.id);
     }
   }
 };

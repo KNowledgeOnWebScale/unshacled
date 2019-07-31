@@ -1,4 +1,4 @@
-import { CUSTOM_URI, EXAMPLE_URI } from "../util/constants";
+import { CUSTOM_URI } from "../util/constants";
 
 /**
  * This module contains everything to change the shape constraints.
@@ -10,54 +10,16 @@ const constraintModule = {
   actions: {
     /* ADD ========================================================================================================== */
 
-    /**
-     * Add a property with the given id and value to the node with the given id.
-     * @param store
-     * @param args
-     *              nodeID id of the node
-     *              propertyID id of the property we want to add
-     *              propertyValue object with the value of the property we want to add
-     */
-    addPropertyToNode({ getters, commit, rootState }, args) {
-      const { nodeID, propertyID } = args;
-
-      if (propertyID !== "") {
-        // Check if the new property name is already an existing PropertyShape.
-        if (!getters.propertyShapes[propertyID]) {
-          // If not, create a new PropertyShape that is a copy of the original one.
-          const property = { "@id": propertyID };
-          property[`${CUSTOM_URI}path`] = [
-            { "@id": `${EXAMPLE_URI}${propertyID}` }
-          ];
-
-          // Add the shape to the state.
-          commit(
-            "addShape",
-            { object: property, bottomLefts: getters.allbottomLefts },
-            { root: true }
-          ); // this works as intended
-        }
-
-        const shape = getters.shapeWithID(nodeID);
-        // Put the new value in the list of shape properties
-        commit("addPropertyIDToShape", { propertyID, shape }, { root: true });
-        // Update the y values
-        commit(
-          "updateYValues",
-          { nodeID, shapes: rootState.mShape.model },
-          { root: true }
-        );
-      }
-    },
-
     addPredicate({ getters, commit, rootState }, args) {
       const { shapeID, predicate, valueType } = args;
       console.log("valueType", valueType);
       // TODO if the value type is a list, then create a list if necessary and add the value to the list
 
       if (predicate.includes("property")) {
-        const argument = { nodeID: shapeID, propertyID: args.input };
-        this.dispatch("addPropertyToNode", argument);
+        this.dispatch("addPropertyToShape", {
+          shapeID,
+          propertyID: args.input
+        });
       }
       const obj = getters.shapeWithID(shapeID);
 
@@ -71,7 +33,7 @@ const constraintModule = {
       // Update the y values.
       commit(
         "updateYValues",
-        { nodeID: shapeID, shapes: rootState.mShape.model },
+        { shapeID, shapes: rootState.mShape.model },
         { root: true }
       );
       // Toggle the predicate modal.
@@ -81,7 +43,7 @@ const constraintModule = {
     /* EDIT ========================================================================================================= */
 
     /**
-     * Update the constraint value of the given node.
+     * Update the constraint value of the given shape.
      * @param rootGetters
      * @param commit
      * @param args
@@ -117,28 +79,28 @@ const constraintModule = {
       // Update the y values
       commit(
         "updateYValues",
-        { nodeID: shapeID, shapes: rootState.mShape.model },
+        { shapeID, shapes: rootState.mShape.model },
         { root: true }
       );
     }
   },
   getters: {
     /**
-     * Get a list of property ID's for the node with the given ID.
+     * Get a list of property ID's for the sahpe with the given ID.
      * @param state
      * @param getters
      * @param rootState
      * @returns {function(*): Array}
      */
     shapeProperties: (state, getters, rootState) => shapeID => {
-      let node;
-      for (const shape of rootState.mShape.model) {
-        if (shape["@id"] === shapeID) {
-          node = shape;
+      let shape;
+      for (const s of rootState.mShape.model) {
+        if (s["@id"] === shapeID) {
+          shape = s;
         }
       }
 
-      const propertyObjects = node[`${CUSTOM_URI}property`];
+      const propertyObjects = shape[`${CUSTOM_URI}property`];
       const properties = [];
 
       if (propertyObjects) {
@@ -153,7 +115,7 @@ const constraintModule = {
           `${CUSTOM_URI}property`,
           `${CUSTOM_URI}targetNode`
         ];
-        for (const p in node) {
+        for (const p in shape) {
           if (!ignored.includes(p)) properties.push(p[0]["@id"]);
         }
       }
@@ -169,26 +131,26 @@ const constraintModule = {
      */
     shapeConstraints: (state, getters, rootState) => shapeID => {
       const constraints = {};
-      let node;
-      for (const shape of rootState.mShape.model) {
-        if (shape["@id"] === shapeID) {
-          node = shape;
+      let shape;
+      for (const s of rootState.mShape.model) {
+        if (s["@id"] === shapeID) {
+          shape = s;
         }
       }
 
       const ignored = ["@id", "@type"];
-      for (const prop in node) {
+      for (const prop in shape) {
         // Only handle the constraints that are not ignored
         if (ignored.indexOf(prop) < 0) {
-          if (node[prop].length > 1) {
+          if (shape[prop].length > 1) {
             // Get the ID of every element in the list
             const properties = [];
-            for (const p of node[prop]) {
+            for (const p of shape[prop]) {
               properties.push(p["@id"]);
             }
             constraints[prop] = properties;
           } else {
-            constraints[prop] = node[prop];
+            constraints[prop] = shape[prop];
           }
         }
       }

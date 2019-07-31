@@ -1,6 +1,6 @@
 <template>
   <v-group>
-    <v-rect :config="this.$props.constraintConfig"></v-rect>
+    <v-rect :config="rectangleConfig"></v-rect>
     <v-text ref="key" :config="keyConfig"></v-text>
     <v-line :config="lineConfig"></v-line>
     <v-text ref="value" :config="valueConfig"></v-text>
@@ -35,6 +35,11 @@ export default {
       type: Boolean,
       required: true
     },
+    stroke: {
+      type: String,
+      required: false,
+      default: "black"
+    },
     constraintConfig: {
       type: Object,
       required: true
@@ -54,6 +59,10 @@ export default {
       lineConfig: {
         ...CONSTRAINT_SEPARATION_LINE,
         points: [x, y + HEIGHT, x + WIDTH, y + HEIGHT]
+      },
+      rectangleConfig: {
+        ...this.$props.constraintConfig,
+        stroke: this.$props.stroke
       },
       keyConfig: {
         ...this.$props.constraintTextConfig,

@@ -20,7 +20,6 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     editor: null,
-    // relationships: {}, // TODO remove this
     showNodeShapeModal: false,
     showClearModal: false,
     predicateModal: {
@@ -92,27 +91,6 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    /**
-     * Takes two keys from nodeshapes and uses them to add a relationship to the state
-     * @param state
-     * @param keys contains two keys, which can be queried using keys.one and keys.two.
-     */
-    /*
-    addRelationship(state, keys) {
-      Vue.set(state.relationships, keys.one + keys.two, {
-        "@id": keys.one + keys.two,
-        one: keys.one,
-        two: keys.two,
-        coords: [
-          state.coordinates[keys.two].x,
-          state.coordinates[keys.two].y,
-          state.coordinates[keys.one].y,
-          state.coordinates[keys.one].x
-        ]
-      });
-    },
-     */
-
     /**
      * Load in some example data.
      */

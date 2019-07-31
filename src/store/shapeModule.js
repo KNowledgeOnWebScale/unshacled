@@ -35,28 +35,26 @@ const shapeModule = {
      * @param args
      */
     setModel(state, args) {
-      let { model } = args;
+      const { model } = args;
       const { getters } = args;
 
       // Parse the model if necessary.
-      if (JSON.stringify(model).indexOf(SHACL_URI) !== -1) {
-        model = shaclToInternal(model);
-      }
-      console.log(JSON.stringify(model, null, 2));
-
-      state.model = model;
+      state.model =
+        JSON.stringify(model).indexOf(SHACL_URI) === -1
+          ? model
+          : shaclToInternal(model);
 
       // Update y values and set coordinates to zero
       for (const shape of state.model) {
         this.commit("updateYValues", {
-          nodeID: shape["@id"],
+          shapeID: shape["@id"],
           shapes: state.model
         });
         const { x, y } = getNonOverlappingCoordinates({
           coordinates: state.mCoordinate.coordinates,
           bottomLefts: getters.allbottomLefts
         });
-        this.commit("updateCoordinates", { node: shape["@id"], x, y });
+        this.commit("updateCoordinates", { shapeID: shape["@id"], x, y });
       }
     },
 
@@ -76,24 +74,9 @@ const shapeModule = {
       });
       Vue.set(state.mCoordinate.coordinates, object["@id"], { x, y });
       this.commit("updateYValues", {
-        nodeID: object["@id"],
+        shapeID: object["@id"],
         shapes: state.model
       });
-    },
-
-    /**
-     * Add the given property ID to the given shape.
-     * @param state
-     * @param args
-     *            propertyID the ID of the property that should be added.
-     *            shape the shape the property should be added to.
-     */
-    addPropertyIDToShape(state, args) {
-      const { propertyID, shape } = args;
-      // FIXME this assumes properties, not constraints or targetNodes or sth
-      const p = shape[`${CUSTOM_URI}property`];
-      if (!p) shape[`${CUSTOM_URI}property`] = [];
-      shape[`${CUSTOM_URI}property`].push({ "@id": propertyID });
     },
 
     /* EDIT ========================================================================================================= */
@@ -191,7 +174,11 @@ const shapeModule = {
       if (values.length === 0) {
         Vue.delete(shape, constraintID);
       } else {
-        this.commit("setConstraintValue", { shape, constraintID, value: values });
+        this.commit("setConstraintValue", {
+          shape,
+          constraintID,
+          value: values
+        });
       }
     }
   },
@@ -204,7 +191,6 @@ const shapeModule = {
      * @param id
      */
     addNodeShape({ commit, getters }, id) {
-      console.log(getters);
       const object = {
         "@id": id,
         "@type": [`${CUSTOM_URI}NodeShape`]
@@ -241,22 +227,9 @@ const shapeModule = {
 
       // If the ID has changed
       if (oldID !== newURL) {
-        // Update the shape's ID
+        // Update the shape's ID and locations
         const index = getters.indexWithID(oldID);
         commit("updateShapeID", { index, newID: newURL });
-
-        // Update Relationships TODO
-        /*
-        for (let prop in state.relationships) {
-          if (state.relationships[prop].one === oldID)
-            state.relationships[prop].one = newID;
-          if (state.relationships[prop].two === oldID)
-            state.relationships[prop].two = newID;
-          prop = state.relationships[prop].one + state.relationships[prop].two;
-        }
-         */
-
-        // Update the coordinates and y values.
         commit("updateLocations", { oldID, newID: newURL });
       }
     },
@@ -281,8 +254,8 @@ const shapeModule = {
       }
       commit("updateLocations", { oldID, newID });
       // Update the y values of the properties.
-      for (const node of state.model) {
-        commit("updateYValues", { nodeID: node["@id"], shapes: state.model });
+      for (const shape of state.model) {
+        commit("updateYValues", { shapeID: shape["@id"], shapes: state.model });
       }
     },
 
