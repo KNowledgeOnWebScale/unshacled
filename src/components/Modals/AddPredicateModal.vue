@@ -27,15 +27,19 @@
         </sui-form-field>
 
         <sui-form-field v-if="predicate" class="field">
-          <label for="valueInput">Value</label>
-          <input id="valueInput" v-model="input" list="datalist" />
-          <datalist v-if="predicate === 'property'" id="datalist" type="text">
+          <label>Value</label>
+          <input v-if="showString()" v-model="input" type="text" />
+          <input v-if="showCheckbox()" v-model="input" type="checkbox" />
+          <input v-if="showInteger()" v-model="input" type="number" />
+          <input v-if="showShapes()" v-model="input" list="datalist" />
+          <datalist v-if="showShapes()" id="datalist" type="text">
             <option
               v-for="key in getOptions()"
               :key="getOptionID(key)"
               :value="getOptionID(key)"
             ></option>
           </datalist>
+          <input v-if="showOther()" v-model="input" />
         </sui-form-field>
       </sui-form>
 
@@ -113,17 +117,43 @@ export default {
       return `${this.urls[this.predicate]}#${this.predicate}`;
     },
 
+    showCheckbox() {
+      return this.constraintType === "boolean";
+    },
+    showInteger() {
+      return this.constraintType === "integer";
+    },
+    showString() {
+      return this.constraintType === "string";
+    },
+    showShapes() {
+      const possibilities = ["Property", "PropertyShape", "NodeShape", "Shape"];
+      return (
+        possibilities.includes(this.constraintType) ||
+        this.predicate === "property"
+      );
+    },
+    showOther() {
+      return !(
+        this.showCheckbox() ||
+        this.showInteger() ||
+        this.showString() ||
+        this.showShapes()
+      );
+    },
+
     /**
      * Select the object given the selected predicate, assuming that there's only one possible object.
      */
     selectObject() {
+      // Reset the constraintType and input values.
+      this.constraintType = "";
+      this.input = "";
+
       if (this.predicate) {
         this.object = this.$store.getters.objects(this.predicateUrl())[0];
         const typeUrl = getConstraintValueType(this.predicateUrl());
-        if (typeUrl) {
-          this.constraintType = urlToName(typeUrl);
-          console.log(this.constraintType);
-        }
+        if (typeUrl) this.constraintType = urlToName(typeUrl);
       } else {
         this.object = "";
       }
@@ -165,10 +195,14 @@ export default {
 
     /**
      * Get the possible options for the datalist object.
-     * @returns {getters.propertyShapes}
+     * @returns {*}
      */
     getOptions() {
-      return this.$store.getters.propertyShapes;
+      const ct = this.constraintType.toLocaleLowerCase();
+      if (ct.includes("property")) return this.$store.getters.propertyShapes;
+      if (ct.includes("node")) return this.$store.getters.nodeShapes;
+      if (ct.includes("shape")) return this.$store.getters.shapes;
+      return [];
     },
 
     /**
