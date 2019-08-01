@@ -27,7 +27,6 @@ const constraintModule = {
         value: shape[predicate]
       });
 
-      console.log(predicate);
       if (predicate.includes("property")) {
         dispatch("addPropertyShape", input);
       }

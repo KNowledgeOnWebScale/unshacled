@@ -11,8 +11,9 @@
             <label>Filename</label>
             <input v-model="filename" />
             .
-            <select v-model="extension">
+            <select v-model="extension" class="field ui fluid dropdown">
               <option>json</option>
+              <option disabled>ttl</option>
             </select>
           </sui-form-field>
         </sui-form>
