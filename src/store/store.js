@@ -22,6 +22,8 @@ export default new Vuex.Store({
     editor: null,
     showNodeShapeModal: false,
     showClearModal: false,
+    showExportModal: false,
+    exportType: "",
     predicateModal: {
       show: false,
       id: String,
@@ -50,7 +52,7 @@ export default new Vuex.Store({
     /* MODALS ======================================================================================================= */
 
     /**
-     * TODO
+     * Show the validation report modal.
      * @param state
      */
     toggleValidationReport(state) {
@@ -75,6 +77,12 @@ export default new Vuex.Store({
     toggleClearModal(state) {
       event.preventDefault();
       state.showClearModal = !state.showClearModal;
+    },
+
+    toggleExportModal(state, type) {
+      this.state.exportType = type;
+      event.preventDefault();
+      state.showExportModal = !state.showExportModal;
     },
 
     /**
@@ -129,7 +137,7 @@ export default new Vuex.Store({
     },
 
     /**
-     * TODO
+     * Get the possible predicates for the given value type.
      * @returns {function(*): string[]}
      */
     predicates: () => type => {
@@ -137,7 +145,7 @@ export default new Vuex.Store({
     },
 
     /**
-     * TODO
+     * Get the possible object for the currently set predicate.
      * @param state
      * @returns {string[]}
      */

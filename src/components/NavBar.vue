@@ -25,8 +25,9 @@
             />
           </sui-dropdown-item>
 
-          <!-- TODO this has no function yet -->
-          <sui-dropdown-item>Export Shapes</sui-dropdown-item>
+          <sui-dropdown-item @click="exportFile(shacl)">
+            Export as SHACL
+          </sui-dropdown-item>
 
           <sui-dropdown-divider></sui-dropdown-divider>
 
@@ -63,6 +64,7 @@
 
     <clear-modal></clear-modal>
     <no-data-file-modal></no-data-file-modal>
+    <export-modal></export-modal>
     <validation-report-modal></validation-report-modal>
 
     <add-predicate-modal
@@ -75,15 +77,21 @@
 <script>
 import SuiDropdown from "semantic-ui-vue/dist/commonjs/modules/Dropdown/Dropdown";
 import SuiDropdownDivider from "semantic-ui-vue/dist/commonjs/modules/Dropdown/DropdownDivider";
+
+// Modals
 import ClearModal from "./Modals/ClearModal.vue";
 import NodeShapeModal from "./Modals/NodeShapeModal.vue";
 import ValidationReportModal from "./Modals/ValidationReportModal.vue";
 import AddPredicateModal from "./Modals/AddPredicateModal.vue";
 import NoDataFileModal from "./Modals/NoDataFileModal.vue";
+import ExportModal from "./Modals/ExportModal.vue";
+
+import languages from "../util/enums/languages";
 
 export default {
   name: "NavBar",
   components: {
+    ExportModal,
     NoDataFileModal,
     ClearModal,
     NodeShapeModal,
@@ -94,7 +102,9 @@ export default {
   },
   data() {
     return {
-      createPropertyShape: false
+      createPropertyShape: false,
+      shacl: languages.SHACL,
+      shex: languages.SHEX
     };
   },
   methods: {
@@ -115,6 +125,9 @@ export default {
     readTextFile() {
       const file = document.getElementById("file").files[0];
       this.$store.commit("uploadSchemaFile", file);
+    },
+    exportFile(type) {
+      this.$store.commit("toggleExportModal", type);
     },
     uploadDataFile() {
       const file = document.getElementById("dataFile").files[0];

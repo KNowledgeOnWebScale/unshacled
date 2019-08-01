@@ -12,7 +12,6 @@ const constraintModule = {
 
     addPredicate({ getters, commit, dispatch, rootState }, args) {
       const { shapeID, predicate, valueType, input, object } = args;
-      // TODO if the value type is a list, then create a list if necessary and add the value to the list
       const shape = getters.shapeWithID(shapeID);
 
       // Add the predicate to the shape.
@@ -66,11 +65,13 @@ const constraintModule = {
     /* DELETE ======================================================================================================= */
 
     /**
-     * TODO
+     * Delete the given constraint from the given shape.
      * @param store
      * @param args
+     *            shapeID the ID of the shape from which the constraint should be removed.
+     *            constraint the ID of the constraint that should be removed.
      */
-    deleteConstraintFromShape({ getters, commit, rootState }, args) {
+    deleteConstraintFromShapeWithID({ getters, commit, rootState }, args) {
       const { shapeID, constraint } = args;
       const shape = getters.shapeWithID(shapeID);
       commit(
@@ -82,14 +83,14 @@ const constraintModule = {
       // Update the y values
       commit(
         "updateYValues",
-        { shapeID, shapes: rootState.mShape.model },
+        { shape, shapes: rootState.mShape.model },
         { root: true }
       );
     }
   },
   getters: {
     /**
-     * Get a list of property ID's for the sahpe with the given ID.
+     * Get a list of property ID's for the shape with the given ID.
      * @param state
      * @param getters
      * @param rootState
@@ -122,37 +123,42 @@ const constraintModule = {
 
     /**
      * Get a map of the constraints of the shape with the given ID.
-     * @param state
-     * @param getters
-     * @param rootState
+     * @param _state
+     * @param _getters
+     * @param _rootState
+     * @param rootGetters
      * @returns {Function}
      */
-    shapeConstraints: (state, getters, rootState) => shapeID => {
+    shapeConstraints: (
+      _state,
+      _getters,
+      _rootState,
+      rootGetters
+    ) => shapeID => {
       const constraints = {};
-      let shape;
-      for (const s of rootState.mShape.model) {
-        if (s["@id"] === shapeID) {
-          shape = s;
-        }
-      }
+      const shape = rootGetters.shapeWithID(shapeID);
 
-      const ignored = ["@id", "@type"];
-      for (const prop in shape) {
-        // Only handle the constraints that are not ignored
-        if (ignored.indexOf(prop) < 0) {
-          if (shape[prop].length > 1) {
-            // Get the ID of every element in the list
-            const properties = [];
-            for (const p of shape[prop]) {
-              properties.push(p["@id"]);
+      if (shape) {
+        const ignored = ["@id", "@type"];
+        for (const prop in shape) {
+          // Only handle the constraints that are not ignored
+          if (ignored.indexOf(prop) < 0) {
+            if (shape[prop].length > 1) {
+              // Get the ID of every element in the list
+              const properties = [];
+              for (const p of shape[prop]) {
+                properties.push(p["@id"]);
+              }
+              constraints[prop] = properties;
+            } else {
+              constraints[prop] = shape[prop];
             }
-            constraints[prop] = properties;
-          } else {
-            constraints[prop] = shape[prop];
           }
         }
+        return constraints;
+      } else {
+        return undefined;
       }
-      return constraints;
     }
   }
 };

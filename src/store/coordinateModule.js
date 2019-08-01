@@ -9,11 +9,11 @@ const coordinateModule = {
   },
   mutations: {
     /**
-     * Update the coordinates and values of the given shape.
+     * Update the coordinates and values of the given shapeID.
      * @param state
      * @param args
-     *            oldID the shape's old ID.
-     *            newID the shape's new ID.
+     *            oldID the shapeID's old ID.
+     *            newID the shapeID's new ID.
      */
     updateLocations(state, args) {
       const { oldID, newID } = args;
@@ -28,7 +28,7 @@ const coordinateModule = {
     },
 
     /**
-     * Delete the coordinates and y values of the shape with the given id.
+     * Delete the coordinates and y values of the shapeID with the given id.
      * @param state
      * @param id
      */
@@ -38,7 +38,7 @@ const coordinateModule = {
     },
 
     /**
-     * Update the y values of the properties of the given shape.
+     * Update the y values of the properties of the given shapeID.
      * @param state
      * @param args
      */
@@ -73,10 +73,10 @@ const coordinateModule = {
     },
 
     /**
-     * Update the coordinates of the given shape.
+     * Update the coordinates of the given shapeID.
      * @param state
      * @param args
-     *    shapeID: the ID of the shape whose location should be updated.
+     *    shapeID: the ID of the shapeID whose location should be updated.
      *    x: the new x coordinate.
      *    y: the new y coordinate.
      */
@@ -97,7 +97,7 @@ const coordinateModule = {
   actions: {},
   getters: {
     /**
-     * Get the bottom right coordinate of the shape with the given ID.
+     * Get the bottom right coordinate of the shapeID with the given ID.
      * @param state
      * @returns {function(*): {x: *, y: *}}
      */
