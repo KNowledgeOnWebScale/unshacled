@@ -1,4 +1,4 @@
-import { CUSTOM_URI } from "../util/constants";
+import { TERM } from "../translation/terminology";
 
 /**
  * This module contains everything to change the shape constraints.
@@ -103,7 +103,7 @@ const constraintModule = {
         }
       }
 
-      const propertyObjects = shape[`${CUSTOM_URI}property`];
+      const propertyObjects = shape[TERM.property];
       const properties = [];
 
       if (propertyObjects) {
@@ -112,12 +112,7 @@ const constraintModule = {
           properties.push(p["@id"]);
         }
         // Get the other properties
-        const ignored = [
-          "@id",
-          "@type",
-          `${CUSTOM_URI}property`,
-          `${CUSTOM_URI}targetNode`
-        ];
+        const ignored = ["@id", "@type", TERM.property, TERM.targetNode];
         for (const p in shape) {
           if (!ignored.includes(p)) properties.push(p[0]["@id"]);
         }

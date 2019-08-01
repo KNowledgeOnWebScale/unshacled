@@ -1,4 +1,4 @@
-import traverse from "Traverse";
+import traverse from "../util/traverse";
 import dictionary from "./shaclDictionary";
 /**
  *  ShaclTranslator class translates SHACL JSON-LD to an internal model and back

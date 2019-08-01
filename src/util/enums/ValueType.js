@@ -1,38 +1,33 @@
-import { CUSTOM_URI } from "../constants";
+import { TERM } from "../../translation/terminology";
 
 const ids = new Set([
-  `${CUSTOM_URI}path`,
-  `${CUSTOM_URI}class`,
-  `${CUSTOM_URI}property`,
-  `${CUSTOM_URI}targetNode`,
-  `${CUSTOM_URI}datatype`,
-  `${CUSTOM_URI}nodeKind`,
-  `${CUSTOM_URI}targetObjectsOf`,
-  `${CUSTOM_URI}equals`,
-  `${CUSTOM_URI}disjoint`,
-  `${CUSTOM_URI}lessThan`,
-  `${CUSTOM_URI}lessThanOrEquals`,
-  `${CUSTOM_URI}not`,
-  `${CUSTOM_URI}targetClass`,
-  `${CUSTOM_URI}node`
+  TERM.id,
+  TERM.class,
+  TERM.property,
+  TERM.targetNode,
+  TERM.datatype,
+  TERM.nodeKind,
+  TERM.targetObjectsOf,
+  TERM.equals,
+  TERM.disjoint,
+  TERM.lessThan,
+  TERM.lessThanOrEquals,
+  TERM.not,
+  TERM.targetClass,
+  TERM.node
 ]);
 const types = new Set([
-  `${CUSTOM_URI}minCount`,
-  `${CUSTOM_URI}maxCount`,
-  `${CUSTOM_URI}minExclusive`,
-  `${CUSTOM_URI}maxExclusive`,
-  `${CUSTOM_URI}minInclusive`,
-  `${CUSTOM_URI}maxInclusive`,
-  `${CUSTOM_URI}minLength`,
-  `${CUSTOM_URI}maxLength`,
-  `${CUSTOM_URI}uniqueLang`
+  TERM.minCount,
+  TERM.maxCount,
+  TERM.minExclusive,
+  TERM.maxExclusive,
+  TERM.minInclusive,
+  TERM.maxInclusive,
+  TERM.minLength,
+  TERM.maxLength,
+  TERM.uniqueLang
 ]);
-const lists = new Set([
-  `${CUSTOM_URI}languageIn`,
-  `${CUSTOM_URI}and`,
-  `${CUSTOM_URI}or`,
-  `${CUSTOM_URI}xone`
-]);
+const lists = new Set([TERM.languageIn, TERM.and, TERM.or, TERM.xone]);
 
 /**
  * TODO

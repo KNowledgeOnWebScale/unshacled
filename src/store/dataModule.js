@@ -5,8 +5,6 @@ import SerializerManager from "../parsing/serializerManager";
 import ValidatorManager from "../validation/validatorManager";
 import language from "../util/enums/languages";
 import getConstraints from "../util/constraintSelector";
-import shaclToInternal from "../parsing/internalParser";
-import {SHACL_URI} from "../util/constants";
 
 /**
  * This module contains everything to handle data imports/exports and validation.
