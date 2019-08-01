@@ -38,89 +38,51 @@ const coordinateModule = {
     },
 
     /**
-     * Update the y values of the properties of the given node.
+     * Update the y values of the properties of the given shape.
      * @param state
      * @param args
      */
     updateYValues(state, args) {
-      const { nodeID, shapes } = args;
+      const { shapeID, shapes } = args;
       // Update the y values of the properties.
-      Vue.set(state.yValues, nodeID, {});
+      Vue.set(state.yValues, shapeID, {});
 
-      let node;
+      let shape;
       for (const item of shapes) {
-        if (item["@id"] === nodeID) node = item;
-      }
-
-      // FIXME code duplication, find a way to use `shapeProperties`
-      const propertyObjects =
-        node["https://2019.summerofcode.be/unshacled#property"];
-
-      // Get the references to property shapes.
-      const properties = [];
-      if (propertyObjects) {
-        for (const p of propertyObjects) properties.push(p["@id"]);
+        if (item["@id"] === shapeID) shape = item;
       }
 
       // The other properties.
-      const ignored = [
-        "@id",
-        "@type",
-        "https://2019.summerofcode.be/unshacled#property"
-      ];
+      const ignored = ["@id", "@type"];
 
       // Get the IDs form all the constraints.
       const constraints = [];
-      for (const c in node) {
+      for (const c in shape) {
         if (!ignored.includes(c)) constraints.push(c);
-      }
-
-      // Get the IDs from all the properties.
-      for (const p in node) {
-        if (!ignored.includes(p)) properties.push(p[0]["@id"]);
       }
 
       // Calculate their y values.
       let i = 1;
       for (const con of constraints) {
-        Vue.set(state.yValues[nodeID], con, i * HEIGHT);
+        Vue.set(state.yValues[shapeID], con, i * HEIGHT);
         i += 2; // Constraints need twice the height.
       }
-      for (const prop of properties) {
-        Vue.set(state.yValues[nodeID], prop, i * HEIGHT);
-        i += 1;
-      }
+
       // Set the bottom right coordinate.
-      state.bottom[nodeID] = i * HEIGHT;
+      state.bottom[shapeID] = i * HEIGHT;
     },
 
     /**
      * Update the coordinates of the given shape.
      * @param state
      * @param args
-     *    node: the ID of the node shape whose location should be updated.
+     *    shapeID: the ID of the shape whose location should be updated.
      *    x: the new x coordinate.
      *    y: the new y coordinate.
      */
     updateCoordinates(state, args) {
-      const { node, x, y } = args;
-      const coords = { x, y };
-      Vue.set(state.coordinates, node, coords);
-
-      /*
-      for (const prop in state.relationships) {
-        if (prop.includes(node)) {
-          const changedKey = node;
-          const otherKey = prop.replace(changedKey, "");
-          state.relationships[prop].coords = [
-            state.coordinates[otherKey].x,
-            state.coordinates[otherKey].y,
-            state.coordinates[changedKey].x,
-            state.coordinates[changedKey].y
-          ];
-        }
-      }
-       */
+      const { shapeID, x, y } = args;
+      Vue.set(state.coordinates, shapeID, { x, y });
     },
 
     /**

@@ -6,7 +6,7 @@ import language from "./enums/languages";
  * @param input
  * @returns {*}
  */
-export function getConstraints(input) {
+export default function getConstraints(input) {
   switch (input) {
     case language.SHACL:
       return groupedConstraints;

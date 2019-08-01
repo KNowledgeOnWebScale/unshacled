@@ -1,4 +1,4 @@
-export const EXAMPLE_URL = "http://example.org/ns#";
+import { EXAMPLE_URI } from "../util/constants";
 
 /**
  * Takes the name out of an url if possible.
@@ -28,5 +28,5 @@ export function extractUrl(string) {
  * @returns {string}
  */
 export function createUrl(id) {
-  return EXAMPLE_URL + id;
+  return EXAMPLE_URI + id;
 }

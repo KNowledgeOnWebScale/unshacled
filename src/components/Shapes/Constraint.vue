@@ -1,19 +1,24 @@
 <template>
   <v-group>
-    <v-rect :config="this.$props.constraintConfig"></v-rect>
+    <v-rect :config="rectangleConfig"></v-rect>
     <v-text ref="key" :config="keyConfig"></v-text>
+    <v-line :config="lineConfig"></v-line>
     <v-text ref="value" :config="valueConfig"></v-text>
     <v-circle
       v-if="this.$props.hover"
-      :config="this.$props.deletePropConfig"
+      :config="this.$props.deleteConstraintConfig"
       @click="deleteConstraint"
     ></v-circle>
   </v-group>
 </template>
 
 <script>
-import { HEIGHT } from "../../util/konvaConfigs";
-import { urlToName } from "../../util/urlParser";
+import {
+  HEIGHT,
+  CONSTRAINT_SEPARATION_LINE,
+  WIDTH
+} from "../../util/konvaConfigs";
+import { urlToName } from "../../parsing/urlParser";
 
 export default {
   name: "Constraint",
@@ -30,32 +35,54 @@ export default {
       type: Boolean,
       required: true
     },
+    stroke: {
+      type: String,
+      required: false,
+      default: "black"
+    },
     constraintConfig: {
       type: Object,
       required: true
     },
-    propTextConfig: {
+    constraintTextConfig: {
       type: Object,
       required: true
     },
-    deletePropConfig: {
+    deleteConstraintConfig: {
       type: Object,
       required: true
     }
   },
   data() {
+    const { x, y } = this.$props.constraintConfig;
     return {
+      lineConfig: {
+        ...CONSTRAINT_SEPARATION_LINE,
+        points: [x, y + HEIGHT, x + WIDTH, y + HEIGHT] // [x1, y1, x2, y2]
+      },
+      rectangleConfig: {
+        ...this.$props.constraintConfig,
+        stroke: this.$props.stroke
+      },
       keyConfig: {
-        ...this.$props.propTextConfig,
+        ...this.$props.constraintTextConfig,
         fontStyle: "italic",
         text: urlToName(this.$props.constraintID)
       },
       valueConfig: {
-        ...this.$props.propTextConfig,
-        y: this.$props.propTextConfig.y + HEIGHT,
+        ...this.$props.constraintTextConfig,
+        y: this.$props.constraintTextConfig.y + HEIGHT,
         text: this.getConstraintValue()
       }
     };
+  },
+  mounted() {
+    const self = this;
+    // Update the text value whenever the shape has changed.
+    this.$store.watch(
+      () => self.$store.getters.shapeConstraints(self.$props.shape),
+      () => self.updateConfigs()
+    );
   },
   methods: {
     /**
@@ -97,6 +124,20 @@ export default {
         // Get the value.
         return value[0]["@value"];
       }
+    },
+
+    /**
+     * Update the text values.
+     */
+    updateConfigs() {
+      this.keyConfig = {
+        ...this.keyConfig,
+        text: urlToName(this.$props.constraintID)
+      };
+      this.valueConfig = {
+        ...this.valueConfig,
+        text: this.getConstraintValue()
+      };
     }
   }
 };

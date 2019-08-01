@@ -1,5 +1,4 @@
-import Vue from "vue";
-import { urlToName } from "../util/urlParser";
+import { CUSTOM_URI } from "../util/constants";
 
 /**
  * This module contains everything to change the shape constraints.
@@ -11,68 +10,33 @@ const constraintModule = {
   actions: {
     /* ADD ========================================================================================================== */
 
-    /**
-     * Add a property with the given id and value to the node with the given id.
-     * @param store
-     * @param args
-     *              nodeID id of the node
-     *              propertyID id of the property we want to add
-     *              propertyValue object with the value of the property we want to add
-     */
-    addPropertyToNode({ getters, commit, rootState }, args) {
-      const { nodeID, propertyID } = args;
+    addPredicate({ getters, commit, dispatch, rootState }, args) {
+      const { shapeID, predicate, valueType, input, object } = args;
+      // TODO if the value type is a list, then create a list if necessary and add the value to the list
+      const shape = getters.shapeWithID(shapeID);
 
-      if (propertyID !== "") {
-        // Check if the new property name is already an existing PropertyShape.
-        if (!getters.propertyShapes[propertyID]) {
-          // If not, create a new PropertyShape that is a copy of the original one.
-          const property = {
-            "@id": propertyID,
-            "https://2019.summerofcode.be/unshacled#path": [
-              { "@id": `http://example.org/ns#${propertyID}` }
-            ]
-          };
+      // Add the predicate to the shape.
+      if (!shape[predicate]) shape[predicate] = [];
+      const value =
+        valueType === "id" || valueType === "lists"
+          ? { "@id": input }
+          : { "@type": object, "@value": input };
+      shape[predicate].push(value);
+      commit("setConstraintValue", {
+        shape,
+        constraintID: predicate,
+        value: shape[predicate]
+      });
 
-          // Add the shape to the state.
-          commit(
-            "addShape",
-            { object: property, bottomLefts: getters.allbottomLefts },
-            { root: true }
-          ); // this works as intended
-        }
-
-        const shape = getters.shapeWithID(nodeID);
-        // Put the new value in the list of shape properties
-        commit("addPropertyIDToShape", { propertyID, shape }, { root: true });
-        // Update the y values
-        commit(
-          "updateYValues",
-          { nodeID, shapes: rootState.mShape.model },
-          { root: true }
-        );
-      }
-    },
-
-    addPredicate({ getters, commit, rootState }, args) {
-      const { shapeID, predicate, valueType } = args;
-
+      console.log(predicate);
       if (predicate.includes("property")) {
-        const argument = { nodeID: shapeID, propertyID: args.input };
-        this.dispatch("addPropertyToNode", argument);
-      }
-      const obj = getters.shapeWithID(shapeID);
-
-      if (valueType === "id" || valueType === "lists") {
-        obj[predicate] = [{ "@id": args.input }];
-      }
-      if (valueType === "type") {
-        obj[predicate] = [{ "@type": args.object, "@value": args.input }];
+        dispatch("addPropertyShape", input);
       }
 
       // Update the y values.
       commit(
         "updateYValues",
-        { nodeID: shapeID, shapes: rootState.mShape.model },
+        { shapeID, shapes: rootState.mShape.model },
         { root: true }
       );
       // Toggle the predicate modal.
@@ -82,84 +46,24 @@ const constraintModule = {
     /* EDIT ========================================================================================================= */
 
     /**
-     * Edit the given property in the given node shape.
-     * If the new property ID already exists, this will make a copy
-     * @param store
+     * Update the constraint value of the given shape.
+     * @param rootGetters
+     * @param commit
      * @param args
+     *            shapeID the ID of the shape.
+     *            constraintID the ID of the constraint we want to update.
+     *            value the new value of the given constraint.
      */
-    editPropertyInNode({ getters, commit, rootState }, args) {
-      const { nodeID, oldID, newID } = args;
-
-      // Check if the new property name is already an existing PropertyShape.
-      if (!getters.propertyShapes[newID]) {
-        // If not, create a new PropertyShape that is a copy of the original one.
-        const copied = Vue.util.extend({}, getters.propertyShapes[oldID]);
-        copied["@id"] = newID;
-
-        const name = urlToName(newID);
-        copied["https://2019.summerofcode.be/unshacled#path"][0][
-          "@id"
-        ] = `http://example.org/ns#${name}`; // TODO dromedarisCaseOrSomething
-
-        // Add the shape to the state.
-        commit(
-          "addShape",
-          { object: copied, bottomLefts: getters.allbottomLefts },
-          { root: true }
-        );
-      }
-
-      const shape = getters.shapeWithID(nodeID);
-      // Put the new value in the list of shape properties
-      commit(
-        "addPropertyIDToShape",
-        { propertyID: newID, shape },
-        { root: true }
-      );
-      // Remove the old value from the list of shape properties.
-      commit(
-        "deletePropertyFromShape",
-        { shape, propertyID: oldID },
-        { root: true }
-      );
-      // Update the y values
-      commit(
-        "updateYValues",
-        { nodeID, shapes: rootState.mShape.model },
-        { root: true }
-      );
+    updateConstraint({ rootGetters, commit }, args) {
+      const { shapeID, constraintID, value } = args;
+      commit("setConstraintValue", {
+        shape: rootGetters.shapeWithID(shapeID),
+        constraintID,
+        value
+      });
     },
 
     /* DELETE ======================================================================================================= */
-
-    /**
-     * Delete the given property from the given node shape.
-     * @param store
-     * @param args
-     *            node the id of the node shape
-     *            prop the id of the property that should be removed from the shape
-     */
-    deletePropFromNode({ getters, commit, rootState }, args) {
-      const { node, prop } = args;
-
-      const shape = getters.shapeWithID(node);
-      const properties =
-        shape["https://2019.summerofcode.be/unshacled#property"];
-
-      for (const p in properties) {
-        if (properties[p]["@id"] === prop) {
-          // Delete the property from the node and update the y values.
-          properties.splice(p, 1);
-        }
-      }
-
-      // Update the y values
-      commit(
-        "updateYValues",
-        { nodeID: node, shapes: rootState.mShape.model },
-        { root: true }
-      );
-    },
 
     /**
      * TODO
@@ -178,29 +82,28 @@ const constraintModule = {
       // Update the y values
       commit(
         "updateYValues",
-        { nodeID: shapeID, shapes: rootState.mShape.model },
+        { shapeID, shapes: rootState.mShape.model },
         { root: true }
       );
     }
   },
   getters: {
     /**
-     * Get a list of property ID's for the node with the given ID.
+     * Get a list of property ID's for the sahpe with the given ID.
      * @param state
      * @param getters
      * @param rootState
      * @returns {function(*): Array}
      */
     shapeProperties: (state, getters, rootState) => shapeID => {
-      let node;
-      for (const shape of rootState.mShape.model) {
-        if (shape["@id"] === shapeID) {
-          node = shape;
+      let shape;
+      for (const s of rootState.mShape.model) {
+        if (s["@id"] === shapeID) {
+          shape = s;
         }
       }
 
-      const propertyObjects =
-        node["https://2019.summerofcode.be/unshacled#property"];
+      const propertyObjects = shape[`${CUSTOM_URI}property`];
       const properties = [];
 
       if (propertyObjects) {
@@ -212,10 +115,10 @@ const constraintModule = {
         const ignored = [
           "@id",
           "@type",
-          "https://2019.summerofcode.be/unshacled#property",
-          "https://2019.summerofcode.be/unshacled#targetNode"
+          `${CUSTOM_URI}property`,
+          `${CUSTOM_URI}targetNode`
         ];
-        for (const p in node) {
+        for (const p in shape) {
           if (!ignored.includes(p)) properties.push(p[0]["@id"]);
         }
       }
@@ -231,30 +134,26 @@ const constraintModule = {
      */
     shapeConstraints: (state, getters, rootState) => shapeID => {
       const constraints = {};
-      let node;
-      for (const shape of rootState.mShape.model) {
-        if (shape["@id"] === shapeID) {
-          node = shape;
+      let shape;
+      for (const s of rootState.mShape.model) {
+        if (s["@id"] === shapeID) {
+          shape = s;
         }
       }
 
-      const ignored = [
-        "@id",
-        "@type",
-        "https://2019.summerofcode.be/unshacled#property"
-      ];
-      for (const prop in node) {
+      const ignored = ["@id", "@type"];
+      for (const prop in shape) {
         // Only handle the constraints that are not ignored
         if (ignored.indexOf(prop) < 0) {
-          if (node[prop].length > 1) {
+          if (shape[prop].length > 1) {
             // Get the ID of every element in the list
             const properties = [];
-            for (const p of node[prop]) {
+            for (const p of shape[prop]) {
               properties.push(p["@id"]);
             }
             constraints[prop] = properties;
           } else {
-            constraints[prop] = node[prop];
+            constraints[prop] = shape[prop];
           }
         }
       }

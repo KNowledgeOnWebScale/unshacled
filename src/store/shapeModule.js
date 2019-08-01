@@ -1,8 +1,10 @@
 import Vue from "vue";
 import constraintModule from "./constraintModule";
-import { extractUrl, urlToName } from "../util/urlParser";
+import { extractUrl, urlToName } from "../parsing/urlParser";
 import { getNonOverlappingCoordinates } from "../util";
 import coordinateModule from "./coordinateModule";
+import { CUSTOM_URI, EXAMPLE_URI, SHACL_URI } from "../util/constants";
+import shaclToInternal from "../parsing/internalParser";
 
 /**
  * This module contains everything to change the shapes.
@@ -28,25 +30,31 @@ const shapeModule = {
     },
 
     /**
-     * Set the model to the given value.
+     * Set the model to the given value. Parse to internal value if necessary.
      * @param state
      * @param args
      */
     setModel(state, args) {
-      const { model, getters } = args;
-      state.model = model;
+      const { model } = args;
+      const { getters } = args;
+
+      // Parse the model if necessary.
+      state.model =
+        JSON.stringify(model).indexOf(SHACL_URI) === -1
+          ? model
+          : shaclToInternal(model);
 
       // Update y values and set coordinates to zero
       for (const shape of state.model) {
         this.commit("updateYValues", {
-          nodeID: shape["@id"],
+          shapeID: shape["@id"],
           shapes: state.model
         });
         const { x, y } = getNonOverlappingCoordinates({
           coordinates: state.mCoordinate.coordinates,
           bottomLefts: getters.allbottomLefts
         });
-        this.commit("updateCoordinates", { node: shape["@id"], x, y });
+        this.commit("updateCoordinates", { shapeID: shape["@id"], x, y });
       }
     },
 
@@ -66,39 +74,8 @@ const shapeModule = {
       });
       Vue.set(state.mCoordinate.coordinates, object["@id"], { x, y });
       this.commit("updateYValues", {
-        nodeID: object["@id"],
+        shapeID: object["@id"],
         shapes: state.model
-      });
-    },
-
-    /**
-     * Add a property with the given ID and value to the node with the given ID.
-     * @param state
-     * @param args
-     */
-    addPropertyToShape(state, args) {
-      const { nodeID, propertyID, propertyValue } = args;
-      // FIXME should not be put in list if it is a list already
-      Vue.set(state.model[nodeID], propertyID, [propertyValue]);
-      // TODO complete this
-    },
-
-    /**
-     * Add the given property ID to the given shape.
-     * @param state
-     * @param args
-     *            propertyID the ID of the property that should be added.
-     *            shape the shape the property should be added to.
-     */
-    addPropertyIDToShape(state, args) {
-      const { propertyID, shape } = args;
-      // FIXME this assumes properties, not constraints or targetNodes or sth
-      const p = shape["https://2019.summerofcode.be/unshacled#property"];
-      if (!p) {
-        shape["https://2019.summerofcode.be/unshacled#property"] = [];
-      }
-      shape["https://2019.summerofcode.be/unshacled#property"].push({
-        "@id": propertyID
       });
     },
 
@@ -129,9 +106,17 @@ const shapeModule = {
 
       // Update the path with the new ID.
       const name = urlToName(newID);
-      shape["https://2019.summerofcode.be/unshacled#path"][0][
-        "@id"
-      ] = `http://example.org/ns#${name}`;
+      shape[`${CUSTOM_URI}path`][0]["@id"] = `${EXAMPLE_URI}${name}`;
+    },
+
+    /**
+     * TODO
+     * @param state
+     * @param args
+     */
+    setConstraintValue(state, args) {
+      const { shape, constraintID, value } = args;
+      Vue.set(shape, constraintID, value);
     },
 
     /* DELETE ======================================================================================================= */
@@ -154,26 +139,47 @@ const shapeModule = {
      */
     deletePropertyFromShape(state, args) {
       const { shape, propertyID } = args;
-      const properties =
-        shape["https://2019.summerofcode.be/unshacled#property"];
-      for (const p in properties) {
-        if (properties[p]["@id"] === propertyID) Vue.delete(properties, p);
-      }
-      Vue.set(
+      const key = `${CUSTOM_URI}property`;
+      this.commit("deleteConstraintValue", {
         shape,
-        "https://2019.summerofcode.be/unshacled#property",
-        properties
-      );
+        constraintID: key,
+        constraintValue: propertyID
+      });
     },
 
     /**
      * TODO
-     * @param store
+     * @param state
      * @param args
      */
     deleteConstraintFromShape(state, args) {
       const { shape, constraint } = args;
+      console.log("deleteConstraintFromShape", shape["@id"], constraint);
       Vue.delete(shape, constraint);
+    },
+
+    /**
+     * TODO
+     * @param state
+     * @param args
+     */
+    deleteConstraintValue(state, args) {
+      const { shape, constraintID, constraintValue } = args;
+      const values = shape[constraintID];
+      for (const v in values) {
+        if (values[v]["@id"] === constraintValue) values.splice(v, 1);
+      }
+
+      // Delete the constraint from the shape if there are no values left. Otherwise, update the constraint value.
+      if (values.length === 0) {
+        Vue.delete(shape, constraintID);
+      } else {
+        this.commit("setConstraintValue", {
+          shape,
+          constraintID,
+          value: values
+        });
+      }
     }
   },
   actions: {
@@ -185,20 +191,14 @@ const shapeModule = {
      * @param id
      */
     addNodeShape({ commit, getters }, id) {
-      console.log(getters);
-      commit(
-        "addShape",
-        {
-          object: {
-            "@id": id,
-            "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
-            "https://2019.summerofcode.be/unshacled#property": [],
-            "https://2019.summerofcode.be/unshacled#targetNode": []
-          },
-          bottomLefts: getters.allbottomLefts
-        },
-        { root: true }
-      );
+      const object = {
+        "@id": id,
+        "@type": [`${CUSTOM_URI}NodeShape`]
+      };
+      object[`${CUSTOM_URI}property`] = [];
+      object[`${CUSTOM_URI}targetNode`] = [];
+
+      commit("addShape", { object, bottomLefts: getters.allbottomLefts });
     },
 
     /**
@@ -207,19 +207,14 @@ const shapeModule = {
      * @param id
      */
     addPropertyShape({ commit, getters }, id) {
-      commit(
-        "addShape",
-        {
-          object: {
-            "@id": id,
-            "https://2019.summerofcode.be/unshacled#path": [
-              `http://example.org/ns#${id}`
-            ]
-          },
-          bottomLefts: getters.allbottomLefts
-        },
-        { root: true }
-      );
+      // Only do so if there is no property shape with this ID yet.
+      if (getters.shapeWithID(id)) {
+        console.log(`Property shape with id ${id} already exists.`);
+      } else {
+        const object = { "@id": id };
+        object[`${CUSTOM_URI}path`] = [{ "@id": `${EXAMPLE_URI}${id}` }];
+        commit("addShape", { object, bottomLefts: getters.allbottomLefts });
+      }
     },
 
     /* EDIT ========================================================================================================= */
@@ -237,23 +232,10 @@ const shapeModule = {
 
       // If the ID has changed
       if (oldID !== newURL) {
-        // Update the shape's ID
+        // Update the shape's ID and locations
         const index = getters.indexWithID(oldID);
-        commit("updateShapeID", { index, newID: newURL }, { root: true });
-
-        // Update Relationships TODO
-        /*
-        for (let prop in state.relationships) {
-          if (state.relationships[prop].one === oldID)
-            state.relationships[prop].one = newID;
-          if (state.relationships[prop].two === oldID)
-            state.relationships[prop].two = newID;
-          prop = state.relationships[prop].one + state.relationships[prop].two;
-        }
-         */
-
-        // Update the coordinates and y values.
-        commit("updateLocations", { oldID, newID: newURL }, { root: true });
+        commit("updateShapeID", { index, newID: newURL });
+        commit("updateLocations", { oldID, newID: newURL });
       }
     },
 
@@ -269,20 +251,16 @@ const shapeModule = {
       // Update the state's shapes.
       const shape = getters.shapeWithID(oldID);
       commit("updatePropertyShapeID", { shape, newID });
-      for (const node of state.model) {
-        if (getters.shapeProperties(node["@id"]).indexOf(oldID) !== -1) {
-          commit("deletePropertyFromShape", { shape: node, propertyID: oldID });
-          commit("addPropertyIDToShape", { shape: node, propertyID: newID });
+      for (const shape of state.model) {
+        if (getters.shapeProperties(shape["@id"]).indexOf(oldID) !== -1) {
+          commit("deletePropertyFromShape", { shape, propertyID: oldID });
+          commit("addPropertyIDToShape", { shape, propertyID: newID });
         }
       }
-      commit("updateLocations", { oldID, newID }, { root: true });
+      commit("updateLocations", { oldID, newID });
       // Update the y values of the properties.
-      for (const node of state.model) {
-        commit(
-          "updateYValues",
-          { nodeID: node["@id"], shapes: state.model },
-          { root: true }
-        );
+      for (const shape of state.model) {
+        commit("updateYValues", { shapeID: shape["@id"], shapes: state.model });
       }
     },
 
@@ -294,8 +272,8 @@ const shapeModule = {
      * @param id
      */
     deleteNodeShape({ getters, commit }, id) {
-      commit("deleteShapeAtIndex", getters.indexWithID(id), { root: true });
-      commit("deleteShapeLocations", id, { root: true });
+      commit("deleteShapeAtIndex", getters.indexWithID(id));
+      commit("deleteShapeLocations", id);
     },
 
     /**
@@ -306,26 +284,13 @@ const shapeModule = {
     deletePropertyShape({ state, getters, commit }, id) {
       // Check every nodeShape if it contains the given property.
       for (const shape of state.model) {
-        console.log(shape);
-        const properties =
-          shape["https://2019.summerofcode.be/unshacled#property"];
-
-        for (const p in properties) {
-          if (properties[p]["@id"] === id) {
-            // Delete the property from the node and update the y values.
-            properties.splice(p, 1);
-            commit(
-              "updateYValues",
-              { nodeID: shape["@id"], shapes: state.model },
-              { root: true }
-            );
-          }
+        if (getters.shapeProperties(shape["@id"]).indexOf(id) !== -1) {
+          commit("deletePropertyFromShape", { shape, propertyID: id });
         }
-        console.log(properties);
       }
       // Remove the property from the state
-      commit("deleteShapeAtIndex", getters.indexWithID(id), { root: true });
-      commit("deleteShapeLocations", id, { root: true });
+      commit("deleteShapeAtIndex", getters.indexWithID(id));
+      commit("deleteShapeLocations", id);
     }
   },
   getters: {
