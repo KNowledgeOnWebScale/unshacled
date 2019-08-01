@@ -27,8 +27,7 @@ export default new Vuex.Store({
     predicateModal: {
       show: false,
       id: String,
-      type: String,
-      predicate: String
+      type: String
     }
   },
   modules: {
@@ -36,10 +35,6 @@ export default new Vuex.Store({
     mData: dataModule
   },
   mutations: {
-    updatePredicateInModal(state, pred) {
-      Vue.set(state.predicateModal, "predicate", pred);
-    },
-
     /**
      * Save a reference to the editor.
      * @param state
@@ -146,11 +141,9 @@ export default new Vuex.Store({
 
     /**
      * Get the possible object for the currently set predicate.
-     * @param state
-     * @returns {string[]}
      */
-    objects: state => {
-      return possibleObjects(state.predicateModal.predicate);
+    objects: () => predicate => {
+      return possibleObjects(predicate);
     }
   }
 });
