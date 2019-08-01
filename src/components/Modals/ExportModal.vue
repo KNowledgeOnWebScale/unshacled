@@ -1,13 +1,19 @@
 <template>
   <div>
     <sui-modal v-model="this.$store.state.showExportModal">
-      <sui-modal-header> Export Shapes as {{ $store.state.exportType }} </sui-modal-header>
+      <sui-modal-header>
+        Export Shapes as {{ $store.state.exportType }}
+      </sui-modal-header>
       <sui-modal-content>
         <!-- TODO add filename input field -->
         <sui-form>
-          <sui-form-field>
+          <sui-form-field inline>
             <label>Filename</label>
             <input v-model="filename" />
+            .
+            <select v-model="extension">
+              <option>json</option>
+            </select>
           </sui-form-field>
         </sui-form>
 
@@ -29,6 +35,7 @@ export default {
   data() {
     return {
       filename: "",
+      extension: "json",
       error: false
     };
   },
@@ -39,8 +46,9 @@ export default {
      * Otherwise, show an error message.
      */
     confirm() {
-      if (this.checkFilename(this.filename)) {
-        this.$store.dispatch("exportFileWithName", this.filename);
+      const output = `${this.filename}.${this.extension}`;
+      if (this.checkFilename(output)) {
+        this.$store.dispatch("exportFileWithName", output);
         this.toggleExportModal();
       }
     },
@@ -54,16 +62,18 @@ export default {
      */
     toggleExportModal() {
       this.filename = "";
+      this.extension = "json";
       this.$store.commit("toggleExportModal", "");
     },
 
     /**
      * Check if the filename is valid.
      * Toggle the error message if needed.
+     * @param filename
      * @returns {*} boolean, indicates if the filename is valid.
      */
-    checkFilename() {
-      const bool = this.filename.match(/^[\w,\s-]+\.[A-Za-z]+$/);
+    checkFilename(filename) {
+      const bool = filename.match(/^[\w,\s-]+\.[A-Za-z]+/);
       this.error = !bool;
       return bool;
     }
