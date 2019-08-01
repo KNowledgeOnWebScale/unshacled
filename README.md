@@ -35,7 +35,7 @@ npm run serve
 ```
 
 ### Compile and minify for production
-Execute this command, then move the contents of [/dist] into the `gh-pages` branch.
+Execute this command, then move the contents of `/dist` into the `gh-pages` branch. The application will be automatically deployed to [UnSHACLed.com](unshacled.com).
 ```
 npm run build
 ```
