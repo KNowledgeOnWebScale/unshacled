@@ -6,6 +6,7 @@ import ValidatorManager from "../validation/validatorManager";
 import language from "../util/enums/languages";
 import getConstraints from "../util/constraintSelector";
 import { internalToShacl } from "../parsing/internalParser";
+import { downloadFile } from "../util";
 
 /**
  * This module contains everything to handle data imports/exports and validation.
@@ -79,6 +80,10 @@ const dataModule = {
       }
     },
 
+    /**
+     * TODO
+     * @param state
+     */
     toggleNoDataFilePopup(state) {
       Vue.set(state, "showNoDataFileModal", !state.showNoDataFileModal);
     }
@@ -109,24 +114,20 @@ const dataModule = {
      * @param rootState
      * @param filename
      */
-    exportFileWithName({ rootState }, filename) {
-      const text = JSON.stringify(
-        internalToShacl(rootState.mShape.model),
-        null,
-        2
-      );
-
-      const element = document.createElement("a");
-      element.setAttribute(
-        "href",
-        `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`
-      );
-      element.setAttribute("download", filename);
-
-      element.style.display = "none";
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
+    exportFileWithName({ rootState, rootGetters }, args) {
+      const { filename, extension } = args;
+      const type = ETF[extension];
+      if (extension === "json") {
+        downloadFile(
+          filename,
+          JSON.stringify(rootGetters.internalModelToJson, null, 2)
+        );
+      } else {
+        SerializerManager.serialize(
+          internalToShacl(rootState.mShape.model),
+          type
+        ).then(e => downloadFile(filename, e));
+      }
     }
   },
   getters: {

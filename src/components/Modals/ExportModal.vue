@@ -13,7 +13,7 @@
             .
             <select v-model="extension" class="field ui fluid dropdown">
               <option>json</option>
-              <option disabled>ttl</option>
+              <option>ttl</option>
             </select>
           </sui-form-field>
         </sui-form>
@@ -31,6 +31,8 @@
 </template>
 
 <script>
+import { ETF } from "../../util/enums/extensionToFormat";
+
 export default {
   name: "ExportModal",
   data() {
@@ -49,7 +51,10 @@ export default {
     confirm() {
       const output = `${this.filename}.${this.extension}`;
       if (this.checkFilename(output)) {
-        this.$store.dispatch("exportFileWithName", output);
+        this.$store.dispatch("exportFileWithName", {
+          filename: output,
+          extension: this.extension
+        });
         this.toggleExportModal();
       }
     },

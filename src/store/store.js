@@ -14,6 +14,7 @@ import { TERM } from "../translation/terminology";
 // Modules
 import shapeModule from "./shapeModule";
 import dataModule from "./dataModule";
+import {internalToShacl} from "../parsing/internalParser";
 
 Vue.use(Vuex);
 
@@ -116,7 +117,7 @@ export default new Vuex.Store({
      * @returns {*}
      */
     internalModelToJson: state => {
-      return state.mShape.model;
+      return internalToShacl(state.mShape.model);
     },
 
     /**
@@ -126,7 +127,7 @@ export default new Vuex.Store({
      */
     internalModelToTurtle: state => {
       return TranslatorManager.translateToLanguage(
-        state.mShape.model,
+        internalToShacl(state.mShape.model),
         state.format
       );
     },
