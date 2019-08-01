@@ -32,7 +32,7 @@ Compile and hot-reload for development
 ```
 npm run serve
 ```
-Compile and minify for production
+Compile and minify for production. Execute this command, then move the contents of [/dist] into the `gh-pages` branch.
 ```
 npm run build
 ```
