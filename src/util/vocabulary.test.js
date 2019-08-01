@@ -49,7 +49,7 @@ test('dictionary contains predicates for subject "NodeShape"', () => {
   ];
   expect(
     JSON.stringify(
-      Vocabulary.possiblePredicates(ShaclDictionary.TERM.NodeShape)
+      Vocabulary.possiblePredicates(TERM.NodeShape)
     )
   ).toStrictEqual(JSON.stringify(expected));
 });
@@ -57,6 +57,6 @@ test('dictionary contains predicates for subject "NodeShape"', () => {
 test('dictionary contains objects for predicate "property"', () => {
   const expected = ["https://2019.summerofcode.be/unshacled#PropertyShape"];
   expect(
-    JSON.stringify(Vocabulary.possibleObjects(ShaclDictionary.TERM.property))
+    JSON.stringify(Vocabulary.possibleObjects(TERM.property))
   ).toStrictEqual(JSON.stringify(expected));
 });

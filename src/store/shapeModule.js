@@ -3,8 +3,9 @@ import constraintModule from "./constraintModule";
 import { extractUrl, urlToName } from "../parsing/urlParser";
 import { getNonOverlappingCoordinates } from "../util";
 import coordinateModule from "./coordinateModule";
-import { CUSTOM_URI, EXAMPLE_URI, SHACL_URI } from "../util/constants";
-import shaclToInternal from "../parsing/internalParser";
+import { EXAMPLE_URI, SHACL_URI } from "../util/constants";
+import { shaclToInternal } from "../parsing/internalParser";
+import { TERM } from "../translation/terminology";
 
 /**
  * This module contains everything to change the shapes.
@@ -106,7 +107,7 @@ const shapeModule = {
 
       // Update the path with the new ID.
       const name = urlToName(newID);
-      shape[`${CUSTOM_URI}path`][0]["@id"] = `${EXAMPLE_URI}${name}`;
+      shape[TERM.path][0]["@id"] = `${EXAMPLE_URI}${name}`;
     },
 
     /**
@@ -139,10 +140,9 @@ const shapeModule = {
      */
     deletePropertyFromShape(state, args) {
       const { shape, propertyID } = args;
-      const key = `${CUSTOM_URI}property`;
       this.commit("deleteConstraintValue", {
         shape,
-        constraintID: key,
+        constraintID: TERM.property,
         constraintValue: propertyID
       });
     },
@@ -193,10 +193,10 @@ const shapeModule = {
     addNodeShape({ commit, getters }, id) {
       const object = {
         "@id": id,
-        "@type": [`${CUSTOM_URI}NodeShape`]
+        "@type": [TERM.NodeShape]
       };
-      object[`${CUSTOM_URI}property`] = [];
-      object[`${CUSTOM_URI}targetNode`] = [];
+      object[TERM.property] = [];
+      object[TERM.targetNode] = [];
 
       commit("addShape", { object, bottomLefts: getters.allbottomLefts });
     },
@@ -212,7 +212,7 @@ const shapeModule = {
         console.log(`Property shape with id ${id} already exists.`);
       } else {
         const object = { "@id": id };
-        object[`${CUSTOM_URI}path`] = [{ "@id": `${EXAMPLE_URI}${id}` }];
+        object[TERM.path] = [{ "@id": `${EXAMPLE_URI}${id}` }];
         commit("addShape", { object, bottomLefts: getters.allbottomLefts });
       }
     },

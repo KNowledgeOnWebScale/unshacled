@@ -9,7 +9,7 @@ import { possiblePredicates, possibleObjects } from "../util/vocabulary";
 
 // Translation
 import { TranslatorManager } from "../translation/translatorManager";
-import ShaclDictionary from "../translation/shaclDictionary";
+import { TERM } from "../translation/terminology";
 
 // Modules
 import shapeModule from "./shapeModule";
@@ -133,7 +133,7 @@ export default new Vuex.Store({
      * @returns {function(*): string[]}
      */
     predicates: () => type => {
-      return possiblePredicates(ShaclDictionary.TERM[type]);
+      return possiblePredicates(TERM[type]);
     },
 
     /**

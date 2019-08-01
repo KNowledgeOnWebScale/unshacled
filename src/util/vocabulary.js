@@ -1,6 +1,6 @@
-import ShaclDictionary from "ShaclDictionary";
-import SHACLTranslator from "ShaclTranslator";
 import shacl from "./shacl";
+import { TERM } from "../translation/terminology";
+import SHACLTranslator from "../translation/shaclTranslator";
 
 /** Dictionary with distinct Types
  {
@@ -167,33 +167,33 @@ export function isInDictionary(id) {
  * @param state State is required as for certain list entries might be existing shapes that are kept in the state
  * @returns {Object[]} Array with possible values for the list
  */
-export function listValues(predicate, state) {
+export function listValues(predicate) {
   // The (single) value of this property must be a list of path elements, representing the elements of alternative paths.
-  if (predicate === ShaclDictionary.TERM.alternativePath) {
+  if (predicate === TERM.alternativePath) {
     return null; // TODO
   }
   // RDF list of shapes to validate the value nodes against.
-  if (predicate === ShaclDictionary.TERM.and) {
+  if (predicate === TERM.and) {
     return null; // TODO List of all existing Shape instance id's
   }
   // An optional RDF list of properties that are also permitted in addition to those explicitly enumerated via sh:property/sh:path.
-  if (predicate === ShaclDictionary.TERM.ignoredProperties) {
+  if (predicate === TERM.ignoredProperties) {
     return null; // TODO
   }
   // Specifies a list of allowed values so that each value node must be among the members of the given list.
-  if (predicate === ShaclDictionary.TERM.in) {
+  if (predicate === TERM.in) {
     return null; // TODO
   }
   // Specifies a list of language tags that all value nodes must have.
-  if (predicate === ShaclDictionary.TERM.languageIn) {
+  if (predicate === TERM.languageIn) {
     return null; // TODO
   }
   // Specifies a list of shapes so that the value nodes must conform to at least one of the shapes.
-  if (predicate === ShaclDictionary.TERM.or) {
+  if (predicate === TERM.or) {
     return null; // TODO
   }
   // Specifies a list of shapes so that the value nodes must conform to exactly one of the shapes.
-  if (predicate === ShaclDictionary.TERM.xone) {
+  if (predicate === TERM.xone) {
     return null; // TODO
   }
 }
