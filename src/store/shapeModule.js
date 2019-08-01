@@ -207,9 +207,14 @@ const shapeModule = {
      * @param id
      */
     addPropertyShape({ commit, getters }, id) {
-      const object = { "@id": id };
-      object[`${CUSTOM_URI}path`] = [`${EXAMPLE_URI}${id}`];
-      commit("addShape", { object, bottomLefts: getters.allbottomLefts });
+      // Only do so if there is no property shape with this ID yet.
+      if (getters.shapeWithID(id)) {
+        console.log(`Property shape with id ${id} already exists.`);
+      } else {
+        const object = { "@id": id };
+        object[`${CUSTOM_URI}path`] = [{ "@id": `${EXAMPLE_URI}${id}` }];
+        commit("addShape", { object, bottomLefts: getters.allbottomLefts });
+      }
     },
 
     /* EDIT ========================================================================================================= */

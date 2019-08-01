@@ -58,7 +58,7 @@ export default {
     return {
       lineConfig: {
         ...CONSTRAINT_SEPARATION_LINE,
-        points: [x, y + HEIGHT, x + WIDTH, y + HEIGHT]
+        points: [x, y + HEIGHT, x + WIDTH, y + HEIGHT] // [x1, y1, x2, y2]
       },
       rectangleConfig: {
         ...this.$props.constraintConfig,
@@ -75,6 +75,14 @@ export default {
         text: this.getConstraintValue()
       }
     };
+  },
+  mounted() {
+    const self = this;
+    // Update the text value whenever the shape has changed.
+    this.$store.watch(
+      () => self.$store.getters.shapeConstraints(self.$props.shape),
+      () => self.updateConfigs()
+    );
   },
   methods: {
     /**
@@ -116,6 +124,20 @@ export default {
         // Get the value.
         return value[0]["@value"];
       }
+    },
+
+    /**
+     * Update the text values.
+     */
+    updateConfigs() {
+      this.keyConfig = {
+        ...this.keyConfig,
+        text: urlToName(this.$props.constraintID)
+      };
+      this.valueConfig = {
+        ...this.valueConfig,
+        text: this.getConstraintValue()
+      };
     }
   }
 };

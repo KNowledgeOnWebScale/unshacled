@@ -10,24 +10,27 @@ const constraintModule = {
   actions: {
     /* ADD ========================================================================================================== */
 
-    addPredicate({ getters, commit, rootState }, args) {
-      const { shapeID, predicate, valueType } = args;
-      console.log("valueType", valueType);
+    addPredicate({ getters, commit, dispatch, rootState }, args) {
+      const { shapeID, predicate, valueType, input, object } = args;
       // TODO if the value type is a list, then create a list if necessary and add the value to the list
+      const shape = getters.shapeWithID(shapeID);
 
+      // Add the predicate to the shape.
+      if (!shape[predicate]) shape[predicate] = [];
+      const value =
+        valueType === "id" || valueType === "lists"
+          ? { "@id": input }
+          : { "@type": object, "@value": input };
+      shape[predicate].push(value);
+      commit("setConstraintValue", {
+        shape,
+        constraintID: predicate,
+        value: shape[predicate]
+      });
+
+      console.log(predicate);
       if (predicate.includes("property")) {
-        this.dispatch("addPropertyToShape", {
-          shapeID,
-          propertyID: args.input
-        });
-      }
-      const obj = getters.shapeWithID(shapeID);
-
-      if (valueType === "id" || valueType === "lists") {
-        obj[predicate] = [{ "@id": args.input }];
-      }
-      if (valueType === "type") {
-        obj[predicate] = [{ "@type": args.object, "@value": args.input }];
+        dispatch("addPropertyShape", input);
       }
 
       // Update the y values.

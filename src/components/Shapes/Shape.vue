@@ -47,7 +47,6 @@
 </template>
 
 <script>
-import Vue from "vue";
 import Constraint from "./Constraint.vue";
 import ReactiveInput from "../FormElements/ReactiveInput.vue";
 import { urlToName } from "../../parsing/urlParser";
@@ -110,6 +109,14 @@ export default {
         this.$store.state.mShape.mCoordinate.coordinates[this.$props.id]
       );
     this.updateCoordinates();
+
+    // Update the configurations if the shape had changed.
+    const self = this;
+    this.$store.watch(
+      () => self.$store.getters.shapeConstraints(self.$props.id),
+      () =>
+        self.setConfigs(self.$store.getters.shapeConstraints(self.$props.id))
+    );
   },
   methods: {
     /**
