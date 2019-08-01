@@ -23,7 +23,7 @@ import { urlToName } from "../../parsing/urlParser";
 export default {
   name: "Constraint",
   props: {
-    shape: {
+    shapeID: {
       type: String,
       required: true
     },
@@ -80,7 +80,7 @@ export default {
     const self = this;
     // Update the text value whenever the shape has changed.
     this.$store.watch(
-      () => self.$store.getters.shapeConstraints(self.$props.shape),
+      () => self.$store.getters.shapeConstraints(self.$props.shapeID),
       () => self.updateConfigs()
     );
   },
@@ -90,10 +90,10 @@ export default {
      */
     deleteConstraint() {
       const args = {
-        shapeID: this.$props.shape,
+        shapeID: this.$props.shapeID,
         constraint: this.$props.constraintID
       };
-      this.$store.dispatch("deleteConstraintFromShape", args);
+      this.$store.dispatch("deleteConstraintFromShapeWithID", args);
     },
 
     /**
@@ -101,29 +101,33 @@ export default {
      * @returns {[]|*} array or string, depending to the number of values.
      */
     getConstraintValue() {
-      const value = this.$store.getters.shapeConstraints(this.$props.shape)[
-        this.$props.constraintID
-      ];
+      const constraints = this.$store.getters.shapeConstraints(
+        this.$props.shapeID
+      );
+      if (constraints && constraints[this.$props.constraintID]) {
+        const value = constraints[this.$props.constraintID];
 
-      // Check if there is more than one value.
-      if (value.length > 1) {
-        // Transform the list.
-        const output = [];
-        for (const element of value) {
-          // Extract each element's name.
-          output.push(urlToName(element));
+        // Check if there is more than one value.
+        if (value.length > 1) {
+          // Transform the list.
+          const output = [];
+          for (const element of value) {
+            // Extract each element's name.
+            output.push(urlToName(element));
+          }
+          return output;
+        } else if (value.length === 0) {
+          // The constraint has no value.
+          return "(empty)";
+        } else if (value[0]["@id"]) {
+          // Get the ID and extract the name.
+          return urlToName(value[0]["@id"]);
+        } else if (value[0]["@value"]) {
+          // Get the value.
+          return value[0]["@value"];
         }
-        return output;
-      } else if (value.length === 0) {
-        // The constraint has no value.
-        return "(empty)";
-      } else if (value[0]["@id"]) {
-        // Get the ID and extract the name.
-        return urlToName(value[0]["@id"]);
-      } else if (value[0]["@value"]) {
-        // Get the value.
-        return value[0]["@value"];
       }
+      return "";
     },
 
     /**

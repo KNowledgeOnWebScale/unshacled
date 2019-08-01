@@ -1,7 +1,7 @@
 import { values } from "ramda";
 import { HEIGHT, WIDTH } from "./konvaConfigs";
 
-/** @returns {x: number, y: number} the coordinates for a newly added shape */
+/** @returns {x: number, y: number} the coordinates for a newly added shapeID */
 export default ({ coordinates, bottomLefts }) => {
   // TODO use bottomLefts for this
   const MARGIN = 16;
@@ -18,7 +18,7 @@ export default ({ coordinates, bottomLefts }) => {
     ...[0, ...coords.filter(({ y }) => y >= yMax).map(({ x }) => x)]
   );
 
-  // If negative, add the shape to the right; if positive, a bit lower to the left.
+  // If negative, add the shapeID to the right; if positive, a bit lower to the left.
   const criterion = xMax + 2 * (MARGIN + WIDTH) > innerWidth;
   const x = MARGIN + (criterion ? 0 : xMax + (coords.length ? WIDTH : 0));
   const y = yMax + (criterion ? MARGIN + HEIGHT : 0) || MARGIN;

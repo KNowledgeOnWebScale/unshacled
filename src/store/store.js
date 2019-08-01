@@ -50,7 +50,7 @@ export default new Vuex.Store({
     /* MODALS ======================================================================================================= */
 
     /**
-     * TODO
+     * Show the validation report modal.
      * @param state
      */
     toggleValidationReport(state) {
@@ -129,7 +129,7 @@ export default new Vuex.Store({
     },
 
     /**
-     * TODO
+     * Get the possible predicates for the given value type.
      * @returns {function(*): string[]}
      */
     predicates: () => type => {
@@ -137,7 +137,7 @@ export default new Vuex.Store({
     },
 
     /**
-     * TODO
+     * Get the possible object for the currently set predicate.
      * @param state
      * @returns {string[]}
      */

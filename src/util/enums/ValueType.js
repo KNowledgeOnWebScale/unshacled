@@ -30,9 +30,9 @@ const types = new Set([
 const lists = new Set([TERM.languageIn, TERM.and, TERM.or, TERM.xone]);
 
 /**
- * TODO
+ * Get the value type of the given url.
  * @param url
- * @returns {string}
+ * @returns {string} either "id", "type" or "list"
  */
 export default function getValueType(url) {
   if (ids.has(url)) return "id";

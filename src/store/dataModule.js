@@ -47,7 +47,6 @@ const dataModule = {
 
       reader.readAsText(file);
       reader.onload = function(event) {
-        // TODO File to intermediate format
         ParserManager.parse(event.target.result, type).then(e => {
           self.dispatch("updateModel", e);
         });
@@ -95,11 +94,20 @@ const dataModule = {
     },
 
     /**
-     * TODO
+     * Validate the interal model.
      * @param rootState
      */
     validate({ rootState }) {
       this.commit("validateWithModel", rootState.model);
+    },
+
+    /**
+     * Export the internal model to a file.
+     * // TODO the default is SHACL for now
+     * @param rootState
+     */
+    exportFile({ rootState }) {
+
     }
   },
   getters: {

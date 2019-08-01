@@ -34,7 +34,7 @@
       <div v-for="(prop, key) in getConstraints()" :key="key">
         <constraint
           :constraint-i-d="key"
-          :shape="$props.id"
+          :shape-i-d="$props.id"
           :hover="hover"
           :stroke="shapeConfig.stroke"
           :constraint-config="constraintConfigs[key]"
@@ -102,20 +102,21 @@ export default {
     };
   },
   mounted() {
+    const { id } = this.$props;
     // Move the shape to the defined coordinate.
     this.$refs.posRef
       .getNode()
-      .setPosition(
-        this.$store.state.mShape.mCoordinate.coordinates[this.$props.id]
-      );
+      .setPosition(this.$store.state.mShape.mCoordinate.coordinates[id]);
     this.updateCoordinates();
 
     // Update the configurations if the shape had changed.
     const self = this;
     this.$store.watch(
-      () => self.$store.getters.shapeConstraints(self.$props.id),
-      () =>
-        self.setConfigs(self.$store.getters.shapeConstraints(self.$props.id))
+      () => self.$store.getters.shapeConstraints(id),
+      () => {
+        const constraints = self.$store.getters.shapeConstraints(id);
+        if (constraints) self.setConfigs(constraints);
+      }
     );
   },
   methods: {

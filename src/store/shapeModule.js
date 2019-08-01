@@ -98,7 +98,7 @@ const shapeModule = {
      * Update the given property shape's ID.
      * @param state
      * @param args
-     *            shape the property shape that should be updated,
+     *            shape the property shapeI that should be updated,
      *            newID the shape's new ID.
      */
     updatePropertyShapeID(state, args) {
@@ -111,9 +111,12 @@ const shapeModule = {
     },
 
     /**
-     * TODO
+     * Set the value of the constraint with the given ID to the given value.
      * @param state
      * @param args
+     *            shape the shape object that has to be updated.
+     *            constraintID the ID of the constraint that should be updated.
+     *            value the new value of the given constraint.
      */
     setConstraintValue(state, args) {
       const { shape, constraintID, value } = args;
@@ -135,7 +138,7 @@ const shapeModule = {
      * Delete the property with the given ID from the given shape.
      * @param state
      * @param args
-     *            shape the shape from which the property should be removed..
+     *            shape the shape object from which the property should be removed.
      *            propertyID the ID of the property that should be removed.
      */
     deletePropertyFromShape(state, args) {
@@ -148,20 +151,24 @@ const shapeModule = {
     },
 
     /**
-     * TODO
+     * Delete the given constraint from the given shape object.
      * @param state
      * @param args
+     *            shape the shape object that should be updated.
+     *            constraint the ID of the constraint that should be deleted.
      */
     deleteConstraintFromShape(state, args) {
       const { shape, constraint } = args;
-      console.log("deleteConstraintFromShape", shape["@id"], constraint);
       Vue.delete(shape, constraint);
     },
 
     /**
-     * TODO
+     * Delete the given value from the given constraint.
      * @param state
      * @param args
+     *            shape the shape object that should be updated.
+     *            constraintID the ID of the constraint that should be updated.
+     *            constraintValue the value that should be removed from the given constraint.
      */
     deleteConstraintValue(state, args) {
       const { shape, constraintID, constraintValue } = args;

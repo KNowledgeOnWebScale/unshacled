@@ -25,8 +25,9 @@
             />
           </sui-dropdown-item>
 
-          <!-- TODO this has no function yet -->
-          <sui-dropdown-item>Export Shapes</sui-dropdown-item>
+          <sui-dropdown-item @click="exportFile(shacl)">
+            Export Shapes as SHACL
+          </sui-dropdown-item>
 
           <sui-dropdown-divider></sui-dropdown-divider>
 
@@ -80,6 +81,7 @@ import NodeShapeModal from "./Modals/NodeShapeModal.vue";
 import ValidationReportModal from "./Modals/ValidationReportModal.vue";
 import AddPredicateModal from "./Modals/AddPredicateModal.vue";
 import NoDataFileModal from "./Modals/NoDataFileModal.vue";
+import languages from "../util/enums/languages";
 
 export default {
   name: "NavBar",
@@ -94,7 +96,9 @@ export default {
   },
   data() {
     return {
-      createPropertyShape: false
+      createPropertyShape: false,
+      shacl: languages.SHACL,
+      shex: languages.SHEX
     };
   },
   methods: {
@@ -115,6 +119,9 @@ export default {
     readTextFile() {
       const file = document.getElementById("file").files[0];
       this.$store.commit("uploadSchemaFile", file);
+    },
+    exportFile(type) {
+      this.$store.dispatch("exportFile", type);
     },
     uploadDataFile() {
       const file = document.getElementById("dataFile").files[0];
