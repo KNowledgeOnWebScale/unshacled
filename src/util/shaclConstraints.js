@@ -1,4 +1,5 @@
-import { shaclToInternal } from "../parsing/internalParser";
+import { internalToShacl, shaclToInternal } from "../parsing/internalParser";
+import { urlToCuston } from "../parsing/urlParser";
 
 getReady;
 const initialConstraints = [];
@@ -6475,5 +6476,19 @@ const json = [
     "@id": "http://www.w3.org/ns/shacl-shacl#"
   }
 ];
+
+/**
+ * Get the value type of the constraint with the given ID.
+ * @param constraint
+ * @returns {string} possible values:
+ *                    Class, Datatype,  NodeKind, List
+ *                    Property, PropertyShape, NodeShape, Shape
+ *                    integer, string, boolean
+ */
+export function getConstraintValueType(constraint) {
+  const object = json.filter(c => c["@id"] === internalToShacl(constraint))[0];
+  const range = object["http://www.w3.org/2000/01/rdf-schema#range"];
+  return range ? shaclToInternal(range[0]["@id"]) : undefined;
+}
 
 export const groupedConstraints = groupBy(constraintsWithTypes, "type");

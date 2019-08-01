@@ -55,8 +55,10 @@ import Vue from "vue";
 import ValueType from "../../util/enums/ValueType";
 import {
   constraintsByTypes,
-  customConstraintsByType
+  customConstraintsByType,
+  getConstraintValueType
 } from "../../util/shaclConstraints";
+import { urlToName } from "../../parsing/urlParser";
 
 export default {
   name: "AddPredicateModal",
@@ -68,6 +70,7 @@ export default {
       urls: {},
       input: "",
       object: "",
+      constraintType: "",
       error: false
     };
   },
@@ -114,7 +117,16 @@ export default {
      * Select the object given the selected predicate, assuming that there's only one possible object.
      */
     selectObject() {
-      this.object = this.$store.getters.objects(this.predicateUrl())[0];
+      if (this.predicate) {
+        this.object = this.$store.getters.objects(this.predicateUrl())[0];
+        const typeUrl = getConstraintValueType(this.predicateUrl());
+        if (typeUrl) {
+          this.constraintType = urlToName(typeUrl);
+          console.log(this.constraintType);
+        }
+      } else {
+        this.object = "";
+      }
     },
 
     /**

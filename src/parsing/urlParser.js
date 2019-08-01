@@ -1,4 +1,4 @@
-import { EXAMPLE_URI } from "../util/constants";
+import {CUSTOM_URI, EXAMPLE_URI} from "../util/constants";
 
 /**
  * Takes the name out of an url if possible.
@@ -29,4 +29,12 @@ export function extractUrl(string) {
  */
 export function createUrl(id) {
   return EXAMPLE_URI + id;
+}
+
+/**
+ * TODO
+ * @param url
+ */
+export function urlToCuston(url) {
+  return `${CUSTOM_URI}${urlToName(url)}`;
 }
