@@ -5,6 +5,7 @@ import SerializerManager from "../parsing/serializerManager";
 import ValidatorManager from "../validation/validatorManager";
 import language from "../util/enums/languages";
 import getConstraints from "../util/constraintSelector";
+import { internalToShacl } from "../parsing/internalParser";
 
 /**
  * This module contains everything to handle data imports/exports and validation.
@@ -103,11 +104,29 @@ const dataModule = {
 
     /**
      * Export the internal model to a file.
-     * // TODO the default is SHACL for now
+     * // TODO parse the JSON to Turtle
+     * // FIXME the default is SHACL for now
      * @param rootState
+     * @param filename
      */
-    exportFile({ rootState }) {
+    exportFileWithName({ rootState }, filename) {
+      const text = JSON.stringify(
+        internalToShacl(rootState.mShape.model),
+        null,
+        2
+      );
 
+      const element = document.createElement("a");
+      element.setAttribute(
+        "href",
+        `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`
+      );
+      element.setAttribute("download", filename);
+
+      element.style.display = "none";
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
     }
   },
   getters: {

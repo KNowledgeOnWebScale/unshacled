@@ -22,6 +22,8 @@ export default new Vuex.Store({
     editor: null,
     showNodeShapeModal: false,
     showClearModal: false,
+    showExportModal: false,
+    exportType: "",
     predicateModal: {
       show: false,
       id: String,
@@ -75,6 +77,12 @@ export default new Vuex.Store({
     toggleClearModal(state) {
       event.preventDefault();
       state.showClearModal = !state.showClearModal;
+    },
+
+    toggleExportModal(state, type) {
+      this.state.exportType = type;
+      event.preventDefault();
+      state.showExportModal = !state.showExportModal;
     },
 
     /**

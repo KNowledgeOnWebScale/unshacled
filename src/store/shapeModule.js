@@ -202,8 +202,6 @@ const shapeModule = {
         "@id": id,
         "@type": [TERM.NodeShape]
       };
-      object[TERM.property] = [];
-      object[TERM.targetNode] = [];
 
       commit("addShape", { object, bottomLefts: getters.allbottomLefts });
     },
