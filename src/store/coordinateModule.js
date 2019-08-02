@@ -55,17 +55,21 @@ const coordinateModule = {
       // The other properties.
       const ignored = ["@id", "@type"];
 
-      // Get the IDs form all the constraints.
-      const constraints = [];
+      // Get the IDs of all the constraints and the number of values for each constraint.
+      const constraints = {};
       for (const c in shape) {
-        if (!ignored.includes(c)) constraints.push(c);
+        if (!ignored.includes(c)) constraints[c] = shape[c].length;
       }
 
       // Calculate their y values.
       let i = 1;
-      for (const con of constraints) {
+      for (const con of Object.keys(constraints)) {
         Vue.set(state.yValues[shapeID], con, i * HEIGHT);
-        i += 2; // Constraints need twice the height.
+        if (con.includes("property")) {
+          i += 2; // The properties will be listed on a single line.
+        } else {
+          i += 1 + constraints[con]; // Every entry on a seperate line.
+        }
       }
 
       // Set the bottom right coordinate.

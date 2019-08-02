@@ -6,7 +6,7 @@
     <v-text ref="value" :config="valueConfig"></v-text>
     <v-circle
       v-if="this.$props.hover"
-      :config="this.$props.deleteConstraintConfig"
+      :config="deleteConstraintConfig"
       @click="deleteConstraint"
     ></v-circle>
   </v-group>
@@ -16,7 +16,12 @@
 import {
   HEIGHT,
   CONSTRAINT_SEPARATION_LINE,
-  WIDTH
+  WIDTH,
+  CONSTRAINT_CONFIG,
+  CONSTRAINT_TEXT_CONFIG,
+  DELTA_Y_TEXT,
+  DELETE_BUTTON_CONFIG,
+  DELTA_Y_DELETE
 } from "../../util/konvaConfigs";
 import { urlToName } from "../../parsing/urlParser";
 
@@ -39,40 +44,42 @@ export default {
       type: String,
       required: false,
       default: "black"
-    },
-    constraintConfig: {
-      type: Object,
-      required: true
-    },
-    constraintTextConfig: {
-      type: Object,
-      required: true
-    },
-    deleteConstraintConfig: {
-      type: Object,
-      required: true
     }
   },
   data() {
-    const { x, y } = this.$props.constraintConfig;
+    const numConstraints = this.$store.getters.shapeWithID(this.$props.shapeID)[
+      this.$props.constraintID
+    ].length;
+
+    const y = this.$store.state.mShape.mCoordinate.yValues[this.$props.shapeID][
+      this.$props.constraintID
+    ];
+
     return {
       lineConfig: {
         ...CONSTRAINT_SEPARATION_LINE,
-        points: [x, y + HEIGHT, x + WIDTH, y + HEIGHT] // [x1, y1, x2, y2]
+        points: [0, y + HEIGHT, WIDTH, y + HEIGHT] // [x1, y1, x2, y2]
       },
       rectangleConfig: {
-        ...this.$props.constraintConfig,
+        ...CONSTRAINT_CONFIG,
+        y,
+        height: HEIGHT * (numConstraints + 1),
         stroke: this.$props.stroke
       },
       keyConfig: {
-        ...this.$props.constraintTextConfig,
+        ...CONSTRAINT_TEXT_CONFIG,
+        y: y + DELTA_Y_TEXT,
         fontStyle: "italic",
         text: urlToName(this.$props.constraintID)
       },
       valueConfig: {
-        ...this.$props.constraintTextConfig,
-        y: this.$props.constraintTextConfig.y + HEIGHT,
+        ...CONSTRAINT_TEXT_CONFIG,
+        y: y + DELTA_Y_TEXT + HEIGHT,
         text: this.getConstraintValue()
+      },
+      deleteConstraintConfig: {
+        ...DELETE_BUTTON_CONFIG,
+        y: y + DELTA_Y_DELETE
       }
     };
   },
@@ -89,11 +96,14 @@ export default {
      * Delete the current constraint from its shape.
      */
     deleteConstraint() {
-      const args = {
+      this.$store.dispatch("deleteConstraintFromShapeWithID", {
         shapeID: this.$props.shapeID,
         constraint: this.$props.constraintID
-      };
-      this.$store.dispatch("deleteConstraintFromShapeWithID", args);
+      });
+      this.$store.commit("updateYValues", {
+        shapeID: this.$props.shapeID,
+        shapes: this.$store.state.mShape.model
+      });
     },
 
     /**
