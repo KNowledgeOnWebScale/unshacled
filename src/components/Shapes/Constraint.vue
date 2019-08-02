@@ -3,12 +3,18 @@
     <v-rect :config="getRectConfig()"></v-rect>
     <v-text ref="key" :config="keyConfig"></v-text>
     <v-line :config="lineConfig"></v-line>
+    <v-circle
+      v-if="hover"
+      :config="deleteConstraintConfig"
+      @click="deleteConstraint"
+    ></v-circle>
+
     <div v-for="(value, index) of getConstraintValues()" :key="index">
       <v-text :config="getTextConfig(value, index)"></v-text>
       <v-circle
         v-if="hover"
-        :config="deleteConstraintConfig"
-        @click="deleteConstraint"
+        :config="getDeleteValueConfig(index)"
+        @click="deleteConstraintValue(index)"
       ></v-circle>
     </div>
   </v-group>
@@ -83,11 +89,19 @@ export default {
     deleteConstraint() {
       this.$store.dispatch("deleteConstraintFromShapeWithID", {
         shapeID: this.$props.shapeID,
-        constraint: this.$props.constraintID
+        constraintID: this.$props.constraintID
       });
       this.$store.commit("updateYValues", {
         shapeID: this.$props.shapeID,
         shapes: this.$store.state.mShape.model
+      });
+    },
+
+    deleteConstraintValue(index) {
+      this.$store.dispatch("deleteConstraintValueWithIndex", {
+        shapeID: this.$props.shapeID,
+        constraintID: this.$props.constraintID,
+        valueIndex: index
       });
     },
 
@@ -104,10 +118,12 @@ export default {
       if (constraints && constraints[this.$props.constraintID]) {
         const values = constraints[this.$props.constraintID];
 
-        // Properties should be listed in a single entry
+        // Properties should be listed in a single entry.
         if (this.$props.constraintID.includes("property")) {
           for (const value of values) {
-            output.push(urlToName(value));
+            output.push(
+              value["@id"] ? urlToName(value["@id"]) : urlToName(value)
+            );
           }
           return [output.toString()];
         }
@@ -134,6 +150,9 @@ export default {
       return output;
     },
 
+    /**
+     * Get the rectangle configuration based on the current number of values.
+     */
     getRectConfig() {
       return {
         ...this.rectangleConfig,
@@ -153,6 +172,16 @@ export default {
     },
 
     /**
+     * Get the delete button configuration based on the current number of values.
+     */
+    getDeleteValueConfig(index) {
+      return {
+        ...this.deleteConstraintConfig,
+        y: this.deleteConstraintConfig.y + (index + 1) * HEIGHT
+      };
+    },
+
+    /**
      * Get the number of constraint values.
      * @returns {number}
      */
@@ -163,7 +192,7 @@ export default {
 
       return this.$props.constraintID.includes("property")
         ? 1 // For `property`, these will be listed as a single value.
-        : cvs[0]["@list"]
+        : cvs.length > 0 && cvs[0]["@list"]
         ? cvs[0]["@list"].length // Get the number of elements if it's a list.
         : cvs.length;
     }

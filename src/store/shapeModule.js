@@ -142,7 +142,7 @@ const shapeModule = {
      */
     deletePropertyFromShape(state, args) {
       const { shape, propertyID } = args;
-      this.commit("deleteConstraintValue", {
+      this.commit("deleteConstraintValueWithIndex", {
         shape,
         constraintID: TERM.property,
         constraintValue: propertyID
@@ -157,8 +157,8 @@ const shapeModule = {
      *            constraint the ID of the constraint that should be deleted.
      */
     deleteConstraintFromShape(state, args) {
-      const { shape, constraint } = args;
-      Vue.delete(shape, constraint);
+      const { shape, constraintID } = args;
+      Vue.delete(shape, constraintID);
     },
 
     /**
@@ -169,7 +169,7 @@ const shapeModule = {
      *            constraintID the ID of the constraint that should be updated.
      *            constraintValue the value that should be removed from the given constraint.
      */
-    deleteConstraintValue(state, args) {
+    deleteConstraintValueWithIndex(state, args) {
       const { shape, constraintID, constraintValue } = args;
       const values = shape[constraintID];
       for (const v in values) {

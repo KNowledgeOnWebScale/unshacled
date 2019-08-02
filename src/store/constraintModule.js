@@ -71,11 +71,11 @@ const constraintModule = {
      *            constraint the ID of the constraint that should be removed.
      */
     deleteConstraintFromShapeWithID({ getters, commit, rootState }, args) {
-      const { shapeID, constraint } = args;
+      const { shapeID, constraintID } = args;
       const shape = getters.shapeWithID(shapeID);
       commit(
         "deleteConstraintFromShape",
-        { shape, constraint },
+        { shape, constraintID },
         { root: true }
       );
 
@@ -85,6 +85,20 @@ const constraintModule = {
         { shape, shapes: rootState.mShape.model },
         { root: true }
       );
+    },
+
+    deleteConstraintValueWithIndex({ getters }, args) {
+      const { shapeID, constraintID, valueIndex } = args;
+      const shape = getters.shapeWithID(shapeID);
+      shape[constraintID].splice(valueIndex, 1);
+
+      // Delete the constraint from the shape if there are no values left.
+      if (shape[constraintID].length === 0) {
+        this.dispatch("deleteConstraintFromShapeWithID", {
+          shapeID,
+          constraintID
+        });
+      }
     }
   },
   getters: {
