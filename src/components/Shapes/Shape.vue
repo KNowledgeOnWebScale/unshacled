@@ -11,7 +11,7 @@
       :draggable="true"
       @mouseenter="hover = true"
       @mouseleave="hover = false"
-      @dragmove="updateCoordinates"
+      @dragmove="updatePosition"
     >
       <v-rect :config="shapeConfig"></v-rect>
       <v-text
@@ -89,7 +89,7 @@ export default {
     this.$refs.posRef
       .getNode()
       .setPosition(this.$store.state.mShape.mCoordinate.coordinates[id]);
-    this.updateCoordinates();
+    this.updatePosition();
   },
   methods: {
     /**
@@ -103,18 +103,17 @@ export default {
     /**
      * Takes the coordinates from this node shape and calls store to update them.
      */
-    updateCoordinates() {
+    updatePosition() {
       const pos = this.$refs.posRef.getNode().position();
-      const args = {
-        node: this.$props.id,
-        x: pos.x,
-        y: pos.y
-      };
       this.$store.commit("updateYValues", {
         shapeID: this.$props.id,
         shapes: this.$store.state.mShape.model
       });
-      this.$store.commit("updateCoordinates", args);
+      this.$store.commit("updateCoordinates", {
+        shapeID: this.$props.id,
+        x: pos.x,
+        y: pos.y
+      });
     },
 
     /**
