@@ -142,11 +142,25 @@ const shapeModule = {
      */
     deletePropertyFromShape(state, args) {
       const { shape, propertyID } = args;
-      this.commit("deleteConstraintValueWithIndex", {
-        shape,
-        constraintID: TERM.property,
-        constraintValue: propertyID
-      });
+      const properties = shape[TERM.property];
+      let index = -1;
+
+      for (const p in properties) {
+        if (
+          properties[p] === propertyID ||
+          properties[p]["@id"] === propertyID
+        ) {
+          index = p;
+        }
+      }
+
+      if (index >= 0) {
+        this.dispatch("deleteConstraintValueWithIndex", {
+          shapeID: shape["@id"],
+          constraintID: TERM.property,
+          valueIndex: index
+        });
+      }
     },
 
     /**
@@ -224,20 +238,30 @@ const shapeModule = {
      */
     editPropertyShape({ state, getters, commit }, args) {
       const { oldID, newID } = args;
+      if (oldID !== newID) {
+        commit("updateLocations", { oldID, newID });
 
-      // Update the state's shapes.
-      const shape = getters.shapeWithID(oldID);
-      commit("updatePropertyShapeID", { shape, newID });
-      for (const shape of state.model) {
-        if (getters.shapeProperties(shape["@id"]).includes(oldID)) {
-          commit("deletePropertyFromShape", { shape, propertyID: oldID });
-          commit("addPropertyIDToShape", { shape, propertyID: newID });
+        // Update the state's shapes.
+        const shape = getters.shapeWithID(oldID);
+        commit("updatePropertyShapeID", { shape, newID });
+        for (const shape of state.model) {
+          if (getters.shapeProperties(shape["@id"]).includes(oldID)) {
+            this.dispatch("addPredicate", {
+              shapeID: shape["@id"],
+              predicate: TERM.property,
+              valueType: "id",
+              input: newID
+            });
+            commit("deletePropertyFromShape", { shape, propertyID: oldID });
+          }
         }
-      }
-      commit("updateLocations", { oldID, newID });
-      // Update the y values of the properties.
-      for (const shape of state.model) {
-        commit("updateYValues", { shapeID: shape["@id"], shapes: state.model });
+        // Update the y values of the properties.
+        for (const shape of state.model) {
+          commit("updateYValues", {
+            shapeID: shape["@id"],
+            shapes: state.model
+          });
+        }
       }
     },
 

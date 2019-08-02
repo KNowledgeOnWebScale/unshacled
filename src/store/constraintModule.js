@@ -38,7 +38,8 @@ const constraintModule = {
         { root: true }
       );
       // Toggle the predicate modal.
-      commit("togglePredicateModal", undefined, { root: true });
+      if (rootState.predicateModal.show)
+        commit("togglePredicateModal", undefined, { root: true });
     },
 
     /* EDIT ========================================================================================================= */

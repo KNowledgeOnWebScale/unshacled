@@ -137,9 +137,9 @@ export default {
 
         // FIXME ugly
         for (const value of values) {
-          if (value["@id"]) {
+          if (value["@id"] || value["@id"] === "") {
             output.push(urlToName(value["@id"]));
-          } else if (value["@value"]) {
+          } else if (value["@value"] || value["@value"] === "") {
             output.push(urlToName(value["@value"]));
           } else if (value["@list"]) {
             for (const v of value["@list"]) {
