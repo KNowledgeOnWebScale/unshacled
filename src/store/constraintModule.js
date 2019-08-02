@@ -82,7 +82,7 @@ const constraintModule = {
       // Update the y values
       commit(
         "updateYValues",
-        { shape, shapes: rootState.mShape.model },
+        { shapeID, shapes: rootState.mShape.model },
         { root: true }
       );
     },

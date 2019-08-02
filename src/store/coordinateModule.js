@@ -47,6 +47,7 @@ const coordinateModule = {
       // Update the y values of the properties.
       Vue.set(state.yValues, shapeID, {});
 
+      // Get the shape with the given ID.
       let shape;
       for (const item of shapes) {
         if (item["@id"] === shapeID) shape = item;

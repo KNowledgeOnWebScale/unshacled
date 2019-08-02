@@ -1,22 +1,28 @@
 <template>
-  <v-group @mouseenter="hover = true" @mouseleave="hover = false">
-    <v-rect :config="getRectConfig()"></v-rect>
-    <v-text ref="key" :config="keyConfig"></v-text>
-    <v-line :config="lineConfig"></v-line>
-    <v-circle
-      v-if="hover"
-      :config="deleteConstraintConfig"
-      @click="deleteConstraint"
-    ></v-circle>
+  <v-group>
+    <v-rect :config="getConfigs().rectangleConfig"></v-rect>
 
-    <div v-for="(value, index) of getConstraintValues()" :key="index">
-      <v-text :config="getTextConfig(value, index)"></v-text>
+    <v-group @mouseenter="hoverKey = true" @mouseleave="hoverKey = false">
+      <v-text ref="key" :config="getConfigs().keyConfig"></v-text>
       <v-circle
-        v-if="hover"
-        :config="getDeleteValueConfig(index)"
-        @click="deleteConstraintValue(index)"
+        v-if="hoverKey"
+        :config="getConfigs().deleteConstraint"
+        @click="deleteConstraint"
       ></v-circle>
-    </div>
+    </v-group>
+
+    <v-line :config="getConfigs().lineConfig"></v-line>
+
+    <v-group @mouseenter="hoverValues = true" @mouseleave="hoverValues = false">
+      <div v-for="(value, index) of getConstraintValues()" :key="index">
+        <v-text :config="getValueConfig(value, index)"></v-text>
+        <v-circle
+          v-if="hoverValues"
+          :config="getDeleteValueConfig(index)"
+          @click="deleteConstraintValue(index)"
+        ></v-circle>
+      </div>
+    </v-group>
   </v-group>
 </template>
 
@@ -51,34 +57,31 @@ export default {
     }
   },
   data() {
-    const y = this.$store.state.mShape.mCoordinate.yValues[this.$props.shapeID][
-      this.$props.constraintID
-    ];
-
     return {
-      hover: false,
+      hoverKey: false,
+      hoverValues: false,
+
       lineConfig: {
         ...CONSTRAINT_SEPARATION_LINE,
-        points: [0, y + HEIGHT, WIDTH, y + HEIGHT] // [x1, y1, x2, y2]
+        points: [0, HEIGHT, WIDTH, HEIGHT] // [x1, y1, x2, y2]
       },
       rectangleConfig: {
         ...CONSTRAINT_CONFIG,
-        y,
         stroke: this.$props.stroke
       },
       keyConfig: {
         ...CONSTRAINT_TEXT_CONFIG,
-        y: y + DELTA_Y_TEXT,
+        y: DELTA_Y_TEXT,
         fontStyle: "italic",
         text: urlToName(this.$props.constraintID)
       },
       valueConfig: {
         ...CONSTRAINT_TEXT_CONFIG,
-        y: y + DELTA_Y_TEXT + HEIGHT
+        y: DELTA_Y_TEXT + HEIGHT
       },
       deleteConstraintConfig: {
         ...DELETE_BUTTON_CONFIG,
-        y: y + DELTA_Y_DELETE
+        y: DELTA_Y_DELETE
       }
     };
   },
@@ -155,37 +158,6 @@ export default {
     },
 
     /**
-     * Get the rectangle configuration based on the current number of values.
-     */
-    getRectConfig() {
-      return {
-        ...this.rectangleConfig,
-        height: HEIGHT * (this.getNumConstraintValues() + 1)
-      };
-    },
-
-    /**
-     * Get the configuration for the given text value.
-     */
-    getTextConfig(text, index) {
-      return {
-        ...this.valueConfig,
-        y: this.valueConfig.y + index * HEIGHT,
-        text
-      };
-    },
-
-    /**
-     * Get the delete button configuration based on the current number of values.
-     */
-    getDeleteValueConfig(index) {
-      return {
-        ...this.deleteConstraintConfig,
-        y: this.deleteConstraintConfig.y + (index + 1) * HEIGHT
-      };
-    },
-
-    /**
      * Get the number of constraint values.
      * @returns {number}
      */
@@ -199,6 +171,64 @@ export default {
         : cvs.length > 0 && cvs[0]["@list"]
         ? cvs[0]["@list"].length // Get the number of elements if it's a list.
         : cvs.length;
+    },
+
+    /**
+     * Return the y value of this constraint.
+     * @returns {*}
+     */
+    getYValue() {
+      return this.$store.state.mShape.mCoordinate.yValues[this.$props.shapeID][
+        this.$props.constraintID
+      ];
+    },
+
+    /* CONFIGURATIONS =============================================================================================== */
+
+    getConfigs() {
+      const y = this.getYValue();
+      const points = [...this.lineConfig.points];
+      points[1] += y;
+      points[3] += y;
+
+      return {
+        lineConfig: { ...this.lineConfig, points },
+        rectangleConfig: {
+          ...this.rectangleConfig,
+          y,
+          height: (this.getNumConstraintValues() + 1) * HEIGHT
+        },
+        keyConfig: {
+          ...this.keyConfig,
+          y: this.keyConfig.y + y
+        },
+        valueConfig: {
+          ...this.valueConfig,
+          y: this.valueConfig.y + y
+        },
+        deleteConstraint: {
+          ...this.deleteConstraintConfig,
+          y: this.deleteConstraintConfig.y + y
+        }
+      };
+    },
+
+    getValueConfig(text, index) {
+      return {
+        ...this.valueConfig,
+        y: this.valueConfig.y + this.getYValue() + index * HEIGHT,
+        text
+      };
+    },
+
+    getDeleteValueConfig(index) {
+      return {
+        ...this.deleteConstraintConfig,
+        y:
+          this.deleteConstraintConfig.y +
+          (index + 1) * HEIGHT +
+          this.getYValue()
+      };
     }
   }
 };
