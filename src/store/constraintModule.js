@@ -38,7 +38,8 @@ const constraintModule = {
         { root: true }
       );
       // Toggle the predicate modal.
-      commit("togglePredicateModal", undefined, { root: true });
+      if (rootState.predicateModal.show)
+        commit("togglePredicateModal", undefined, { root: true });
     },
 
     /* EDIT ========================================================================================================= */
@@ -71,20 +72,47 @@ const constraintModule = {
      *            constraint the ID of the constraint that should be removed.
      */
     deleteConstraintFromShapeWithID({ getters, commit, rootState }, args) {
-      const { shapeID, constraint } = args;
+      const { shapeID, constraintID } = args;
       const shape = getters.shapeWithID(shapeID);
       commit(
         "deleteConstraintFromShape",
-        { shape, constraint },
+        { shape, constraintID },
         { root: true }
       );
 
       // Update the y values
       commit(
         "updateYValues",
-        { shape, shapes: rootState.mShape.model },
+        { shapeID, shapes: rootState.mShape.model },
         { root: true }
       );
+    },
+
+    /**
+     * Delete the constraint value at the given index.
+     * If the constraint value has a '@list' object,
+     *   the constraint with the given index will be removed from that object.
+     * @param getters
+     * @param args
+     */
+    deleteConstraintValueWithIndex({ getters }, args) {
+      const { shapeID, constraintID, valueIndex } = args;
+      const shape = getters.shapeWithID(shapeID);
+
+      // If the value is a list, then remove from that list instead of directly.
+      if (shape[constraintID].length > 0 && shape[constraintID][0]["@list"]) {
+        shape[constraintID][0]["@list"].splice(valueIndex, 1);
+      } else {
+        shape[constraintID].splice(valueIndex, 1);
+      }
+
+      // Delete the constraint from the shape if there are no values left.
+      if (shape[constraintID].length === 0) {
+        this.dispatch("deleteConstraintFromShapeWithID", {
+          shapeID,
+          constraintID
+        });
+      }
     }
   },
   getters: {
@@ -141,7 +169,7 @@ const constraintModule = {
         const ignored = ["@id", "@type"];
         for (const prop in shape) {
           // Only handle the constraints that are not ignored
-          if (ignored.indexOf(prop) < 0) {
+          if (!ignored.includes(prop)) {
             if (shape[prop].length > 1) {
               // Get the ID of every element in the list
               const properties = [];

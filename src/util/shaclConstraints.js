@@ -1,5 +1,4 @@
 import { internalToShacl, shaclToInternal } from "../parsing/internalParser";
-import { urlToCuston } from "../parsing/urlParser";
 
 getReady;
 const initialConstraints = [];
@@ -53,6 +52,12 @@ function simplifyParameter(obj) {
   if (constraint) constraint.parameter = parameter;
 }
 
+/**
+ * Group the given dictionary of objects by the given key.
+ * @param xs
+ * @param key
+ * @returns {*}
+ */
 function groupBy(xs, key) {
   return xs.reduce((rv, x) => {
     (rv[x[key]] = rv[x[key]] || []).push(x);
@@ -453,71 +458,6 @@ const constraintsWithTypes = [
     }
   }
 ];
-
-export const constraintsByTypes = {
-  "Value Type Constraints": [
-    "http://www.w3.org/ns/shacl#class",
-    "http://www.w3.org/ns/shacl#datatype",
-    "http://www.w3.org/ns/shacl#nodeKind"
-  ],
-  "Cardinality Constraints": [
-    "http://www.w3.org/ns/shacl#minCount",
-    "http://www.w3.org/ns/shacl#maxCount"
-  ],
-  "Value Range Constraints": [
-    "http://www.w3.org/ns/shacl#minInclusive",
-    "http://www.w3.org/ns/shacl#minExclusive",
-    "http://www.w3.org/ns/shacl#maxInclusive",
-    "http://www.w3.org/ns/shacl#maxExclusive"
-  ],
-  "String-Based Constraints": [
-    "http://www.w3.org/ns/shacl#minLength",
-    "http://www.w3.org/ns/shacl#maxLength",
-    "http://www.w3.org/ns/shacl#pattern",
-    "http://www.w3.org/ns/shacl#languageIn",
-    "http://www.w3.org/ns/shacl#uniqueLang"
-  ],
-  "Property Pair Constraints": [
-    "http://www.w3.org/ns/shacl#equals",
-    "http://www.w3.org/ns/shacl#disjoint",
-    "http://www.w3.org/ns/shacl#lessThan",
-    "http://www.w3.org/ns/shacl#lessThanOrEquals"
-  ],
-  "Logical Constraints": [
-    "http://www.w3.org/ns/shacl#not",
-    "http://www.w3.org/ns/shacl#and",
-    "http://www.w3.org/ns/shacl#or",
-    "http://www.w3.org/ns/shacl#xone"
-  ],
-  "Shape-Based Constraints": [
-    "http://www.w3.org/ns/shacl#node",
-    "http://www.w3.org/ns/shacl#property",
-    "http://www.w3.org/ns/shacl#qualifiedValueShape",
-    "http://www.w3.org/ns/shacl#qualifiedMinCount",
-    "http://www.w3.org/ns/shacl#qualifiedMaxCount"
-  ],
-  "Other Constraints": [
-    "http://www.w3.org/ns/shacl#closed",
-    "http://www.w3.org/ns/shacl#ignoredProperties",
-    "http://www.w3.org/ns/shacl#hasValue",
-    "http://www.w3.org/ns/shacl#in"
-  ]
-};
-
-/**
- * TODO
- */
-export function customConstraintsByType() {
-  const output = {};
-  for (const type in constraintsByTypes) {
-    const byType = [];
-    for (const constraint of constraintsByTypes[type]) {
-      byType.push(shaclToInternal(constraint));
-    }
-    output[type] = byType;
-  }
-  return output;
-}
 
 const json = [
   {
@@ -6476,6 +6416,84 @@ const json = [
     "@id": "http://www.w3.org/ns/shacl-shacl#"
   }
 ];
+
+// The core SHACL constraints divided by category.
+export const constraintsByTypes = {
+  "Value Type Constraints": [
+    "http://www.w3.org/ns/shacl#class",
+    "http://www.w3.org/ns/shacl#datatype",
+    "http://www.w3.org/ns/shacl#nodeKind"
+  ],
+  "Cardinality Constraints": [
+    "http://www.w3.org/ns/shacl#minCount",
+    "http://www.w3.org/ns/shacl#maxCount"
+  ],
+  "Value Range Constraints": [
+    "http://www.w3.org/ns/shacl#minInclusive",
+    "http://www.w3.org/ns/shacl#minExclusive",
+    "http://www.w3.org/ns/shacl#maxInclusive",
+    "http://www.w3.org/ns/shacl#maxExclusive"
+  ],
+  "String-Based Constraints": [
+    "http://www.w3.org/ns/shacl#minLength",
+    "http://www.w3.org/ns/shacl#maxLength",
+    "http://www.w3.org/ns/shacl#pattern",
+    "http://www.w3.org/ns/shacl#languageIn",
+    "http://www.w3.org/ns/shacl#uniqueLang"
+  ],
+  "Property Pair Constraints": [
+    "http://www.w3.org/ns/shacl#equals",
+    "http://www.w3.org/ns/shacl#disjoint",
+    "http://www.w3.org/ns/shacl#lessThan",
+    "http://www.w3.org/ns/shacl#lessThanOrEquals"
+  ],
+  "Logical Constraints": [
+    "http://www.w3.org/ns/shacl#not",
+    "http://www.w3.org/ns/shacl#and",
+    "http://www.w3.org/ns/shacl#or",
+    "http://www.w3.org/ns/shacl#xone"
+  ],
+  "Shape-Based Constraints": [
+    "http://www.w3.org/ns/shacl#node",
+    "http://www.w3.org/ns/shacl#property",
+    "http://www.w3.org/ns/shacl#qualifiedValueShape",
+    "http://www.w3.org/ns/shacl#qualifiedMinCount",
+    "http://www.w3.org/ns/shacl#qualifiedMaxCount"
+  ],
+  "Other Constraints": [
+    "http://www.w3.org/ns/shacl#closed",
+    "http://www.w3.org/ns/shacl#ignoredProperties",
+    "http://www.w3.org/ns/shacl#hasValue",
+    "http://www.w3.org/ns/shacl#in"
+  ]
+};
+
+/**
+ * TODO
+ */
+export function customConstraintsByCategory() {
+  const output = {};
+  for (const type in constraintsByTypes) {
+    const byType = [];
+    for (const constraint of constraintsByTypes[type]) {
+      byType.push(shaclToInternal(constraint));
+    }
+    output[type] = byType;
+  }
+  return output;
+}
+
+/**
+ * Get the constraint category of the constraint with the given ID.
+ * @param constraintID
+ * @returns {string}
+ */
+export function getConstraintCategory(constraintID) {
+  constraintID = internalToShacl(constraintID);
+  for (const type in constraintsByTypes) {
+    if (constraintsByTypes[type].includes(constraintID)) return type;
+  }
+}
 
 /**
  * Get the value type of the constraint with the given ID.

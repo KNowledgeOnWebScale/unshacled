@@ -11,7 +11,7 @@
       :draggable="true"
       @mouseenter="hover = true"
       @mouseleave="hover = false"
-      @dragmove="updateCoordinates"
+      @dragmove="updatePosition"
     >
       <v-rect :config="shapeConfig"></v-rect>
       <v-text
@@ -35,11 +35,7 @@
         <constraint
           :constraint-i-d="key"
           :shape-i-d="$props.id"
-          :hover="hover"
           :stroke="shapeConfig.stroke"
-          :constraint-config="constraintConfigs[key]"
-          :constraint-text-config="constraintTextConfigs[key]"
-          :delete-constraint-config="deleteConstraintConfigs[key]"
         ></constraint>
       </div>
     </v-group>
@@ -53,15 +49,10 @@ import { urlToName } from "../../parsing/urlParser";
 import {
   DELETE_BUTTON_CONFIG,
   ID_TEXT_CONFIG,
-  CONSTRAINT_TEXT_CONFIG,
-  CONSTRAINT_CONFIG,
   NODE_SHAPE_CONFIG,
   PROPERTY_SHAPE_CONFIG,
   ADD_PREDICATE_CONFIG
 } from "../../util/konvaConfigs";
-
-const DELTA_Y_TEXT = 15;
-const DELTA_Y_DELETE = 20;
 
 export default {
   name: "Shape",
@@ -81,9 +72,6 @@ export default {
       hover: false,
       editing: false,
       adding: false,
-      constraintConfigs: {},
-      constraintTextConfigs: {},
-      deleteConstraintConfigs: {},
       shapeConfig: this.$props.nodeShape
         ? NODE_SHAPE_CONFIG
         : PROPERTY_SHAPE_CONFIG,
@@ -92,12 +80,6 @@ export default {
         ...ID_TEXT_CONFIG,
         text: urlToName(this.$props.id)
       },
-      constraintConfig: CONSTRAINT_CONFIG,
-      constraintTextConfig: {
-        ...CONSTRAINT_TEXT_CONFIG,
-        text: urlToName(this.$props.propKey)
-      },
-      deleteConstraintConfig: DELETE_BUTTON_CONFIG,
       addPredicateConfig: ADD_PREDICATE_CONFIG
     };
   },
@@ -107,17 +89,7 @@ export default {
     this.$refs.posRef
       .getNode()
       .setPosition(this.$store.state.mShape.mCoordinate.coordinates[id]);
-    this.updateCoordinates();
-
-    // Update the configurations if the shape had changed.
-    const self = this;
-    this.$store.watch(
-      () => self.$store.getters.shapeConstraints(id),
-      () => {
-        const constraints = self.$store.getters.shapeConstraints(id);
-        if (constraints) self.setConfigs(constraints);
-      }
-    );
+    this.updatePosition();
   },
   methods: {
     /**
@@ -125,61 +97,32 @@ export default {
      * @returns an object mapping every constraint name to a (list of) values.
      */
     getConstraints() {
-      const constraints = this.$store.getters.shapeConstraints(this.$props.id);
-      this.setConfigs(constraints);
-      return constraints;
+      return this.$store.getters.shapeConstraints(this.$props.id);
     },
 
     /**
      * Takes the coordinates from this node shape and calls store to update them.
      */
-    updateCoordinates() {
+    updatePosition() {
       const pos = this.$refs.posRef.getNode().position();
-      const args = {
-        node: this.$props.id,
-        x: pos.x,
-        y: pos.y
-      };
       this.$store.commit("updateYValues", {
         shapeID: this.$props.id,
         shapes: this.$store.state.mShape.model
       });
-      this.$store.commit("updateCoordinates", args);
+      this.$store.commit("updateCoordinates", {
+        shapeID: this.$props.id,
+        x: pos.x,
+        y: pos.y
+      });
     },
 
     /**
-     * Set the configurations of its children using the updated y values from the state.
-     * @param elements a dictionary containing the node shape's elements.
-     */
-    setConfigs(elements) {
-      const { id } = this.$props;
-      const ys = this.$store.state.mShape.mCoordinate.yValues[id];
-
-      // FIXME
-      for (const prop of Object.keys(elements)) {
-        this.constraintConfigs[prop] = {
-          ...this.constraintConfig,
-          y: ys[prop]
-        };
-        this.constraintTextConfigs[prop] = {
-          ...this.constraintTextConfig,
-          y: ys[prop] + DELTA_Y_TEXT,
-          text: prop
-        };
-        this.deleteConstraintConfigs[prop] = {
-          ...this.deleteConstraintConfig,
-          y: ys[prop] + DELTA_Y_DELETE
-        };
-      }
-    },
-
-    /**
-     * TODO
+     * Toggle the predicate model to add a constraint to this shape.
      */
     addPredicate() {
       this.$store.commit("togglePredicateModal", {
         id: this.id,
-        type: "PropertyShape"
+        type: this.nodeShape ? "NodeShape" : "PropertyShape"
       });
     },
 

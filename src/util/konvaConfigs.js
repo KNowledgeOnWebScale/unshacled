@@ -1,5 +1,8 @@
 export const WIDTH = 250;
 export const HEIGHT = 40;
+export const DELTA_Y_TEXT = 15;
+export const DELTA_Y_DELETE = 20;
+
 const X = 0;
 const TEXT_SIZE = HEIGHT / 2;
 const DELETE_BUTTON_OFFSET = 240;

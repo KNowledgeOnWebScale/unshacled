@@ -40,10 +40,9 @@ const shapeModule = {
       const { getters } = args;
 
       // Parse the model if necessary.
-      state.model =
-        JSON.stringify(model).indexOf(SHACL_URI) === -1
-          ? model
-          : shaclToInternal(model);
+      state.model = JSON.stringify(model).includes(SHACL_URI)
+        ? shaclToInternal(model)
+        : model;
 
       // Update y values and set coordinates to zero
       for (const shape of state.model) {
@@ -143,11 +142,25 @@ const shapeModule = {
      */
     deletePropertyFromShape(state, args) {
       const { shape, propertyID } = args;
-      this.commit("deleteConstraintValue", {
-        shape,
-        constraintID: TERM.property,
-        constraintValue: propertyID
-      });
+      const properties = shape[TERM.property];
+      let index = -1;
+
+      for (const p in properties) {
+        if (
+          properties[p] === propertyID ||
+          properties[p]["@id"] === propertyID
+        ) {
+          index = p;
+        }
+      }
+
+      if (index >= 0) {
+        this.dispatch("deleteConstraintValueWithIndex", {
+          shapeID: shape["@id"],
+          constraintID: TERM.property,
+          valueIndex: index
+        });
+      }
     },
 
     /**
@@ -158,35 +171,8 @@ const shapeModule = {
      *            constraint the ID of the constraint that should be deleted.
      */
     deleteConstraintFromShape(state, args) {
-      const { shape, constraint } = args;
-      Vue.delete(shape, constraint);
-    },
-
-    /**
-     * Delete the given value from the given constraint.
-     * @param state
-     * @param args
-     *            shape the shape object that should be updated.
-     *            constraintID the ID of the constraint that should be updated.
-     *            constraintValue the value that should be removed from the given constraint.
-     */
-    deleteConstraintValue(state, args) {
-      const { shape, constraintID, constraintValue } = args;
-      const values = shape[constraintID];
-      for (const v in values) {
-        if (values[v]["@id"] === constraintValue) values.splice(v, 1);
-      }
-
-      // Delete the constraint from the shape if there are no values left. Otherwise, update the constraint value.
-      if (values.length === 0) {
-        Vue.delete(shape, constraintID);
-      } else {
-        this.commit("setConstraintValue", {
-          shape,
-          constraintID,
-          value: values
-        });
-      }
+      const { shape, constraintID } = args;
+      Vue.delete(shape, constraintID);
     }
   },
   actions: {
@@ -252,20 +238,30 @@ const shapeModule = {
      */
     editPropertyShape({ state, getters, commit }, args) {
       const { oldID, newID } = args;
+      if (oldID !== newID) {
+        commit("updateLocations", { oldID, newID });
 
-      // Update the state's shapes.
-      const shape = getters.shapeWithID(oldID);
-      commit("updatePropertyShapeID", { shape, newID });
-      for (const shape of state.model) {
-        if (getters.shapeProperties(shape["@id"]).indexOf(oldID) !== -1) {
-          commit("deletePropertyFromShape", { shape, propertyID: oldID });
-          commit("addPropertyIDToShape", { shape, propertyID: newID });
+        // Update the state's shapes.
+        const shape = getters.shapeWithID(oldID);
+        commit("updatePropertyShapeID", { shape, newID });
+        for (const shape of state.model) {
+          if (getters.shapeProperties(shape["@id"]).includes(oldID)) {
+            this.dispatch("addPredicate", {
+              shapeID: shape["@id"],
+              predicate: TERM.property,
+              valueType: "id",
+              input: newID
+            });
+            commit("deletePropertyFromShape", { shape, propertyID: oldID });
+          }
         }
-      }
-      commit("updateLocations", { oldID, newID });
-      // Update the y values of the properties.
-      for (const shape of state.model) {
-        commit("updateYValues", { shapeID: shape["@id"], shapes: state.model });
+        // Update the y values of the properties.
+        for (const shape of state.model) {
+          commit("updateYValues", {
+            shapeID: shape["@id"],
+            shapes: state.model
+          });
+        }
       }
     },
 
@@ -289,7 +285,7 @@ const shapeModule = {
     deletePropertyShape({ state, getters, commit }, id) {
       // Check every nodeShape if it contains the given property.
       for (const shape of state.model) {
-        if (getters.shapeProperties(shape["@id"]).indexOf(id) !== -1) {
+        if (getters.shapeProperties(shape["@id"]).includes(id)) {
           commit("deletePropertyFromShape", { shape, propertyID: id });
         }
       }

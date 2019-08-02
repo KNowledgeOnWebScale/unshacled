@@ -67,10 +67,10 @@
     <export-modal></export-modal>
     <validation-report-modal></validation-report-modal>
 
-    <add-predicate-modal
+    <predicate-modal
       :id="this.$store.state.predicateModal.id"
       :type="this.$store.state.predicateModal.type"
-    ></add-predicate-modal>
+    ></predicate-modal>
   </div>
 </template>
 
@@ -82,7 +82,7 @@ import SuiDropdownDivider from "semantic-ui-vue/dist/commonjs/modules/Dropdown/D
 import ClearModal from "./Modals/ClearModal.vue";
 import NodeShapeModal from "./Modals/NodeShapeModal.vue";
 import ValidationReportModal from "./Modals/ValidationReportModal.vue";
-import AddPredicateModal from "./Modals/AddPredicateModal.vue";
+import PredicateModal from "./Modals/PredicateModal.vue";
 import NoDataFileModal from "./Modals/NoDataFileModal.vue";
 import ExportModal from "./Modals/ExportModal.vue";
 
@@ -98,7 +98,7 @@ export default {
     SuiDropdownDivider,
     SuiDropdown,
     ValidationReportModal,
-    AddPredicateModal
+    PredicateModal
   },
   data() {
     return {
