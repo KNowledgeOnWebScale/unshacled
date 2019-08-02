@@ -97,6 +97,10 @@ export default {
       });
     },
 
+    /**
+     * Delete the constraint value at the given index,
+     * @param index
+     */
     deleteConstraintValue(index) {
       this.$store.dispatch("deleteConstraintValueWithIndex", {
         shapeID: this.$props.shapeID,

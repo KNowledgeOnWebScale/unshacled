@@ -87,10 +87,23 @@ const constraintModule = {
       );
     },
 
+    /**
+     * Delete the constraint value at the given index.
+     * If the constraint value has a '@list' object,
+     *   the constraint with the given index will be removed from that object.
+     * @param getters
+     * @param args
+     */
     deleteConstraintValueWithIndex({ getters }, args) {
       const { shapeID, constraintID, valueIndex } = args;
       const shape = getters.shapeWithID(shapeID);
-      shape[constraintID].splice(valueIndex, 1);
+
+      // If the value is a list, then remove from that list instead of directly.
+      if (shape[constraintID].length > 0 && shape[constraintID][0]["@list"]) {
+        shape[constraintID][0]["@list"].splice(valueIndex, 1);
+      } else {
+        shape[constraintID].splice(valueIndex, 1);
+      }
 
       // Delete the constraint from the shape if there are no values left.
       if (shape[constraintID].length === 0) {

@@ -159,33 +159,6 @@ const shapeModule = {
     deleteConstraintFromShape(state, args) {
       const { shape, constraintID } = args;
       Vue.delete(shape, constraintID);
-    },
-
-    /**
-     * Delete the given value from the given constraint.
-     * @param state
-     * @param args
-     *            shape the shape object that should be updated.
-     *            constraintID the ID of the constraint that should be updated.
-     *            constraintValue the value that should be removed from the given constraint.
-     */
-    deleteConstraintValueWithIndex(state, args) {
-      const { shape, constraintID, constraintValue } = args;
-      const values = shape[constraintID];
-      for (const v in values) {
-        if (values[v]["@id"] === constraintValue) values.splice(v, 1);
-      }
-
-      // Delete the constraint from the shape if there are no values left. Otherwise, update the constraint value.
-      if (values.length === 0) {
-        Vue.delete(shape, constraintID);
-      } else {
-        this.commit("setConstraintValue", {
-          shape,
-          constraintID,
-          value: values
-        });
-      }
     }
   },
   actions: {
