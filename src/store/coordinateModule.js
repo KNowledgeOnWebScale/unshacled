@@ -91,7 +91,7 @@ const coordinateModule = {
     },
 
     /**
-     * TODO
+     * Clear all the coordinates and y values.
      * @param state
      */
     clearLocations(state) {

@@ -81,7 +81,7 @@ const dataModule = {
     },
 
     /**
-     * TODO
+     * Toggle a modal to alert the user that no data file has been loaded.
      * @param state
      */
     toggleNoDataFilePopup(state) {
@@ -109,7 +109,6 @@ const dataModule = {
 
     /**
      * Export the internal model to a file.
-     * // TODO parse the JSON to Turtle
      * // FIXME the default is SHACL for now
      * @param rootState
      * @param filename

@@ -92,7 +92,7 @@ export default {
     /* EDIT/DELETE  ================================================================================================= */
 
     /**
-     * TODO
+     * Start editing the value of the given constraint.
      */
     editValue(index, value) {
       this.$store.dispatch("startConstraintEdit", {

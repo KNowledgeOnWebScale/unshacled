@@ -5,7 +5,6 @@
         Export Shapes as {{ $store.state.exportType }}
       </sui-modal-header>
       <sui-modal-content>
-        <!-- TODO add filename input field -->
         <sui-form>
           <sui-form-field inline>
             <label>Filename</label>

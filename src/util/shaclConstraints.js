@@ -6469,7 +6469,7 @@ export const constraintsByTypes = {
 };
 
 /**
- * TODO
+ * Get an object mapping the category types to a list of custom constraints in that category.
  */
 export function customConstraintsByCategory() {
   const output = {};
