@@ -1,5 +1,5 @@
 <template>
-  <sui-modal v-model="this.$store.state.predicateModal.show">
+  <sui-modal v-model="$store.state.mShape.mConstraint.predicateModal.show">
     <sui-modal-header> Add Predicate</sui-modal-header>
     <sui-modal-content @submit.prevent="confirmNodeShape">
       <sui-form>
@@ -114,7 +114,8 @@ export default {
      * Select the given predicate.
      */
     predicateUrl() {
-      return `${this.urls[this.predicate]}#${this.predicate}`;
+      const { urls, predicate } = this;
+      return `${urls[predicate]}#${predicate}`;
     },
 
     showCheckbox() {

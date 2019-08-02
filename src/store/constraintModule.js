@@ -5,7 +5,13 @@ import { TERM } from "../translation/terminology";
  * @type {{mutations: {}, state: {}, getters: {}, actions: {}}}
  */
 const constraintModule = {
-  state: {},
+  state: {
+    predicateModal: {
+      show: false,
+      id: String,
+      type: String
+    }
+  },
   mutations: {},
   actions: {
     /* ADD ========================================================================================================== */
@@ -38,7 +44,7 @@ const constraintModule = {
         { root: true }
       );
       // Toggle the predicate modal.
-      if (rootState.predicateModal.show)
+      if (rootState.mShape.mConstraint.predicateModal.show)
         commit("togglePredicateModal", undefined, { root: true });
     },
 

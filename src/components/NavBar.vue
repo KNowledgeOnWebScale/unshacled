@@ -68,8 +68,8 @@
     <validation-report-modal></validation-report-modal>
 
     <predicate-modal
-      :id="this.$store.state.predicateModal.id"
-      :type="this.$store.state.predicateModal.type"
+      :id="this.$store.state.mShape.mConstraint.predicateModal.id"
+      :type="this.$store.state.mShape.mConstraint.predicateModal.type"
     ></predicate-modal>
   </div>
 </template>

@@ -14,7 +14,7 @@ import { TERM } from "../translation/terminology";
 // Modules
 import shapeModule from "./shapeModule";
 import dataModule from "./dataModule";
-import {internalToShacl} from "../parsing/internalParser";
+import { internalToShacl } from "../parsing/internalParser";
 
 Vue.use(Vuex);
 
@@ -24,12 +24,7 @@ export default new Vuex.Store({
     showNodeShapeModal: false,
     showClearModal: false,
     showExportModal: false,
-    exportType: "",
-    predicateModal: {
-      show: false,
-      id: String,
-      type: String
-    }
+    exportType: ""
   },
   modules: {
     mShape: shapeModule,
@@ -89,9 +84,13 @@ export default new Vuex.Store({
     togglePredicateModal(state, args) {
       if (!args) args = { id: null, type: null };
 
-      Vue.set(state.predicateModal, "show", !state.predicateModal.show);
-      Vue.set(state.predicateModal, "id", args.id);
-      Vue.set(state.predicateModal, "type", args.type);
+      Vue.set(
+        state.mShape.mConstraint.predicateModal,
+        "show",
+        !state.mShape.mConstraint.predicateModal.show
+      );
+      Vue.set(state.mShape.mConstraint.predicateModal, "id", args.id);
+      Vue.set(state.mShape.mConstraint.predicateModal, "type", args.type);
     }
   },
   actions: {

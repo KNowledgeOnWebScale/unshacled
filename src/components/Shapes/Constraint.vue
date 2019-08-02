@@ -15,7 +15,10 @@
 
     <v-group @mouseenter="hoverValues = true" @mouseleave="hoverValues = false">
       <div v-for="(value, index) of getConstraintValues()" :key="index">
-        <v-text :config="getValueConfig(value, index)"></v-text>
+        <v-text
+          :config="getValueConfig(value, index)"
+          @click="editValue(index, value)"
+        ></v-text>
         <v-circle
           v-if="hoverValues"
           :config="getDeleteValueConfig(index)"
@@ -86,6 +89,15 @@ export default {
     };
   },
   methods: {
+    /* EDIT/DELETE  ================================================================================================= */
+
+    /**
+     * TODO
+     */
+    editValue(index, value) {
+      console.log(index, value);
+    },
+
     /**
      * Delete the current constraint from its shape.
      */
@@ -111,6 +123,8 @@ export default {
         valueIndex: index
       });
     },
+
+    /* HELPERS ====================================================================================================== */
 
     /**
      * Get all the constraint values of this predicate.
@@ -173,6 +187,8 @@ export default {
         : cvs.length;
     },
 
+    /* CONFIGURATIONS =============================================================================================== */
+
     /**
      * Return the y value of this constraint.
      * @returns {*}
@@ -182,8 +198,6 @@ export default {
         this.$props.constraintID
       ];
     },
-
-    /* CONFIGURATIONS =============================================================================================== */
 
     getConfigs() {
       const y = this.getYValue();
