@@ -59,13 +59,13 @@ import Vue from "vue";
 import ValueType from "../../util/enums/ValueType";
 import {
   constraintsByTypes,
-  customConstraintsByType,
+  customConstraintsByCategory,
   getConstraintValueType
 } from "../../util/shaclConstraints";
 import { urlToName } from "../../parsing/urlParser";
 
 export default {
-  name: "AddPredicateModal",
+  name: "PredicateModal",
   props: ["type", "id"],
   data() {
     return {
@@ -88,10 +88,10 @@ export default {
 
       if (this.type) {
         const preds = this.$store.getters.predicates(this.type);
-        const byCategory = customConstraintsByType()[this.category];
+        const byCategory = customConstraintsByCategory()[this.category];
         if (preds)
           preds.forEach(pred => {
-            if (byCategory.indexOf(pred) !== -1) {
+            if (byCategory.includes(pred)) {
               const value = pred.split("#")[1];
               Vue.set(this.urls, value, pred.split("#")[0]);
               predsWithoutUrl.push(value);

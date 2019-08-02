@@ -141,7 +141,7 @@ const constraintModule = {
         const ignored = ["@id", "@type"];
         for (const prop in shape) {
           // Only handle the constraints that are not ignored
-          if (ignored.indexOf(prop) < 0) {
+          if (!ignored.includes(prop)) {
             if (shape[prop].length > 1) {
               // Get the ID of every element in the list
               const properties = [];

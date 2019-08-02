@@ -40,10 +40,9 @@ const shapeModule = {
       const { getters } = args;
 
       // Parse the model if necessary.
-      state.model =
-        JSON.stringify(model).indexOf(SHACL_URI) === -1
-          ? model
-          : shaclToInternal(model);
+      state.model = JSON.stringify(model).includes(SHACL_URI)
+        ? shaclToInternal(model)
+        : model;
 
       // Update y values and set coordinates to zero
       for (const shape of state.model) {
@@ -257,7 +256,7 @@ const shapeModule = {
       const shape = getters.shapeWithID(oldID);
       commit("updatePropertyShapeID", { shape, newID });
       for (const shape of state.model) {
-        if (getters.shapeProperties(shape["@id"]).indexOf(oldID) !== -1) {
+        if (getters.shapeProperties(shape["@id"]).includes(oldID)) {
           commit("deletePropertyFromShape", { shape, propertyID: oldID });
           commit("addPropertyIDToShape", { shape, propertyID: newID });
         }
@@ -289,7 +288,7 @@ const shapeModule = {
     deletePropertyShape({ state, getters, commit }, id) {
       // Check every nodeShape if it contains the given property.
       for (const shape of state.model) {
-        if (getters.shapeProperties(shape["@id"]).indexOf(id) !== -1) {
+        if (getters.shapeProperties(shape["@id"]).includes(id)) {
           commit("deletePropertyFromShape", { shape, propertyID: id });
         }
       }
