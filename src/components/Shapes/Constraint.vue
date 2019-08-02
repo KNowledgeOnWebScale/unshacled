@@ -1,14 +1,16 @@
 <template>
-  <v-group>
+  <v-group @mouseenter="hover = true" @mouseleave="hover = false">
     <v-rect :config="rectangleConfig"></v-rect>
     <v-text ref="key" :config="keyConfig"></v-text>
     <v-line :config="lineConfig"></v-line>
-    <v-text ref="value" :config="valueConfig"></v-text>
-    <v-circle
-      v-if="this.$props.hover"
-      :config="deleteConstraintConfig"
-      @click="deleteConstraint"
-    ></v-circle>
+    <div v-for="(value, index) of getConstraintValues()" :key="index">
+      <v-text :config="getConfig(value, index)"></v-text>
+      <v-circle
+        v-if="hover"
+        :config="deleteConstraintConfig"
+        @click="deleteConstraint"
+      ></v-circle>
+    </div>
   </v-group>
 </template>
 
@@ -36,10 +38,6 @@ export default {
       type: String,
       required: true
     },
-    hover: {
-      type: Boolean,
-      required: true
-    },
     stroke: {
       type: String,
       required: false,
@@ -47,15 +45,19 @@ export default {
     }
   },
   data() {
-    const numConstraints = this.$store.getters.shapeWithID(this.$props.shapeID)[
-      this.$props.constraintID
-    ].length;
+    // Get the number of constraint values. For `property`, these will be listed as a single value.
+    const numConstraintValues = this.$props.constraintID.includes("property")
+      ? 1
+      : this.$store.getters.shapeWithID(this.$props.shapeID)[
+          this.$props.constraintID
+        ].length;
 
     const y = this.$store.state.mShape.mCoordinate.yValues[this.$props.shapeID][
       this.$props.constraintID
     ];
 
     return {
+      hover: false,
       lineConfig: {
         ...CONSTRAINT_SEPARATION_LINE,
         points: [0, y + HEIGHT, WIDTH, y + HEIGHT] // [x1, y1, x2, y2]
@@ -63,7 +65,7 @@ export default {
       rectangleConfig: {
         ...CONSTRAINT_CONFIG,
         y,
-        height: HEIGHT * (numConstraints + 1),
+        height: HEIGHT * (numConstraintValues + 1),
         stroke: this.$props.stroke
       },
       keyConfig: {
@@ -111,6 +113,7 @@ export default {
      * @returns {[]|*} array or string, depending to the number of values.
      */
     getConstraintValue() {
+      this.getConstraintValues();
       const constraints = this.$store.getters.shapeConstraints(
         this.$props.shapeID
       );
@@ -138,6 +141,52 @@ export default {
         }
       }
       return "";
+    },
+
+    /**
+     * Get all the constraint values of this predicate.
+     * Returns a list of values.
+     */
+    getConstraintValues() {
+      const constraints = this.$store.getters.shapeConstraints(
+        this.$props.shapeID
+      );
+      const output = [];
+
+      if (constraints && constraints[this.$props.constraintID]) {
+        const values = constraints[this.$props.constraintID];
+
+        // FIXME ugly
+        for (const value of values) {
+          if (value["@id"]) {
+            output.push(urlToName(value["@id"]));
+          } else if (value["@value"]) {
+            output.push(urlToName(value["@value"]));
+          } else if (value["@list"]) {
+            for (const v of value["@list"]) {
+              if (v["@id"]) {
+                output.push(v["@id"]);
+              } else if (v["@value"]) {
+                output.push(v["@value"]);
+              }
+            }
+          } else {
+            output.push(urlToName(value));
+          }
+        }
+      }
+      return output;
+    },
+
+    /**
+     * Get the configuration for the given text value.
+     */
+    getConfig(text, index) {
+      return {
+        ...this.valueConfig,
+        y: this.valueConfig.y + index * HEIGHT,
+        text
+      };
     },
 
     /**

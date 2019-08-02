@@ -161,6 +161,7 @@ export default {
 
     /**
      * Add the predicate that's been filled out in the modal.
+     * TODO check if this is correct, cfr @value/@id/@list n stuff
      */
     addPredicate() {
       const predicate = this.predicateUrl();

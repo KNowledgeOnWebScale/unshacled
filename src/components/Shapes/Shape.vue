@@ -35,7 +35,6 @@
         <constraint
           :constraint-i-d="key"
           :shape-i-d="$props.id"
-          :hover="hover"
           :stroke="shapeConfig.stroke"
         ></constraint>
       </div>
