@@ -1,10 +1,10 @@
 <template>
   <v-group @mouseenter="hover = true" @mouseleave="hover = false">
-    <v-rect :config="rectangleConfig"></v-rect>
+    <v-rect :config="getRectConfig()"></v-rect>
     <v-text ref="key" :config="keyConfig"></v-text>
     <v-line :config="lineConfig"></v-line>
     <div v-for="(value, index) of getConstraintValues()" :key="index">
-      <v-text :config="getConfig(value, index)"></v-text>
+      <v-text :config="getTextConfig(value, index)"></v-text>
       <v-circle
         v-if="hover"
         :config="deleteConstraintConfig"
@@ -45,13 +45,6 @@ export default {
     }
   },
   data() {
-    // Get the number of constraint values. For `property`, these will be listed as a single value.
-    const numConstraintValues = this.$props.constraintID.includes("property")
-      ? 1
-      : this.$store.getters.shapeWithID(this.$props.shapeID)[
-          this.$props.constraintID
-        ].length;
-
     const y = this.$store.state.mShape.mCoordinate.yValues[this.$props.shapeID][
       this.$props.constraintID
     ];
@@ -65,7 +58,6 @@ export default {
       rectangleConfig: {
         ...CONSTRAINT_CONFIG,
         y,
-        height: HEIGHT * (numConstraintValues + 1),
         stroke: this.$props.stroke
       },
       keyConfig: {
@@ -76,22 +68,13 @@ export default {
       },
       valueConfig: {
         ...CONSTRAINT_TEXT_CONFIG,
-        y: y + DELTA_Y_TEXT + HEIGHT,
-        text: this.getConstraintValue()
+        y: y + DELTA_Y_TEXT + HEIGHT
       },
       deleteConstraintConfig: {
         ...DELETE_BUTTON_CONFIG,
         y: y + DELTA_Y_DELETE
       }
     };
-  },
-  mounted() {
-    const self = this;
-    // Update the text value whenever the shape has changed.
-    this.$store.watch(
-      () => self.$store.getters.shapeConstraints(self.$props.shapeID),
-      () => self.updateConfigs()
-    );
   },
   methods: {
     /**
@@ -109,41 +92,6 @@ export default {
     },
 
     /**
-     * Get the value of the current constraint.
-     * @returns {[]|*} array or string, depending to the number of values.
-     */
-    getConstraintValue() {
-      this.getConstraintValues();
-      const constraints = this.$store.getters.shapeConstraints(
-        this.$props.shapeID
-      );
-      if (constraints && constraints[this.$props.constraintID]) {
-        const value = constraints[this.$props.constraintID];
-
-        // Check if there is more than one value.
-        if (value.length > 1) {
-          // Transform the list.
-          const output = [];
-          for (const element of value) {
-            // Extract each element's name.
-            output.push(urlToName(element));
-          }
-          return output;
-        } else if (value.length === 0) {
-          // The constraint has no value.
-          return "(empty)";
-        } else if (value[0]["@id"]) {
-          // Get the ID and extract the name.
-          return urlToName(value[0]["@id"]);
-        } else if (value[0]["@value"]) {
-          // Get the value.
-          return value[0]["@value"];
-        }
-      }
-      return "";
-    },
-
-    /**
      * Get all the constraint values of this predicate.
      * Returns a list of values.
      */
@@ -155,6 +103,14 @@ export default {
 
       if (constraints && constraints[this.$props.constraintID]) {
         const values = constraints[this.$props.constraintID];
+
+        // Properties should be listed in a single entry
+        if (this.$props.constraintID.includes("property")) {
+          for (const value of values) {
+            output.push(urlToName(value));
+          }
+          return [output.toString()];
+        }
 
         // FIXME ugly
         for (const value of values) {
@@ -178,10 +134,17 @@ export default {
       return output;
     },
 
+    getRectConfig() {
+      return {
+        ...this.rectangleConfig,
+        height: HEIGHT * (this.getNumConstraintValues() + 1)
+      };
+    },
+
     /**
      * Get the configuration for the given text value.
      */
-    getConfig(text, index) {
+    getTextConfig(text, index) {
       return {
         ...this.valueConfig,
         y: this.valueConfig.y + index * HEIGHT,
@@ -190,17 +153,19 @@ export default {
     },
 
     /**
-     * Update the text values.
+     * Get the number of constraint values.
+     * @returns {number}
      */
-    updateConfigs() {
-      this.keyConfig = {
-        ...this.keyConfig,
-        text: urlToName(this.$props.constraintID)
-      };
-      this.valueConfig = {
-        ...this.valueConfig,
-        text: this.getConstraintValue()
-      };
+    getNumConstraintValues() {
+      const cvs = this.$store.getters.shapeWithID(this.$props.shapeID)[
+        this.$props.constraintID
+      ];
+
+      return this.$props.constraintID.includes("property")
+        ? 1 // For `property`, these will be listed as a single value.
+        : cvs[0]["@list"]
+        ? cvs[0]["@list"].length // Get the number of elements if it's a list.
+        : cvs.length;
     }
   }
 };
