@@ -82,15 +82,15 @@ export default new Vuex.Store({
      * @param args
      */
     togglePredicateModal(state, args) {
-      if (!args) args = { id: null, type: null };
+      if (!args) args = { shapeID: "", shapeType: "" };
 
       Vue.set(
         state.mShape.mConstraint.predicateModal,
         "show",
         !state.mShape.mConstraint.predicateModal.show
       );
-      Vue.set(state.mShape.mConstraint.predicateModal, "id", args.id);
-      Vue.set(state.mShape.mConstraint.predicateModal, "type", args.type);
+      Vue.set(state.mShape.mConstraint.predicateModal, "shapeID", args.shapeID);
+      Vue.set(state.mShape.mConstraint.predicateModal, "shapeType", args.shapeType);
     }
   },
   actions: {

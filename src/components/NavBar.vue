@@ -68,8 +68,18 @@
     <validation-report-modal></validation-report-modal>
 
     <predicate-modal
-      :id="this.$store.state.mShape.mConstraint.predicateModal.id"
-      :type="this.$store.state.mShape.mConstraint.predicateModal.type"
+      :shape-i-d="this.$store.state.mShape.mConstraint.predicateModal.shapeID"
+      :shape-type="
+        this.$store.state.mShape.mConstraint.predicateModal.shapeType
+      "
+      :category="this.$store.state.mShape.mConstraint.predicateModal.category"
+      :predicate="this.$store.state.mShape.mConstraint.predicateModal.predicate"
+      :urls="this.$store.state.mShape.mConstraint.predicateModal.urls"
+      :input="this.$store.state.mShape.mConstraint.predicateModal.input"
+      :object="this.$store.state.mShape.mConstraint.predicateModal.object"
+      :constraint-type="
+        this.$store.state.mShape.mConstraint.predicateModal.constraintType
+      "
     ></predicate-modal>
   </div>
 </template>
@@ -108,20 +118,22 @@ export default {
     };
   },
   methods: {
-    loadExample() {
-      this.$store.dispatch("loadExample");
+    toggleClearModal() {
+      this.$store.commit("toggleClearModal");
     },
     toggleShapeModal() {
       this.createPropertyShape = false;
       this.$store.commit("toggleShapeModal");
     },
-    toggleClearModal() {
-      this.$store.commit("toggleClearModal");
-    },
     togglePropertyModal() {
       this.createPropertyShape = true;
       this.$store.commit("toggleShapeModal");
     },
+
+    loadExample() {
+      this.$store.dispatch("loadExample");
+    },
+
     readTextFile() {
       const file = document.getElementById("file").files[0];
       this.$store.commit("uploadSchemaFile", file);
@@ -133,6 +145,7 @@ export default {
       const file = document.getElementById("dataFile").files[0];
       this.$store.commit("uploadDataFile", file);
     },
+
     validate() {
       this.$store.dispatch("validate");
     }

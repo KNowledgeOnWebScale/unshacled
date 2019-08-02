@@ -8,8 +8,14 @@ const constraintModule = {
   state: {
     predicateModal: {
       show: false,
-      id: String,
-      type: String
+      shapeID: "",
+      shapeType: "",
+      category: "",
+      predicate: "",
+      urls: {},
+      input: "",
+      object: "",
+      constraintType: ""
     }
   },
   mutations: {},
@@ -65,6 +71,19 @@ const constraintModule = {
         shape: rootGetters.shapeWithID(shapeID),
         constraintID,
         value
+      });
+    },
+
+    startConstraintEdit({ commit }, args) {
+      const { shapeID, constraintID, index, value } = args;
+      console.log(constraintID, index, value);
+      this.state.predicateModal = {
+        ...this.state.predicateModal,
+        show: true,
+      };
+      commit("togglePredicateModal", {
+        shapeID,
+        shapeType: this.shapeType
       });
     },
 

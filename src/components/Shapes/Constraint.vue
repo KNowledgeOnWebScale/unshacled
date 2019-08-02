@@ -95,7 +95,12 @@ export default {
      * TODO
      */
     editValue(index, value) {
-      console.log(index, value);
+      this.$store.dispatch("startConstraintEdit", {
+        shapeID: this.$props.shapeID,
+        constraintID: this.$props.constraintID,
+        index,
+        value
+      });
     },
 
     /**
