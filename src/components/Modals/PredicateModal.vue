@@ -39,14 +39,23 @@
           <input v-if="showString()" v-model="values.input" type="text" />
           <input v-if="showCheckbox()" v-model="values.input" type="checkbox" />
           <input v-if="showInteger()" v-model="values.input" type="number" />
-          <input v-if="showShapes()" v-model="values.input" list="datalist" />
-          <datalist v-if="showShapes()" id="datalist" type="text">
+          <input v-if="showShapes()" v-model="values.input" list="shapeList" />
+
+          <datalist v-if="showShapes()" id="shapeList" type="text">
             <option
-              v-for="key in getOptions()"
+              v-for="key in getShapeOptions()"
               :key="getOptionID(key)"
               :value="getOptionID(key)"
             ></option>
           </datalist>
+
+          <input v-if="showPaths()" v-model="values.input" list="pathList" />
+          <datalist v-if="showPaths()" id="pathList" type="text">
+            <option v-for="key in getPathOptions()" :key="key" :value="key">
+              {{ getPathName(key) }}
+            </option>
+          </datalist>
+
           <input v-if="showOther()" v-model="values.input" />
         </sui-form-field>
       </sui-form>
@@ -72,7 +81,9 @@ import {
   customConstraintsByCategory,
   getConstraintValueType
 } from "../../util/shaclConstraints";
-import { urlToName } from "../../parsing/urlParser";
+import { isUrl, urlToName } from "../../parsing/urlParser";
+import { TERM } from "../../translation/terminology";
+import { SCHEMA_URL } from "../../util/constants";
 
 export default {
   name: "PredicateModal",
@@ -165,19 +176,23 @@ export default {
     },
 
     showCheckbox() {
-      return this.values.constraintType === "boolean";
+      return this.values.constraintType.includes("boolean");
     },
     showInteger() {
-      return this.values.constraintType === "integer";
+      return this.values.constraintType.includes("integer");
     },
     showString() {
-      return this.values.constraintType === "string";
+      return this.values.constraintType.includes("string");
+    },
+    showPaths() {
+      return this.values.category === "Property Pair Constraints";
     },
     showShapes() {
       const possibilities = ["Property", "PropertyShape", "NodeShape", "Shape"];
       return (
-        possibilities.includes(this.values.constraintType) ||
-        this.values.predicate === "property"
+        !this.showPaths() &&
+        (possibilities.includes(this.values.constraintType) ||
+          this.values.predicate === "property")
       );
     },
     showOther() {
@@ -185,7 +200,8 @@ export default {
         this.showCheckbox() ||
         this.showInteger() ||
         this.showString() ||
-        this.showShapes()
+        this.showShapes() ||
+        this.showPaths()
       );
     },
 
@@ -216,6 +232,11 @@ export default {
       const valueType = ValueType(predicate);
       this.error = valueType === undefined;
 
+      if (this.values.category.includes("Property Pair")) {
+        if (!isUrl(this.values.input))
+          this.values.input = `${SCHEMA_URL}${this.values.input}`;
+      }
+
       if (!this.error) {
         this.$store.dispatch(this.$props.modalProperties.onExit, {
           predicate,
@@ -243,11 +264,13 @@ export default {
       this.error = false;
     },
 
+    /* POPULATING =================================================================================================== */
+
     /**
      * Get the possible options for the datalist object.
      * @returns {*}
      */
-    getOptions() {
+    getShapeOptions() {
       const ct = this.values.constraintType.toLocaleLowerCase();
       if (ct.includes("property")) return this.$store.getters.propertyShapes;
       if (ct.includes("node")) return this.$store.getters.nodeShapes;
@@ -262,6 +285,39 @@ export default {
      */
     getOptionID(key) {
       return key["@id"];
+    },
+
+    /**
+     * Get the different options for choosing an existing path.
+     * The path of the current shape is not an option.
+     * @returns {[]}
+     */
+    getPathOptions() {
+      const { propertyShapes } = this.$store.getters;
+      const thisPath =
+        propertyShapes[this.$props.modalProperties.shapeID][TERM.path];
+
+      const paths = [];
+      for (const ps in propertyShapes) {
+        const path = propertyShapes[ps][TERM.path];
+        if (
+          path && // Check if the shape has a path.
+          (!thisPath || (thisPath && thisPath[0]["@id"] !== path[0]["@id"])) // Do not include the shape itself.
+        ) {
+          paths.push(path[0]["@id"]);
+        }
+      }
+      return paths;
+    },
+
+    /**
+     * Get the name of the path from the given url.
+     * Used in the HTML since `urlToName` cannot be used directly.
+     * @param key
+     * @returns {*}
+     */
+    getPathName(key) {
+      return urlToName(key);
     }
   }
 };

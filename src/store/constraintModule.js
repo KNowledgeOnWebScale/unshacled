@@ -37,28 +37,14 @@ const constraintModule = {
      * @param args
      */
     togglePredicateModal(state, args) {
-      if (!args) args = { shapeID: "", shapeType: "", onExit: "" };
+      if (!args)
+        args = { shapeID: "", shapeType: "", onExit: "", editing: false };
 
       Vue.set(state.predicateModal, "show", !state.predicateModal.show);
       Vue.set(state.predicateModal, "shapeID", args.shapeID);
       Vue.set(state.predicateModal, "shapeType", args.shapeType);
+      Vue.set(state.predicateModal, "editing", args.editing);
       Vue.set(state.predicateModal, "onExit", args.onExit);
-    },
-
-    resetPredicateModal() {
-      this.predicateModal = {
-        show: false,
-        shapeID: "",
-        shapeType: "",
-        category: "",
-        predicate: "",
-        urls: {},
-        input: "",
-        object: "",
-        constraintType: "",
-        editing: false,
-        onExit: ""
-      };
     }
   },
   actions: {
@@ -178,7 +164,6 @@ const constraintModule = {
      */
     updateConstraint({ rootGetters, commit }, args) {
       const { shapeID, constraintID, newValue } = args;
-      console.log(args);
 
       commit("setConstraintValue", {
         shape: rootGetters.shapeWithID(shapeID),

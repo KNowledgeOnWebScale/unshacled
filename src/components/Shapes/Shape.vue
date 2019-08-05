@@ -130,7 +130,8 @@ export default {
       this.$store.commit("togglePredicateModal", {
         shapeID: this.id,
         shapeType: this.nodeShape ? "NodeShape" : "PropertyShape",
-        onExit: "addPredicate"
+        onExit: "addPredicate",
+        editing: false
       });
     },
 
