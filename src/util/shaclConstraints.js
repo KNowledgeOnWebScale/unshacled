@@ -6455,6 +6455,7 @@ export const constraintsByTypes = {
   ],
   "Shape-Based Constraints": [
     "http://www.w3.org/ns/shacl#node",
+    "http://www.w3.org/ns/shacl#targetNode",
     "http://www.w3.org/ns/shacl#property",
     "http://www.w3.org/ns/shacl#qualifiedValueShape",
     "http://www.w3.org/ns/shacl#qualifiedMinCount",

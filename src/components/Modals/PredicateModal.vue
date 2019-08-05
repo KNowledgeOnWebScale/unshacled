@@ -1,6 +1,8 @@
 <template>
   <sui-modal v-model="$store.state.mShape.mConstraint.predicateModal.show">
-    <sui-modal-header> Add Predicate</sui-modal-header>
+    <sui-modal-header>
+      {{ $props.modalProperties.editing ? "Edit Predicate" : "Add Predicate" }}
+    </sui-modal-header>
     <sui-modal-content @submit.prevent="confirmNodeShape">
       <sui-form>
         <sui-form-field>
@@ -9,6 +11,7 @@
             v-if="categories"
             id="selectCategory"
             v-model="values.category"
+            :disabled="$props.modalProperties.editing"
             @change="values.predicate = ''"
           >
             <option v-for="c in categories" :key="c" :value="c">
@@ -22,7 +25,8 @@
           <select
             id="selectPreds"
             v-model="values.predicate"
-            @change="selectObject()"
+            :disabled="$props.modalProperties.editing"
+            @change="selectObject"
           >
             <option v-for="p in predicates" :key="p" :value="p">
               {{ p }}
@@ -52,8 +56,10 @@
       </sui-segment>
     </sui-modal-content>
     <sui-modal-actions>
-      <sui-button positive @click="addPredicate">Add</sui-button>
-      <sui-button negative @click="toggleModal">Cancel</sui-button>
+      <sui-button @click="toggleModal">Cancel</sui-button>
+      <sui-button positive @click="exit">
+        {{ $props.modalProperties.editing ? "Confirm" : "Add" }}
+      </sui-button>
     </sui-modal-actions>
   </sui-modal>
 </template>
@@ -115,18 +121,33 @@ export default {
     }
   },
   mounted() {
-    // Get the values passed on by the parent.
-    const { category, predicate, input, object, constraintType } = this.$props;
-    this.values = {
-      ...this.values,
-      category,
-      predicate,
-      input,
-      object,
-      constraintType
-    };
+    const self = this;
+    this.$store.watch(
+      () => self.$store.state.mShape.mConstraint.predicateModal,
+      () => self.updateValues()
+    );
   },
   methods: {
+    /**
+     * Get the values passed on by the parent.
+     */
+    updateValues() {
+      const {
+        category,
+        predicate,
+        input,
+        constraintType
+      } = this.$props.modalProperties;
+
+      this.values = {
+        ...this.values,
+        category,
+        predicate,
+        input,
+        constraintType
+      };
+    },
+
     /**
      * Toggle the visibility of the modal.
      */
@@ -190,26 +211,19 @@ export default {
       }
     },
 
-    /**
-     * Add the predicate that's been filled out in the modal.
-     * TODO check if this is correct, cfr @value/@id/@list n stuff
-     */
-    addPredicate() {
-      const { input, object } = this.values;
+    exit() {
       const predicate = this.predicateUrl();
       const valueType = ValueType(predicate);
       this.error = valueType === undefined;
 
       if (!this.error) {
-        const args = {
+        this.$store.dispatch(this.$props.modalProperties.onExit, {
           predicate,
           valueType,
           shapeID: this.$props.modalProperties.shapeID,
-          input,
-          object
-        };
-
-        this.$store.dispatch("addPredicate", args);
+          input: this.values.input,
+          object: this.$store.getters.objects(predicate)[0]
+        });
         this.reset();
       }
     },

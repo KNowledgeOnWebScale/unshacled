@@ -1,8 +1,11 @@
+import Vue from "vue";
+import { clone } from "ramda";
 import { TERM } from "../translation/terminology";
 import {
   getConstraintCategory,
   getConstraintValueType
 } from "../util/shaclConstraints";
+import { urlToName } from "../parsing/urlParser";
 
 /**
  * This module contains everything to change the shape constraints.
@@ -19,11 +22,28 @@ const constraintModule = {
       urls: {},
       input: "",
       object: "",
-      constraintType: ""
-    }
+      constraintType: "",
+      editing: false,
+      onExit: undefined
+    },
+    constraintIndex: 0
   },
   mutations: {
     /* PREDICATE MODAL ============================================================================================== */
+
+    /**
+     * Toggle the visibility of the predicate modal.
+     * @param state
+     * @param args
+     */
+    togglePredicateModal(state, args) {
+      if (!args) args = { shapeID: "", shapeType: "", onExit: "" };
+
+      Vue.set(state.predicateModal, "show", !state.predicateModal.show);
+      Vue.set(state.predicateModal, "shapeID", args.shapeID);
+      Vue.set(state.predicateModal, "shapeType", args.shapeType);
+      Vue.set(state.predicateModal, "onExit", args.onExit);
+    },
 
     resetPredicateModal() {
       this.predicateModal = {
@@ -35,7 +55,9 @@ const constraintModule = {
         urls: {},
         input: "",
         object: "",
-        constraintType: ""
+        constraintType: "",
+        editing: false,
+        onExit: ""
       };
     }
   },
@@ -76,6 +98,57 @@ const constraintModule = {
 
     /* EDIT ========================================================================================================= */
 
+    startConstraintEdit({ state }, args) {
+      const { shapeID, shapeType, constraintID, index, value } = args;
+
+      state.constraintIndex = index;
+
+      state.predicateModal = {
+        ...state.predicateModal,
+        shapeID,
+        shapeType,
+        category: getConstraintCategory(constraintID),
+        predicate: urlToName(constraintID),
+        input: value,
+        constraintType: getConstraintValueType(constraintID),
+        editing: true
+      };
+      this.commit("togglePredicateModal", {
+        shapeID,
+        shapeType,
+        onExit: "stopConstraintEdit"
+      });
+    },
+
+    // eslint-disable-next-line no-unused-vars
+    stopConstraintEdit({ state, rootGetters }, args) {
+      console.log(args);
+      state.predicateModal.editing = false;
+
+      const {
+        shapeID,
+        predicate: constraintID,
+        input,
+        object,
+        valueType
+      } = args;
+      const i = state.constraintIndex;
+      const updated = clone(rootGetters.shapeWithID(shapeID)[constraintID]);
+
+      const newValue =
+        valueType === "id" || valueType === "lists"
+          ? { "@id": input }
+          : { "@type": object, "@value": input };
+
+      if (updated[0]["@list"]) {
+        updated[0][i] = newValue;
+      } else {
+        updated[i] = newValue;
+      }
+      args.newValue = updated;
+      this.dispatch("updateConstraint", args);
+    },
+
     /**
      * Update the constraint value of the given shape.
      * @param rootGetters
@@ -85,29 +158,14 @@ const constraintModule = {
      *            constraintID the ID of the constraint we want to update.
      *            value the new value of the given constraint.
      */
-    updateConstraint({ rootGetters, commit }, args) {
-      const { shapeID, constraintID, value } = args;
-      commit("setConstraintValue", {
-        shape: rootGetters.shapeWithID(shapeID),
-        constraintID,
-        value
-      });
-    },
+    updateConstraint({ state, rootGetters, commit }, args) {
+      const { shapeID, predicate: constraintID, newValue } = args;
 
-    startConstraintEdit({ state, commit }, args) {
-      const { shapeID, shapeType, constraintID, index, value } = args;
-      console.log(constraintID, index, value);
-      state.predicateModal = {
-        ...state.predicateModal,
-        show: true,
-        shapeID,
-        shapeType,
-        category: getConstraintCategory(constraintID),
-        predicate: constraintID,
-        input: value,
-        constraintType: getConstraintValueType(constraintID)
-      };
-      commit("togglePredicateModal", { shapeID, shapeType });
+      // commit("setConstraintValue", {
+      //   shape: rootGetters.shapeWithID(shapeID),
+      //   constraintID,
+      //   value: newValue
+      // });
     },
 
     /* DELETE ======================================================================================================= */

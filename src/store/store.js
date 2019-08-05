@@ -74,23 +74,6 @@ export default new Vuex.Store({
       this.state.exportType = type;
       event.preventDefault();
       state.showExportModal = !state.showExportModal;
-    },
-
-    /**
-     * Toggle the visibility of the predicate modal.
-     * @param state
-     * @param args
-     */
-    togglePredicateModal(state, args) {
-      if (!args) args = { shapeID: "", shapeType: "" };
-
-      Vue.set(
-        state.mShape.mConstraint.predicateModal,
-        "show",
-        !state.mShape.mConstraint.predicateModal.show
-      );
-      Vue.set(state.mShape.mConstraint.predicateModal, "shapeID", args.shapeID);
-      Vue.set(state.mShape.mConstraint.predicateModal, "shapeType", args.shapeType);
     }
   },
   actions: {
