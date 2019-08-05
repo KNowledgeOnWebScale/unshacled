@@ -88,6 +88,7 @@ const constraintModule = {
       const { shapeID, shapeType, constraintID, index, value } = args;
 
       state.constraintIndex = index;
+      console.log(JSON.stringify(args, null, 2));
 
       state.predicateModal = {
         ...state.predicateModal,

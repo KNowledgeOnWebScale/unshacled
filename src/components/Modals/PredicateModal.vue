@@ -52,9 +52,15 @@
           <input v-if="showPaths()" v-model="values.input" list="pathList" />
           <datalist v-if="showPaths()" id="pathList" type="text">
             <option v-for="key in getPathOptions()" :key="key" :value="key">
-              {{ getPathName(key) }}
+              {{ getName(key) }}
             </option>
           </datalist>
+
+          <select v-if="showDataTypes" v-model="values.input">
+            <option v-for="key in getDataTypes()" :key="key" :value="key">
+              {{ getName(key) }}
+            </option>
+          </select>
 
           <input v-if="showOther()" v-model="values.input" />
         </sui-form-field>
@@ -83,7 +89,7 @@ import {
 } from "../../util/shaclConstraints";
 import { isUrl, urlToName } from "../../parsing/urlParser";
 import { TERM } from "../../translation/terminology";
-import { SCHEMA_URL } from "../../util/constants";
+import { SCHEMA_URL, XML_DATATYPES } from "../../util/constants";
 
 export default {
   name: "PredicateModal",
@@ -157,6 +163,7 @@ export default {
         input,
         constraintType
       };
+      console.log(JSON.stringify(this.values, null, 2));
     },
 
     /**
@@ -187,6 +194,9 @@ export default {
     showPaths() {
       return this.values.category === "Property Pair Constraints";
     },
+    showDataTypes() {
+      return urlToName(this.values.predicate).includes("datatype");
+    },
     showShapes() {
       const possibilities = ["Property", "PropertyShape", "NodeShape", "Shape"];
       return (
@@ -201,7 +211,8 @@ export default {
         this.showInteger() ||
         this.showString() ||
         this.showShapes() ||
-        this.showPaths()
+        this.showPaths() ||
+        this.showDataTypes()
       );
     },
 
@@ -232,6 +243,7 @@ export default {
       const valueType = ValueType(predicate);
       this.error = valueType === undefined;
 
+      // Add the `schema` url to the path input if necessary.
       if (this.values.category.includes("Property Pair")) {
         if (!isUrl(this.values.input))
           this.values.input = `${SCHEMA_URL}${this.values.input}`;
@@ -316,8 +328,17 @@ export default {
      * @param key
      * @returns {*}
      */
-    getPathName(key) {
+    getName(key) {
       return urlToName(key);
+    },
+
+    /**
+     * Get the possible XML datatypes.
+     * Used in the HTML since `XML_DATATYPES` cannot be used directly.
+     * @returns {*[]}
+     */
+    getDataTypes() {
+      return XML_DATATYPES;
     }
   }
 };

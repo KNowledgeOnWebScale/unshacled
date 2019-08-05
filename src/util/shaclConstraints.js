@@ -3551,6 +3551,7 @@ const json = [
       }
     ]
   },
+
   {
     "@id": "http://www.w3.org/ns/shacl#alternativePath",
     "@type": ["http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"],
@@ -6456,6 +6457,7 @@ export const constraintsByTypes = {
   "Shape-Based Constraints": [
     "http://www.w3.org/ns/shacl#node",
     "http://www.w3.org/ns/shacl#targetNode",
+    "http://www.w3.org/ns/shacl#targetClass",
     "http://www.w3.org/ns/shacl#property",
     "http://www.w3.org/ns/shacl#qualifiedValueShape",
     "http://www.w3.org/ns/shacl#qualifiedMinCount",
