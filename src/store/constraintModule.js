@@ -5,7 +5,7 @@ import {
   getConstraintCategory,
   getConstraintValueType
 } from "../util/shaclConstraints";
-import { urlToName } from "../parsing/urlParser";
+import { extractUrl, urlToName } from "../parsing/urlParser";
 
 /**
  * This module contains everything to change the shape constraints.
@@ -122,7 +122,8 @@ const constraintModule = {
 
     // eslint-disable-next-line no-unused-vars
     stopConstraintEdit({ state, rootGetters }, args) {
-      console.log(args);
+      // Update the modal state.
+      state.predicateModal.show = false;
       state.predicateModal.editing = false;
 
       const {
@@ -133,20 +134,37 @@ const constraintModule = {
         valueType
       } = args;
       const i = state.constraintIndex;
+
+      // Clone the original constraint and get the value we want to update.
       const updated = clone(rootGetters.shapeWithID(shapeID)[constraintID]);
+      const original = updated[0]["@list"]
+        ? updated[0]["@list"][i]
+        : updated[i];
 
-      const newValue =
-        valueType === "id" || valueType === "lists"
-          ? { "@id": input }
-          : { "@type": object, "@value": input };
+      // Create a new value object.
+      let newValue;
+      if (valueType === "id" || valueType === "lists") {
+        newValue = {
+          "@id": `${extractUrl(original["@id"])}${urlToName(input)}`
+        };
+      } else {
+        newValue = {
+          "@type": object,
+          "@value": `${extractUrl(original["@value"])}${urlToName(input)}`
+        };
+      }
 
+      // Update this value in the original constraint object.
       if (updated[0]["@list"]) {
-        updated[0][i] = newValue;
+        updated[0]["@list"][i] = newValue;
       } else {
         updated[i] = newValue;
       }
-      args.newValue = updated;
-      this.dispatch("updateConstraint", args);
+      this.dispatch("updateConstraint", {
+        shapeID,
+        constraintID,
+        newValue: updated
+      });
     },
 
     /**
@@ -158,14 +176,15 @@ const constraintModule = {
      *            constraintID the ID of the constraint we want to update.
      *            value the new value of the given constraint.
      */
-    updateConstraint({ state, rootGetters, commit }, args) {
-      const { shapeID, predicate: constraintID, newValue } = args;
+    updateConstraint({ rootGetters, commit }, args) {
+      const { shapeID, constraintID, newValue } = args;
+      console.log(args);
 
-      // commit("setConstraintValue", {
-      //   shape: rootGetters.shapeWithID(shapeID),
-      //   constraintID,
-      //   value: newValue
-      // });
+      commit("setConstraintValue", {
+        shape: rootGetters.shapeWithID(shapeID),
+        constraintID,
+        value: newValue
+      });
     },
 
     /* DELETE ======================================================================================================= */

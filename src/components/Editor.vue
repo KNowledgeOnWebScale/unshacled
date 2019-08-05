@@ -50,10 +50,12 @@ export default {
      * Resize the canvas on resizing of the window.
      */
     handleResize() {
-      const stage = this.$refs.stage.getNode();
-      this.configKonva.height = window.innerHeight - this.marginTop;
-      this.configKonva.width = window.innerWidth;
-      this.$nextTick(() => stage.draw()); // Resize on the next tick
+      if (this.$refs.stage) {
+        const stage = this.$refs.stage.getNode();
+        this.configKonva.height = window.innerHeight - this.marginTop;
+        this.configKonva.width = window.innerWidth;
+        this.$nextTick(() => stage.draw()); // Resize on the next tick
+      }
     },
 
     /**
@@ -100,11 +102,12 @@ export default {
 
     /**
      * Scale the canvas depending on the pointer position when scrolling.
+     * This will zoom in on scrolling up and zoom out on scrolling down.
      * @param e scoll event
      */
     scroll(e) {
       const stage = this.$refs.stage.getNode();
-      const scaleBy = 1.01;
+      const scaleBy = 0.99; // 1.01 for other direction (down = zoom in, up = zoom out)
       const oldScale = stage.scaleX();
       e.evt.preventDefault();
 

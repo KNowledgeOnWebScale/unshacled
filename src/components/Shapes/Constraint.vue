@@ -97,15 +97,18 @@ export default {
 
     /**
      * Start editing the value of the given constraint.
+     * NOTE: We don't want to edit properties this way. They will be edited using the visual relationships.
      */
     editValue(index, value) {
-      this.$store.dispatch("startConstraintEdit", {
-        shapeID: this.$props.shapeID,
-        shapeType: this.$props.nodeShape ? "NodeShape" : "PropertyShape",
-        constraintID: this.$props.constraintID,
-        index,
-        value
-      });
+      if (!this.$props.constraintID.includes("property")) {
+        this.$store.dispatch("startConstraintEdit", {
+          shapeID: this.$props.shapeID,
+          shapeType: this.$props.nodeShape ? "NodeShape" : "PropertyShape",
+          constraintID: this.$props.constraintID,
+          index,
+          value
+        });
+      }
     },
 
     /**

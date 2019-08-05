@@ -119,6 +119,7 @@ const shapeModule = {
      */
     setConstraintValue(state, args) {
       const { shape, constraintID, value } = args;
+      console.log(args);
       Vue.set(shape, constraintID, value);
     },
 
