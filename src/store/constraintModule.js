@@ -1,5 +1,8 @@
 import { TERM } from "../translation/terminology";
-import {getConstraintCategory, getConstraintValueType} from "../util/shaclConstraints";
+import {
+  getConstraintCategory,
+  getConstraintValueType
+} from "../util/shaclConstraints";
 
 /**
  * This module contains everything to change the shape constraints.
@@ -19,7 +22,23 @@ const constraintModule = {
       constraintType: ""
     }
   },
-  mutations: {},
+  mutations: {
+    /* PREDICATE MODAL ============================================================================================== */
+
+    resetPredicateModal() {
+      this.predicateModal = {
+        show: false,
+        shapeID: "",
+        shapeType: "",
+        category: "",
+        predicate: "",
+        urls: {},
+        input: "",
+        object: "",
+        constraintType: ""
+      };
+    }
+  },
   actions: {
     /* ADD ========================================================================================================== */
 

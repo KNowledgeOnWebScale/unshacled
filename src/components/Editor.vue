@@ -40,10 +40,9 @@ export default {
 
   mounted() {
     this.$store.commit("setEditor", this.$refs.stage.getNode());
-    window.addEventListener("resize", this.handleResize);
+    window.addEventListener("resize", this.handleResize); // React to window resizing.
     this.handleResize();
-
-    this.$store.subscribe(() => this.stopPan());
+    this.$store.subscribe(() => this.stopPan()); // Stop panning on a change of state.
   },
 
   methods: {

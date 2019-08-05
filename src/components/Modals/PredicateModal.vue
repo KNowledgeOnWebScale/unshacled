@@ -8,8 +8,8 @@
           <select
             v-if="categories"
             id="selectCategory"
-            v-model="myCategory"
-            @change="myPredicate = ''"
+            v-model="values.category"
+            @change="values.predicate = ''"
           >
             <option v-for="c in categories" :key="c" :value="c">
               {{ c }}
@@ -17,11 +17,11 @@
           </select>
         </sui-form-field>
 
-        <sui-form-field v-if="myCategory">
+        <sui-form-field v-if="values.category">
           <label for="selectPreds">Predicate</label>
           <select
             id="selectPreds"
-            v-model="myPredicate"
+            v-model="values.predicate"
             @change="selectObject()"
           >
             <option v-for="p in predicates" :key="p" :value="p">
@@ -30,12 +30,12 @@
           </select>
         </sui-form-field>
 
-        <sui-form-field v-if="myPredicate" class="field">
+        <sui-form-field v-if="values.predicate" class="field">
           <label>Value</label>
-          <input v-if="showString()" v-model="myInput" type="text" />
-          <input v-if="showCheckbox()" v-model="myInput" type="checkbox" />
-          <input v-if="showInteger()" v-model="myInput" type="number" />
-          <input v-if="showShapes()" v-model="myInput" list="datalist" />
+          <input v-if="showString()" v-model="values.input" type="text" />
+          <input v-if="showCheckbox()" v-model="values.input" type="checkbox" />
+          <input v-if="showInteger()" v-model="values.input" type="number" />
+          <input v-if="showShapes()" v-model="values.input" list="datalist" />
           <datalist v-if="showShapes()" id="datalist" type="text">
             <option
               v-for="key in getOptions()"
@@ -43,7 +43,7 @@
               :value="getOptionID(key)"
             ></option>
           </datalist>
-          <input v-if="showOther()" v-model="myInput" />
+          <input v-if="showOther()" v-model="values.input" />
         </sui-form-field>
       </sui-form>
 
@@ -71,47 +71,21 @@ import { urlToName } from "../../parsing/urlParser";
 export default {
   name: "PredicateModal",
   props: {
-    shapeType: {
-      type: String || null,
-      required: true
-    },
-    shapeID: {
-      type: String || null,
-      required: true
-    },
-    category: {
-      type: String,
-      required: true
-    },
-    predicate: {
-      type: String,
-      required: true
-    },
-    urls: {
-      type: Object,
-      required: true
-    },
-    input: {
-      type: String,
-      required: true
-    },
-    object: {
-      type: String,
-      required: true
-    },
-    constraintType: {
-      type: String,
-      required: true
+    modalProperties: {
+      required: true,
+      type: Object
     }
   },
   data() {
     return {
-      myCategory: "",
-      myPredicate: "",
-      myUrls: {},
-      myInput: "",
-      myObject: "",
-      myConstraintType: "",
+      values: {
+        urls: {},
+        category: "",
+        predicate: "",
+        input: "",
+        object: "",
+        constraintType: ""
+      },
       error: false
     };
   },
@@ -123,14 +97,16 @@ export default {
     predicates() {
       const predsWithoutUrl = [];
 
-      if (this.shapeType) {
-        const preds = this.$store.getters.predicates(this.shapeType);
-        const byCategory = customConstraintsByCategory()[this.myCategory];
+      if (this.$props.modalProperties.shapeType) {
+        const preds = this.$store.getters.predicates(
+          this.$props.modalProperties.shapeType
+        );
+        const byCategory = customConstraintsByCategory()[this.values.category];
         if (preds)
           preds.forEach(pred => {
             if (byCategory.includes(pred)) {
               const value = pred.split("#")[1];
-              Vue.set(this.myUrls, value, pred.split("#")[0]);
+              Vue.set(this.values.urls, value, pred.split("#")[0]);
               predsWithoutUrl.push(value);
             }
           });
@@ -139,33 +115,18 @@ export default {
     }
   },
   mounted() {
-    const self = this;
-    this.$store.watch(
-      () => self.$store.state.mShape.mConstraint.predicateModal.show,
-      () => self.updateValues()
-    );
+    // Get the values passed on by the parent.
+    const { category, predicate, input, object, constraintType } = this.$props;
+    this.values = {
+      ...this.values,
+      category,
+      predicate,
+      input,
+      object,
+      constraintType
+    };
   },
   methods: {
-    /**
-     * TODO
-     */
-    updateValues() {
-      this.myCategory = this.$props.category;
-      this.myPredicate = this.$props.predicate;
-      this.myUrls = this.$props.urls;
-      this.myInput = this.$props.input;
-      this.myObject = this.$props.object;
-      this.myConstraintType = this.$props.constraintType;
-      // console.log(JSON.stringify(this.$props, null, 2));
-      // console.log(
-      //   JSON.stringify(
-      //     this.$store.state.mShape.mConstraint.predicateModal,
-      //     null,
-      //     2
-      //   )
-      // );
-    },
-
     /**
      * Toggle the visibility of the modal.
      */
@@ -178,24 +139,24 @@ export default {
      * Select the given predicate.
      */
     predicateUrl() {
-      const { myUrls, myPredicate } = this;
-      return `${myUrls[myPredicate]}#${myPredicate}`;
+      const { urls, predicate } = this.values;
+      return `${urls[predicate]}#${predicate}`;
     },
 
     showCheckbox() {
-      return this.myConstraintType === "boolean";
+      return this.values.constraintType === "boolean";
     },
     showInteger() {
-      return this.myConstraintType === "integer";
+      return this.values.constraintType === "integer";
     },
     showString() {
-      return this.myConstraintType === "string";
+      return this.values.constraintType === "string";
     },
     showShapes() {
       const possibilities = ["Property", "PropertyShape", "NodeShape", "Shape"];
       return (
-        possibilities.includes(this.myConstraintType) ||
-        this.myPredicate === "property"
+        possibilities.includes(this.values.constraintType) ||
+        this.values.predicate === "property"
       );
     },
     showOther() {
@@ -212,15 +173,20 @@ export default {
      */
     selectObject() {
       // Reset the constraintType and input values.
-      this.myConstraintType = "";
-      this.myInput = "";
+      this.values = {
+        ...this.values,
+        input: "",
+        constraintType: ""
+      };
 
-      if (this.myPredicate) {
-        this.myObject = this.$store.getters.objects(this.predicateUrl())[0];
+      if (this.values.predicate) {
+        this.values.object = this.$store.getters.objects(
+          this.predicateUrl()
+        )[0];
         const typeUrl = getConstraintValueType(this.predicateUrl());
-        if (typeUrl) this.myConstraintType = urlToName(typeUrl);
+        if (typeUrl) this.values.constraintType = urlToName(typeUrl);
       } else {
-        this.myObject = "";
+        this.values.object = "";
       }
     },
 
@@ -229,19 +195,20 @@ export default {
      * TODO check if this is correct, cfr @value/@id/@list n stuff
      */
     addPredicate() {
+      const { input, object } = this.values;
       const predicate = this.predicateUrl();
       const valueType = ValueType(predicate);
       this.error = valueType === undefined;
 
-      const args = {
-        predicate,
-        valueType,
-        shapeID: this.shapeID,
-        input: this.myInput,
-        object: this.myObject
-      };
-
       if (!this.error) {
+        const args = {
+          predicate,
+          valueType,
+          shapeID: this.$props.modalProperties.shapeID,
+          input,
+          object
+        };
+
         this.$store.dispatch("addPredicate", args);
         this.reset();
       }
@@ -251,11 +218,14 @@ export default {
      * Reset the data from the modal.
      */
     reset() {
-      this.myCategory = "";
-      this.myPredicate = "";
-      this.myUrls = {};
-      this.myInput = "";
-      this.myObject = "";
+      this.values = {
+        urls: {},
+        category: "",
+        predicate: "",
+        input: "",
+        object: "",
+        constraintType: ""
+      };
       this.error = false;
     },
 
@@ -264,7 +234,7 @@ export default {
      * @returns {*}
      */
     getOptions() {
-      const ct = this.myConstraintType.toLocaleLowerCase();
+      const ct = this.values.constraintType.toLocaleLowerCase();
       if (ct.includes("property")) return this.$store.getters.propertyShapes;
       if (ct.includes("node")) return this.$store.getters.nodeShapes;
       if (ct.includes("shape")) return this.$store.getters.shapes;

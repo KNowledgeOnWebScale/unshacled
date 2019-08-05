@@ -68,18 +68,7 @@
     <validation-report-modal></validation-report-modal>
 
     <predicate-modal
-      :shape-i-d="this.$store.state.mShape.mConstraint.predicateModal.shapeID"
-      :shape-type="
-        this.$store.state.mShape.mConstraint.predicateModal.shapeType
-      "
-      :category="this.$store.state.mShape.mConstraint.predicateModal.category"
-      :predicate="this.$store.state.mShape.mConstraint.predicateModal.predicate"
-      :urls="this.$store.state.mShape.mConstraint.predicateModal.urls"
-      :input="this.$store.state.mShape.mConstraint.predicateModal.input"
-      :object="this.$store.state.mShape.mConstraint.predicateModal.object"
-      :constraint-type="
-        this.$store.state.mShape.mConstraint.predicateModal.constraintType
-      "
+      :modal-properties="$store.state.mShape.mConstraint.predicateModal"
     ></predicate-modal>
   </div>
 </template>
