@@ -6,6 +6,7 @@ import coordinateModule from "./coordinateModule";
 import { EXAMPLE_URI, SHACL_URI } from "../util/constants";
 import { shaclToInternal } from "../parsing/internalParser";
 import { TERM } from "../translation/terminology";
+import getValueType from "../util/enums/ValueType";
 
 /**
  * This module contains everything to change the shapes.
@@ -119,7 +120,6 @@ const shapeModule = {
      */
     setConstraintValue(state, args) {
       const { shape, constraintID, value } = args;
-      console.log("setConstraintValue", JSON.stringify(args.value, null, 2));
       Vue.set(shape, constraintID, value);
     },
 
@@ -246,7 +246,7 @@ const shapeModule = {
             this.dispatch("addPredicate", {
               shapeID: shape["@id"],
               predicate: TERM.property,
-              valueType: "id",
+              valueType: getValueType(TERM.property),
               input: newID
             });
             commit("deletePropertyFromShape", { shape, propertyID: oldID });

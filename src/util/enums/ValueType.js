@@ -16,9 +16,15 @@ const ids = new Set([
   TERM.not,
   TERM.node,
   TERM.path,
+  TERM.pattern,
+  TERM.qualifiedMaxCount,
+  TERM.qualifiedMinCount,
+  TERM.qualifiedValueShape,
   TERM.targetClass
 ]);
 const types = new Set([
+  TERM.closed,
+  TERM.hasValue,
   TERM.minCount,
   TERM.maxCount,
   TERM.minExclusive,
@@ -29,15 +35,17 @@ const types = new Set([
   TERM.maxLength,
   TERM.uniqueLang
 ]);
-const lists = new Set([TERM.languageIn, TERM.in, TERM.and, TERM.or, TERM.xone]);
+const valueLists = new Set([TERM.ignoredProperties, TERM.languageIn, TERM.in]);
+const idLists = new Set([TERM.and, TERM.or, TERM.xone]);
 
 /**
  * Get the value type of the given url.
  * @param url
- * @returns {string} either "id", "type" or "list"
+ * @returns {string} either "id", "type", or "valueList" or "idList"
  */
 export default function getValueType(url) {
   if (ids.has(url)) return "id";
   if (types.has(url)) return "type";
-  if (lists.has(url)) return "list";
+  if (valueLists.has(url)) return "valueList";
+  if (idLists.has(url)) return "idList";
 }

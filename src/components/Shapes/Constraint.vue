@@ -135,6 +135,10 @@ export default {
         constraintID: this.$props.constraintID,
         valueIndex: index
       });
+      this.$store.commit("updateYValues", {
+        shapeID: this.$props.shapeID,
+        shapes: this.$store.state.mShape.model
+      });
     },
 
     /* HELPERS ====================================================================================================== */

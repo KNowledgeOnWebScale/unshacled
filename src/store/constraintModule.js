@@ -76,18 +76,31 @@ const constraintModule = {
       const { shapeID, predicate, valueType, input, object } = args;
       const shape = getters.shapeWithID(shapeID);
 
-      // Add the predicate to the shape.
-      if (!shape[predicate]) shape[predicate] = [];
-      const value = ["id", "list"].includes(valueType)
+      // Create an empty list to add to if necessary.
+      if (!shape[predicate]) {
+        shape[predicate] = [];
+        if (valueType.includes("List")) shape[predicate].push({ "@list": [] });
+      }
+
+      // Create the object we want to add.
+      const value = valueType.includes("id")
         ? { "@id": input }
         : { "@type": object, "@value": input };
-      shape[predicate].push(value);
+
+      // Determine which list we want to add the predicate to.
+      const list = valueType.includes("List")
+        ? shape[predicate][0]["@list"]
+        : shape[predicate];
+      list.push(value);
+
+      // Add the predicate to the shape.
       commit("setConstraintValue", {
         shape,
         constraintID: predicate,
         value: shape[predicate]
       });
 
+      // Add a property shape if needed.
       if (predicate.includes("property")) {
         dispatch("addPropertyShape", input);
       }
@@ -154,13 +167,13 @@ const constraintModule = {
 
       // Clone the original constraint and get the value we want to update.
       const updated = clone(rootGetters.shapeWithID(shapeID)[constraintID]);
-      const iter = valueType === "list" ? updated[0]["@list"] : updated;
+      const iter = valueType.includes("List") ? updated[0]["@list"] : updated;
       const original = iter[i];
 
       // Create a new value object.
       let newValue;
       let name;
-      if (["id", "list"].includes(valueType)) {
+      if (valueType.includes("id")) {
         name = `${extractUrl(original["@id"])}${urlToName(input)}`;
         newValue = { "@id": name };
       } else {
@@ -170,7 +183,7 @@ const constraintModule = {
 
       // Check if this new value is a duplicate.
       let duplicate = false;
-      const field = ["id", "list"].includes(valueType) ? "@id" : "@value";
+      const field = valueType.includes("id") ? "@id" : "@value";
       for (const j in iter) {
         if (i !== j && iter[j][field] === name) duplicate = true;
       }
