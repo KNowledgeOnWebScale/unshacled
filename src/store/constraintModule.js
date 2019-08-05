@@ -1,4 +1,5 @@
 import { TERM } from "../translation/terminology";
+import {getConstraintCategory, getConstraintValueType} from "../util/shaclConstraints";
 
 /**
  * This module contains everything to change the shape constraints.
@@ -74,17 +75,20 @@ const constraintModule = {
       });
     },
 
-    startConstraintEdit({ commit }, args) {
-      const { shapeID, constraintID, index, value } = args;
+    startConstraintEdit({ state, commit }, args) {
+      const { shapeID, shapeType, constraintID, index, value } = args;
       console.log(constraintID, index, value);
-      this.state.predicateModal = {
-        ...this.state.predicateModal,
+      state.predicateModal = {
+        ...state.predicateModal,
         show: true,
-      };
-      commit("togglePredicateModal", {
         shapeID,
-        shapeType: this.shapeType
-      });
+        shapeType,
+        category: getConstraintCategory(constraintID),
+        predicate: constraintID,
+        input: value,
+        constraintType: getConstraintValueType(constraintID)
+      };
+      commit("togglePredicateModal", { shapeID, shapeType });
     },
 
     /* DELETE ======================================================================================================= */

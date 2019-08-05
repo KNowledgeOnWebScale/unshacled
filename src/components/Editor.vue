@@ -42,6 +42,8 @@ export default {
     this.$store.commit("setEditor", this.$refs.stage.getNode());
     window.addEventListener("resize", this.handleResize);
     this.handleResize();
+
+    this.$store.subscribe(() => this.stopPan());
   },
 
   methods: {

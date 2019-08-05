@@ -49,6 +49,10 @@ export default {
       type: String,
       required: true
     },
+    nodeShape: {
+      type: Boolean,
+      required: true
+    },
     constraintID: {
       type: String,
       required: true
@@ -97,6 +101,7 @@ export default {
     editValue(index, value) {
       this.$store.dispatch("startConstraintEdit", {
         shapeID: this.$props.shapeID,
+        shapeType: this.$props.nodeShape ? "NodeShape" : "PropertyShape",
         constraintID: this.$props.constraintID,
         index,
         value

@@ -139,14 +139,33 @@ export default {
     }
   },
   mounted() {
-    this.myCategory = this.$props.category;
-    this.myPredicate = this.$props.predicate;
-    this.myUrls = this.$props.urls;
-    this.myInput = this.$props.input;
-    this.myObject = this.$props.object;
-    this.myConstraintType = this.$props.constraintType;
+    const self = this;
+    this.$store.watch(
+      () => self.$store.state.mShape.mConstraint.predicateModal.show,
+      () => self.updateValues()
+    );
   },
   methods: {
+    /**
+     * TODO
+     */
+    updateValues() {
+      this.myCategory = this.$props.category;
+      this.myPredicate = this.$props.predicate;
+      this.myUrls = this.$props.urls;
+      this.myInput = this.$props.input;
+      this.myObject = this.$props.object;
+      this.myConstraintType = this.$props.constraintType;
+      // console.log(JSON.stringify(this.$props, null, 2));
+      // console.log(
+      //   JSON.stringify(
+      //     this.$store.state.mShape.mConstraint.predicateModal,
+      //     null,
+      //     2
+      //   )
+      // );
+    },
+
     /**
      * Toggle the visibility of the modal.
      */

@@ -35,6 +35,7 @@
         <constraint
           :constraint-i-d="key"
           :shape-i-d="$props.id"
+          :nodeShape="$props.nodeShape"
           :stroke="shapeConfig.stroke"
         ></constraint>
       </div>
