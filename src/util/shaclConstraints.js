@@ -6437,6 +6437,7 @@ export const constraintsByTypes = {
     "http://www.w3.org/ns/shacl#maxExclusive"
   ],
   "String-Based Constraints": [
+    "http://www.w3.org/ns/shacl#name",
     "http://www.w3.org/ns/shacl#minLength",
     "http://www.w3.org/ns/shacl#maxLength",
     "http://www.w3.org/ns/shacl#pattern",

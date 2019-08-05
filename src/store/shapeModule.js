@@ -119,7 +119,7 @@ const shapeModule = {
      */
     setConstraintValue(state, args) {
       const { shape, constraintID, value } = args;
-      console.log("setConstrintValue", args);
+      console.log("setConstraintValue", JSON.stringify(args.value, null, 2));
       Vue.set(shape, constraintID, value);
     },
 
@@ -147,12 +147,8 @@ const shapeModule = {
       let index = -1;
 
       for (const p in properties) {
-        if (
-          properties[p] === propertyID ||
-          properties[p]["@id"] === propertyID
-        ) {
+        if ([properties[p], properties[p]["@id"]].includes(propertyID))
           index = p;
-        }
       }
 
       if (index >= 0) {

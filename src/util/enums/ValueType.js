@@ -12,6 +12,7 @@ const ids = new Set([
   TERM.disjoint,
   TERM.lessThan,
   TERM.lessThanOrEquals,
+  TERM.name,
   TERM.not,
   TERM.node,
   TERM.path,

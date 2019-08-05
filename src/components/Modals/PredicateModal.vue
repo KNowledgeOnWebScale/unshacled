@@ -163,7 +163,6 @@ export default {
         input,
         constraintType
       };
-      console.log(JSON.stringify(this.values, null, 2));
     },
 
     /**
@@ -189,11 +188,10 @@ export default {
       return this.values.constraintType.includes("integer");
     },
     showString() {
-      console.log(this.values.constraintType);
       return this.values.constraintType.includes("string");
     },
     showPaths() {
-      return this.values.category === "Property Pair Constraints";
+      return this.values.category.includes("Property Pair");
     },
     showDataTypes() {
       return urlToName(this.values.predicate).includes("datatype");
@@ -203,7 +201,8 @@ export default {
       return (
         !this.showPaths() &&
         (possibilities.includes(this.values.constraintType) ||
-          this.values.predicate === "property")
+          this.values.predicate === "property" ||
+          this.values.category.includes("Logical"))
       );
     },
     showOther() {
@@ -242,7 +241,6 @@ export default {
     exit() {
       const predicate = this.predicateUrl();
       const valueType = ValueType(predicate);
-      console.log(valueType);
       this.error = valueType === undefined;
 
       // Add the `schema` url to the path input if necessary.
@@ -286,7 +284,8 @@ export default {
      */
     getShapeOptions() {
       const ct = this.values.constraintType.toLocaleLowerCase();
-      if (ct.includes("property")) return this.$store.getters.propertyShapes;
+      if (ct.includes("property") || this.values.category.includes("Logical"))
+        return this.$store.getters.propertyShapes;
       if (ct.includes("node")) return this.$store.getters.nodeShapes;
       if (ct.includes("shape")) return this.$store.getters.shapes;
       return [];

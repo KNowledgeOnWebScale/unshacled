@@ -1,4 +1,3 @@
-import Vue from "vue";
 import { clone } from "ramda";
 import { TERM } from "../translation/terminology";
 import {
@@ -79,10 +78,9 @@ const constraintModule = {
 
       // Add the predicate to the shape.
       if (!shape[predicate]) shape[predicate] = [];
-      const value =
-        valueType === "id" || valueType === "lists"
-          ? { "@id": input }
-          : { "@type": object, "@value": input };
+      const value = ["id", "list"].includes(valueType)
+        ? { "@id": input }
+        : { "@type": object, "@value": input };
       shape[predicate].push(value);
       commit("setConstraintValue", {
         shape,
@@ -107,12 +105,15 @@ const constraintModule = {
 
     /* EDIT ========================================================================================================= */
 
+    /**
+     * TODO
+     * @param state
+     * @param args
+     */
     startConstraintEdit({ state }, args) {
       const { shapeID, shapeType, constraintID, index, value } = args;
 
       state.constraintIndex = index;
-      console.log(JSON.stringify(args, null, 2));
-
       state.predicateModal = {
         ...state.predicateModal,
         shapeID,
@@ -131,7 +132,12 @@ const constraintModule = {
       });
     },
 
-    // eslint-disable-next-line no-unused-vars
+    /**
+     * TODO
+     * @param state
+     * @param rootGetters
+     * @param args
+     */
     stopConstraintEdit({ state, rootGetters }, args) {
       // Update the modal state.
       state.predicateModal.show = false;
@@ -145,34 +151,39 @@ const constraintModule = {
         valueType
       } = args;
       const i = state.constraintIndex;
-      console.log(JSON.stringify(args, null, 2));
 
       // Clone the original constraint and get the value we want to update.
       const updated = clone(rootGetters.shapeWithID(shapeID)[constraintID]);
-      const original = updated[0]["@list"]
-        ? updated[0]["@list"][i]
-        : updated[i];
-      console.log("original", original);
+      const iter = valueType === "list" ? updated[0]["@list"] : updated;
+      const original = iter[i];
 
       // Create a new value object.
       let newValue;
-      if (valueType === "id" || valueType === "lists") {
-        newValue = {
-          "@id": `${extractUrl(original["@id"])}${urlToName(input)}`
-        };
+      let name;
+      if (["id", "list"].includes(valueType)) {
+        name = `${extractUrl(original["@id"])}${urlToName(input)}`;
+        newValue = { "@id": name };
       } else {
-        newValue = {
-          "@type": object,
-          "@value": `${extractUrl(original["@value"])}${urlToName(input)}`
-        };
+        name = `${extractUrl(original["@value"])}${urlToName(input)}`;
+        newValue = { "@type": object, "@value": name };
+      }
+
+      // Check if this new value is a duplicate.
+      let duplicate = false;
+      const field = ["id", "list"].includes(valueType) ? "@id" : "@value";
+      for (const j in iter) {
+        if (i !== j && iter[j][field] === name) duplicate = true;
       }
 
       // Update this value in the original constraint object.
-      if (updated[0]["@list"]) {
-        updated[0]["@list"][i] = newValue;
+      // `iter` is a reference to the array we have to modify.
+      if (duplicate) {
+        // Delete the duplicate.
+        iter.splice(i, 1);
       } else {
-        updated[i] = newValue;
+        iter[i] = newValue;
       }
+
       this.dispatch("updateConstraint", {
         shapeID,
         constraintID,
@@ -191,7 +202,6 @@ const constraintModule = {
      */
     updateConstraint({ rootGetters, commit }, args) {
       const { shapeID, constraintID, newValue } = args;
-      console.log("newValue", JSON.stringify(newValue, null, 2));
 
       commit("setConstraintValue", {
         shape: rootGetters.shapeWithID(shapeID),
