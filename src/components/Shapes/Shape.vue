@@ -127,6 +127,7 @@ export default {
      * Toggle the predicate model to add a constraint to this shape.
      */
     addPredicate() {
+      this.$store.commit("resetPredicateModal");
       this.$store.commit("togglePredicateModal", {
         shapeID: this.id,
         shapeType: this.nodeShape ? "NodeShape" : "PropertyShape",

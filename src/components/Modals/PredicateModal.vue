@@ -56,7 +56,7 @@
             </option>
           </datalist>
 
-          <select v-if="showDataTypes" v-model="values.input">
+          <select v-if="showDataTypes()" v-model="values.input">
             <option v-for="key in getDataTypes()" :key="key" :value="key">
               {{ getName(key) }}
             </option>
@@ -189,6 +189,7 @@ export default {
       return this.values.constraintType.includes("integer");
     },
     showString() {
+      console.log(this.values.constraintType);
       return this.values.constraintType.includes("string");
     },
     showPaths() {
@@ -241,6 +242,7 @@ export default {
     exit() {
       const predicate = this.predicateUrl();
       const valueType = ValueType(predicate);
+      console.log(valueType);
       this.error = valueType === undefined;
 
       // Add the `schema` url to the path input if necessary.

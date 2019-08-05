@@ -40,11 +40,34 @@ const constraintModule = {
       if (!args)
         args = { shapeID: "", shapeType: "", onExit: "", editing: false };
 
-      Vue.set(state.predicateModal, "show", !state.predicateModal.show);
-      Vue.set(state.predicateModal, "shapeID", args.shapeID);
-      Vue.set(state.predicateModal, "shapeType", args.shapeType);
-      Vue.set(state.predicateModal, "editing", args.editing);
-      Vue.set(state.predicateModal, "onExit", args.onExit);
+      state.predicateModal = {
+        ...state.predicateModal,
+        show: !state.predicateModal.show,
+        shapeID: args.shapeID,
+        shapeType: args.shapeType,
+        editing: args.editing,
+        onExit: args.onExit
+      };
+    },
+
+    /**
+     * Reset the properties of the predicate modal.
+     * @param state
+     */
+    resetPredicateModal(state) {
+      state.predicateModal = {
+        show: false,
+        shapeID: "",
+        shapeType: "",
+        category: "",
+        predicate: "",
+        urls: {},
+        input: "",
+        object: "",
+        constraintType: "",
+        editing: false,
+        onExit: undefined
+      };
     }
   },
   actions: {
@@ -103,7 +126,8 @@ const constraintModule = {
       this.commit("togglePredicateModal", {
         shapeID,
         shapeType,
-        onExit: "stopConstraintEdit"
+        onExit: "stopConstraintEdit",
+        editing: true
       });
     },
 
@@ -121,12 +145,14 @@ const constraintModule = {
         valueType
       } = args;
       const i = state.constraintIndex;
+      console.log(JSON.stringify(args, null, 2));
 
       // Clone the original constraint and get the value we want to update.
       const updated = clone(rootGetters.shapeWithID(shapeID)[constraintID]);
       const original = updated[0]["@list"]
         ? updated[0]["@list"][i]
         : updated[i];
+      console.log("original", original);
 
       // Create a new value object.
       let newValue;
@@ -165,6 +191,7 @@ const constraintModule = {
      */
     updateConstraint({ rootGetters, commit }, args) {
       const { shapeID, constraintID, newValue } = args;
+      console.log("newValue", JSON.stringify(newValue, null, 2));
 
       commit("setConstraintValue", {
         shape: rootGetters.shapeWithID(shapeID),

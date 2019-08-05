@@ -13,8 +13,9 @@ const ids = new Set([
   TERM.lessThan,
   TERM.lessThanOrEquals,
   TERM.not,
-  TERM.targetClass,
-  TERM.node
+  TERM.node,
+  TERM.path,
+  TERM.targetClass
 ]);
 const types = new Set([
   TERM.minCount,
@@ -27,7 +28,7 @@ const types = new Set([
   TERM.maxLength,
   TERM.uniqueLang
 ]);
-const lists = new Set([TERM.languageIn, TERM.and, TERM.or, TERM.xone]);
+const lists = new Set([TERM.languageIn, TERM.in, TERM.and, TERM.or, TERM.xone]);
 
 /**
  * Get the value type of the given url.

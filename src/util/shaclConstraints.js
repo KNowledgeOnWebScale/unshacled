@@ -6422,6 +6422,7 @@ const json = [
 export const constraintsByTypes = {
   "Value Type Constraints": [
     "http://www.w3.org/ns/shacl#class",
+    "http://www.w3.org/ns/shacl#path",
     "http://www.w3.org/ns/shacl#datatype",
     "http://www.w3.org/ns/shacl#nodeKind"
   ],
@@ -6458,6 +6459,7 @@ export const constraintsByTypes = {
     "http://www.w3.org/ns/shacl#node",
     "http://www.w3.org/ns/shacl#targetNode",
     "http://www.w3.org/ns/shacl#targetClass",
+    "http://www.w3.org/ns/shacl#targetObjectsOf",
     "http://www.w3.org/ns/shacl#property",
     "http://www.w3.org/ns/shacl#qualifiedValueShape",
     "http://www.w3.org/ns/shacl#qualifiedMinCount",
@@ -6509,7 +6511,7 @@ export function getConstraintCategory(constraintID) {
 export function getConstraintValueType(constraint) {
   const object = json.filter(c => c["@id"] === internalToShacl(constraint))[0];
   const range = object["http://www.w3.org/2000/01/rdf-schema#range"];
-  return range ? shaclToInternal(range[0]["@id"]) : undefined;
+  return range ? shaclToInternal(range[0]["@id"]) : "";
 }
 
 export const groupedConstraints = groupBy(constraintsWithTypes, "type");
