@@ -17,9 +17,8 @@ const dataModule = {
     format: language.SHACL,
     dataFile: {},
     dataFileExtension: String,
-    validationReport: "hello",
-    showValidationReportModal: false,
-    showNoDataFileModal: false
+    validationReport: {},
+    showValidationReportModal: false
   },
   mutations: {
     /**
@@ -62,30 +61,20 @@ const dataModule = {
      */
     validateWithModel(state, model) {
       if (state.dataFile.length === 0) {
+        console.log("No data file uploaded.");
         this.commit("toggleNoDataFilePopup");
       } else {
-        console.log("Serializing...");
-        SerializerManager.serialize(model, ETF.ttl)
-          .then(e => {
-            console.log("Validating...");
-            ValidatorManager.validate(state.dataFile, e, state.format)
-              .then(e => {
-                console.log("validationReport", e);
-                state.validationReport = e;
+        SerializerManager.serialize(internalToShacl(model), ETF.ttl)
+          .then(shapes => {
+            ValidatorManager.validate(state.dataFile, shapes, state.format)
+              .then(report => {
+                state.validationReport = report;
                 state.showValidationReportModal = true;
               })
               .catch(e => console.log(`Error while validating: ${e}`));
           })
           .catch(e => console.log(`Error while serializing: ${e}`));
       }
-    },
-
-    /**
-     * Toggle a modal to alert the user that no data file has been loaded.
-     * @param state
-     */
-    toggleNoDataFilePopup(state) {
-      Vue.set(state, "showNoDataFileModal", !state.showNoDataFileModal);
     }
   },
   actions: {
@@ -104,7 +93,7 @@ const dataModule = {
      * @param rootState
      */
     validate({ rootState }) {
-      this.commit("validateWithModel", rootState.model);
+      this.commit("validateWithModel", rootState.mShape.model);
     },
 
     /**
