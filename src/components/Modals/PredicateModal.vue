@@ -37,10 +37,14 @@
         <sui-form-field v-if="values.predicate" class="field">
           <label>Value</label>
           <input v-if="showString()" v-model="values.input" type="text" />
-          <input v-if="showCheckbox()" v-model="values.input" type="checkbox" />
+          <input
+            v-if="showCheckbox()"
+            v-model="values.inputBool"
+            type="checkbox"
+          />
           <input v-if="showInteger()" v-model="values.input" type="number" />
-          <input v-if="showShapes()" v-model="values.input" list="shapeList" />
 
+          <input v-if="showShapes()" v-model="values.input" list="shapeList" />
           <datalist v-if="showShapes()" id="shapeList" type="text">
             <option
               v-for="key in getShapeOptions()"
@@ -106,6 +110,7 @@ export default {
         category: "",
         predicate: "",
         input: "",
+        inputBool: false,
         object: "",
         constraintType: ""
       },
@@ -145,6 +150,10 @@ export default {
     );
   },
   methods: {
+    print(sth) {
+      console.log(sth);
+    },
+
     /**
      * Get the values passed on by the parent.
      */
@@ -161,6 +170,7 @@ export default {
         category,
         predicate,
         input,
+        inputBool: input === "true",
         constraintType
       };
     },
@@ -248,6 +258,7 @@ export default {
         if (!isUrl(this.values.input))
           this.values.input = `${SCHEMA_URL}${this.values.input}`;
       }
+      if (this.showCheckbox()) this.values.input = this.values.inputBool;
 
       if (!this.error) {
         this.$store.dispatch(this.$props.modalProperties.onExit, {

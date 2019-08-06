@@ -182,14 +182,11 @@ const constraintModule = {
       state.predicateModal.show = false;
       state.predicateModal.editing = false;
 
-      const {
-        shapeID,
-        predicate: constraintID,
-        input,
-        object,
-        valueType
-      } = args;
+      const { shapeID, predicate: constraintID, object, valueType } = args;
       const i = state.constraintIndex;
+
+      let { input } = args;
+      if (typeof input === "boolean") input = input.toString();
 
       // Clone the original constraint and get the value we want to update.
       const updated = clone(rootGetters.shapeWithID(shapeID)[constraintID]);
