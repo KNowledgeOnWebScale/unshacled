@@ -19,7 +19,11 @@ export function urlToName(url) {
  * @returns {*}
  */
 export function extractUrl(string) {
-  return string.slice(0, string.indexOf("#") + 1);
+  if (string.indexOf("#") !== -1)
+    return string.substring(0, string.indexOf("#") + 1);
+  if (string.indexOf("/") !== -1)
+    return string.substring(0, string.lastIndexOf("/") + 1);
+  return "";
 }
 
 /**

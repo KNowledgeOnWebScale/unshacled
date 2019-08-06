@@ -36,7 +36,11 @@
 
         <sui-form-field v-if="values.predicate" class="field">
           <label>Value</label>
-          <input v-if="showString()" v-model="values.input" type="text" />
+          <input
+            v-if="showString()"
+            v-model="values.inputWithoutUrl"
+            type="text"
+          />
           <input
             v-if="showCheckbox()"
             v-model="values.inputBool"
@@ -53,7 +57,11 @@
             ></option>
           </datalist>
 
-          <input v-if="showPaths()" v-model="values.input" list="pathList" />
+          <input
+            v-if="showPaths()"
+            v-model="values.inputWithoutUrl"
+            list="pathList"
+          />
           <datalist v-if="showPaths()" id="pathList" type="text">
             <option v-for="key in getPathOptions()" :key="key" :value="key">
               {{ getName(key) }}
@@ -66,7 +74,7 @@
             </option>
           </select>
 
-          <input v-if="showOther()" v-model="values.input" />
+          <input v-if="showOther()" v-model="values.inputWithoutUrl" />
         </sui-form-field>
       </sui-form>
 
@@ -91,7 +99,7 @@ import {
   customConstraintsByCategory,
   getConstraintValueType
 } from "../../util/shaclConstraints";
-import { isUrl, urlToName } from "../../parsing/urlParser";
+import {extractUrl, isUrl, urlToName} from "../../parsing/urlParser";
 import { TERM } from "../../translation/terminology";
 import { SCHEMA_URL, XML_DATATYPES } from "../../util/constants";
 
@@ -150,10 +158,6 @@ export default {
     );
   },
   methods: {
-    print(sth) {
-      console.log(sth);
-    },
-
     /**
      * Get the values passed on by the parent.
      */
@@ -171,6 +175,7 @@ export default {
         predicate,
         input,
         inputBool: input === "true",
+        inputWithoutUrl: urlToName(input),
         constraintType
       };
     },
@@ -258,7 +263,15 @@ export default {
         if (!isUrl(this.values.input))
           this.values.input = `${SCHEMA_URL}${this.values.input}`;
       }
-      if (this.showCheckbox()) this.values.input = this.values.inputBool;
+
+      if (this.showCheckbox()) {
+        // Set the input to the value of the checkbox, as a string.
+        this.values.input = this.values.inputBool;
+      } else if (this.showString() || this.showPaths() || this.showOther()) {
+        // Add the base URL back to the input.
+        const url = extractUrl(this.values.input);
+        this.values.input = `${url}${urlToName(this.values.inputWithoutUrl)}`;
+      }
 
       if (!this.error) {
         this.$store.dispatch(this.$props.modalProperties.onExit, {
