@@ -16,9 +16,9 @@ At the time of writing this editor supports SHACL, future support for ShEx is en
 - [x] Import SHACL files
 - [x] Add, remove and edit shapes
 - [x] Add, remove and edit properties
-- [ ] Add, remove and edit constraints
-- [ ] Export SHACL files
-- [ ] Validate data files
+- [x] Add, remove and edit constraints
+- [x] Export SHACL files
+- [x] Validate data files
 
 ### Concepts
 An [internal model](#Model) is used to represent shapes which can be edited in the browser. Using existing shape files requires these to be imported and [translated to this model](#Translation) before use. Editing is done in a [visual editor](#Interface).
