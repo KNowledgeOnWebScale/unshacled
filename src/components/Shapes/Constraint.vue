@@ -98,7 +98,7 @@ export default {
 
     /**
      * Start editing the value of the given constraint.
-     * NOTE: We don't want to edit properties this way. They will be edited using the visual relationships.
+     * NOTE: We don't want to edit properties this way; they will be edited using the visual relationships.
      */
     editValue(index, value) {
       if (!this.$props.constraintID.includes("property")) {
@@ -177,8 +177,7 @@ export default {
 
         for (const v of values) {
           const key = type.includes("id") ? "@id" : "@value";
-          const name = v[key] ? v[key] : v;
-          output.push(urlToName(name));
+          output.push(v[key] ? v[key] : v);
         }
       }
       return output;
@@ -250,7 +249,7 @@ export default {
       return {
         ...this.valueConfig,
         y: this.valueConfig.y + this.getYValue() + index * HEIGHT,
-        text
+        text: urlToName(text)
       };
     },
 

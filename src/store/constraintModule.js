@@ -163,7 +163,6 @@ const constraintModule = {
         constraintType: getConstraintValueType(constraintID),
         editing: true
       };
-      console.log(constraintID, urlToName(constraintID));
       this.commit("togglePredicateModal", {
         shapeID,
         shapeType,
