@@ -155,31 +155,32 @@ export default {
       const output = [];
 
       if (constraints && constraints[this.$props.constraintID]) {
-        const values = constraints[this.$props.constraintID];
+        let values = constraints[this.$props.constraintID];
 
         // Properties should be listed in a single entry.
         if (this.$props.constraintID.includes("property")) {
-          for (const value of values) {
-            output.push(
-              value["@id"] ? urlToName(value["@id"]) : urlToName(value)
-            );
+          for (const v of values) {
+            output.push(v["@id"] ? urlToName(v["@id"]) : urlToName(v));
           }
           return [output.toString()];
         }
 
         // Other constraints should be visualized as an array of their value representations.
-        for (const value of values) {
-          const valueType = ValueType(this.$props.constraintID);
-          const key = valueType.includes("id") ? "@id" : "@value";
+        const type = ValueType(this.$props.constraintID);
+        if (
+          type.includes("List") &&
+          values.length === 1 &&
+          values[0]["@list"]
+        ) {
+          values = values[0]["@list"];
+        }
 
-          if (valueType.includes("List")) {
-            for (const v of value["@list"]) output.push(v[key]);
-          } else {
-            output.push(urlToName(value[key]));
-          }
+        for (const v of values) {
+          const key = type.includes("id") ? "@id" : "@value";
+          const name = v[key] ? v[key] : v;
+          output.push(urlToName(name));
         }
       }
-      // FIXME in the example, `or` is not visualized correctly
       return output;
     },
 
