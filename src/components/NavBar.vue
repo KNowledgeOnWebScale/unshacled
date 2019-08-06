@@ -43,8 +43,16 @@
         Property
       </sui-menu-item>
 
-      <sui-menu-item class="clickable" icon="check" @click="validate">
+      <sui-menu-item
+        class="clickable"
+        icon="check"
+        :disabled="!dataFileUploaded()"
+        @click="validate"
+      >
         Validate
+        <sui-label v-if="!dataFileUploaded()" color="red">
+          No data file uploaded
+        </sui-label>
       </sui-menu-item>
 
       <sui-menu-item
@@ -63,7 +71,6 @@
     ></node-shape-modal>
 
     <clear-modal></clear-modal>
-    <no-data-file-modal></no-data-file-modal>
     <export-modal></export-modal>
     <validation-report-modal
       :report="this.$store.state.mData.validationReport"
@@ -84,7 +91,6 @@ import ClearModal from "./Modals/ClearModal.vue";
 import NodeShapeModal from "./Modals/NodeShapeModal.vue";
 import ValidationReportModal from "./Modals/ValidationReportModal.vue";
 import PredicateModal from "./Modals/PredicateModal.vue";
-import NoDataFileModal from "./Modals/NoDataFileModal.vue";
 import ExportModal from "./Modals/ExportModal.vue";
 
 import languages from "../util/enums/languages";
@@ -93,7 +99,6 @@ export default {
   name: "NavBar",
   components: {
     ExportModal,
-    NoDataFileModal,
     ClearModal,
     NodeShapeModal,
     SuiDropdownDivider,
@@ -136,7 +141,9 @@ export default {
       const file = document.getElementById("dataFile").files[0];
       this.$store.commit("uploadDataFile", file);
     },
-
+    dataFileUploaded() {
+      return this.$store.state.mData.dataFile.length > 0;
+    },
     validate() {
       this.$store.dispatch("validate");
     }

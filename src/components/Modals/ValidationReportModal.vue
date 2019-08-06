@@ -9,11 +9,13 @@
       </sui-modal-header>
       <sui-modal-content :scrolling="true">
         <sui-segment basic>
-          <h3 is="sui-header">
-            <sui-icon name="cog" />
-            <sui-header-content>General</sui-header-content>
-          </h3>
-          <sui-divider></sui-divider>
+          <div v-if="!conforms()">
+            <h3 is="sui-header">
+              <sui-icon name="cog" />
+              <sui-header-content>General</sui-header-content>
+            </h3>
+            <sui-divider></sui-divider>
+          </div>
 
           <sui-segment v-if="conforms()" color="green">
             This data conforms to the given model.
@@ -34,7 +36,7 @@
           </div>
         </sui-segment>
 
-        <sui-segment basic>
+        <sui-segment v-if="!conforms()" basic>
           <h3 is="sui-header">
             <sui-icon name="cogs" />
             <sui-header-content>Details</sui-header-content>
@@ -119,18 +121,21 @@ export default {
         const generalReport = {};
         generalReport.conforms =
           validationNode[`${SHACL_URI}conforms`][0]["@value"];
-        generalReport.nodeIDs = [];
-        generalReport.nodes = [];
 
-        for (const node of validationNode[`${SHACL_URI}result`]) {
-          generalReport.nodeIDs.push(node["@id"]);
-          generalReport.nodes.push(
-            this.getSimpleResults()[node["@id"]]["node"]
-          );
+        // Only generate the results if the data does not conform.
+        if (generalReport.conforms !== "true") {
+          generalReport.nodeIDs = [];
+          generalReport.nodes = [];
+
+          for (const node of validationNode[`${SHACL_URI}result`]) {
+            generalReport.nodeIDs.push(node["@id"]);
+            generalReport.nodes.push(
+              this.getSimpleResults()[node["@id"]]["node"]
+            );
+          }
+          generalReport.nodeIDs = new Set(generalReport.nodeIDs);
+          generalReport.nodes = new Set(generalReport.nodes);
         }
-
-        generalReport.nodeIDs = new Set(generalReport.nodeIDs);
-        generalReport.nodes = new Set(generalReport.nodes);
 
         return generalReport;
       }

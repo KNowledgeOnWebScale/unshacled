@@ -18,8 +18,7 @@ const dataModule = {
     dataFile: {},
     dataFileExtension: String,
     validationReport: {},
-    showValidationReportModal: false,
-    showNoDataFileModal: false
+    showValidationReportModal: false
   },
   mutations: {
     /**
@@ -62,6 +61,7 @@ const dataModule = {
      */
     validateWithModel(state, model) {
       if (state.dataFile.length === 0) {
+        console.log("No data file uploaded.");
         this.commit("toggleNoDataFilePopup");
       } else {
         SerializerManager.serialize(internalToShacl(model), ETF.ttl)
@@ -75,14 +75,6 @@ const dataModule = {
           })
           .catch(e => console.log(`Error while serializing: ${e}`));
       }
-    },
-
-    /**
-     * Toggle a modal to alert the user that no data file has been loaded.
-     * @param state
-     */
-    toggleNoDataFilePopup(state) {
-      Vue.set(state, "showNoDataFileModal", !state.showNoDataFileModal);
     }
   },
   actions: {
