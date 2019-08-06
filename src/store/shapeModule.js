@@ -6,6 +6,7 @@ import coordinateModule from "./coordinateModule";
 import { EXAMPLE_URI, SHACL_URI } from "../util/constants";
 import { shaclToInternal } from "../parsing/internalParser";
 import { TERM } from "../translation/terminology";
+import getValueType from "../util/enums/ValueType";
 
 /**
  * This module contains everything to change the shapes.
@@ -109,19 +110,6 @@ const shapeModule = {
       shape[TERM.path][0]["@id"] = `${EXAMPLE_URI}${name}`;
     },
 
-    /**
-     * Set the value of the constraint with the given ID to the given value.
-     * @param state
-     * @param args
-     *            shape the shape object that has to be updated.
-     *            constraintID the ID of the constraint that should be updated.
-     *            value the new value of the given constraint.
-     */
-    setConstraintValue(state, args) {
-      const { shape, constraintID, value } = args;
-      Vue.set(shape, constraintID, value);
-    },
-
     /* DELETE ======================================================================================================= */
 
     /**
@@ -146,12 +134,8 @@ const shapeModule = {
       let index = -1;
 
       for (const p in properties) {
-        if (
-          properties[p] === propertyID ||
-          properties[p]["@id"] === propertyID
-        ) {
+        if ([properties[p], properties[p]["@id"]].includes(propertyID))
           index = p;
-        }
       }
 
       if (index >= 0) {
@@ -161,18 +145,6 @@ const shapeModule = {
           valueIndex: index
         });
       }
-    },
-
-    /**
-     * Delete the given constraint from the given shape object.
-     * @param state
-     * @param args
-     *            shape the shape object that should be updated.
-     *            constraint the ID of the constraint that should be deleted.
-     */
-    deleteConstraintFromShape(state, args) {
-      const { shape, constraintID } = args;
-      Vue.delete(shape, constraintID);
     }
   },
   actions: {
@@ -249,7 +221,7 @@ const shapeModule = {
             this.dispatch("addPredicate", {
               shapeID: shape["@id"],
               predicate: TERM.property,
-              valueType: "id",
+              valueType: getValueType(TERM.property),
               input: newID
             });
             commit("deletePropertyFromShape", { shape, propertyID: oldID });

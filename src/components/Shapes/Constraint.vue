@@ -15,7 +15,10 @@
 
     <v-group @mouseenter="hoverValues = true" @mouseleave="hoverValues = false">
       <div v-for="(value, index) of getConstraintValues()" :key="index">
-        <v-text :config="getValueConfig(value, index)"></v-text>
+        <v-text
+          :config="getValueConfig(value, index)"
+          @click="editValue(index, value)"
+        ></v-text>
         <v-circle
           v-if="hoverValues"
           :config="getDeleteValueConfig(index)"
@@ -38,12 +41,17 @@ import {
   DELTA_Y_DELETE
 } from "../../util/konvaConfigs";
 import { urlToName } from "../../parsing/urlParser";
+import ValueType from "../../util/enums/ValueType";
 
 export default {
   name: "Constraint",
   props: {
     shapeID: {
       type: String,
+      required: true
+    },
+    nodeShape: {
+      type: Boolean,
       required: true
     },
     constraintID: {
@@ -86,6 +94,24 @@ export default {
     };
   },
   methods: {
+    /* EDIT/DELETE  ================================================================================================= */
+
+    /**
+     * Start editing the value of the given constraint.
+     * NOTE: We don't want to edit properties this way; they will be edited using the visual relationships.
+     */
+    editValue(index, value) {
+      if (!this.$props.constraintID.includes("property")) {
+        this.$store.dispatch("startConstraintEdit", {
+          shapeID: this.$props.shapeID,
+          shapeType: this.$props.nodeShape ? "NodeShape" : "PropertyShape",
+          constraintID: this.$props.constraintID,
+          index,
+          value
+        });
+      }
+    },
+
     /**
      * Delete the current constraint from its shape.
      */
@@ -110,7 +136,13 @@ export default {
         constraintID: this.$props.constraintID,
         valueIndex: index
       });
+      this.$store.commit("updateYValues", {
+        shapeID: this.$props.shapeID,
+        shapes: this.$store.state.mShape.model
+      });
     },
+
+    /* HELPERS ====================================================================================================== */
 
     /**
      * Get all the constraint values of this predicate.
@@ -123,35 +155,29 @@ export default {
       const output = [];
 
       if (constraints && constraints[this.$props.constraintID]) {
-        const values = constraints[this.$props.constraintID];
+        let values = constraints[this.$props.constraintID];
 
         // Properties should be listed in a single entry.
         if (this.$props.constraintID.includes("property")) {
-          for (const value of values) {
-            output.push(
-              value["@id"] ? urlToName(value["@id"]) : urlToName(value)
-            );
+          for (const v of values) {
+            output.push(v["@id"] ? urlToName(v["@id"]) : urlToName(v));
           }
           return [output.toString()];
         }
 
-        // FIXME ugly
-        for (const value of values) {
-          if (value["@id"] || value["@id"] === "") {
-            output.push(urlToName(value["@id"]));
-          } else if (value["@value"] || value["@value"] === "") {
-            output.push(urlToName(value["@value"]));
-          } else if (value["@list"]) {
-            for (const v of value["@list"]) {
-              if (v["@id"]) {
-                output.push(v["@id"]);
-              } else if (v["@value"]) {
-                output.push(v["@value"]);
-              }
-            }
-          } else {
-            output.push(urlToName(value));
-          }
+        // Other constraints should be visualized as an array of their value representations.
+        const type = ValueType(this.$props.constraintID);
+        if (
+          type.includes("List") &&
+          values.length === 1 &&
+          values[0]["@list"]
+        ) {
+          values = values[0]["@list"];
+        }
+
+        for (const v of values) {
+          const key = type.includes("id") ? "@id" : "@value";
+          output.push(v[key] ? v[key] : v);
         }
       }
       return output;
@@ -173,6 +199,8 @@ export default {
         : cvs.length;
     },
 
+    /* CONFIGURATIONS =============================================================================================== */
+
     /**
      * Return the y value of this constraint.
      * @returns {*}
@@ -182,8 +210,6 @@ export default {
         this.$props.constraintID
       ];
     },
-
-    /* CONFIGURATIONS =============================================================================================== */
 
     getConfigs() {
       const y = this.getYValue();
@@ -213,14 +239,25 @@ export default {
       };
     },
 
+    /**
+     * TODO
+     * @param text
+     * @param index
+     * @returns {{y: *, text: *}}
+     */
     getValueConfig(text, index) {
       return {
         ...this.valueConfig,
         y: this.valueConfig.y + this.getYValue() + index * HEIGHT,
-        text
+        text: urlToName(text)
       };
     },
 
+    /**
+     * TODO
+     * @param index
+     * @returns {{y: *}}
+     */
     getDeleteValueConfig(index) {
       return {
         ...this.deleteConstraintConfig,

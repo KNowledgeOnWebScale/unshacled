@@ -1,4 +1,4 @@
-import {CUSTOM_URI, EXAMPLE_URI} from "../util/constants";
+import { CUSTOM_URI, EXAMPLE_URI } from "../util/constants";
 
 /**
  * Takes the name out of an url if possible.
@@ -19,7 +19,20 @@ export function urlToName(url) {
  * @returns {*}
  */
 export function extractUrl(string) {
-  return string.slice(0, string.indexOf("#") + 1);
+  if (string.indexOf("#") !== -1)
+    return string.substring(0, string.indexOf("#") + 1);
+  if (string.indexOf("/") !== -1)
+    return string.substring(0, string.lastIndexOf("/") + 1);
+  return "";
+}
+
+/**
+ * Check if the given string is an url.
+ * @param string
+ * @returns {f1|*|boolean}
+ */
+export function isUrl(string) {
+  return string.includes("/");
 }
 
 /**

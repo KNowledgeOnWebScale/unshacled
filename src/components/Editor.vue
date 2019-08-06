@@ -1,5 +1,12 @@
 <template>
-  <v-stage ref="stage" :config="configKonva" @wheel="scroll">
+  <v-stage
+    ref="stage"
+    :config="configKonva"
+    @wheel="scroll"
+    @mousedown="startPan"
+    @mousemove="pan"
+    @mouseup="stopPan"
+  >
     <v-layer>
       <div v-for="(obj, key) in this.$store.getters.nodeShapes" :key="key">
         <shape :id="key" :node-shape="true"></shape>
@@ -21,6 +28,8 @@ export default {
   data() {
     const marginTop = 40;
     return {
+      panning: false,
+      previousPosition: undefined,
       marginTop, // Provide space for the NavBar
       configKonva: {
         width: window.innerWidth,
@@ -31,8 +40,9 @@ export default {
 
   mounted() {
     this.$store.commit("setEditor", this.$refs.stage.getNode());
-    window.addEventListener("resize", this.handleResize);
+    window.addEventListener("resize", this.handleResize); // React to window resizing.
     this.handleResize();
+    this.$store.subscribe(() => this.stopPan()); // Stop panning on a change of state.
   },
 
   methods: {
@@ -40,19 +50,64 @@ export default {
      * Resize the canvas on resizing of the window.
      */
     handleResize() {
-      const stage = this.$refs.stage.getNode();
-      this.configKonva.height = window.innerHeight - this.marginTop;
-      this.configKonva.width = window.innerWidth;
-      this.$nextTick(() => stage.draw()); // Resize on the next tick
+      if (this.$refs.stage) {
+        const stage = this.$refs.stage.getNode();
+        this.configKonva.height = window.innerHeight - this.marginTop;
+        this.configKonva.width = window.innerWidth;
+        this.$nextTick(() => stage.draw()); // Resize on the next tick
+      }
+    },
+
+    /**
+     * Determine the current position and start panning.
+     */
+    startPan() {
+      this.panning = true;
+      this.previousPosition = this.$refs.stage.getNode().getPointerPosition();
+    },
+
+    /**
+     * Stop panning.
+     */
+    stopPan() {
+      this.panning = false;
+      this.previousPosition = undefined;
+    },
+
+    /**
+     * Move the whole stage while the user is dragging the canvas.
+     */
+    pan() {
+      if (this.panning) {
+        const stage = this.$refs.stage.getNode();
+        // Determine the current position and the difference with the previous one.
+        const newPosition = stage.getPointerPosition();
+        const delta = {
+          x: newPosition.x - this.previousPosition.x,
+          y: newPosition.y - this.previousPosition.y
+        };
+
+        // Calculate the new position of the stage.
+        const sp = {
+          x: stage.x() + delta.x,
+          y: stage.y() + delta.y
+        };
+
+        // Set the stage to this position and draw the contents.
+        stage.position(sp);
+        stage.batchDraw();
+        this.previousPosition = newPosition;
+      }
     },
 
     /**
      * Scale the canvas depending on the pointer position when scrolling.
+     * This will zoom in on scrolling up and zoom out on scrolling down.
      * @param e scoll event
      */
     scroll(e) {
       const stage = this.$refs.stage.getNode();
-      const scaleBy = 1.01;
+      const scaleBy = 0.99; // 1.01 for other direction (down = zoom in, up = zoom out)
       const oldScale = stage.scaleX();
       e.evt.preventDefault();
 

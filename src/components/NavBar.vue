@@ -68,8 +68,7 @@
     <validation-report-modal></validation-report-modal>
 
     <predicate-modal
-      :id="this.$store.state.predicateModal.id"
-      :type="this.$store.state.predicateModal.type"
+      :modal-properties="$store.state.mShape.mConstraint.predicateModal"
     ></predicate-modal>
   </div>
 </template>
@@ -108,20 +107,22 @@ export default {
     };
   },
   methods: {
-    loadExample() {
-      this.$store.dispatch("loadExample");
+    toggleClearModal() {
+      this.$store.commit("toggleClearModal");
     },
     toggleShapeModal() {
       this.createPropertyShape = false;
       this.$store.commit("toggleShapeModal");
     },
-    toggleClearModal() {
-      this.$store.commit("toggleClearModal");
-    },
     togglePropertyModal() {
       this.createPropertyShape = true;
       this.$store.commit("toggleShapeModal");
     },
+
+    loadExample() {
+      this.$store.dispatch("loadExample");
+    },
+
     readTextFile() {
       const file = document.getElementById("file").files[0];
       this.$store.commit("uploadSchemaFile", file);
@@ -133,6 +134,7 @@ export default {
       const file = document.getElementById("dataFile").files[0];
       this.$store.commit("uploadDataFile", file);
     },
+
     validate() {
       this.$store.dispatch("validate");
     }

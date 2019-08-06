@@ -16,7 +16,7 @@
         </sui-segment>
       </sui-modal-content>
       <sui-modal-actions>
-        <sui-button negative @click="toggleShapeModal">Cancel</sui-button>
+        <sui-button @click="toggleShapeModal">Cancel</sui-button>
         <sui-button positive @click="confirmNodeShape">Add</sui-button>
       </sui-modal-actions>
     </sui-modal>

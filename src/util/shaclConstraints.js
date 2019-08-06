@@ -3551,6 +3551,7 @@ const json = [
       }
     ]
   },
+
   {
     "@id": "http://www.w3.org/ns/shacl#alternativePath",
     "@type": ["http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"],
@@ -6421,6 +6422,7 @@ const json = [
 export const constraintsByTypes = {
   "Value Type Constraints": [
     "http://www.w3.org/ns/shacl#class",
+    "http://www.w3.org/ns/shacl#path",
     "http://www.w3.org/ns/shacl#datatype",
     "http://www.w3.org/ns/shacl#nodeKind"
   ],
@@ -6435,6 +6437,7 @@ export const constraintsByTypes = {
     "http://www.w3.org/ns/shacl#maxExclusive"
   ],
   "String-Based Constraints": [
+    "http://www.w3.org/ns/shacl#name",
     "http://www.w3.org/ns/shacl#minLength",
     "http://www.w3.org/ns/shacl#maxLength",
     "http://www.w3.org/ns/shacl#pattern",
@@ -6455,6 +6458,9 @@ export const constraintsByTypes = {
   ],
   "Shape-Based Constraints": [
     "http://www.w3.org/ns/shacl#node",
+    "http://www.w3.org/ns/shacl#targetNode",
+    "http://www.w3.org/ns/shacl#targetClass",
+    "http://www.w3.org/ns/shacl#targetObjectsOf",
     "http://www.w3.org/ns/shacl#property",
     "http://www.w3.org/ns/shacl#qualifiedValueShape",
     "http://www.w3.org/ns/shacl#qualifiedMinCount",
@@ -6469,7 +6475,7 @@ export const constraintsByTypes = {
 };
 
 /**
- * TODO
+ * Get an object mapping the category types to a list of custom constraints in that category.
  */
 export function customConstraintsByCategory() {
   const output = {};
@@ -6506,7 +6512,7 @@ export function getConstraintCategory(constraintID) {
 export function getConstraintValueType(constraint) {
   const object = json.filter(c => c["@id"] === internalToShacl(constraint))[0];
   const range = object["http://www.w3.org/2000/01/rdf-schema#range"];
-  return range ? shaclToInternal(range[0]["@id"]) : undefined;
+  return range ? shaclToInternal(range[0]["@id"]) : "";
 }
 
 export const groupedConstraints = groupBy(constraintsWithTypes, "type");

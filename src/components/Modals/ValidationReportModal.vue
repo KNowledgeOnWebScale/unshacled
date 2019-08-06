@@ -11,7 +11,7 @@
         {{ this.$store.state.mData.validationReport }}
       </sui-modal-content>
       <sui-modal-actions>
-        <sui-button negative @click="toggleModal">Cancel</sui-button>
+        <sui-button @click="toggleModal">Cancel</sui-button>
       </sui-modal-actions>
     </sui-modal>
   </div>

@@ -1,5 +1,6 @@
 import Vue from "vue";
 import { HEIGHT } from "../util/konvaConfigs";
+import ValueType from "../util/enums/ValueType";
 
 const coordinateModule = {
   state: {
@@ -59,7 +60,10 @@ const coordinateModule = {
       // Get the IDs of all the constraints and the number of values for each constraint.
       const constraints = {};
       for (const c in shape) {
-        if (!ignored.includes(c)) constraints[c] = shape[c].length;
+        if (!ignored.includes(c))
+          constraints[c] = ValueType(c).includes("List")
+            ? shape[c][0]["@list"].length
+            : shape[c].length;
       }
 
       // Calculate their y values.
@@ -91,7 +95,7 @@ const coordinateModule = {
     },
 
     /**
-     * TODO
+     * Clear all the coordinates and y values.
      * @param state
      */
     clearLocations(state) {
