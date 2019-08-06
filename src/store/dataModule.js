@@ -7,6 +7,7 @@ import language from "../util/enums/languages";
 import getConstraints from "../util/constraintSelector";
 import { internalToShacl } from "../parsing/internalParser";
 import { downloadFile } from "../util";
+import { CUSTOM_URI, SHACL_URI } from "../util/constants";
 
 /**
  * This module contains everything to handle data imports/exports and validation.
@@ -17,7 +18,7 @@ const dataModule = {
     format: language.SHACL,
     dataFile: {},
     dataFileExtension: String,
-    validationReport: "hello",
+    validationReport: {},
     showValidationReportModal: false,
     showNoDataFileModal: false
   },
@@ -64,14 +65,12 @@ const dataModule = {
       if (state.dataFile.length === 0) {
         this.commit("toggleNoDataFilePopup");
       } else {
-        console.log("Serializing...");
-        SerializerManager.serialize(model, ETF.ttl)
-          .then(e => {
+        SerializerManager.serialize(internalToShacl(model), ETF.ttl)
+          .then(shapes => {
             console.log("Validating...");
-            ValidatorManager.validate(state.dataFile, e, state.format)
-              .then(e => {
-                console.log("validationReport", e);
-                state.validationReport = e;
+            ValidatorManager.validate(state.dataFile, shapes, state.format)
+              .then(report => {
+                state.validationReport = report;
                 state.showValidationReportModal = true;
               })
               .catch(e => console.log(`Error while validating: ${e}`));
@@ -104,7 +103,7 @@ const dataModule = {
      * @param rootState
      */
     validate({ rootState }) {
-      this.commit("validateWithModel", rootState.model);
+      this.commit("validateWithModel", rootState.mShape.model);
     },
 
     /**

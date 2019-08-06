@@ -65,7 +65,9 @@
     <clear-modal></clear-modal>
     <no-data-file-modal></no-data-file-modal>
     <export-modal></export-modal>
-    <validation-report-modal></validation-report-modal>
+    <validation-report-modal
+      :report="this.$store.state.mData.validationReport"
+    ></validation-report-modal>
 
     <predicate-modal
       :modal-properties="$store.state.mShape.mConstraint.predicateModal"
