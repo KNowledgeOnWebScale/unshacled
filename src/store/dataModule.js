@@ -7,7 +7,6 @@ import language from "../util/enums/languages";
 import getConstraints from "../util/constraintSelector";
 import { internalToShacl } from "../parsing/internalParser";
 import { downloadFile } from "../util";
-import { CUSTOM_URI, SHACL_URI } from "../util/constants";
 
 /**
  * This module contains everything to handle data imports/exports and validation.
@@ -67,7 +66,6 @@ const dataModule = {
       } else {
         SerializerManager.serialize(internalToShacl(model), ETF.ttl)
           .then(shapes => {
-            console.log("Validating...");
             ValidatorManager.validate(state.dataFile, shapes, state.format)
               .then(report => {
                 state.validationReport = report;

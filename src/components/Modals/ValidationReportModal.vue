@@ -8,8 +8,12 @@
         Validation report
       </sui-modal-header>
       <sui-modal-content :scrolling="true">
-        <div>
-          <h4>General</h4>
+        <sui-segment basic>
+          <h3 is="sui-header">
+            <sui-icon name="cog" />
+            <sui-header-content>General</sui-header-content>
+          </h3>
+          <sui-divider></sui-divider>
 
           <sui-segment v-if="conforms()" color="green">
             This data conforms to the given model.
@@ -28,16 +32,39 @@
             </ul>
             <p>More details can be found below.</p>
           </div>
-        </div>
+        </sui-segment>
 
-        <sui-divider></sui-divider>
+        <sui-segment basic>
+          <h3 is="sui-header">
+            <sui-icon name="cogs" />
+            <sui-header-content>Details</sui-header-content>
+          </h3>
 
-        <div>
-          <h4>Details</h4>
-          <p v-for="(value, key) of getSimpleResults()" :key="key">
-            {{ key }}: {{ JSON.stringify(value, null, 2) }}
-          </p>
-        </div>
+          <sui-divider></sui-divider>
+
+          <sui-segment
+            v-for="(results, node) of getResultsByNode()"
+            :key="node"
+            basic
+          >
+            <h4 is="sui-header">{{ node }}</h4>
+            <sui-segments>
+              <sui-segment v-for="result of results" :key="result.shape">
+                <sui-grid>
+                  <sui-grid-row v-for="(value, key) of result" :key="key">
+                    <sui-grid-column :width="1"></sui-grid-column>
+
+                    <sui-grid-column :width="3">
+                      <h5 is="sui-header">{{ cfl(key) }}</h5>
+                    </sui-grid-column>
+
+                    <sui-grid-column :width="12">{{ value }}</sui-grid-column>
+                  </sui-grid-row>
+                </sui-grid>
+              </sui-segment>
+            </sui-segments>
+          </sui-segment>
+        </sui-segment>
       </sui-modal-content>
       <sui-modal-actions>
         <sui-button @click="toggleModal">Close</sui-button>
@@ -49,6 +76,7 @@
 <script>
 import { SHACL_URI } from "../../util/constants";
 import { urlToName } from "../../parsing/urlParser";
+import { capitalizeFirstLetter, groupBy } from "../../util";
 
 export default {
   name: "ValidationReportModal",
@@ -63,11 +91,23 @@ export default {
       this.$store.commit("toggleValidationReport");
     },
 
+    /**
+     * Returns a boolean value to indicate whether the data conforms to the model.
+     */
     conforms() {
       return (
         this.getGeneralReport().conforms &&
         this.getGeneralReport().conforms === "true"
       );
+    },
+
+    /**
+     * Capitalize the first letter of the given string.
+     * Used because `capitalizeFirstLetter` cannot be called directly from the HTML.
+     * @param string
+     */
+    cfl(string) {
+      return capitalizeFirstLetter(string);
     },
 
     /**
@@ -84,7 +124,9 @@ export default {
 
         for (const node of validationNode[`${SHACL_URI}result`]) {
           generalReport.nodeIDs.push(node["@id"]);
-          generalReport.nodes.push(this.getSimpleResults()[node["@id"]]["node"]);
+          generalReport.nodes.push(
+            this.getSimpleResults()[node["@id"]]["node"]
+          );
         }
 
         generalReport.nodeIDs = new Set(generalReport.nodeIDs);
@@ -134,13 +176,20 @@ export default {
           simple[key] = {};
           for (const constr of Object.keys(r)) {
             const name = urlToName(r[constr]);
-            simple[key][constr] = name === "(undefined)" ? undefined : name;
+            if (name !== "(undefined)") simple[key][constr] = name;
           }
           simple[key].message = r.message;
         }
         return simple;
       }
       return {};
+    },
+
+    /**
+     * Get the validation results grouped by node.
+     */
+    getResultsByNode() {
+      return groupBy(this.getSimpleResults(), "node", true);
     }
   }
 };
