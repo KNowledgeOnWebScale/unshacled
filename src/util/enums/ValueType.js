@@ -12,7 +12,6 @@ const ids = new Set([
   TERM.disjoint,
   TERM.lessThan,
   TERM.lessThanOrEquals,
-  TERM.name,
   TERM.not,
   TERM.node,
   TERM.path,
@@ -33,6 +32,7 @@ const types = new Set([
   TERM.maxInclusive,
   TERM.minLength,
   TERM.maxLength,
+  TERM.name,
   TERM.uniqueLang
 ]);
 const valueLists = new Set([TERM.ignoredProperties, TERM.languageIn, TERM.in]);

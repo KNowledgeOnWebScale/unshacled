@@ -1,4 +1,5 @@
 import { clone } from "ramda";
+import Vue from "vue";
 import { TERM } from "../translation/terminology";
 import {
   getConstraintCategory,
@@ -223,6 +224,19 @@ const constraintModule = {
       });
     },
 
+    /**
+     * Set the value of the constraint with the given ID to the given value.
+     * @param state
+     * @param args
+     *            shape the shape object that has to be updated.
+     *            constraintID the ID of the constraint that should be updated.
+     *            value the new value of the given constraint.
+     */
+    setConstraintValue(state, args) {
+      const { shape, constraintID, value } = args;
+      Vue.set(shape, constraintID, value);
+    },
+
     /* DELETE ======================================================================================================= */
 
     /**
@@ -274,6 +288,18 @@ const constraintModule = {
           constraintID
         });
       }
+    },
+
+    /**
+     * Delete the given constraint from the given shape object.
+     * @param state
+     * @param args
+     *            shape the shape object that should be updated.
+     *            constraint the ID of the constraint that should be deleted.
+     */
+    deleteConstraintFromShape(state, args) {
+      const { shape, constraintID } = args;
+      Vue.delete(shape, constraintID);
     }
   },
   getters: {

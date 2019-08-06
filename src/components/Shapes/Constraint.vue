@@ -41,6 +41,7 @@ import {
   DELTA_Y_DELETE
 } from "../../util/konvaConfigs";
 import { urlToName } from "../../parsing/urlParser";
+import ValueType from "../../util/enums/ValueType";
 
 export default {
   name: "Constraint",
@@ -166,25 +167,19 @@ export default {
           return [output.toString()];
         }
 
-        // FIXME ugly
+        // Other constraints should be visualized as an array of their value representations.
         for (const value of values) {
-          if (value["@id"] || value["@id"] === "") {
-            output.push(urlToName(value["@id"]));
-          } else if (value["@value"] || value["@value"] === "") {
-            output.push(urlToName(value["@value"]));
-          } else if (value["@list"]) {
-            for (const v of value["@list"]) {
-              if (v["@id"]) {
-                output.push(v["@id"]);
-              } else if (v["@value"]) {
-                output.push(v["@value"]);
-              }
-            }
+          const valueType = ValueType(this.$props.constraintID);
+          const key = valueType.includes("id") ? "@id" : "@value";
+
+          if (valueType.includes("List")) {
+            for (const v of value["@list"]) output.push(v[key]);
           } else {
-            output.push(urlToName(value));
+            output.push(urlToName(value[key]));
           }
         }
       }
+      // FIXME in the example, `or` is not visualized correctly
       return output;
     },
 
@@ -244,6 +239,12 @@ export default {
       };
     },
 
+    /**
+     * TODO
+     * @param text
+     * @param index
+     * @returns {{y: *, text: *}}
+     */
     getValueConfig(text, index) {
       return {
         ...this.valueConfig,
@@ -252,6 +253,11 @@ export default {
       };
     },
 
+    /**
+     * TODO
+     * @param index
+     * @returns {{y: *}}
+     */
     getDeleteValueConfig(index) {
       return {
         ...this.deleteConstraintConfig,
