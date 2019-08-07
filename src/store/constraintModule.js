@@ -125,6 +125,10 @@ const constraintModule = {
         constraintID: predicate,
         value: shape[predicate]
       });
+      commit("updateShape", {
+        shapeID,
+        value: rootState.mShape.model[shapeID]
+      });
 
       // Add a property shape if needed.
       if (predicate.includes("property")) {
