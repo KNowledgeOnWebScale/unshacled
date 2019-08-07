@@ -273,7 +273,7 @@ export default {
 
       if (this.showCheckbox()) {
         // Set the input to the value of the checkbox, as a string.
-        this.values.input = this.values.inputBool;
+        this.values.input = this.values.inputBool.toString();
       } else if (this.showString() || this.showPaths() || this.showOther()) {
         // Add the base URL back to the input.
         const url = extractUrl(this.values.input);
