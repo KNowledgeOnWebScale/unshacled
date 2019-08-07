@@ -53,6 +53,9 @@
         <sui-label v-if="!dataFileUploaded()" color="red">
           No data file uploaded
         </sui-label>
+        <sui-label v-if="dataFileUploaded()" color="green">
+          {{ $store.state.mData.dataFileName }}
+        </sui-label>
       </sui-menu-item>
 
       <sui-menu-item
