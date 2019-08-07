@@ -36,10 +36,10 @@
           </sui-dropdown-item>
         </sui-dropdown-menu>
       </sui-dropdown>
-      <sui-menu-item class="clickable" icon="add" @click="toggleShapeModal">
+      <sui-menu-item class="clickable" icon="add" @click="createNodeShape">
         Shape
       </sui-menu-item>
-      <sui-menu-item class="clickable" icon="add" @click="togglePropertyModal">
+      <sui-menu-item class="clickable" icon="add" @click="createPropertyShape">
         Property
       </sui-menu-item>
 
@@ -66,10 +66,6 @@
       </sui-menu-menu>
     </sui-menu>
 
-    <node-shape-modal
-      :is-property-shape-modal="createPropertyShape"
-    ></node-shape-modal>
-
     <clear-modal></clear-modal>
     <export-modal></export-modal>
     <validation-report-modal
@@ -88,7 +84,6 @@ import SuiDropdownDivider from "semantic-ui-vue/dist/commonjs/modules/Dropdown/D
 
 // Modals
 import ClearModal from "./Modals/ClearModal.vue";
-import NodeShapeModal from "./Modals/NodeShapeModal.vue";
 import ValidationReportModal from "./Modals/ValidationReportModal.vue";
 import PredicateModal from "./Modals/PredicateModal.vue";
 import ExportModal from "./Modals/ExportModal.vue";
@@ -100,7 +95,6 @@ export default {
   components: {
     ExportModal,
     ClearModal,
-    NodeShapeModal,
     SuiDropdownDivider,
     SuiDropdown,
     ValidationReportModal,
@@ -108,7 +102,7 @@ export default {
   },
   data() {
     return {
-      createPropertyShape: false,
+      uuid: require("uuid/v4"),
       shacl: languages.SHACL,
       shex: languages.SHEX
     };
@@ -117,13 +111,11 @@ export default {
     toggleClearModal() {
       this.$store.commit("toggleClearModal");
     },
-    toggleShapeModal() {
-      this.createPropertyShape = false;
-      this.$store.commit("toggleShapeModal");
+    createNodeShape() {
+      this.$store.dispatch("addNodeShape", this.uuid());
     },
-    togglePropertyModal() {
-      this.createPropertyShape = true;
-      this.$store.commit("toggleShapeModal");
+    createPropertyShape() {
+      this.$store.dispatch("addPropertyShape", this.uuid());
     },
 
     loadExample() {

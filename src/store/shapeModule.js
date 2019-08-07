@@ -55,6 +55,7 @@ const shapeModule = {
           coordinates: state.mCoordinate.coordinates,
           bottomLefts: getters.allbottomLefts
         });
+        console.log(JSON.stringify(getters.allbottomLefts, null, 2));
         this.commit("updateCoordinates", { shapeID: shape["@id"], x, y });
       }
     },
