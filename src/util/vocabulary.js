@@ -41,6 +41,8 @@ Dictionary[PropertyShape].push(...PropertyShapeFields);
 const Constraints = findObjectsWithType(shacl, Types.Parameter).map(
   obj => obj["http://www.w3.org/ns/shacl#path"][0]["@id"]
 );
+
+// FIXME Not every constraint is applicable to a NodeShape or a PropertyShape
 Dictionary[NodeShape].push(...Constraints);
 Dictionary[NodeShape] = removeDuplicates(Dictionary[NodeShape]);
 Dictionary[PropertyShape].push(...Constraints);
@@ -63,7 +65,7 @@ Dictionary[PropertyShape].forEach(predicate => {
 // Translate to internal terminology
 Dictionary = SHACLTranslator.toModel(Dictionary);
 
-/** FUNCTIONS TO GATHER INFORMATION FROM SHACL.JS */
+/* FUNCTIONS TO GATHER INFORMATION FROM SHACL.JS ==================================================================== */
 
 /**
  * Returns first object with a matching @id from document

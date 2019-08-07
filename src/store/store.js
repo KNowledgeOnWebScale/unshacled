@@ -8,7 +8,7 @@ import EXAMPLE from "../util/examples";
 import { possiblePredicates, possibleObjects } from "../util/vocabulary";
 
 // Translation
-import { TranslatorManager } from "../translation/translatorManager";
+import TranslatorManager from "../translation/translatorManager";
 import { TERM } from "../translation/terminology";
 
 // Modules
