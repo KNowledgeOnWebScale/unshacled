@@ -1,10 +1,8 @@
 // Vue
-import { clone } from "ramda";
 import Vue from "vue";
 import Vuex from "vuex";
 
 // Util
-import EXAMPLE from "../util/examples";
 import { possiblePredicates, possibleObjects } from "../util/vocabulary";
 
 // Translation
@@ -15,6 +13,9 @@ import { TERM } from "../translation/terminology";
 import shapeModule from "./shapeModule";
 import dataModule from "./dataModule";
 import { internalToShacl } from "../parsing/internalParser";
+import { exampleData, exampleShapes } from "../assets/example";
+import ParserManager from "../parsing/parserManager";
+import { ETF } from "../util/enums/extensionToFormat";
 
 Vue.use(Vuex);
 
@@ -81,15 +82,13 @@ export default new Vuex.Store({
      * Load in some example data.
      */
     loadExample({ getters }) {
+      const self = this;
       console.log("Loading example...");
       this.commit("clear"); // Clear the existing data first.
-
-      const example = EXAMPLE.model[0];
-      const newModel = [];
-      for (const element of example) {
-        newModel.push(clone(element)); // Deep copy
-      }
-      this.commit("setModel", { model: newModel, getters });
+      this.commit("setDataFile", exampleData); // Set the data.
+      ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
+        self.commit("setModel", { model, getters }); // Set the shapes.
+      });
     }
   },
   getters: {

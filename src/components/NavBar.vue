@@ -132,14 +132,14 @@ export default {
 
     readTextFile() {
       const file = document.getElementById("file").files[0];
-      this.$store.commit("uploadSchemaFile", file);
+      this.$store.dispatch("uploadSchemaFile", file);
     },
     exportFile(type) {
       this.$store.commit("toggleExportModal", type);
     },
     uploadDataFile() {
       const file = document.getElementById("dataFile").files[0];
-      this.$store.commit("uploadDataFile", file);
+      this.$store.dispatch("uploadDataFile", file);
     },
     dataFileUploaded() {
       return this.$store.state.mData.dataFile.length > 0;
