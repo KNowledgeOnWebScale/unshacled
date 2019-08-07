@@ -85,7 +85,11 @@ export default new Vuex.Store({
       const self = this;
       console.log("Loading example...");
       this.commit("clear"); // Clear the existing data first.
-      this.commit("setDataFile", { contents: exampleData, extension: "ttl" }); // Set the data.
+      this.commit("setDataFile", {
+        name: "example.ttl",
+        contents: exampleData,
+        extension: "ttl"
+      }); // Set the data.
       ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
         self.commit("setModel", { model, getters }); // Set the shapes.
       });

@@ -16,6 +16,7 @@ const dataModule = {
   state: {
     format: language.SHACL,
     dataFile: {},
+    dataFileName: String,
     dataFileExtension: String,
     validationReport: {},
     showValidationReportModal: false
@@ -27,7 +28,8 @@ const dataModule = {
      * @param contents the contents of a read data file.
      * @param extension the extension of the data file.
      */
-    setDataFile(state, { contents, extension }) {
+    setDataFile(state, { name, contents, extension }) {
+      Vue.set(state, "dataFileName", name);
       Vue.set(state, "dataFile", contents);
       Vue.set(state, "dataFileExtension", extension);
     },
@@ -71,6 +73,7 @@ const dataModule = {
       reader.readAsText(file);
       reader.onload = event =>
         commit("setDataFile", {
+          name: file.name,
           contents: event.target.result,
           extension: file.name.split(".").pop()
         });
