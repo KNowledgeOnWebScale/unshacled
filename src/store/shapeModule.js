@@ -110,6 +110,16 @@ const shapeModule = {
       shape[TERM.path][0]["@id"] = `${EXAMPLE_URI}${name}`;
     },
 
+    /**
+     * Update the value of the shape with the given ID to the given value.
+     * @param state
+     * @param args
+     */
+    updateShape(state, args) {
+      const { shapeID, value } = args;
+      Vue.set(state.model, shapeID, value);
+    },
+
     /* DELETE ======================================================================================================= */
 
     /**

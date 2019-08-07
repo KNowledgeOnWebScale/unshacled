@@ -99,7 +99,7 @@ import {
   customConstraintsByCategory,
   getConstraintValueType
 } from "../../util/shaclConstraints";
-import {extractUrl, isUrl, urlToName} from "../../parsing/urlParser";
+import { extractUrl, isUrl, urlToName } from "../../parsing/urlParser";
 import { TERM } from "../../translation/terminology";
 import { SCHEMA_URL, XML_DATATYPES } from "../../util/constants";
 
@@ -151,6 +151,13 @@ export default {
     }
   },
   mounted() {
+    /*
+    The reason this watch is implemented is that this modal cannot work with `v-model="$props.something`.
+    A component should not edit his properties directly, since a re-render in the parent component causes them
+    to update (and override) their values. That's why this component keeps a copy of his properties, which he actually
+    can modify directly. With every update of his properties (in `mConstraint.predicateModal`), he copies these values
+    to his own state.
+     */
     const self = this;
     this.$store.watch(
       () => self.$store.state.mShape.mConstraint.predicateModal,
@@ -266,7 +273,7 @@ export default {
 
       if (this.showCheckbox()) {
         // Set the input to the value of the checkbox, as a string.
-        this.values.input = this.values.inputBool;
+        this.values.input = this.values.inputBool.toString();
       } else if (this.showString() || this.showPaths() || this.showOther()) {
         // Add the base URL back to the input.
         const url = extractUrl(this.values.input);
@@ -331,8 +338,10 @@ export default {
      */
     getPathOptions() {
       const { propertyShapes } = this.$store.getters;
-      const thisPath =
-        propertyShapes[this.$props.modalProperties.shapeID][TERM.path];
+      const pShape = propertyShapes[this.$props.modalProperties.shapeID];
+
+      let thisPath;
+      if (pShape) thisPath = pShape[TERM.path];
 
       const paths = [];
       for (const ps in propertyShapes) {

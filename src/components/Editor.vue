@@ -1,5 +1,6 @@
 <template>
   <v-stage
+    id="stage"
     ref="stage"
     :config="configKonva"
     @wheel="scroll"
@@ -60,10 +61,14 @@ export default {
 
     /**
      * Determine the current position and start panning.
+     * Only start panning if the user has clicked on the canvas.
      */
-    startPan() {
-      this.panning = true;
-      this.previousPosition = this.$refs.stage.getNode().getPointerPosition();
+    startPan(e) {
+      // Check if the user has clicked on the canvas.
+      if (e.target.content) {
+        this.panning = true;
+        this.previousPosition = this.$refs.stage.getNode().getPointerPosition();
+      }
     },
 
     /**
