@@ -25,9 +25,11 @@ const dataModule = {
      * Set the data file to the given contents.
      * @param state
      * @param contents the contents of a read data file.
+     * @param extension the extension of the data file.
      */
-    setDataFile(state, contents) {
+    setDataFile(state, { contents, extension }) {
       Vue.set(state, "dataFile", contents);
+      Vue.set(state, "dataFileExtension", extension);
     },
 
     /**
@@ -40,6 +42,10 @@ const dataModule = {
       if (state.dataFile.length > 0) {
         SerializerManager.serialize(internalToShacl(model), ETF.ttl)
           .then(shapes => {
+            if (state.dataFileExtension === "json")
+              throw "JSON data files are not yet supported."; // FIXME
+            // SerializerManager.serialize(state.dataFile, ETF.ttl).then(result => console.log(result)); // FIXME this errors
+
             ValidatorManager.validate(state.dataFile, shapes, state.format)
               .then(report => {
                 state.validationReport = report;
@@ -60,11 +66,14 @@ const dataModule = {
      * @param commit
      * @param file The file containing data to check on
      * */
-    uploadDataFile({ state, commit }, file) {
+    uploadDataFile({ commit }, file) {
       const reader = new FileReader();
-      state.dataFileExtension = file.name.split(".").pop();
       reader.readAsText(file);
-      reader.onload = event => commit("setDataFile", event.target.result);
+      reader.onload = event =>
+        commit("setDataFile", {
+          contents: event.target.result,
+          extension: file.name.split(".").pop()
+        });
     },
 
     /**
