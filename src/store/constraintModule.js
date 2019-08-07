@@ -113,11 +113,16 @@ const constraintModule = {
         ? { "@id": input }
         : { "@type": object, "@value": input };
 
-      // Determine which list we want to add the predicate to.
-      const list = valueType.includes("List")
-        ? shape[predicate][0]["@list"]
-        : shape[predicate];
-      list.push(value);
+      if (valueType === "type") {
+        // Replace the value.
+        Vue.set(shape[predicate], 0, value);
+      } else {
+        // Determine which list we want to add the predicate to.
+        const list = valueType.includes("List")
+          ? shape[predicate][0]["@list"]
+          : shape[predicate];
+        list.push(value);
+      }
 
       // Add the predicate to the shape.
       commit("setConstraintValue", {
