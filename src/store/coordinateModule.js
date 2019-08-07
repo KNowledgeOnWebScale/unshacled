@@ -6,7 +6,7 @@ const coordinateModule = {
   state: {
     yValues: {},
     coordinates: {},
-    bottom: {}
+    bottoms: {}
   },
   mutations: {
     /**
@@ -77,8 +77,8 @@ const coordinateModule = {
         }
       }
 
-      // Set the bottom right coordinate.
-      state.bottom[shapeID] = i * HEIGHT;
+      // Set the bottom coordinate.
+      state.bottoms[shapeID] = i * HEIGHT;
     },
 
     /**
@@ -110,11 +110,8 @@ const coordinateModule = {
      * @param state
      * @returns {function(*): {x: *, y: *}}
      */
-    bottomLeft: state => shapeID => {
-      return {
-        x: state.coordinates[shapeID].x,
-        y: state.bottom[shapeID]
-      };
+    bottomYCoordinate: state => shapeID => {
+      return state.bottoms[shapeID] + state.coordinates[shapeID].y;
     },
 
     /**
@@ -122,10 +119,10 @@ const coordinateModule = {
      * @param state
      * @param getters
      */
-    allbottomLefts: (state, getters) => {
+    allBottomYs: (state, getters) => {
       const output = {};
       for (const key of Object.keys(state.coordinates)) {
-        output[key] = getters.bottomLeft(key);
+        output[key] = getters.bottomYCoordinate(key);
       }
       return output;
     }

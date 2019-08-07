@@ -53,9 +53,9 @@ const shapeModule = {
         });
         const { x, y } = getNonOverlappingCoordinates({
           coordinates: state.mCoordinate.coordinates,
-          bottomLefts: getters.allbottomLefts
+          bottomYs: getters.allBottomYs,
+          bottoms: state.mCoordinate.bottoms
         });
-        console.log(JSON.stringify(getters.allbottomLefts, null, 2));
         this.commit("updateCoordinates", { shapeID: shape["@id"], x, y });
       }
     },
@@ -68,11 +68,12 @@ const shapeModule = {
      * @param args
      */
     addShape(state, args) {
-      const { object, bottomLefts } = args;
+      const { object, bottomYs } = args;
       state.model.push(object);
       const { x, y } = getNonOverlappingCoordinates({
         coordinates: state.mCoordinate.coordinates,
-        bottomLefts
+        bottomYs,
+        bottoms: state.mCoordinate.bottoms
       });
       Vue.set(state.mCoordinate.coordinates, object["@id"], { x, y });
       this.commit("updateYValues", {
@@ -172,7 +173,7 @@ const shapeModule = {
         "@type": [TERM.NodeShape]
       };
 
-      commit("addShape", { object, bottomLefts: getters.allbottomLefts });
+      commit("addShape", { object, bottomYs: getters.allBottomYs });
     },
 
     /**
@@ -187,7 +188,7 @@ const shapeModule = {
       } else {
         const object = { "@id": id };
         object[TERM.path] = [{ "@id": `${EXAMPLE_URI}${id}` }];
-        commit("addShape", { object, bottomLefts: getters.allbottomLefts });
+        commit("addShape", { object, bottomYs: getters.allBottomYs });
       }
     },
 
