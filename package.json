@@ -21,6 +21,7 @@
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-vue": "^0.8.1",
     "shacl-js": "0.0.1",
+    "uuid": "^3.3.2",
     "vue": "^2.6.10",
     "vue-konva": "^2.0.7",
     "vuex": "^3.0.1"
