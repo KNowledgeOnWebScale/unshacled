@@ -6,6 +6,42 @@
     <sui-modal-content @submit.prevent="confirmNodeShape">
       <sui-form>
         <sui-form-field>
+          <label for="selectPreds">Predicate</label>
+          <!-- <select
+            id="selectPreds"
+            v-model="values.predicate"
+            class="ui fluid search dropdown"
+            :disabled="$props.modalProperties.editing"
+            @change="selectObject"
+          >
+            <option v-for="p in predicates" :key="p" :value="p">
+              {{ p }}
+            </option>
+          </select> -->
+          <input
+            id="selectPreds"
+            v-model="values.predicate"
+            class="ui fluid search dropdown"
+            list="predicates"
+            :disabled="$props.modalProperties.editing"
+            @input="selectObject"
+          />
+          <sui-label
+            v-if="
+              values.predicate !== '' && !$store.getters.objects(predicateUrl())
+            "
+            basic
+            pointing
+            color="red"
+          >
+            Please enter a valid predicate
+          </sui-label>
+          <datalist id="predicates">
+            <option v-for="p in predicates" :key="p" :value="p">{{ p }}</option>
+          </datalist>
+        </sui-form-field>
+
+        <sui-form-field>
           <label for="selectCategory">Category</label>
           <select
             v-if="categories"
@@ -14,27 +50,17 @@
             :disabled="$props.modalProperties.editing"
             @change="values.predicate = ''"
           >
+            <option :value="''">All categories</option>
             <option v-for="c in categories" :key="c" :value="c">
               {{ c }}
             </option>
           </select>
         </sui-form-field>
 
-        <sui-form-field v-if="values.category">
-          <label for="selectPreds">Predicate</label>
-          <select
-            id="selectPreds"
-            v-model="values.predicate"
-            :disabled="$props.modalProperties.editing"
-            @change="selectObject"
-          >
-            <option v-for="p in predicates" :key="p" :value="p">
-              {{ p }}
-            </option>
-          </select>
-        </sui-form-field>
-
-        <sui-form-field v-if="values.predicate" class="field">
+        <sui-form-field
+          v-if="$store.getters.objects(predicateUrl())"
+          class="field"
+        >
           <label>Value</label>
           <input
             v-if="showString()"
@@ -137,10 +163,14 @@ export default {
         const preds = this.$store.getters.predicates(
           this.$props.modalProperties.shapeType
         );
-        const byCategory = customConstraintsByCategory()[this.values.category];
+        const iter =
+          this.values.category === ""
+            ? Object.values(customConstraintsByCategory()).flat()
+            : customConstraintsByCategory()[this.values.category];
+
         if (preds)
           preds.forEach(pred => {
-            if (byCategory.includes(pred)) {
+            if (iter.includes(pred)) {
               const value = pred.split("#")[1];
               Vue.set(this.values.urls, value, pred.split("#")[0]);
               predsWithoutUrl.push(value);
@@ -250,11 +280,14 @@ export default {
       };
 
       if (this.values.predicate) {
-        this.values.object = this.$store.getters.objects(
-          this.predicateUrl()
-        )[0];
-        const typeUrl = getConstraintValueType(this.predicateUrl());
-        if (typeUrl) this.values.constraintType = urlToName(typeUrl);
+        const object = this.$store.getters.objects(this.predicateUrl());
+        if (object) {
+          this.values.object = object[0];
+          const typeUrl = getConstraintValueType(this.predicateUrl());
+          if (typeUrl) this.values.constraintType = urlToName(typeUrl);
+        } else {
+          this.values.object = "";
+        }
       } else {
         this.values.object = "";
       }
