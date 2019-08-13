@@ -343,7 +343,6 @@ const shapeModule = {
         // Handle every constraint.
         for (const constraintID of Object.keys(constraints)) {
           for (const idValue of constraints[constraintID]) {
-
             // Create an object to represent the relationship.
             output.push({
               from: shapeID,

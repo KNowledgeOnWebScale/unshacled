@@ -12,10 +12,10 @@
 <script>
 import {
   DELETE_BUTTON_CONFIG,
-  HEIGHT,
   RELATIONSHIP_CONFIG,
   WIDTH
 } from "../../util/konvaConfigs";
+import nearestPointOnPerimeter from "../../util/nearestPointOnPerimeter";
 
 export default {
   name: "Relationship",
@@ -45,19 +45,36 @@ export default {
      */
     getEndPoints() {
       const { from, to } = this.$props;
-      const { coordinates } = this.$store.state.mShape.mCoordinate;
-      const start = coordinates[from];
-      const end = coordinates[to];
+      const { coordinates, heights } = this.$store.state.mShape.mCoordinate;
+
+      // Center points of the shapes.
+      const start = {
+        x: coordinates[from].x + WIDTH / 2,
+        y: coordinates[from].y + heights[from] / 2
+      };
+      // const end = {
+      //   x: coordinates[to].x + WIDTH / 2,
+      //   y: coordinates[to].y + heights[to] / 2
+      // };
+      const end = nearestPointOnPerimeter(
+        coordinates[to],
+        {
+          x: coordinates[to].x + WIDTH,
+          y: coordinates[to].y + heights[to]
+        },
+        start
+      );
+
       return [
-        start.x + WIDTH / 2,
-        start.y + HEIGHT / 2,
-        end.x + WIDTH / 2,
-        end.y + HEIGHT / 2
+        start.x, // x1
+        start.y, // y1
+        end.x, // x2
+        end.y // y2
       ];
     },
 
     /**
-     * Get the button config for this relationship.
+     * Get the button configuration for this relationship.
      */
     getButtonConfig() {
       const arrow = this.$refs.arrow.getNode();
@@ -73,7 +90,7 @@ export default {
     },
 
     /**
-     * Get the line config for this relationship.
+     * Get the line configuration for this relationship.
      */
     getLineConfig() {
       return {
