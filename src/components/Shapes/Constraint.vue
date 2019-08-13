@@ -20,7 +20,7 @@
           @click="editValue(index, value)"
         ></v-text>
         <v-circle
-          v-if="hoverValues"
+          v-if="hoverValues && !isListOfValues()"
           :config="getDeleteValueConfig(index)"
           @click="deleteConstraintValue(index)"
         ></v-circle>
@@ -41,6 +41,7 @@ import {
   DELTA_Y_DELETE
 } from "../../util/konvaConfigs";
 import { urlToName } from "../../parsing/urlParser";
+import { SINGLE_ENTRY } from "../../util/constants";
 import ValueType from "../../util/enums/ValueType";
 
 export default {
@@ -145,28 +146,45 @@ export default {
     /* HELPERS ====================================================================================================== */
 
     /**
+     * Returns boolean value which indicates if the current constraint value should be visualized
+     * as a list of values in a single entry.
+     * @returns {boolean}
+     */
+    isListOfValues() {
+      const { shapeID, constraintID } = this.$props;
+      const constraints = this.$store.getters.shapeConstraints(shapeID);
+      return (
+        constraints &&
+        constraints[constraintID] &&
+        SINGLE_ENTRY.includes(urlToName(constraintID))
+      );
+    },
+
+    /**
      * Get all the constraint values of this predicate.
      * Returns a list of values.
      */
     getConstraintValues() {
-      const constraints = this.$store.getters.shapeConstraints(
-        this.$props.shapeID
-      );
+      const { shapeID, constraintID } = this.$props;
+      const constraints = this.$store.getters.shapeConstraints(shapeID);
       const output = [];
 
-      if (constraints && constraints[this.$props.constraintID]) {
-        let values = constraints[this.$props.constraintID];
+      if (constraints && constraints[constraintID]) {
+        let values = constraints[constraintID];
 
         // Properties should be listed in a single entry.
-        if (this.$props.constraintID.includes("property")) {
-          for (const v of values) {
+        if (this.isListOfValues()) {
+          const iter = ValueType(constraintID).includes("List")
+            ? values[0]["@list"]
+            : values;
+          for (const v of iter) {
             output.push(v["@id"] ? urlToName(v["@id"]) : urlToName(v));
           }
           return [output.toString()];
         }
 
         // Other constraints should be visualized as an array of their value representations.
-        const type = ValueType(this.$props.constraintID);
+        const type = ValueType(constraintID);
         if (
           type.includes("List") &&
           values.length === 1 &&
@@ -188,11 +206,9 @@ export default {
      * @returns {number}
      */
     getNumConstraintValues() {
-      const cvs = this.$store.getters.shapeWithID(this.$props.shapeID)[
-        this.$props.constraintID
-      ];
-
-      return this.$props.constraintID.includes("property")
+      const { shapeID, constraintID } = this.$props;
+      const cvs = this.$store.getters.shapeWithID(shapeID)[constraintID];
+      return SINGLE_ENTRY.includes(urlToName(constraintID))
         ? 1 // For `property`, these will be listed as a single value.
         : cvs.length > 0 && cvs[0]["@list"]
         ? cvs[0]["@list"].length // Get the number of elements if it's a list.

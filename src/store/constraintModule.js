@@ -287,9 +287,11 @@ const constraintModule = {
      * If the constraint value has a '@list' object,
      *   the constraint with the given index will be removed from that object.
      * @param getters
+     * @param commit
+     * @param rootState
      * @param args
      */
-    deleteConstraintValueWithIndex({ getters }, args) {
+    deleteConstraintValueWithIndex({ getters, commit, rootState }, args) {
       const { shapeID, constraintID, valueIndex } = args;
       const constraint = getters.shapeWithID(shapeID)[constraintID];
 
@@ -306,6 +308,9 @@ const constraintModule = {
           constraintID
         });
       }
+
+      // Update the y values
+      commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
     },
 
     /**
@@ -313,9 +318,11 @@ const constraintModule = {
      * If the constraint value has a '@list' object,
      *   the constraint with the given index will be removed from that object.
      * @param getters
+     * @param commit
+     * @param rootState
      * @param args
      */
-    deleteConstraintValue({ getters }, args) {
+    deleteConstraintValue({ getters, commit, rootState }, args) {
       const { shapeID, constraintID, value } = args;
       const constraint = getters.shapeWithID(shapeID)[constraintID];
 
@@ -340,6 +347,9 @@ const constraintModule = {
           constraintID
         });
       }
+
+      // Update the y values
+      commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
     }
   },
   getters: {
