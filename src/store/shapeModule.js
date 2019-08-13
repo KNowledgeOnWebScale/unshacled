@@ -54,7 +54,7 @@ const shapeModule = {
         const { x, y } = getNonOverlappingCoordinates({
           coordinates: state.mCoordinate.coordinates,
           bottomYs: getters.allBottomYs,
-          bottoms: state.mCoordinate.bottoms
+          heights: state.mCoordinate.heights
         });
         this.commit("updateCoordinates", { shapeID: shape["@id"], x, y });
       }
@@ -73,7 +73,7 @@ const shapeModule = {
       const { x, y } = getNonOverlappingCoordinates({
         coordinates: state.mCoordinate.coordinates,
         bottomYs,
-        bottoms: state.mCoordinate.bottoms
+        heights: state.mCoordinate.heights
       });
       Vue.set(state.mCoordinate.coordinates, object["@id"], { x, y });
       this.commit("updateYValues", {
