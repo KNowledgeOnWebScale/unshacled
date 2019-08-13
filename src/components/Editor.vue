@@ -18,7 +18,6 @@
           id="key"
           :from="obj.from"
           :to="obj.to"
-          :points="obj.points"
           :on-click-props="obj.onClick"
         ></relationship>
       </div>

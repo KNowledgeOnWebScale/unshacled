@@ -343,17 +343,16 @@ const shapeModule = {
         // Handle every constraint.
         for (const constraintID of Object.keys(constraints)) {
           for (const idValue of constraints[constraintID]) {
+
             // Create an object to represent the relationship.
             output.push({
               from: shapeID,
               to: idValue,
-              points: [],
               onClick: { shapeID, constraintID, value: idValue }
             });
           }
         }
       }
-      console.log(JSON.stringify(output, null, 2));
       return output;
     },
 
