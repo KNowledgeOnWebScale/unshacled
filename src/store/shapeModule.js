@@ -292,6 +292,15 @@ const shapeModule = {
     },
 
     /**
+     * Returns a list of the shape IDs.
+     * @param state
+     * @param getters
+     */
+    shapeIDs(state, getters) {
+      return Object.keys(getters.shapes);
+    },
+
+    /**
      * Get a dictionary mapping ID's to the respective node shape objects.
      * @param state
      */
@@ -320,9 +329,36 @@ const shapeModule = {
     },
 
     /**
+     * TODO
+     * @param state
+     * @param getters
+     */
+    relationships: (state, getters) => {
+      const { shapes } = getters;
+      const output = [];
+
+      // Check every shape.
+      for (const shapeID of Object.keys(shapes)) {
+        const constraints = getters.shapeIDConstraints(shapeID);
+        // Handle every constraint.
+        for (const constraintID of Object.keys(constraints)) {
+          for (const idValue of constraints[constraintID]) {
+            // Create an object to represent the relationship.
+            output.push({
+              from: shapeID,
+              to: idValue,
+              onClick: { shapeID, constraintID, value: idValue }
+            });
+          }
+        }
+      }
+      return output;
+    },
+
+    /**
      * Get the shape object with the given ID.
      * @param state
-     * @returns {null}
+     * @returns {Object|null}
      */
     shapeWithID: state => id => {
       for (const item of state.model) {
@@ -334,7 +370,7 @@ const shapeModule = {
     /**
      * Get the index of the shape object with the given ID.
      * @param state
-     * @returns {string|number}
+     * @returns {number}
      */
     indexWithID: state => id => {
       for (const i in state.model) {
