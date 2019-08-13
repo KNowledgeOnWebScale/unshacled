@@ -1,11 +1,11 @@
 <template>
   <v-group @mouseenter="hover = true" @mouseleave="hover = false">
+    <v-arrow ref="arrow" :config="getLineConfig()"></v-arrow>
     <v-circle
       v-if="hover"
       :config="getButtonConfig()"
       @click="click()"
     ></v-circle>
-    <v-arrow :config="getLineConfig()"></v-arrow>
   </v-group>
 </template>
 
@@ -58,20 +58,22 @@ export default {
 
     /**
      * Get the button config for this relationship.
-     * @returns {{x, y, radius, fill}}
      */
     getButtonConfig() {
-      const points = this.getEndPoints();
+      const arrow = this.$refs.arrow.getNode();
+      const transform = arrow.getAbsoluteTransform().copy();
+      transform.invert();
+      const pointer = arrow.getStage().getPointerPosition();
+      const relative = transform.point(pointer);
       return {
         ...DELETE_BUTTON_CONFIG,
-        x: (points[0] + points[2]) / 2,
-        y: (points[1] + points[3]) / 2
+        x: relative.x,
+        y: relative.y
       };
     },
 
     /**
      * Get the line config for this relationship.
-     * @returns {{points, stroke, fill}}
      */
     getLineConfig() {
       return {

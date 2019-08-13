@@ -78,6 +78,7 @@ export const CONSTRAINT_TEXT_CONFIG = {
 export const RELATIONSHIP_CONFIG = {
   stroke: "black",
   fill: "black",
+  strokeWidth: 4,
   pointerLength: 10,
   pointerWidth: 10
 };
