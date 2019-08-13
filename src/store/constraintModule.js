@@ -6,6 +6,7 @@ import {
   getConstraintValueType
 } from "../util/shaclConstraints";
 import { extractUrl, urlToName } from "../parsing/urlParser";
+import getValueType from "../util/enums/ValueType";
 
 /**
  * This module contains everything to change the shape constraints.
@@ -290,17 +291,50 @@ const constraintModule = {
      */
     deleteConstraintValueWithIndex({ getters }, args) {
       const { shapeID, constraintID, valueIndex } = args;
-      const shape = getters.shapeWithID(shapeID);
+      const constraint = getters.shapeWithID(shapeID)[constraintID];
 
       // If the value is a list, then remove from that list instead of directly.
-      if (shape[constraintID].length > 0 && shape[constraintID][0]["@list"]) {
-        shape[constraintID][0]["@list"].splice(valueIndex, 1);
-      } else {
-        shape[constraintID].splice(valueIndex, 1);
+      const iter = getValueType(constraintID).includes("List")
+        ? constraint[0]["@list"]
+        : constraint;
+      iter.splice(valueIndex, 1);
+
+      // Delete the constraint from the shape if there are no values left.
+      if (iter.length === 0) {
+        this.dispatch("deleteConstraintFromShapeWithID", {
+          shapeID,
+          constraintID
+        });
+      }
+    },
+
+    /**
+     * Delete the given constraint.
+     * If the constraint value has a '@list' object,
+     *   the constraint with the given index will be removed from that object.
+     * @param getters
+     * @param args
+     */
+    deleteConstraintValue({ getters }, args) {
+      const { shapeID, constraintID, value } = args;
+      const constraint = getters.shapeWithID(shapeID)[constraintID];
+
+      // If the value is a list, then remove from that list instead of directly.
+      const iter = getValueType(constraintID).includes("List")
+        ? constraint[0]["@list"]
+        : constraint;
+
+      // Check every value of the list.
+      for (const i in iter) {
+        const val = iter[i];
+        if (val["@id"] === value || val["@value"] === value || val === value) {
+          // Delete this value from the list if it is the value we want to remove.
+          iter.splice(i, 1);
+        }
       }
 
       // Delete the constraint from the shape if there are no values left.
-      if (shape[constraintID].length === 0) {
+      if (iter.length === 0) {
         this.dispatch("deleteConstraintFromShapeWithID", {
           shapeID,
           constraintID
@@ -379,6 +413,47 @@ const constraintModule = {
       } else {
         return undefined;
       }
+    },
+
+    /**
+     * Get the constraints that have existing shape IDs as values.
+     * This will return a dictionary that maps every constraint IDs to a list of shape IDs.
+     * @returns {Function}
+     * @param _state
+     * @param getters
+     * @param _rootState
+     * @param rootGetters
+     */
+    shapeIDConstraints: (
+      _state,
+      getters,
+      _rootState,
+      rootGetters
+    ) => shapeID => {
+      const output = {};
+      const { shapeIDs } = rootGetters;
+
+      // Check every constraint of the given shape.
+      const constraints = getters.shapeConstraints(shapeID);
+      for (const c of Object.keys(constraints)) {
+        const vt = getValueType(c);
+        if (vt.includes("id")) {
+          const values = [];
+          const iter = vt.includes("List")
+            ? constraints[c][0]["@list"]
+            : constraints[c];
+
+          // Check every constraint value.
+          for (const value of iter) {
+            const id = value["@id"] ? value["@id"] : value;
+            // Check if the value is an existing shape ID.
+            if (shapeIDs.includes(id)) values.push(id);
+          }
+          // Only push the constraints that do have some values.
+          if (values.length > 0) output[c] = values;
+        }
+      }
+      return output;
     }
   }
 };
