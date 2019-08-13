@@ -6,7 +6,7 @@ const coordinateModule = {
   state: {
     yValues: {},
     coordinates: {},
-    bottoms: {}
+    heights: {}
   },
   mutations: {
     /**
@@ -78,7 +78,7 @@ const coordinateModule = {
       }
 
       // Set the bottom coordinate.
-      state.bottoms[shapeID] = i * HEIGHT;
+      state.heights[shapeID] = i * HEIGHT;
     },
 
     /**
@@ -106,16 +106,16 @@ const coordinateModule = {
   actions: {},
   getters: {
     /**
-     * Get the bottom right coordinate of the shapeID with the given ID.
+     * Get the absolute bottom y coordinate of the shapeID with the given ID.
      * @param state
      * @returns {function(*): {x: *, y: *}}
      */
     bottomYCoordinate: state => shapeID => {
-      return state.bottoms[shapeID] + state.coordinates[shapeID].y;
+      return state.heights[shapeID] + state.coordinates[shapeID].y;
     },
 
     /**
-     * Get the bottom right coordinates of all the shapes.
+     * Get the absolute bottom y coordinates of all the shapes.
      * @param state
      * @param getters
      */

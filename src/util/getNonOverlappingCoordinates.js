@@ -1,13 +1,17 @@
 import { values } from "ramda";
 import { WIDTH } from "./konvaConfigs";
 
-/** @returns {x: number, y: number} the coordinates for a newly added shapeID */
-export default ({ coordinates, bottomYs, bottoms }) => {
-  // TODO use bottoms for this
+/**
+ * @param coordinates dictionary of object keys mapped to their top left coordinates.
+ * @param bottomYs dictionary of object keys mapped to their absolute bottom y coordinate.
+ * @param height dictionary of object keys mapped to height.
+ *
+ * @returns {x: number, y: number} the coordinates for a newly added shapeID */
+export default ({ coordinates, bottomYs, heights }) => {
   const MARGIN = 16;
   const { innerWidth } = window;
 
-  // Get the y value of the bottom row.
+  // Get the top y value of the bottom row.
   const yBottomRow = Math.max(
     ...[0, ...Object.keys(coordinates).map(key => coordinates[key].y)]
   );
@@ -18,7 +22,7 @@ export default ({ coordinates, bottomYs, bottoms }) => {
   );
 
   // Get the deepest y value on the bottom row.
-  const deepestY = Math.max(...bottomRow.map(key => bottomYs[key]));
+  const deepestY = Math.max(...[0, ...bottomRow.map(key => bottomYs[key])]);
   // Get the shape that has the deepest y value on the bottom row.
   const deepest = bottomRow.filter(key => bottomYs[key] >= deepestY);
 
@@ -31,17 +35,17 @@ export default ({ coordinates, bottomYs, bottoms }) => {
   const newLine = rightestX + 2 * (MARGIN + WIDTH) > innerWidth;
 
   // Calculate x coordinate
-  let x = MARGIN;
+  let x = MARGIN; // Default
   if (!newLine) x += rightestX + (values(coordinates).length ? WIDTH : 0);
 
   // Calculate y coordinate
-  let y = 0;
-  if (deepest.length > 0) y += coordinates[deepest[0]].y; // On the same row as the deepest shape.
+  let y = MARGIN; // Default
+  if (deepest.length > 0) ({ y } = coordinates[deepest[0]]); // On the same row as the deepest shape.
+  // Check if this shape has to be on a new line.
   if (newLine) {
-    y += MARGIN;
-    if (deepest.length > 0) y += deepestY;
+    y += MARGIN; // Add a margin between rows.
+    if (deepest.length > 0) y += heights[deepest[0]]; // Add the height of the deepest shape.
   }
-  if (y === 0) y = MARGIN;
 
   return { x, y };
 };
