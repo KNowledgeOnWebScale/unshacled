@@ -52,10 +52,6 @@ export default {
         x: coordinates[from].x + WIDTH / 2,
         y: coordinates[from].y + heights[from] / 2
       };
-      // const end = {
-      //   x: coordinates[to].x + WIDTH / 2,
-      //   y: coordinates[to].y + heights[to] / 2
-      // };
       const end = nearestPointOnPerimeter(
         coordinates[to],
         {
@@ -103,6 +99,7 @@ export default {
      * Call the delete function using the given arguments.
      */
     click() {
+      this.hover = false;
       this.$store.dispatch("deleteConstraintValue", this.$props.onClickProps);
     }
   }
