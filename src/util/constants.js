@@ -23,3 +23,6 @@ export const XML_DATATYPES = [
   "http://www.w3.org/2001/XMLSchema#anyURI",
   "http://www.w3.org/2001/XMLSchema#QName"
 ];
+
+// Indicates which constraints should be visualized in a single entry.
+export const SINGLE_ENTRY = ["property"];

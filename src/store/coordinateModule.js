@@ -1,6 +1,8 @@
 import Vue from "vue";
 import { HEIGHT } from "../util/konvaConfigs";
 import ValueType from "../util/enums/ValueType";
+import {SINGLE_ENTRY} from "../util/constants";
+import {urlToName} from "../parsing/urlParser";
 
 const coordinateModule = {
   state: {
@@ -70,7 +72,7 @@ const coordinateModule = {
       let i = 1;
       for (const con of Object.keys(constraints)) {
         Vue.set(state.yValues[shapeID], con, i * HEIGHT);
-        if (con.includes("property")) {
+        if (SINGLE_ENTRY.includes(urlToName(con))) {
           i += 2; // The properties will be listed on a single line.
         } else {
           i += 1 + constraints[con]; // Every entry on a seperate line.
