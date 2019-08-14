@@ -1,5 +1,5 @@
 <template>
-  <v-group @mouseenter="hover = true" @mouseleave="hover = false">
+  <v-group ref="group" @mouseenter="hover = true" @mouseleave="hover = false">
     <v-arrow ref="arrow" :config="getLineConfig()"></v-arrow>
     <v-circle
       v-if="hover"
