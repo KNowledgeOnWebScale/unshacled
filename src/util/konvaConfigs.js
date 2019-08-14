@@ -1,5 +1,6 @@
 export const WIDTH = 250;
 export const HEIGHT = 40;
+export const MARGIN = 5;
 export const DELTA_Y_TEXT = 15;
 export const DELTA_Y_DELETE = 20;
 
@@ -75,10 +76,20 @@ export const CONSTRAINT_TEXT_CONFIG = {
   align: "center"
 };
 
-export const RELATIONSHIP_CONFIG = {
+export const RELATIONSHIP_ARROW_CONFIG = {
   stroke: "black",
   fill: "black",
   strokeWidth: 4,
   pointerLength: 10,
   pointerWidth: 10
+};
+
+export const RELATIONSHIP_LABEL_TEXT_CONFIG = {
+  size: TEXT_SIZE,
+  align: "center"
+};
+
+export const RELATIONSHIP_LABEL_RECT_CONFIG = {
+  fill: "white",
+  height: TEXT_SIZE + MARGIN
 };

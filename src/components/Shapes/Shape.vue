@@ -100,7 +100,7 @@ export default {
   },
   methods: {
     /**
-     * Get an object containing all the constraints and set their y values.
+     * Get an object containing all the constraints.
      * @returns an object mapping every constraint name to a (list of) values.
      */
     getConstraints() {

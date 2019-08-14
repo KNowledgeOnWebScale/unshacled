@@ -7,14 +7,19 @@
     @wheel="scroll"
   >
     <v-layer>
-      <div v-for="(obj, key) in this.$store.getters.relationships" :key="key">
+      <v-group
+        v-for="(obj, key) in this.$store.getters.relationships"
+        :key="key"
+        ref="relationships"
+      >
         <relationship
-          id="key"
+          :id="key"
           :from="obj.from"
           :to="obj.to"
+          :constraint-i-d="obj.constraintID"
           :on-click-props="obj.onClick"
         ></relationship>
-      </div>
+      </v-group>
       <div v-for="(obj, key) in this.$store.getters.propertyShapes" :key="key">
         <shape :id="key" :node-shape="false"></shape>
       </div>
@@ -49,6 +54,12 @@ export default {
     this.$store.commit("setEditor", this.$refs.stage.getNode());
     window.addEventListener("resize", this.handleResize); // React to window resizing.
     this.handleResize();
+  },
+
+  updated() {
+    // Put the arrows on the bottom layer.
+    const layer = this.$refs.relationships;
+    if (layer && layer.getNode) layer.getNode.zIndex(0);
   },
 
   methods: {
