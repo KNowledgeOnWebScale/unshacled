@@ -25,6 +25,7 @@ import {
 } from "../../util/konvaConfigs";
 import nearestPointOnPerimeter from "../../util/nearestPointOnPerimeter";
 import { urlToName } from "../../parsing/urlParser";
+import {distance} from "../../util";
 
 export default {
   name: "Relationship",
@@ -77,6 +78,17 @@ export default {
         },
         start
       );
+
+      // Grab the nearest edge of the start shape.
+      const edges = {
+        xl: coordinates[from].x,
+        xr: coordinates[from].x + WIDTH,
+        y: coordinates[from].y + yValues[from][constraintID] + HEIGHT
+      };
+      const distLeft = distance(edges.xl, edges.y, end.x, end.y);
+      const distRight = distance(edges.xr, edges.y, end.x, end.y);
+      start.x = distLeft < distRight ? edges.xl : edges.xr;
+      start.y = edges.y;
 
       return [
         start.x, // x1
