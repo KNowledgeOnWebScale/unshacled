@@ -46,7 +46,7 @@
 <script>
 import Constraint from "./Constraint.vue";
 import ReactiveInput from "../FormElements/ReactiveInput.vue";
-import { urlToName } from "../../parsing/urlParser";
+import { urlToName } from "../../util/urlParser";
 import {
   DELETE_BUTTON_CONFIG,
   ID_TEXT_CONFIG,

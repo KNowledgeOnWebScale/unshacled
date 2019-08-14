@@ -77,7 +77,7 @@
 
 <script>
 import { SHACL_URI } from "../../util/constants";
-import { urlToName } from "../../parsing/urlParser";
+import { urlToName } from "../../util/urlParser";
 import { capitalizeFirstLetter, groupBy } from "../../util";
 
 export default {

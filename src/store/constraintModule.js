@@ -5,7 +5,7 @@ import {
   getConstraintCategory,
   getConstraintValueType
 } from "../util/shaclConstraints";
-import { extractUrl, urlToName } from "../parsing/urlParser";
+import { extractUrl, urlToName } from "../util/urlParser";
 import getValueType from "../util/enums/ValueType";
 
 /**

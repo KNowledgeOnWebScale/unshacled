@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { createUrl } from "../../parsing/urlParser";
+import { createUrl } from "../../util/urlParser";
 
 export default {
   name: "NodeShapeModal",

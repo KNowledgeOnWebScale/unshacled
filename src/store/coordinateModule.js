@@ -2,7 +2,7 @@ import Vue from "vue";
 import { HEIGHT } from "../util/konvaConfigs";
 import ValueType from "../util/enums/ValueType";
 import {SINGLE_ENTRY} from "../util/constants";
-import {urlToName} from "../parsing/urlParser";
+import {urlToName} from "../util/urlParser";
 
 const coordinateModule = {
   state: {

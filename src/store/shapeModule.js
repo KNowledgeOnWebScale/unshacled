@@ -1,6 +1,6 @@
 import Vue from "vue";
 import constraintModule from "./constraintModule";
-import { extractUrl, urlToName } from "../parsing/urlParser";
+import { extractUrl, urlToName } from "../util/urlParser";
 import { getNonOverlappingCoordinates } from "../util";
 import coordinateModule from "./coordinateModule";
 import { EXAMPLE_URI, SHACL_URI } from "../util/constants";
