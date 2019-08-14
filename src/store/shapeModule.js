@@ -4,9 +4,9 @@ import { extractUrl, urlToName } from "../parsing/urlParser";
 import { getNonOverlappingCoordinates } from "../util";
 import coordinateModule from "./coordinateModule";
 import { EXAMPLE_URI, SHACL_URI } from "../util/constants";
-import { shaclToInternal } from "../parsing/internalParser";
 import { TERM } from "../translation/terminology";
 import getValueType from "../util/enums/ValueType";
+import ShaclTranslator from "../translation/shaclTranslator";
 
 /**
  * This module contains everything to change the shapes.
@@ -42,7 +42,7 @@ const shapeModule = {
 
       // Parse the model if necessary.
       state.model = JSON.stringify(model).includes(SHACL_URI)
-        ? shaclToInternal(model)
+        ? ShaclTranslator.toModelSimple(model)
         : model;
 
       // Update y values and set coordinates to zero

@@ -1,4 +1,4 @@
-import { internalToShacl, shaclToInternal } from "../parsing/internalParser";
+import ShaclTranslator from "../translation/shaclTranslator";
 
 getReady;
 const initialConstraints = [];
@@ -6482,7 +6482,7 @@ export function customConstraintsByCategory() {
   for (const type in constraintsByTypes) {
     const byType = [];
     for (const constraint of constraintsByTypes[type]) {
-      byType.push(shaclToInternal(constraint));
+      byType.push(ShaclTranslator.toModelSimple(constraint));
     }
     output[type] = byType;
   }
@@ -6495,7 +6495,7 @@ export function customConstraintsByCategory() {
  * @returns {string}
  */
 export function getConstraintCategory(constraintID) {
-  constraintID = internalToShacl(constraintID);
+  constraintID = ShaclTranslator.toSHACLSimple(constraintID);
   for (const type in constraintsByTypes) {
     if (constraintsByTypes[type].includes(constraintID)) return type;
   }
@@ -6510,9 +6510,11 @@ export function getConstraintCategory(constraintID) {
  *                    integer, string, boolean
  */
 export function getConstraintValueType(constraint) {
-  const object = json.filter(c => c["@id"] === internalToShacl(constraint))[0];
+  const object = json.filter(
+    c => c["@id"] === ShaclTranslator.toSHACLSimple(constraint)
+  )[0];
   const range = object["http://www.w3.org/2000/01/rdf-schema#range"];
-  return range ? shaclToInternal(range[0]["@id"]) : "";
+  return range ? ShaclTranslator.toModelSimple(range[0]["@id"]) : "";
 }
 
 export const groupedConstraints = groupBy(constraintsWithTypes, "type");
