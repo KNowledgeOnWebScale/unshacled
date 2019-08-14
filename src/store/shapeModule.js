@@ -339,14 +339,16 @@ const shapeModule = {
 
       // Check every shape.
       for (const shapeID of Object.keys(shapes)) {
-        const constraints = getters.shapeIDConstraints(shapeID);
+        const idConstraints = getters.shapeIDConstraints(shapeID);
+
         // Handle every constraint.
-        for (const constraintID of Object.keys(constraints)) {
-          for (const idValue of constraints[constraintID]) {
+        for (const constraintID of Object.keys(idConstraints)) {
+          for (const idValue of idConstraints[constraintID]) {
             // Create an object to represent the relationship.
             output.push({
               from: shapeID,
               to: idValue,
+              constraintID,
               onClick: { shapeID, constraintID, value: idValue }
             });
           }

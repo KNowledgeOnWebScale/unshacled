@@ -16,6 +16,7 @@
           :id="key"
           :from="obj.from"
           :to="obj.to"
+          :constraint-i-d="obj.constraintID"
           :on-click-props="obj.onClick"
         ></relationship>
       </v-group>
@@ -56,7 +57,9 @@ export default {
   },
 
   updated() {
-    this.$refs.relationships.getNode().zIndex(0);
+    // Put the arrows on the bottom layer.
+    const layer = this.$refs.relationships;
+    if (layer && layer.getNode) layer.getNode.zIndex(0);
   },
 
   methods: {

@@ -13,6 +13,7 @@
 import {
   DELETE_BUTTON_CONFIG,
   RELATIONSHIP_CONFIG,
+  HEIGHT,
   WIDTH
 } from "../../util/konvaConfigs";
 import nearestPointOnPerimeter from "../../util/nearestPointOnPerimeter";
@@ -25,6 +26,10 @@ export default {
       required: true
     },
     to: {
+      type: String,
+      required: true
+    },
+    constraintID: {
       type: String,
       required: true
     },
@@ -44,13 +49,17 @@ export default {
      * @returns {array}
      */
     getEndPoints() {
-      const { from, to } = this.$props;
-      const { coordinates, heights } = this.$store.state.mShape.mCoordinate;
+      const { from, to, constraintID } = this.$props;
+      const {
+        coordinates,
+        heights,
+        yValues
+      } = this.$store.state.mShape.mCoordinate;
 
       // Center points of the shapes.
       const start = {
         x: coordinates[from].x + WIDTH / 2,
-        y: coordinates[from].y + heights[from] / 2
+        y: coordinates[from].y + yValues[from][constraintID] + HEIGHT / 2
       };
       const end = nearestPointOnPerimeter(
         coordinates[to],
