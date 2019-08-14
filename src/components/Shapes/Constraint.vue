@@ -42,7 +42,10 @@ import {
 } from "../../util/konvaConfigs";
 import { urlToName } from "../../util/urlParser";
 import { SINGLE_ENTRY } from "../../util/constants";
-import ValueType from "../../util/enums/ValueType";
+import ValueType, {
+  getValueTypeFromConstraint,
+  ValueTypes
+} from "../../util/enums/ValueType";
 
 export default {
   name: "Constraint",
@@ -171,10 +174,13 @@ export default {
 
       if (constraints && constraints[constraintID]) {
         let values = constraints[constraintID];
+        const vt = ValueType(constraintID)
+          ? ValueType(constraintID)
+          : getValueTypeFromConstraint(constraints[constraintID]);
 
         // Properties should be listed in a single entry.
         if (this.isListOfValues()) {
-          const iter = ValueType(constraintID).includes("List")
+          const iter = vt.includes(ValueTypes.LIST)
             ? values[0]["@list"]
             : values;
           for (const v of iter) {
@@ -184,9 +190,8 @@ export default {
         }
 
         // Other constraints should be visualized as an array of their value representations.
-        const type = ValueType(constraintID);
         if (
-          type.includes("List") &&
+          vt.includes(ValueTypes.LIST) &&
           values.length === 1 &&
           values[0]["@list"]
         ) {
@@ -194,7 +199,7 @@ export default {
         }
 
         for (const v of values) {
-          const key = type.includes("id") ? "@id" : "@value";
+          const key = vt.includes(ValueTypes.ID) ? "@id" : "@value";
           output.push(v[key] ? v[key] : v);
         }
       }

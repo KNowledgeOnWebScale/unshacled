@@ -6,7 +6,7 @@ import {
   getConstraintValueType
 } from "../util/shaclConstraints";
 import { extractUrl, urlToName } from "../util/urlParser";
-import getValueType from "../util/enums/ValueType";
+import getValueType, { ValueTypes } from "../util/enums/ValueType";
 
 /**
  * This module contains everything to change the shape constraints.
@@ -106,11 +106,12 @@ const constraintModule = {
       // Create an empty list to add to if necessary.
       if (!shape[predicate]) {
         shape[predicate] = [];
-        if (valueType.includes("List")) shape[predicate].push({ "@list": [] });
+        if (valueType.includes(ValueTypes.LIST))
+          shape[predicate].push({ "@list": [] });
       }
 
       // Create the object we want to add.
-      const value = valueType.includes("id")
+      const value = valueType.includes(ValueTypes.ID)
         ? { "@id": input }
         : { "@type": object, "@value": input };
 
@@ -119,7 +120,7 @@ const constraintModule = {
         Vue.set(shape[predicate], 0, value);
       } else {
         // Determine which list we want to add the predicate to.
-        const list = valueType.includes("List")
+        const list = valueType.includes(ValueTypes.LIST)
           ? shape[predicate][0]["@list"]
           : shape[predicate];
         list.push(value);
@@ -200,13 +201,15 @@ const constraintModule = {
 
       // Clone the original constraint and get the value we want to update.
       const updated = clone(rootGetters.shapeWithID(shapeID)[constraintID]);
-      const iter = valueType.includes("List") ? updated[0]["@list"] : updated;
+      const iter = valueType.includes(ValueTypes.LIST)
+        ? updated[0]["@list"]
+        : updated;
       const original = iter[i];
 
       // Create a new value object.
       let newValue;
       let name;
-      if (valueType.includes("id")) {
+      if (valueType.includes(ValueTypes.ID)) {
         name = `${extractUrl(original["@id"])}${urlToName(input)}`;
         newValue = { "@id": name };
       } else {
@@ -216,7 +219,7 @@ const constraintModule = {
 
       // Check if this new value is a duplicate.
       let duplicate = false;
-      const field = valueType.includes("id") ? "@id" : "@value";
+      const field = valueType.includes(ValueTypes.ID) ? "@id" : "@value";
       for (const j in iter) {
         if (i !== j && iter[j][field] === name) duplicate = true;
       }
@@ -296,7 +299,7 @@ const constraintModule = {
       const constraint = getters.shapeWithID(shapeID)[constraintID];
 
       // If the value is a list, then remove from that list instead of directly.
-      const iter = getValueType(constraintID).includes("List")
+      const iter = getValueType(constraintID).includes(ValueTypes.LIST)
         ? constraint[0]["@list"]
         : constraint;
       iter.splice(valueIndex, 1);
@@ -327,7 +330,7 @@ const constraintModule = {
       const constraint = getters.shapeWithID(shapeID)[constraintID];
 
       // If the value is a list, then remove from that list instead of directly.
-      const iter = getValueType(constraintID).includes("List")
+      const iter = getValueType(constraintID).includes(ValueTypes.LIST)
         ? constraint[0]["@list"]
         : constraint;
 
@@ -447,9 +450,9 @@ const constraintModule = {
       const constraints = getters.shapeConstraints(shapeID);
       for (const c of Object.keys(constraints)) {
         const vt = getValueType(c);
-        if (vt.includes("id")) {
+        if (vt && vt.includes(ValueTypes.ID)) {
           const values = [];
-          const iter = vt.includes("List")
+          const iter = vt.includes(ValueTypes.LIST)
             ? constraints[c][0]["@list"]
             : constraints[c];
 

@@ -1,8 +1,11 @@
 import Vue from "vue";
 import { HEIGHT } from "../util/konvaConfigs";
-import ValueType from "../util/enums/ValueType";
-import {SINGLE_ENTRY} from "../util/constants";
-import {urlToName} from "../util/urlParser";
+import ValueType, {
+  getValueTypeFromConstraint,
+  ValueTypes
+} from "../util/enums/ValueType";
+import { SINGLE_ENTRY } from "../util/constants";
+import { urlToName } from "../util/urlParser";
 
 const coordinateModule = {
   state: {
@@ -62,10 +65,14 @@ const coordinateModule = {
       // Get the IDs of all the constraints and the number of values for each constraint.
       const constraints = {};
       for (const c in shape) {
-        if (!ignored.includes(c))
-          constraints[c] = ValueType(c).includes("List")
+        if (!ignored.includes(c)) {
+          const vt = ValueType(c)
+            ? ValueType(c)
+            : getValueTypeFromConstraint(shape[c]);
+          constraints[c] = vt.includes(ValueTypes.LIST)
             ? shape[c][0]["@list"].length
             : shape[c].length;
+        }
       }
 
       // Calculate their y values.

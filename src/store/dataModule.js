@@ -108,6 +108,7 @@ const dataModule = {
      * @param model
      */
     updateModel({ commit, rootGetters }, model) {
+      console.log(JSON.stringify(model, null, 2));
       commit("setModel", { model, getters: rootGetters }, { root: true });
     },
 
