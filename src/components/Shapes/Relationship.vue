@@ -1,6 +1,10 @@
 <template>
   <v-group ref="group" @mouseenter="hover = true" @mouseleave="hover = false">
-    <v-arrow ref="arrow" :config="getLineConfig()"></v-arrow>
+    <v-arrow ref="arrow" :config="getConfigs().line"></v-arrow>
+    <v-group ref="label" :config="getConfigs().label">
+      <v-rect :config="getLabelRectConfig()"></v-rect>
+      <v-text ref="text" :config="getConfigs().text"></v-text>
+    </v-group>
     <v-circle
       v-if="hover"
       :config="getButtonConfig()"
@@ -11,12 +15,16 @@
 
 <script>
 import {
-  DELETE_BUTTON_CONFIG,
-  RELATIONSHIP_CONFIG,
+  WIDTH,
   HEIGHT,
-  WIDTH
+  DELETE_BUTTON_CONFIG,
+  RELATIONSHIP_ARROW_CONFIG,
+  RELATIONSHIP_LABEL_RECT_CONFIG,
+  RELATIONSHIP_LABEL_TEXT_CONFIG,
+  MARGIN
 } from "../../util/konvaConfigs";
 import nearestPointOnPerimeter from "../../util/nearestPointOnPerimeter";
+import { urlToName } from "../../parsing/urlParser";
 
 export default {
   name: "Relationship",
@@ -59,7 +67,7 @@ export default {
       // Center points of the shapes.
       const start = {
         x: coordinates[from].x + WIDTH / 2,
-        y: coordinates[from].y + yValues[from][constraintID] + HEIGHT / 2
+        y: coordinates[from].y + yValues[from][constraintID] + HEIGHT
       };
       const end = nearestPointOnPerimeter(
         coordinates[to],
@@ -78,8 +86,54 @@ export default {
       ];
     },
 
+    getConfigs() {
+      const DEGREES = 180;
+
+      // Get the end points and the rotation of the arrow.
+      const points = this.getEndPoints();
+      const dx = points[2] - points[0];
+      const dy = points[3] - points[1];
+
+      let rotation = Math.atan2(dy, dx) * (DEGREES / Math.PI);
+      rotation > DEGREES / 2 ? (rotation -= DEGREES) : null;
+      rotation < -DEGREES / 2 ? (rotation += DEGREES) : null;
+
+      return {
+        line: {
+          ...RELATIONSHIP_ARROW_CONFIG,
+          points
+        },
+        label: {
+          x: (points[0] + points[2]) / 2,
+          y: (points[1] + points[3] - 2 * MARGIN) / 2,
+          rotation
+        },
+        text: {
+          ...RELATIONSHIP_LABEL_TEXT_CONFIG,
+          text: urlToName(this.$props.constraintID)
+        },
+        rect: {
+          ...RELATIONSHIP_LABEL_RECT_CONFIG,
+          x: -MARGIN,
+          y: -MARGIN
+        }
+      };
+    },
+
+    getLabelRectConfig() {
+      const configs = this.getConfigs();
+      if (this.$refs.text && this.$refs.text.getNode()) {
+        return {
+          ...configs.rect,
+          width: this.$refs.text.getNode().width() + MARGIN * 2
+        };
+      }
+      return configs.rect;
+    },
+
     /**
-     * Get the button configuration for this relationship.
+     * Get the button configuration.
+     * This one is not included in `getConfigs` because it relies on the previously drawn line.
      */
     getButtonConfig() {
       const arrow = this.$refs.arrow.getNode();
@@ -87,20 +141,11 @@ export default {
       transform.invert();
       const pointer = arrow.getStage().getPointerPosition();
       const relative = transform.point(pointer);
+
       return {
         ...DELETE_BUTTON_CONFIG,
         x: relative.x,
         y: relative.y
-      };
-    },
-
-    /**
-     * Get the line configuration for this relationship.
-     */
-    getLineConfig() {
-      return {
-        ...RELATIONSHIP_CONFIG,
-        points: this.getEndPoints()
       };
     },
 
