@@ -6,7 +6,10 @@ import {
   getConstraintValueType
 } from "../util/shaclConstraints";
 import { extractUrl, urlToName } from "../util/urlParser";
-import getValueType, { ValueTypes } from "../util/enums/ValueType";
+import getValueType, {
+  getValueTypeFromConstraint,
+  ValueTypes
+} from "../util/enums/ValueType";
 
 /**
  * This module contains everything to change the shape constraints.
@@ -449,7 +452,9 @@ const constraintModule = {
       // Check every constraint of the given shape.
       const constraints = getters.shapeConstraints(shapeID);
       for (const c of Object.keys(constraints)) {
-        const vt = getValueType(c);
+        const vt = getValueType(c)
+          ? getValueType(c)
+          : getValueTypeFromConstraint(constraints[c]);
         if (vt && vt.includes(ValueTypes.ID)) {
           const values = [];
           const iter = vt.includes(ValueTypes.LIST)
