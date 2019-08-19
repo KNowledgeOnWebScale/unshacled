@@ -71,6 +71,7 @@
 
     <clear-modal></clear-modal>
     <export-modal></export-modal>
+    <path-modal></path-modal>
     <validation-report-modal
       :report="this.$store.state.mData.validationReport"
     ></validation-report-modal>
@@ -92,10 +93,12 @@ import PredicateModal from "./Modals/PredicateModal.vue";
 import ExportModal from "./Modals/ExportModal.vue";
 
 import languages from "../util/enums/languages";
+import PathModal from "./Modals/PathModal";
 
 export default {
   name: "NavBar",
   components: {
+    PathModal,
     ExportModal,
     ClearModal,
     SuiDropdownDivider,
@@ -118,7 +121,7 @@ export default {
       this.$store.dispatch("addNodeShape", this.uuid());
     },
     createPropertyShape() {
-      this.$store.dispatch("addPropertyShape", this.uuid());
+      this.$store.commit("togglePathModal");
     },
 
     loadExample() {
