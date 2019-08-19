@@ -1,11 +1,5 @@
 <template>
   <div>
-    <reactive-input
-      ref="reactiveInput"
-      :is-datalist="false"
-      :on-exit="stopEditing"
-    ></reactive-input>
-
     <v-group
       ref="posRef"
       :draggable="true"
@@ -45,7 +39,6 @@
 
 <script>
 import Constraint from "./Constraint.vue";
-import ReactiveInput from "../FormElements/ReactiveInput.vue";
 import { urlToName } from "../../util/urlParser";
 import {
   DELETE_BUTTON_CONFIG,
@@ -57,7 +50,7 @@ import {
 
 export default {
   name: "Shape",
-  components: { ReactiveInput, Constraint },
+  components: { Constraint },
   props: {
     id: {
       type: String,
@@ -155,8 +148,11 @@ export default {
      * Call the ReactiveInput component to start editing using the given text node.
      */
     startEditing() {
-      if (this.$refs.reactiveInput)
-        this.$refs.reactiveInput.startEditing(this.$refs.shapeID.getNode());
+      this.$store.commit("toggleEditShapeModal", {
+        id: this.id,
+        label: this.$store.getters.labelForId(this.id),
+        nodeShape: this.nodeShape
+      });
     },
 
     /**

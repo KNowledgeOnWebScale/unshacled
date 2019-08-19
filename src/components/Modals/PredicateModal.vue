@@ -3,21 +3,10 @@
     <sui-modal-header>
       {{ $props.modalProperties.editing ? "Edit Predicate" : "Add Predicate" }}
     </sui-modal-header>
-    <sui-modal-content @submit.prevent="confirmNodeShape">
+    <sui-modal-content @submit.prevent="toggleModal">
       <sui-form>
         <sui-form-field>
           <label for="selectPreds">Predicate</label>
-          <!-- <select
-            id="selectPreds"
-            v-model="values.predicate"
-            class="ui fluid search dropdown"
-            :disabled="$props.modalProperties.editing"
-            @change="selectObject"
-          >
-            <option v-for="p in predicates" :key="p" :value="p">
-              {{ p }}
-            </option>
-          </select> -->
           <input
             id="selectPreds"
             v-model="values.predicate"

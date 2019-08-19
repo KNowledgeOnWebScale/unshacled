@@ -15,7 +15,13 @@ import ShaclTranslator from "../translation/shaclTranslator";
 const shapeModule = {
   state: {
     model: [],
-    idToLabel: {}
+    idToLabel: {},
+    shapeModal: {
+      show: false,
+      id: "",
+      label: "",
+      nodeShape: false
+    }
   },
   modules: {
     mConstraint: constraintModule,
@@ -27,7 +33,6 @@ const shapeModule = {
      * @param state the current state
      */
     clear(state) {
-      console.log("Clear!");
       state.model = [];
       this.commit("clearLocations");
     },
@@ -59,6 +64,19 @@ const shapeModule = {
         });
         this.commit("updateCoordinates", { shapeID: shape["@id"], x, y });
       }
+    },
+
+    /**
+     * Toggle the visibility of the node shape modal.
+     * @param state
+     * @param args
+     */
+    toggleEditShapeModal(state, args) {
+      event.preventDefault();
+      if (!args) args = { id: "", label: "" };
+      args.show = !state.shapeModal.show;
+      args.label = args.label ? args.label : "";
+      Vue.set(state, "shapeModal", args);
     },
 
     /* ADD ========================================================================================================== */
@@ -93,24 +111,24 @@ const shapeModule = {
      *            newID the shape's new ID.
      */
     updateShapeID(state, args) {
-      const { index, newID } = args;
+      const { index, oldID, newID, label } = args;
       Vue.set(state.model[index], "@id", newID);
+
+      // Update the label dictionary.
+      Vue.set(state.idToLabel, newID, label);
+      Vue.delete(state.idToLabel, oldID);
     },
 
     /**
-     * Update the given property shape's ID.
+     * Update the label of the shape with the given id.
      * @param state
      * @param args
-     *            shape the property shapeI that should be updated,
-     *            newID the shape's new ID.
+     *            id the shape's ID.
+     *            label the new label for the given shape.
      */
-    updatePropertyShapeID(state, args) {
-      const { shape, newID } = args;
-      Vue.set(shape, "@id", newID);
-
-      // Update the path with the new ID.
-      const name = urlToName(newID);
-      shape[TERM.path][0]["@id"] = `${EXAMPLE_URI}${name}`;
+    updateShapeLabel(state, args) {
+      const { id: shapeID, label } = args;
+      Vue.set(state.idToLabel, shapeID, label);
     },
 
     /**
@@ -185,9 +203,7 @@ const shapeModule = {
     addPropertyShape({ commit, getters }, args) {
       const { id, path } = args;
       // Only do so if there is no property shape with this ID yet.
-      if (getters.shapeWithID(id)) {
-        console.log(`Property shape with id ${id} already exists.`);
-      } else {
+      if (!getters.shapeWithID(id)) {
         const object = { "@id": id };
         object[TERM.path] = [{ "@id": path }];
         commit("addShape", { object, bottomYs: getters.allBottomYs });
@@ -211,7 +227,12 @@ const shapeModule = {
       if (oldID !== newURL) {
         // Update the shape's ID and locations
         const index = getters.indexWithID(oldID);
-        commit("updateShapeID", { index, newID: newURL });
+        commit("updateShapeID", {
+          index,
+          oldID,
+          newID: newURL,
+          label: getters.labelForId(oldID)
+        });
         commit("updateLocations", { oldID, newID: newURL });
       }
     },
@@ -228,8 +249,13 @@ const shapeModule = {
         commit("updateLocations", { oldID, newID });
 
         // Update the state's shapes.
-        const shape = getters.shapeWithID(oldID);
-        commit("updatePropertyShapeID", { shape, newID });
+        const index = getters.indexWithID(oldID);
+        commit("updateShapeID", {
+          index,
+          oldID,
+          newID,
+          label: getters.labelForId(oldID)
+        });
         for (const shape of state.model) {
           if (getters.shapeProperties(shape["@id"]).includes(oldID)) {
             this.dispatch("addPredicate", {

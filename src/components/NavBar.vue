@@ -79,25 +79,29 @@
     <predicate-modal
       :modal-properties="$store.state.mShape.mConstraint.predicateModal"
     ></predicate-modal>
+    <edit-shape-modal
+      :modal-properties="$store.state.mShape.shapeModal"
+    ></edit-shape-modal>
   </div>
 </template>
 
 <script>
 import SuiDropdown from "semantic-ui-vue/dist/commonjs/modules/Dropdown/Dropdown";
 import SuiDropdownDivider from "semantic-ui-vue/dist/commonjs/modules/Dropdown/DropdownDivider";
+import languages from "../util/enums/languages";
 
 // Modals
 import ClearModal from "./Modals/ClearModal.vue";
 import ValidationReportModal from "./Modals/ValidationReportModal.vue";
 import PredicateModal from "./Modals/PredicateModal.vue";
 import ExportModal from "./Modals/ExportModal.vue";
-
-import languages from "../util/enums/languages";
-import PathModal from "./Modals/PathModal";
+import PathModal from "./Modals/PathModal.vue";
+import EditShapeModal from "./Modals/EditShapeModal.vue";
 
 export default {
   name: "NavBar",
   components: {
+    EditShapeModal,
     PathModal,
     ExportModal,
     ClearModal,

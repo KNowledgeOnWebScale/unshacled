@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { iriRegex } from "../../util/constants";
+import { IRI_REGEX } from "../../util/constants";
 
 export default {
   name: "PathModal",
@@ -54,7 +54,7 @@ export default {
       }
     },
     error() {
-      return !iriRegex.test(this.path);
+      return !IRI_REGEX.test(this.path);
     }
   }
 };
