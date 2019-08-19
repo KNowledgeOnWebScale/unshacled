@@ -14,7 +14,8 @@ import ShaclTranslator from "../translation/shaclTranslator";
  */
 const shapeModule = {
   state: {
-    model: []
+    model: [],
+    idToLabel: {}
   },
   modules: {
     mConstraint: constraintModule,
@@ -279,6 +280,14 @@ const shapeModule = {
     }
   },
   getters: {
+    /**
+     * TODO
+     * @param state
+     */
+    labelForId: state => id => {
+      return state.idToLabel[id];
+    },
+
     /**
      * Returns a map of the shape ID's to their respective objects.
      * @param state

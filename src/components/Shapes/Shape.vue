@@ -16,7 +16,7 @@
       <v-rect :config="shapeConfig"></v-rect>
       <v-text
         ref="shapeID"
-        :config="idTextConfig"
+        :config="getTextConfig()"
         @click="startEditing"
       ></v-text>
       <v-circle
@@ -63,6 +63,11 @@ export default {
       type: String,
       required: true
     },
+    label: {
+      type: String,
+      required: false,
+      default: undefined
+    },
     nodeShape: {
       type: Boolean,
       required: true
@@ -99,6 +104,16 @@ export default {
     );
   },
   methods: {
+    /**
+     * TODO
+     */
+    getTextConfig() {
+      return {
+        ...ID_TEXT_CONFIG,
+        text: this.label ? urlToName(this.label) : urlToName(this.id)
+      };
+    },
+
     /**
      * Get an object containing all the constraints.
      * @returns an object mapping every constraint name to a (list of) values.
