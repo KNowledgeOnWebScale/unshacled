@@ -46,6 +46,7 @@ import ValueType, {
   getValueTypeFromConstraint,
   ValueTypes
 } from "../../util/enums/ValueType";
+import { TERM } from "../../translation/terminology";
 
 export default {
   name: "Constraint",
@@ -173,6 +174,12 @@ export default {
       const output = [];
 
       if (constraints && constraints[constraintID]) {
+        // Show the full path.
+        if (constraintID === TERM.path) {
+          return [constraints[constraintID][0]["@id"]];
+        }
+
+        // Get the constraint's value type.
         let values = constraints[constraintID];
         const vt = ValueType(constraintID)
           ? ValueType(constraintID)
@@ -197,7 +204,6 @@ export default {
         ) {
           values = values[0]["@list"];
         }
-
         for (const v of values) {
           const key = vt.includes(ValueTypes.ID) ? "@id" : "@value";
           output.push(v[key] ? v[key] : v);
@@ -261,22 +267,23 @@ export default {
     },
 
     /**
-     * TODO
-     * @param text
-     * @param index
+     * Get the configuration for a constraint value.
+     * This will set the y coordinate and the text using the given value and index.
+     * @param value text that should be visualized in this constraint component.
+     * @param index the index of the constraint value.
      * @returns {{y: *, text: *}}
      */
-    getValueConfig(text, index) {
+    getValueConfig(value, index) {
       return {
         ...this.valueConfig,
         y: this.valueConfig.y + this.getYValue() + index * HEIGHT,
-        text: urlToName(text)
+        text: this.$props.constraintID === TERM.path ? value : urlToName(value)
       };
     },
 
     /**
-     * TODO
-     * @param index
+     * Delete the configuration of the delete button for the constraint value at the given index.
+     * @param index the index of the constraint value.
      * @returns {{y: *}}
      */
     getDeleteValueConfig(index) {
