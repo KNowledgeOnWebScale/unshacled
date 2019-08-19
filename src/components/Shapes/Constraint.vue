@@ -5,7 +5,7 @@
     <v-group @mouseenter="hoverKey = true" @mouseleave="hoverKey = false">
       <v-text ref="key" :config="getConfigs().keyConfig"></v-text>
       <v-circle
-        v-if="hoverKey"
+        v-if="hoverKey && canBeDeleted()"
         :config="getConfigs().deleteConstraint"
         @click="deleteConstraint"
       ></v-circle>
@@ -20,7 +20,7 @@
           @click="editValue(index, value)"
         ></v-text>
         <v-circle
-          v-if="hoverValues && !isListOfValues()"
+          v-if="hoverValues && !isListOfValues() && canBeDeleted()"
           :config="getDeleteValueConfig(index)"
           @click="deleteConstraintValue(index)"
         ></v-circle>
@@ -102,6 +102,13 @@ export default {
     /* EDIT/DELETE  ================================================================================================= */
 
     /**
+     * @returns {boolean} value that indicates if this constraint can be removed from the shape.
+     */
+    canBeDeleted() {
+      return this.$props.constraintID !== TERM.path;
+    },
+
+    /**
      * Start editing the value of the given constraint.
      * NOTE: We don't want to edit properties this way; they will be edited using the visual relationships.
      */
@@ -166,7 +173,7 @@ export default {
 
     /**
      * Get all the constraint values of this predicate.
-     * Returns a list of values.
+     * @returns {[]} a list of values.
      */
     getConstraintValues() {
       const { shapeID, constraintID } = this.$props;
