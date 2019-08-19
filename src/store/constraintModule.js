@@ -142,7 +142,7 @@ const constraintModule = {
 
       // Add a property shape if needed.
       if (predicate.includes("property")) {
-        dispatch("addPropertyShape", input);
+        dispatch("addPropertyShape", { id: input, path: "(undefined)" });
       }
 
       // Update the y values.
