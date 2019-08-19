@@ -78,12 +78,16 @@ export default {
   methods: {
     confirm() {
       const oldID = this.$props.modalProperties.id;
-      this.$store.commit("updateShapeID", {
+      const op = this.$props.modalProperties.nodeShape
+        ? "editNodeShape"
+        : "editPropertyShape";
+      this.$store.dispatch(op, {
         index: this.$store.getters.indexWithID(oldID),
         oldID,
         newID: this.values.id,
-        label: this.values.label
+        newLabel: this.values.label
       });
+
       if (this.values.label && this.values.label !== "") {
         this.$store.commit("updateShapeLabel", {
           shapeID: this.values.id,

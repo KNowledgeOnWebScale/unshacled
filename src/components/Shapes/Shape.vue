@@ -56,11 +56,6 @@ export default {
       type: String,
       required: true
     },
-    label: {
-      type: String,
-      required: false,
-      default: undefined
-    },
     nodeShape: {
       type: Boolean,
       required: true
@@ -101,9 +96,10 @@ export default {
      * TODO
      */
     getTextConfig() {
+      const label = this.$store.getters.labelForId(this.id);
       return {
         ...ID_TEXT_CONFIG,
-        text: this.label ? urlToName(this.label) : urlToName(this.id)
+        text: label || urlToName(this.id)
       };
     },
 

@@ -21,11 +21,7 @@
         ></relationship>
       </v-group>
       <div v-for="(obj, key) in this.$store.getters.propertyShapes" :key="key">
-        <shape
-          :id="key"
-          :node-shape="false"
-          :label="$store.getters.labelForId(key)"
-        ></shape>
+        <shape :id="key" :node-shape="false"></shape>
       </div>
       <div v-for="(obj, key) in this.$store.getters.nodeShapes" :key="key">
         <shape :id="key" :node-shape="true"></shape>

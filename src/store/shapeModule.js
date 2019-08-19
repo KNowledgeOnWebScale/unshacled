@@ -111,12 +111,13 @@ const shapeModule = {
      *            newID the shape's new ID.
      */
     updateShapeID(state, args) {
+      console.log(JSON.stringify(args, null, 2));
       const { index, oldID, newID, label } = args;
       Vue.set(state.model[index], "@id", newID);
 
       // Update the label dictionary.
       Vue.set(state.idToLabel, newID, label);
-      Vue.delete(state.idToLabel, oldID);
+      if (oldID !== newID) Vue.delete(state.idToLabel, oldID);
     },
 
     /**
@@ -127,7 +128,7 @@ const shapeModule = {
      *            label the new label for the given shape.
      */
     updateShapeLabel(state, args) {
-      const { id: shapeID, label } = args;
+      const { shapeID, label } = args;
       Vue.set(state.idToLabel, shapeID, label);
     },
 
@@ -220,7 +221,7 @@ const shapeModule = {
      *    newID: the new ID for the node shape.
      */
     editNodeShape({ getters, commit }, args) {
-      const { oldID, newID } = args;
+      const { oldID, newID, newLabel } = args;
       const newURL = extractUrl(oldID) + newID;
 
       // If the ID has changed
@@ -231,7 +232,7 @@ const shapeModule = {
           index,
           oldID,
           newID: newURL,
-          label: getters.labelForId(oldID)
+          label: newLabel
         });
         commit("updateLocations", { oldID, newID: newURL });
       }
@@ -244,7 +245,7 @@ const shapeModule = {
      * @param args
      */
     editPropertyShape({ state, getters, commit }, args) {
-      const { oldID, newID } = args;
+      const { oldID, newID, newLabel } = args;
       if (oldID !== newID) {
         commit("updateLocations", { oldID, newID });
 
@@ -254,7 +255,7 @@ const shapeModule = {
           index,
           oldID,
           newID,
-          label: getters.labelForId(oldID)
+          label: newLabel
         });
         for (const shape of state.model) {
           if (getters.shapeProperties(shape["@id"]).includes(oldID)) {
