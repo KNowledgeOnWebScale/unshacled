@@ -3,6 +3,7 @@ export const EXAMPLE_URI = "http://example.org/ns#";
 export const SHACL_URI = "http://www.w3.org/ns/shacl#";
 export const SCHEMA_URL = "http://schema.org/";
 
+// List of possible XML datatypes.
 export const XML_DATATYPES = [
   "http://www.w3.org/2001/XMLSchema#string",
   "http://www.w3.org/2001/XMLSchema#boolean",
@@ -26,3 +27,9 @@ export const XML_DATATYPES = [
 
 // Indicates which constraints should be visualized in a single entry.
 export const SINGLE_ENTRY = ["property"];
+
+// Regular expression to test URI's.
+export const iriRegex = new RegExp(
+  // eslint-disable-next-line no-useless-escape
+  /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/
+);

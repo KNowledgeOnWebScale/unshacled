@@ -179,15 +179,16 @@ const shapeModule = {
     /**
      * Add a property shape with the given id.
      * @param store
-     * @param id
+     * @param args
      */
-    addPropertyShape({ commit, getters }, id) {
+    addPropertyShape({ commit, getters }, args) {
+      const { id, path } = args;
       // Only do so if there is no property shape with this ID yet.
       if (getters.shapeWithID(id)) {
         console.log(`Property shape with id ${id} already exists.`);
       } else {
         const object = { "@id": id };
-        object[TERM.path] = [{ "@id": `${EXAMPLE_URI}${id}` }];
+        object[TERM.path] = [{ "@id": path }];
         commit("addShape", { object, bottomYs: getters.allBottomYs });
       }
     },
