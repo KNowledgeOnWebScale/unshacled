@@ -54,7 +54,6 @@ Dictionary[PropertyShape].forEach(predicate => {
     "http://www.w3.org/2000/01/rdf-schema#range"
   ];
   if (range) {
-    // console.log(predicate);
     // TODO is it correct that if path is not defined it's supposed to be a Resource??
     Dictionary[predicate].push(range[0]["@id"]);
   } else {

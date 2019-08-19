@@ -125,7 +125,7 @@ import {
   customConstraintsByCategory,
   getConstraintValueType
 } from "../../util/shaclConstraints";
-import { extractUrl, isUrl, urlToName } from "../../parsing/urlParser";
+import { extractUrl, isUrl, urlToName } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
 import { SCHEMA_URL, XML_DATATYPES } from "../../util/constants";
 

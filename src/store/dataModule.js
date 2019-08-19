@@ -5,8 +5,8 @@ import SerializerManager from "../parsing/serializerManager";
 import ValidatorManager from "../validation/validatorManager";
 import language from "../util/enums/languages";
 import getConstraints from "../util/constraintSelector";
-import { internalToShacl } from "../parsing/internalParser";
 import { downloadFile } from "../util";
+import ShaclTranslator from "../translation/shaclTranslator";
 
 /**
  * This module contains everything to handle data imports/exports and validation.
@@ -42,7 +42,10 @@ const dataModule = {
      */
     validateWithModel(state, model) {
       if (state.dataFile.length > 0) {
-        SerializerManager.serialize(internalToShacl(model), ETF.ttl)
+        SerializerManager.serialize(
+          ShaclTranslator.toSHACLSimple(model),
+          ETF.ttl
+        )
           .then(shapes => {
             if (state.dataFileExtension === "json")
               throw "JSON data files are not yet supported."; // FIXME
@@ -132,7 +135,7 @@ const dataModule = {
         );
       } else {
         SerializerManager.serialize(
-          internalToShacl(rootState.mShape.model),
+          ShaclTranslator.toSHACLSimple(rootState.mShape.model),
           type
         ).then(e => downloadFile(filename, e));
       }

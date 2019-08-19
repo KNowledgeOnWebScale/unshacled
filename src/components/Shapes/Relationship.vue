@@ -24,7 +24,7 @@ import {
   MARGIN
 } from "../../util/konvaConfigs";
 import nearestPointOnPerimeter from "../../util/nearestPointOnPerimeter";
-import { urlToName } from "../../parsing/urlParser";
+import { urlToName } from "../../util/urlParser";
 import {distance} from "../../util";
 
 export default {

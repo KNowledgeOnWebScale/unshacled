@@ -1,4 +1,4 @@
-import { CUSTOM_URI, EXAMPLE_URI } from "../util/constants";
+import { CUSTOM_URI, EXAMPLE_URI } from "./constants";
 
 /**
  * Takes the name out of an url if possible.

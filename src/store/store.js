@@ -12,10 +12,10 @@ import { TERM } from "../translation/terminology";
 // Modules
 import shapeModule from "./shapeModule";
 import dataModule from "./dataModule";
-import { internalToShacl } from "../parsing/internalParser";
 import { exampleData, exampleShapes } from "../assets/example";
 import ParserManager from "../parsing/parserManager";
 import { ETF } from "../util/enums/extensionToFormat";
+import ShaclTranslator from "../translation/shaclTranslator";
 
 Vue.use(Vuex);
 
@@ -102,7 +102,7 @@ export default new Vuex.Store({
      * @returns {*}
      */
     internalModelToJson: state => {
-      return internalToShacl(state.mShape.model);
+      return ShaclTranslator.toSHACLSimple(state.mShape.model);
     },
 
     /**
@@ -112,7 +112,7 @@ export default new Vuex.Store({
      */
     internalModelToTurtle: state => {
       return TranslatorManager.translateToLanguage(
-        internalToShacl(state.mShape.model),
+        ShaclTranslator.toSHACLSimple(state.mShape.model),
         state.format
       );
     },
