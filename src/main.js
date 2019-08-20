@@ -4,7 +4,7 @@ import VueKonva from "vue-konva";
 import Vuex from "vuex";
 import PortalVue from "portal-vue";
 import App from "./App.vue";
-import store from "./store";
+import store from "./store/store";
 import "semantic-ui-css/semantic.min.css";
 
 Vue.config.productionTip = false;

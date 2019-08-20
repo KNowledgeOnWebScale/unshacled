@@ -1,14 +1,84 @@
-const JSONids =
-  '{"https://2019.summerofcode.be/unshacled#path":true,"https://2019.summerofcode.be/unshacled#class":true,"https://2019.summerofcode.be/unshacled#property":true,"https://2019.summerofcode.be/unshacled#targetNode":true,"https://2019.summerofcode.be/unshacled#datatype":true,"https://2019.summerofcode.be/unshacled#nodeKind":true,"https://2019.summerofcode.be/unshacled#targetObjectsOf":true,"https://2019.summerofcode.be/unshacled#equals":true,"https://2019.summerofcode.be/unshacled#disjoint":true,"https://2019.summerofcode.be/unshacled#lessThan":true,"https://2019.summerofcode.be/unshacled#lessThanOrEquals":true,"https://2019.summerofcode.be/unshacled#not":true,"https://2019.summerofcode.be/unshacled#targetClass":true,"https://2019.summerofcode.be/unshacled#node":true}';
-const JSONtypes =
-  '{"https://2019.summerofcode.be/unshacled#minCount":true,"https://2019.summerofcode.be/unshacled#maxCount":true,"https://2019.summerofcode.be/unshacled#minExclusive":true,"https://2019.summerofcode.be/unshacled#minInclusive":true,"https://2019.summerofcode.be/unshacled#maxExclusive":true,"https://2019.summerofcode.be/unshacled#maxInclusive":true,"https://2019.summerofcode.be/unshacled#minLength":true,"https://2019.summerofcode.be/unshacled#maxLength":true,"https://2019.summerofcode.be/unshacled#uniqueLang":true}';
-const JSONlists =
-'{"https://2019.summerofcode.be/unshacled#languageIn":true,"https://2019.summerofcode.be/unshacled#and":true,"https://2019.summerofcode.be/unshacled#or":true,"https://2019.summerofcode.be/unshacled#xone":true}';
-export default function isIn(url) {
-  const ids = JSON.parse(JSONids);
-  const types = JSON.parse(JSONtypes);
-  const lists = JSON.parse(JSONlists);
-  if (ids[url]) return "id";
-  if (types[url]) return "type";
-  if (lists[url]) return "list";
+import { TERM } from "../../translation/terminology";
+import { LABEL } from "../constants";
+
+export const ValueTypes = {
+  ID: "id",
+  VALUE: "type",
+  LIST: "List",
+  ID_LIST: "idList",
+  VALUE_LIST: "valueList"
+};
+
+const ids = new Set([
+  TERM.id,
+  TERM.class,
+  TERM.property,
+  TERM.targetNode,
+  TERM.datatype,
+  TERM.nodeKind,
+  TERM.targetObjectsOf,
+  TERM.equals,
+  TERM.disjoint,
+  TERM.lessThan,
+  TERM.lessThanOrEquals,
+  TERM.not,
+  TERM.node,
+  TERM.path,
+  TERM.pattern,
+  TERM.qualifiedMaxCount,
+  TERM.qualifiedMinCount,
+  TERM.qualifiedValueShape,
+  TERM.targetClass
+]);
+const values = new Set([
+  TERM.closed,
+  TERM.hasValue,
+  TERM.minCount,
+  TERM.maxCount,
+  TERM.minExclusive,
+  TERM.maxExclusive,
+  TERM.minInclusive,
+  TERM.maxInclusive,
+  TERM.minLength,
+  TERM.maxLength,
+  TERM.name,
+  TERM.uniqueLang,
+  TERM.description,
+  LABEL
+]);
+const valueLists = new Set([TERM.ignoredProperties, TERM.languageIn, TERM.in]);
+const idLists = new Set([TERM.and, TERM.or, TERM.xone]);
+
+/**
+ * Get the value type of the given url.
+ * @param url
+ * @returns {string} either "id", "type", or "valueList" or "idList"
+ */
+export default function getValueType(url) {
+  if (ids.has(url)) return ValueTypes.ID;
+  if (values.has(url)) return ValueTypes.VALUE;
+  if (valueLists.has(url)) return ValueTypes.VALUE_LIST;
+  if (idLists.has(url)) return ValueTypes.ID_LIST;
+}
+
+/**
+ * Determine the value type of the given constraint.
+ * @param constraint
+ * @returns {string|null}
+ */
+export function getValueTypeFromConstraint(constraint) {
+  if (constraint.length > 0) {
+    if (constraint.length > 1) return ValueTypes.ID_LIST;
+
+    let value = constraint[0];
+    if (value["@list"]) {
+      value = value["@list"][0];
+      if (value["@id"]) return ValueTypes.ID_LIST;
+      if (value["@value"]) return ValueTypes.VALUE_LIST;
+    } else {
+      if (value["@id"]) return ValueTypes.ID;
+      if (value["@value"]) return ValueTypes.VALUE;
+    }
+  }
+  return null;
 }

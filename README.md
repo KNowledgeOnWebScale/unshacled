@@ -16,35 +16,41 @@ At the time of writing this editor supports SHACL, future support for ShEx is en
 - [x] Import SHACL files
 - [x] Add, remove and edit shapes
 - [x] Add, remove and edit properties
-- [ ] Add, remove and edit constraints
-- [ ] Export SHACL files
-- [ ] Validate data files
+- [x] Add, remove and edit constraints
+- [x] Export SHACL files
+- [x] Validate data files
 
 ### Concepts
 An [internal model](#Model) is used to represent shapes which can be edited in the browser. Using existing shape files requires these to be imported and [translated to this model](#Translation) before use. Editing is done in a [visual editor](#Interface).
 
 ## Setup
-Install dependencies
+### Install dependencies
 ```
 npm install
 ```
-Compile and hot-reload for development
+
+### Compile and hot-reload for development
 ```
 npm run serve
 ```
-Compile and minify for production
+
+### Compile and minify for production
+Execute this command, then move the contents of `/dist` into the `gh-pages` branch. The application will be automatically deployed to [UnSHACLed.com](https://unshacled.com).
 ```
 npm run build
 ```
-Generate documentation in `/docs`
+
+### Generate documentation in `/docs`
 ```
 npm run docs
 ```
-Run tests
+
+### Run tests
 ```
 npm run test
 ```
-Check and fix code style
+
+### Check and fix code style
 ```
 npm run lint
 ```

@@ -1,102 +1,320 @@
 <template>
   <v-group>
-    <v-rect :config="this.$props.constraintConfig"></v-rect>
-    <v-text ref="key" :config="keyConfig"></v-text>
-    <v-text ref="value" :config="valueConfig"></v-text>
-    <v-circle
-      v-if="this.$props.hover"
-      :config="this.$props.deletePropConfig"
-      @click="deleteConstraint"
-    ></v-circle>
+    <v-rect :config="getConfigs().rectangleConfig"></v-rect>
+
+    <v-group @mouseenter="hoverKey = true" @mouseleave="hoverKey = false">
+      <v-text ref="key" :config="getConfigs().keyConfig"></v-text>
+      <v-circle
+        v-if="hoverKey && canBeDeleted()"
+        :config="getConfigs().deleteConstraint"
+        @click="deleteConstraint"
+      ></v-circle>
+    </v-group>
+
+    <v-line :config="getConfigs().lineConfig"></v-line>
+
+    <v-group @mouseenter="hoverValues = true" @mouseleave="hoverValues = false">
+      <div v-for="(value, index) of getConstraintValues()" :key="index">
+        <v-text
+          :config="getValueConfig(value, index)"
+          @click="editValue(index, value)"
+        ></v-text>
+        <v-circle
+          v-if="hoverValues && !isListOfValues() && canBeDeleted()"
+          :config="getDeleteValueConfig(index)"
+          @click="deleteConstraintValue(index)"
+        ></v-circle>
+      </div>
+    </v-group>
   </v-group>
 </template>
 
 <script>
-import { HEIGHT } from "../../util/konvaConfigs";
-import { urlToName } from "../../util/nameParser";
+import {
+  HEIGHT,
+  CONSTRAINT_SEPARATION_LINE,
+  WIDTH,
+  CONSTRAINT_CONFIG,
+  CONSTRAINT_TEXT_CONFIG,
+  DELTA_Y_TEXT,
+  DELETE_BUTTON_CONFIG,
+  DELTA_Y_DELETE,
+  MAX_LENGTH
+} from "../../util/konvaConfigs";
+import { urlToName } from "../../util/urlParser";
+import { SINGLE_ENTRY } from "../../util/constants";
+import ValueType, {
+  getValueTypeFromConstraint,
+  ValueTypes
+} from "../../util/enums/ValueType";
+import { TERM } from "../../translation/terminology";
+import { abbreviate } from "../../util/strings";
 
 export default {
   name: "Constraint",
   props: {
-    shape: {
+    shapeID: {
       type: String,
+      required: true
+    },
+    nodeShape: {
+      type: Boolean,
       required: true
     },
     constraintID: {
       type: String,
       required: true
     },
-    hover: {
-      type: Boolean,
-      required: true
-    },
-    constraintConfig: {
-      type: Object,
-      required: true
-    },
-    propTextConfig: {
-      type: Object,
-      required: true
-    },
-    deletePropConfig: {
-      type: Object,
-      required: true
+    stroke: {
+      type: String,
+      required: false,
+      default: "black"
     }
   },
   data() {
     return {
+      hoverKey: false,
+      hoverValues: false,
+
+      lineConfig: {
+        ...CONSTRAINT_SEPARATION_LINE,
+        points: [0, HEIGHT, WIDTH, HEIGHT] // [x1, y1, x2, y2]
+      },
+      rectangleConfig: {
+        ...CONSTRAINT_CONFIG,
+        stroke: this.$props.stroke
+      },
       keyConfig: {
-        ...this.$props.propTextConfig,
+        ...CONSTRAINT_TEXT_CONFIG,
+        y: DELTA_Y_TEXT,
         fontStyle: "italic",
         text: urlToName(this.$props.constraintID)
       },
       valueConfig: {
-        ...this.$props.propTextConfig,
-        y: this.$props.propTextConfig.y + HEIGHT,
-        text: this.getConstraintValue()
+        ...CONSTRAINT_TEXT_CONFIG,
+        y: DELTA_Y_TEXT + HEIGHT
+      },
+      deleteConstraintConfig: {
+        ...DELETE_BUTTON_CONFIG,
+        y: DELTA_Y_DELETE
       }
     };
   },
   methods: {
+    /* EDIT/DELETE  ================================================================================================= */
+
+    /**
+     * @returns {boolean} value that indicates if this constraint can be removed from the shape.
+     */
+    canBeDeleted() {
+      return this.$props.constraintID !== TERM.path;
+    },
+
+    /**
+     * Start editing the value of the given constraint.
+     * NOTE: We don't want to edit properties this way; they will be edited using the visual relationships.
+     */
+    editValue(index, value) {
+      if (!this.$props.constraintID.includes("property")) {
+        this.$store.dispatch("startConstraintEdit", {
+          shapeID: this.$props.shapeID,
+          shapeType: this.$props.nodeShape ? "NodeShape" : "PropertyShape",
+          constraintID: this.$props.constraintID,
+          index,
+          value
+        });
+      }
+    },
+
     /**
      * Delete the current constraint from its shape.
      */
     deleteConstraint() {
-      const args = {
-        shapeID: this.$props.shape,
-        constraint: this.$props.constraintID
-      };
-      this.$store.dispatch("deleteConstraintFromShape", args);
+      this.$store.dispatch("deleteConstraintFromShapeWithID", {
+        shapeID: this.$props.shapeID,
+        constraintID: this.$props.constraintID
+      });
+      this.$store.commit("updateYValues", {
+        shapeID: this.$props.shapeID,
+        shapes: this.$store.state.mShape.model
+      });
     },
 
     /**
-     * Get the value of the current constraint.
-     * @returns {[]|*} array or string, depending to the number of values.
+     * Delete the constraint value at the given index,
+     * @param index
      */
-    getConstraintValue() {
-      const value = this.$store.getters.shapeConstraints(this.$props.shape)[
+    deleteConstraintValue(index) {
+      this.$store.dispatch("deleteConstraintValueWithIndex", {
+        shapeID: this.$props.shapeID,
+        constraintID: this.$props.constraintID,
+        valueIndex: index
+      });
+      this.$store.commit("updateYValues", {
+        shapeID: this.$props.shapeID,
+        shapes: this.$store.state.mShape.model
+      });
+    },
+
+    /* HELPERS ====================================================================================================== */
+
+    /**
+     * Returns boolean value which indicates if the current constraint value should be visualized
+     * as a list of values in a single entry.
+     * @returns {boolean}
+     */
+    isListOfValues() {
+      const { shapeID, constraintID } = this.$props;
+      const constraints = this.$store.getters.shapeConstraints(shapeID);
+      return (
+        constraints &&
+        constraints[constraintID] &&
+        SINGLE_ENTRY.includes(urlToName(constraintID))
+      );
+    },
+
+    /**
+     * Get all the constraint values of this predicate.
+     * @returns {[]} a list of values.
+     */
+    getConstraintValues() {
+      const { shapeID, constraintID } = this.$props;
+      const constraints = this.$store.getters.shapeConstraints(shapeID);
+      const output = [];
+
+      if (constraints && constraints[constraintID]) {
+        // Show the full path.
+        if (constraintID === TERM.path) {
+          return [constraints[constraintID][0]["@id"]];
+        }
+
+        // Get the constraint's value type.
+        const values = constraints[constraintID];
+        const vt = ValueType(constraintID)
+          ? ValueType(constraintID)
+          : getValueTypeFromConstraint(constraints[constraintID]);
+
+        // Properties should be listed in a single entry.
+        let iter;
+        if (this.isListOfValues()) {
+          iter =
+            values.length > 1 || !vt.includes(ValueTypes.LIST)
+              ? values
+              : values[0]["@list"];
+        } else {
+          iter = values;
+        }
+
+        // Other constraints should be visualized as an array of their value representations.
+        if (
+          vt.includes(ValueTypes.LIST) &&
+          values.length === 1 &&
+          values[0]["@list"]
+        ) {
+          iter = values[0]["@list"];
+        }
+        for (const v of iter) {
+          const key = vt.includes(ValueTypes.ID) ? "@id" : "@value";
+          const name = v[key] ? v[key] : v;
+          // If the shape has a label, use it.
+          const text = this.$store.getters.labelForId(name) || urlToName(name);
+          // Abbreviate the label.
+          output.push(abbreviate(text));
+        }
+        if (this.isListOfValues()) {
+          // Abbreviate the label of every element depending on the number of elements in the list.
+          return [
+            output
+              .map(e => abbreviate(e, MAX_LENGTH / output.length))
+              .join(", ")
+          ];
+        }
+      }
+      return output;
+    },
+
+    /**
+     * Get the number of constraint values.
+     * @returns {number}
+     */
+    getNumConstraintValues() {
+      const { shapeID, constraintID } = this.$props;
+      const cvs = this.$store.getters.shapeWithID(shapeID)[constraintID];
+      return SINGLE_ENTRY.includes(urlToName(constraintID))
+        ? 1 // For `property`, these will be listed as a single value.
+        : cvs.length > 0 && cvs[0]["@list"]
+        ? cvs[0]["@list"].length // Get the number of elements if it's a list.
+        : cvs.length;
+    },
+
+    /* CONFIGURATIONS =============================================================================================== */
+
+    /**
+     * Return the y value of this constraint.
+     * @returns {*}
+     */
+    getYValue() {
+      return this.$store.state.mShape.mCoordinate.yValues[this.$props.shapeID][
         this.$props.constraintID
       ];
+    },
 
-      // Check if there is more than one value.
-      if (value.length > 1) {
-        // Transform the list.
-        const output = [];
-        for (const element of value) {
-          // Extract each element's name.
-          output.push(urlToName(element));
+    getConfigs() {
+      const y = this.getYValue();
+      const points = [...this.lineConfig.points];
+      points[1] += y;
+      points[3] += y;
+
+      return {
+        lineConfig: { ...this.lineConfig, points },
+        rectangleConfig: {
+          ...this.rectangleConfig,
+          y,
+          height: (this.getNumConstraintValues() + 1) * HEIGHT
+        },
+        keyConfig: {
+          ...this.keyConfig,
+          y: this.keyConfig.y + y
+        },
+        valueConfig: {
+          ...this.valueConfig,
+          y: this.valueConfig.y + y
+        },
+        deleteConstraint: {
+          ...this.deleteConstraintConfig,
+          y: this.deleteConstraintConfig.y + y
         }
-        return output;
-      } else if (value.length === 0) {
-        // The constraint has no value.
-        return "(empty)";
-      } else if (value[0]["@id"]) {
-        // Get the ID and extract the name.
-        return urlToName(value[0]["@id"]);
-      } else if (value[0]["@value"]) {
-        // Get the value.
-        return value[0]["@value"];
-      }
+      };
+    },
+
+    /**
+     * Get the configuration for a constraint value.
+     * This will set the y coordinate and the text using the given value and index.
+     * @param value text that should be visualized in this constraint component.
+     * @param index the index of the constraint value.
+     * @returns {{y: *, text: *}}
+     */
+    getValueConfig(value, index) {
+      return {
+        ...this.valueConfig,
+        y: this.valueConfig.y + this.getYValue() + index * HEIGHT,
+        text: this.$props.constraintID === TERM.path ? value : urlToName(value)
+      };
+    },
+
+    /**
+     * Delete the configuration of the delete button for the constraint value at the given index.
+     * @param index the index of the constraint value.
+     * @returns {{y: *}}
+     */
+    getDeleteValueConfig(index) {
+      return {
+        ...this.deleteConstraintConfig,
+        y:
+          this.deleteConstraintConfig.y +
+          (index + 1) * HEIGHT +
+          this.getYValue()
+      };
     }
   }
 };

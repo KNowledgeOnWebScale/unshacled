@@ -1,11 +1,13 @@
-import traverse from "Traverse";
+import traverse from "../util/traverse";
 import dictionary from "./shaclDictionary";
+import { SHACL_URI } from "../util/constants";
+import { CUSTOM_URI } from "./terminology";
 /**
  *  ShaclTranslator class translates SHACL JSON-LD to an internal model and back
  */
 export default class ShaclTranslator {
   /**
-   * Replaces all SHACL URI's with model URI's
+   * Replaces all SHACL URI's with model URI's.
    * @param shacl SHACL in JSON-LD
    * @returns {any} Translated document
    */
@@ -14,7 +16,18 @@ export default class ShaclTranslator {
   }
 
   /**
-   * Replaces all model URI's with SHACL URI's
+   * Replaces all SHACL URI's with model URI's.
+   * @param shacl SHACL in JSON-LD
+   * @returns {any} Translated document
+   */
+  static toModelSimple(shacl) {
+    return JSON.parse(
+      JSON.stringify(shacl).replace(new RegExp(SHACL_URI, "g"), CUSTOM_URI)
+    );
+  }
+
+  /**
+   * Replaces all model URI's with SHACL URI's.
    * @param model Model in JSON-LD
    * @returns {any} Translated document
    */
@@ -23,7 +36,18 @@ export default class ShaclTranslator {
   }
 
   /**
-   * Translates by replacing URI's found in dictionary
+   * Replaces all model URI's with SHACL URI's.
+   * @param model Model in JSON-LD
+   * @returns {any} Translated document
+   */
+  static toSHACLSimple(model) {
+    return JSON.parse(
+      JSON.stringify(model).replace(new RegExp(CUSTOM_URI, "g"), SHACL_URI)
+    );
+  }
+
+  /**
+   * Translates by replacing URI's found in dictionary.
    * @param document Document in JSON-LD
    * @param dict Dictionary which contains URI's to be translated
    * @returns {any} Translated document

@@ -1,16 +1,30 @@
 <template>
-  <v-stage ref="stage" :config="configKonva" @wheel="scroll">
+  <v-stage
+    id="stage"
+    ref="stage"
+    :config="configKonva"
+    :draggable="true"
+    @wheel="scroll"
+  >
     <v-layer>
+      <v-group
+        v-for="(obj, key) in this.$store.getters.relationships"
+        :key="key"
+        ref="relationships"
+      >
+        <relationship
+          :id="key"
+          :from="obj.from"
+          :to="obj.to"
+          :constraint-i-d="obj.constraintID"
+          :on-click-props="obj.onClick"
+        ></relationship>
+      </v-group>
+      <div v-for="(obj, key) in this.$store.getters.propertyShapes" :key="key">
+        <shape :id="key" :node-shape="false"></shape>
+      </div>
       <div v-for="(obj, key) in this.$store.getters.nodeShapes" :key="key">
         <shape :id="key" :node-shape="true"></shape>
-        <!--        <node-shape :id="key" @click="print(key)"></node-shape>-->
-      </div>
-      <!--      <div v-for="(obj, key) in this.$store.state.relationships" :key="key">-->
-      <!--        <relationship :coords="obj.coords"></relationship>-->
-      <!--      </div>-->
-      <div v-for="(obj, key) in this.$store.getters.propertyShapes" :key="key">
-        <!--        <property-shape :id="key"></property-shape>-->
-        <shape :id="key" :node-shape="false"></shape>
       </div>
     </v-layer>
   </v-stage>
@@ -18,14 +32,16 @@
 
 <script>
 import Shape from "./Shapes/Shape.vue";
+import Relationship from "./Shapes/Relationship.vue";
 
 export default {
   name: "Editor",
-  components: { Shape },
+  components: { Relationship, Shape },
 
   data() {
     const marginTop = 40;
     return {
+      previousPosition: undefined,
       marginTop, // Provide space for the NavBar
       configKonva: {
         width: window.innerWidth,
@@ -36,8 +52,14 @@ export default {
 
   mounted() {
     this.$store.commit("setEditor", this.$refs.stage.getNode());
-    window.addEventListener("resize", this.handleResize);
+    window.addEventListener("resize", this.handleResize); // React to window resizing.
     this.handleResize();
+  },
+
+  updated() {
+    // Put the arrows on the bottom layer.
+    const layer = this.$refs.relationships;
+    if (layer && layer.getNode) layer.getNode.zIndex(0);
   },
 
   methods: {
@@ -45,19 +67,22 @@ export default {
      * Resize the canvas on resizing of the window.
      */
     handleResize() {
-      const stage = this.$refs.stage.getNode();
-      this.configKonva.height = window.innerHeight - this.marginTop;
-      this.configKonva.width = window.innerWidth;
-      this.$nextTick(() => stage.draw()); // Resize on the next tick
+      if (this.$refs.stage) {
+        const stage = this.$refs.stage.getNode();
+        this.configKonva.height = window.innerHeight - this.marginTop;
+        this.configKonva.width = window.innerWidth;
+        this.$nextTick(() => stage.draw()); // Resize on the next tick
+      }
     },
 
     /**
      * Scale the canvas depending on the pointer position when scrolling.
+     * This will zoom in on scrolling up and zoom out on scrolling down.
      * @param e scoll event
      */
     scroll(e) {
       const stage = this.$refs.stage.getNode();
-      const scaleBy = 1.01;
+      const scaleBy = 0.99; // 1.01 for other direction (down = zoom in, up = zoom out)
       const oldScale = stage.scaleX();
       e.evt.preventDefault();
 

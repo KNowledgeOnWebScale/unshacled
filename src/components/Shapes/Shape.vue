@@ -1,55 +1,49 @@
 <template>
   <div>
-    <reactive-input
-      ref="reactiveInput"
-      :is-datalist="false"
-      :on-exit="stopEditing"
-    ></reactive-input>
-
     <v-group
       ref="posRef"
       :draggable="true"
       @mouseenter="hover = true"
       @mouseleave="hover = false"
-      @dragmove="updateCoordinates"
+      @dragmove="updatePosition"
     >
-      <v-rect :config="shapeConfig"></v-rect>
-      <v-text
-        ref="nodeID"
-        :config="idTextConfig"
-        @click="startEditing"
-      ></v-text>
-      <v-circle
-        v-if="hover"
-        :config="deleteNodeConfig"
-        @click="deleteShape"
-      ></v-circle>
+      <v-group @mouseenter="titleHover = true" @mouseleave="titleHover = false">
+        <!-- Header -->
+        <v-group @click="startEditing">
+          <v-rect :config="shapeConfig"></v-rect>
+          <v-text ref="shapeLabel" :config="getLabelTextConfig()"></v-text>
+          <v-text ref="shapeURI" :config="getURITextConfig()"></v-text>
+        </v-group>
 
-      <v-circle
-        v-if="hover && !adding"
-        :config="addPredConfig"
-        @mousedown="addPredicate"
-      ></v-circle>
+        <!-- Description -->
+        <v-group v-if="hasDescription() && titleHover">
+          <v-rect :config="getDescriptionConfig().rect"></v-rect>
+          <v-text :config="getDescriptionConfig().title"></v-text>
+          <v-text :config="getDescriptionConfig().text"></v-text>
+        </v-group>
+      </v-group>
 
-      <div v-for="(prop, key) in getProperties()" :key="key">
-        <node-property
-          :prop-key="key"
-          :node="$props.id"
-          :hover="hover"
-          :property-config="propertyConfigs[key]"
-          :prop-text-config="propTextConfigs[key]"
-          :delete-prop-config="deletePropConfigs[key]"
-        ></node-property>
-      </div>
+      <!-- Buttons -->
+      <v-group>
+        <v-circle
+          v-if="hover"
+          :config="deleteNodeConfig"
+          @click="deleteShape"
+        ></v-circle>
+        <v-circle
+          v-if="hover && !adding"
+          :config="addPredicateConfig"
+          @mousedown="addPredicate"
+        ></v-circle>
+      </v-group>
 
+      <!-- Constraints -->
       <div v-for="(prop, key) in getConstraints()" :key="key">
         <constraint
           :constraint-i-d="key"
-          :shape="$props.id"
-          :hover="hover"
-          :constraint-config="propertyConfigs[key]"
-          :prop-text-config="propTextConfigs[key]"
-          :delete-prop-config="deletePropConfigs[key]"
+          :shape-i-d="$props.id"
+          :node-shape="$props.nodeShape"
+          :stroke="shapeConfig.stroke"
         ></constraint>
       </div>
     </v-group>
@@ -57,29 +51,30 @@
 </template>
 
 <script>
-import ReactiveInput from "../FormElements/ReactiveInput.vue";
-import NodeProperty from "./NodeProperty.vue";
 import Constraint from "./Constraint.vue";
-import { urlToName } from "../../util/nameParser";
+import { urlToName } from "../../util/urlParser";
 import {
   DELETE_BUTTON_CONFIG,
-  ADD_PROP_CONFIG,
-  ID_TEXT_CONFIG,
-  PROP_TEXT_CONFIG,
-  PROPERTY_CONFIG,
+  LABEL_TEXT_CONFIG,
   NODE_SHAPE_CONFIG,
   PROPERTY_SHAPE_CONFIG,
-  CONSTRAINT_CONFIG,
-  ADD_PRED_CONFIG
+  ADD_PREDICATE_CONFIG,
+  URI_TEXT_CONFIG,
+  TEXT_OFFSET,
+  OFFSET,
+  DESCRIPTION_RECT_CONFIG,
+  DESCRIPTION_TEXT_CONFIG,
+  MAX_LENGTH,
+  TEXT_SIZE,
+  WIDTH,
+  MARGIN
 } from "../../util/konvaConfigs";
-
-const DELTA_Y_TEXT = 15;
-const DELTA_Y_DELETE = 20;
-const NEW_PROPERTY_TEXT = "newProperty";
+import { TERM } from "../../translation/terminology";
+import { abbreviate } from "../../util/strings";
 
 export default {
   name: "Shape",
-  components: { ReactiveInput, NodeProperty, Constraint },
+  components: { Constraint },
   props: {
     id: {
       type: String,
@@ -93,122 +88,175 @@ export default {
   data() {
     return {
       hover: false,
+      titleHover: false,
       editing: false,
       adding: false,
-      propertyConfigs: {},
-      propTextConfigs: {},
-      deletePropConfigs: {},
       shapeConfig: this.$props.nodeShape
         ? NODE_SHAPE_CONFIG
         : PROPERTY_SHAPE_CONFIG,
       deleteNodeConfig: DELETE_BUTTON_CONFIG,
       idTextConfig: {
-        ...ID_TEXT_CONFIG,
+        ...LABEL_TEXT_CONFIG,
         text: urlToName(this.$props.id)
       },
-      propertyConfig: PROPERTY_CONFIG,
-      propTextConfig: {
-        ...PROP_TEXT_CONFIG,
-        text: urlToName(this.$props.propKey)
-      },
-      constraintConfig: CONSTRAINT_CONFIG,
-      deletePropConfig: DELETE_BUTTON_CONFIG,
-      addPropConfig: ADD_PROP_CONFIG,
-      addPredConfig: ADD_PRED_CONFIG
+      addPredicateConfig: ADD_PREDICATE_CONFIG
     };
   },
   mounted() {
+    const self = this;
+    const { id } = this.$props;
     // Move the shape to the defined coordinate.
     this.$refs.posRef
       .getNode()
-      .setPosition(this.$store.state.coordinates[this.$props.id]);
-    this.updateCoordinates();
+      .setPosition(this.$store.state.mShape.mCoordinate.coordinates[id]);
+    this.updatePosition();
+
+    this.$store.watch(
+      () => self.$store.getters.shapeConstraints(self.$props.id),
+      () => {
+        self.getConstraints();
+        self.getDescriptionConfig();
+      }
+    );
   },
   methods: {
     /**
-     * Get an object containing all the properties and set their y values.
-     * @returns an object mapping every property name to a property object.
+     * @returns {{}} the configuration of the main text
      */
-    getProperties() {
-      const propNames = this.$store.getters.shapeProperties(this.$props.id);
-      const propertyObjects = this.$store.getters.shapes;
-      const propObjects = {};
-      for (const prop of propNames) {
-        // FIXME here's some undefined stuff going on, hence the if
-        if (prop) propObjects[prop] = propertyObjects[prop];
-      }
-      this.setConfigs(propObjects, false);
-      return propObjects;
+    getLabelTextConfig() {
+      const label = this.$store.getters.labelForId(this.id);
+      const text = label ? abbreviate(label) : abbreviate(urlToName(this.id));
+      return {
+        ...LABEL_TEXT_CONFIG,
+        y: label ? OFFSET : TEXT_OFFSET,
+        text
+      };
     },
 
     /**
-     * Get an object containing all the constraints and set their y values.
+     * @returns {{}} the configuration of the URI
+     */
+    getURITextConfig() {
+      const label = this.$store.getters.labelForId(this.id);
+      const text = label ? abbreviate(this.id) : "";
+      return { ...URI_TEXT_CONFIG, text };
+    },
+
+    /**
+     * @returns {boolean} value that indicates if this shape has a description.
+     */
+    hasDescription() {
+      const shape = this.$store.getters.shapeWithID(this.id);
+      if (shape) {
+        const constraint = shape[TERM.description];
+        if (constraint) {
+          const description = constraint[0]["@value"];
+          return description && description !== "";
+        }
+      }
+      return false;
+    },
+
+    /**
+     * Get the configuration for the visualization of the description.
+     */
+    getDescriptionConfig() {
+      // Check if the shape has a description.
+      if (this.hasDescription()) {
+        const text = this.$store.getters.shapeWithID(this.id)[
+          TERM.description
+        ][0]["@value"];
+
+        // Constants for the configuration.
+        const x = WIDTH + MARGIN;
+        const textX = x + 2 * MARGIN;
+        const offset = TEXT_OFFSET / 2;
+        let lines = Math.ceil(text.length / MAX_LENGTH);
+        if (lines < 2) lines = 2;
+
+        return {
+          rect: {
+            ...DESCRIPTION_RECT_CONFIG,
+            x,
+            height: lines * TEXT_SIZE + TEXT_OFFSET,
+            width: WIDTH + 4 * MARGIN
+          },
+          title: {
+            ...DESCRIPTION_TEXT_CONFIG,
+            text: "Description",
+            fontStyle: "bold",
+            x: textX,
+            y: offset
+          },
+          text: {
+            ...DESCRIPTION_TEXT_CONFIG,
+            x: textX,
+            y: offset + TEXT_OFFSET,
+            width: WIDTH,
+            text
+          }
+        };
+      }
+
+      // If the shape does not have a description, do not return any configuration.
+      return {
+        rect: {},
+        title: {},
+        text: {}
+      };
+    },
+
+    /**
+     * Get an object containing all the constraints.
      * @returns an object mapping every constraint name to a (list of) values.
      */
     getConstraints() {
-      const constraints = this.$store.getters.shapeConstraints(this.$props.id);
-      this.setConfigs(constraints, true);
-      return constraints;
+      return this.$store.getters.shapeConstraints(this.$props.id);
     },
 
     /**
-     * Set the configurations of its children using the updated y values from the state.
-     * @param elements a dictionary containing the node shape's elements.
-     * @param constraints boolean value which indicates if the given elements are constraints.
+     * Takes the coordinates from this node shape and calls store to update them.
      */
-    setConfigs(elements, constraints) {
-      const { id } = this.$props;
-      const ys = this.$store.state.yValues[id];
-      for (const prop of Object.keys(elements)) {
-        // The properties should be listed below eachother.
-        if (constraints) {
-          this.propertyConfigs[prop] = {
-            ...this.constraintConfig,
-            y: ys[prop]
-          };
-        } else {
-          this.propertyConfigs[prop] = { ...this.propertyConfig, y: ys[prop] };
-        }
-        this.propTextConfigs[prop] = {
-          ...this.propTextConfig,
-          y: ys[prop] + DELTA_Y_TEXT,
-          text: prop
-        };
-        this.deletePropConfigs[prop] = {
-          ...this.deletePropConfig,
-          y: ys[prop] + DELTA_Y_DELETE
-        };
-      }
-
-      // Set y values for the button and text for adding a new property.
-      this.propertyConfigs[NEW_PROPERTY_TEXT] = {
-        ...this.propertyConfig,
-        y: ys[NEW_PROPERTY_TEXT]
-      };
-      // This text is not visible, but is used to position the input field.
-      this.propTextConfigs[NEW_PROPERTY_TEXT] = {
-        ...this.propTextConfig,
-        y: ys[NEW_PROPERTY_TEXT] + DELTA_Y_TEXT,
-        text: "",
-        fill: "transparent"
-      };
-      this.addPropConfig.y = ys["addButton"];
+    updatePosition() {
+      const pos = this.$refs.posRef.getNode().position();
+      this.$store.commit("updateYValues", {
+        shapeID: this.$props.id,
+        shapes: this.$store.state.mShape.model
+      });
+      this.$store.commit("updateCoordinates", {
+        shapeID: this.$props.id,
+        x: pos.x,
+        y: pos.y
+      });
     },
 
     /**
-     * TODO
+     * Toggle the predicate model to add a constraint to this shape.
      */
     addPredicate() {
-      const args = { id: this.id, type: "PropertyShape" };
-      this.$store.commit("togglePredicateModal", args);
+      this.$store.commit("resetPredicateModal");
+      this.$store.commit("togglePredicateModal", {
+        shapeID: this.id,
+        shapeType: this.nodeShape ? "NodeShape" : "PropertyShape",
+        onExit: "addPredicate",
+        editing: false
+      });
     },
 
     /**
      * Call the ReactiveInput component to start editing using the given text node.
      */
     startEditing() {
-      if (this.$refs.reactiveInput)
-        this.$refs.reactiveInput.startEditing(this.$refs.nodeID.getNode());
+      const shape = this.$store.getters.shapeWithID(this.id);
+      const description = shape[TERM.description]
+        ? shape[TERM.description][0]["@value"]
+        : "";
+      this.$store.commit("toggleEditShapeModal", {
+        id: this.id,
+        label: this.$store.getters.labelForId(this.id),
+        description,
+        nodeShape: this.nodeShape
+      });
     },
 
     /**
@@ -223,11 +271,7 @@ export default {
           oldID: this.$props.id,
           newID: newValue
         };
-        if (this.$props.nodeShape) {
-          this.$store.dispatch("editNodeShape", args);
-        } else {
-          this.$store.dispatch("editPropertyShape", args);
-        }
+        this.$store.dispatch("editShape", args);
       }
     },
 
@@ -235,26 +279,11 @@ export default {
      * Delete this node shape.
      */
     deleteShape() {
-      this.$refs.reactiveInput.stopEditing();
-      if (this.$props.nodeShape) {
-        this.$store.dispatch("deleteNodeShape", this.$props.id);
-      } else {
-        this.$store.dispatch("deletePropertyShape", this.$props.id);
-      }
-    },
-
-    /**
-     * Takes the coordinates from this node shape and calls store to update them.
-     */
-    updateCoordinates() {
-      const pos = this.$refs.posRef.getNode().position();
-      const args = {
-        node: this.$props.id,
-        x: pos.x,
-        y: pos.y
-      };
-      this.$store.commit("updateYValues", this.$props.id);
-      this.$store.commit("updateCoordinates", args);
+      if (this.$refs.reactiveInput) this.$refs.reactiveInput.stopEditing();
+      const action = this.$props.nodeShape
+        ? "deleteNodeShape"
+        : "deletePropertyShape";
+      this.$store.dispatch(action, this.$props.id);
     }
   }
 };

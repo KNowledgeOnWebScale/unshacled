@@ -2,11 +2,14 @@
   <div>
     <sui-modal v-model="this.$store.state.showClearModal">
       <sui-modal-header>
-        Clear page
+        Clear page?
       </sui-modal-header>
+      <sui-modal-content>
+        All your unsaved changes will be lost.
+      </sui-modal-content>
       <sui-modal-actions>
-        <sui-button negative @click="confirm">Clear</sui-button>
         <sui-button @click="cancel">Cancel</sui-button>
+        <sui-button negative @click="confirm">Clear</sui-button>
       </sui-modal-actions>
     </sui-modal>
   </div>

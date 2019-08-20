@@ -1,26 +1,51 @@
 import { values } from "ramda";
-import { HEIGHT, WIDTH } from "./konvaConfigs";
+import { WIDTH } from "./konvaConfigs";
 
-/** @returns {x: number, y: number} the coordinates for a newly added shape */
-export default ({ coordinates }) => {
+/**
+ * @param coordinates dictionary of object keys mapped to their top left coordinates.
+ * @param bottomYs dictionary of object keys mapped to their absolute bottom y coordinate.
+ * @param height dictionary of object keys mapped to height.
+ *
+ * @returns {x: number, y: number} the coordinates for a newly added shapeID */
+export default ({ coordinates, bottomYs, heights }) => {
   const MARGIN = 16;
   const { innerWidth } = window;
 
-  // { [unique id]: {x: number, y: number }, ...} => [{x: number, y: number}, ...]
-  const coords = values(coordinates);
-
-  // Maximum vertical position of the existing shapes.
-  const yMax = Math.max(...[0, ...coords.map(({ y }) => y)]);
-
-  // Corresponding hozitontal position.
-  const xMax = Math.max(
-    ...[0, ...coords.filter(({ y }) => y >= yMax).map(({ x }) => x)]
+  // Get the top y value of the bottom row.
+  const yBottomRow = Math.max(
+    ...[0, ...Object.keys(coordinates).map(key => coordinates[key].y)]
   );
 
-  // If negative, add the shape to the right; if positive, a bit lower to the left.
-  const criterion = xMax + 2 * (MARGIN + WIDTH) > innerWidth;
-  const x = MARGIN + (criterion ? 0 : xMax + (coords.length ? WIDTH : 0));
-  const y = yMax + (criterion ? MARGIN + HEIGHT : 0) || MARGIN;
+  // Get the shapes on the bottom row.
+  const bottomRow = Object.keys(coordinates).filter(
+    key => coordinates[key].y === yBottomRow
+  );
+
+  // Get the deepest y value on the bottom row.
+  const deepestY = Math.max(...[0, ...bottomRow.map(key => bottomYs[key])]);
+  // Get the shape that has the deepest y value on the bottom row.
+  const deepest = bottomRow.filter(key => bottomYs[key] >= deepestY);
+
+  // Get the highest x value on the bottom row.
+  const rightestX = Math.max(
+    ...[0, ...bottomRow.map(key => coordinates[key].x)]
+  );
+
+  // If negative, add the shapeID to the right; if positive, a bit lower to the left.
+  const newLine = rightestX + 2 * (MARGIN + WIDTH) > innerWidth;
+
+  // Calculate x coordinate
+  let x = MARGIN; // Default
+  if (!newLine) x += rightestX + (values(coordinates).length ? WIDTH : 0);
+
+  // Calculate y coordinate
+  let y = MARGIN; // Default
+  if (deepest.length > 0) ({ y } = coordinates[deepest[0]]); // On the same row as the deepest shape.
+  // Check if this shape has to be on a new line.
+  if (newLine) {
+    y += MARGIN; // Add a margin between rows.
+    if (deepest.length > 0) y += heights[deepest[0]]; // Add the height of the deepest shape.
+  }
 
   return { x, y };
 };
