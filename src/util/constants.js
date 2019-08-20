@@ -1,7 +1,10 @@
 export const CUSTOM_URI = "https://2019.summerofcode.be/unshacled#";
 export const EXAMPLE_URI = "http://example.org/ns#";
 export const SHACL_URI = "http://www.w3.org/ns/shacl#";
-export const SCHEMA_URL = "http://schema.org/";
+export const SCHEMA_URI = "http://schema.org/";
+export const XML_CHEMA_URI = "http://www.w3.org/2001/XMLSchema#";
+export const RDFS_URI = "http://www.w3.org/2000/01/rdf-schema#";
+export const RDF_URI = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 
 // List of possible XML datatypes.
 export const XML_DATATYPES = [

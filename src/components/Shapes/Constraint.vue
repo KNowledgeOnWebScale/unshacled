@@ -198,7 +198,11 @@ export default {
             ? values[0]["@list"]
             : values;
           for (const v of iter) {
-            output.push(v["@id"] ? urlToName(v["@id"]) : urlToName(v));
+            const name = v["@id"] ? v["@id"] : v;
+            // If the shape has a label, use it.
+            output.push(
+              this.$store.getters.labelForId(name) || urlToName(name)
+            );
           }
           return [output.toString()];
         }
@@ -213,7 +217,9 @@ export default {
         }
         for (const v of values) {
           const key = vt.includes(ValueTypes.ID) ? "@id" : "@value";
-          output.push(v[key] ? v[key] : v);
+          const name = v[key] ? v[key] : v;
+          // If the shape has a label, use it.
+          output.push(this.$store.getters.labelForId(name) || urlToName(name));
         }
       }
       return output;

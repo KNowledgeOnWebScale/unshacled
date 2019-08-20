@@ -222,7 +222,7 @@ const shapeModule = {
      */
     editNodeShape({ getters, commit }, args) {
       const { oldID, newID, newLabel } = args;
-      const newURL = extractUrl(oldID) + newID;
+      const newURL = extractUrl(oldID) + urlToName(newID);
 
       // If the ID has changed
       if (oldID !== newURL) {

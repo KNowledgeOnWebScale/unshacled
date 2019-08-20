@@ -116,7 +116,7 @@ import {
 } from "../../util/shaclConstraints";
 import { extractUrl, isUrl, urlToName } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
-import { SCHEMA_URL, XML_DATATYPES } from "../../util/constants";
+import { SCHEMA_URI, XML_DATATYPES } from "../../util/constants";
 
 export default {
   name: "PredicateModal",
@@ -290,7 +290,7 @@ export default {
       // Add the `schema` url to the path input if necessary.
       if (this.values.category.includes("Property Pair")) {
         if (!isUrl(this.values.input))
-          this.values.input = `${SCHEMA_URL}${this.values.input}`;
+          this.values.input = `${SCHEMA_URI}${this.values.input}`;
       }
 
       if (this.showCheckbox()) {
