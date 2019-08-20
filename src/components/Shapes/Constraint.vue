@@ -194,9 +194,12 @@ export default {
 
         // Properties should be listed in a single entry.
         if (this.isListOfValues()) {
-          const iter = vt.includes(ValueTypes.LIST)
-            ? values[0]["@list"]
-            : values;
+          const iter =
+            values.length > 1
+              ? values
+              : vt.includes(ValueTypes.LIST)
+              ? values[0]["@list"]
+              : values;
           for (const v of iter) {
             const name = v["@id"] ? v["@id"] : v;
             // If the shape has a label, use it.

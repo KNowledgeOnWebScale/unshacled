@@ -10,7 +10,7 @@ import getValueType, {
   getValueTypeFromConstraint,
   ValueTypes
 } from "../util/enums/ValueType";
-import { LABEL } from "../util/constants";
+import { IGNORED_PROPERTIES } from "../util/constants";
 
 /**
  * This module contains everything to change the shape constraints.
@@ -410,10 +410,9 @@ const constraintModule = {
       const shape = rootGetters.shapeWithID(shapeID);
 
       if (shape) {
-        const ignored = ["@id", "@type", LABEL];
         for (const prop in shape) {
           // Only handle the constraints that are not ignored
-          if (!ignored.includes(prop)) {
+          if (!IGNORED_PROPERTIES.includes(prop)) {
             if (shape[prop].length > 1) {
               // Get the ID of every element in the list
               const properties = [];
@@ -458,9 +457,12 @@ const constraintModule = {
           : getValueTypeFromConstraint(constraints[c]);
         if (vt && vt.includes(ValueTypes.ID)) {
           const values = [];
-          const iter = vt.includes(ValueTypes.LIST)
-            ? constraints[c][0]["@list"]
-            : constraints[c];
+          const iter =
+            constraints[c].length > 1
+              ? constraints[c]
+              : vt.includes(ValueTypes.LIST)
+              ? constraints[c][0]["@list"]
+              : constraints[c];
 
           // Check every constraint value.
           for (const value of iter) {

@@ -111,12 +111,9 @@ const shapeModule = {
      *            newID the shape's new ID.
      */
     updateShapeID(state, args) {
-      const { index, oldID, newID, label } = args;
+      const { index, newID } = args;
+      console.log(JSON.stringify(args, null, 2));
       Vue.set(state.model[index], "@id", newID);
-
-      // Update the label dictionary.
-      Vue.set(state.idToLabel, newID, label);
-      if (oldID !== newID) Vue.delete(state.idToLabel, oldID);
     },
 
     /**
@@ -208,19 +205,14 @@ const shapeModule = {
      *    newID: the new ID for the node shape.
      */
     editNodeShape({ getters, commit }, args) {
-      const { oldID, newID, newLabel } = args;
+      const { oldID, newID } = args;
       const newURL = extractUrl(oldID) + urlToName(newID);
 
       // If the ID has changed
       if (oldID !== newURL) {
         // Update the shape's ID and locations
         const index = getters.indexWithID(oldID);
-        commit("updateShapeID", {
-          index,
-          oldID,
-          newID: newURL,
-          label: newLabel
-        });
+        commit("updateShapeID", { index, newID: newURL });
         commit("updateLocations", { oldID, newID: newURL });
       }
     },
@@ -232,7 +224,7 @@ const shapeModule = {
      * @param args
      */
     editPropertyShape({ state, getters, commit, dispatch }, args) {
-      const { oldID, newID, newLabel } = args;
+      const { oldID, newID } = args;
       // Check if the new ID is differen from the old ID to avoid unexpected errors.
       if (oldID !== newID) {
         // Update the shape's locations.
@@ -240,12 +232,7 @@ const shapeModule = {
 
         // Update the state's shapes.
         const index = getters.indexWithID(oldID);
-        commit("updateShapeID", {
-          index,
-          oldID,
-          newID,
-          label: newLabel
-        });
+        commit("updateShapeID", { index, newID });
 
         // Check if another shape has a reference to this one.
         for (const shape of state.model) {
@@ -334,6 +321,11 @@ const shapeModule = {
       const { shapes } = getters;
       // Get the label of every shape.
       for (const shapeID of Object.keys(shapes)) {
+        // PropertyShapes have a name.
+        const name = shapes[shapeID][TERM.name];
+        if (name) output[shapeID] = name[0]["@value"];
+
+        // NodeShapes have a label.
         const label = shapes[shapeID][LABEL];
         if (label) output[shapeID] = label[0]["@value"];
       }

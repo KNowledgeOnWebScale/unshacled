@@ -1,6 +1,7 @@
 import traverse from "../util/traverse";
 import dictionary from "./shaclDictionary";
-import { CUSTOM_URI, SHACL_URI } from "../util/constants";
+import { SHACL_URI } from "../util/constants";
+import { CUSTOM_URI } from "./terminology";
 /**
  *  ShaclTranslator class translates SHACL JSON-LD to an internal model and back
  */

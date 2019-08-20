@@ -2,7 +2,7 @@
   <div>
     <sui-modal
       v-model="this.$store.state.mData.showValidationReportModal"
-      @submit.prevent="confirmNodeShape"
+      @submit.prevent="toggleModal"
     >
       <sui-modal-header>
         Validation report

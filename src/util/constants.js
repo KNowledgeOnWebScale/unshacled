@@ -1,4 +1,5 @@
-export const CUSTOM_URI = "https://2019.summerofcode.be/unshacled#";
+import { TERM } from "../translation/terminology";
+
 export const EXAMPLE_URI = "http://example.org/ns#";
 export const SHACL_URI = "http://www.w3.org/ns/shacl#";
 export const SCHEMA_URI = "http://schema.org/";
@@ -38,3 +39,12 @@ export const IRI_REGEX = new RegExp(
   /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/
 );
 export const BLANK_REGEX = new RegExp(/^_:.+/);
+
+// Properties ignored when visualizing.
+export const IGNORED_PROPERTIES = [
+  "@id",
+  "@type",
+  LABEL,
+  TERM.name,
+  TERM.description
+];

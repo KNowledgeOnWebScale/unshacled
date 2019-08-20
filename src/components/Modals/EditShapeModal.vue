@@ -1,10 +1,13 @@
 <template>
   <div>
-    <sui-modal v-model="this.$store.state.mShape.shapeModal.show">
+    <sui-modal
+      v-model="this.$store.state.mShape.shapeModal.show"
+      @submit.prevent="cancel"
+    >
       <sui-modal-header>
         Edit Shape
       </sui-modal-header>
-      <sui-modal-content @submit.prevent="cancel">
+      <sui-modal-content>
         <sui-form>
           <sui-form-field>
             <label for="id">IRI</label>
@@ -27,8 +30,19 @@
             </sui-label>
           </sui-form-field>
           <sui-form-field>
-            <label for="label">Label</label>
+            <label v-if="this.$props.modalProperties.nodeShape" for="label">
+              <!-- A node shape has a label. -->
+              Label
+            </label>
+            <label v-if="!this.$props.modalProperties.nodeShape" for="label">
+              <!-- A property shape has a name. -->
+              Name
+            </label>
             <input id="label" v-model="values.label" />
+          </sui-form-field>
+          <sui-form-field>
+            <label for="description">Description</label>
+            <input id="description" v-model="values.description" />
           </sui-form-field>
         </sui-form>
       </sui-modal-content>
@@ -50,6 +64,7 @@ import {
   XML_DATATYPES
 } from "../../util/constants";
 import getValueType from "../../util/enums/ValueType";
+import { TERM } from "../../translation/terminology";
 
 export default {
   name: "EditShapeModal",
@@ -63,7 +78,8 @@ export default {
     return {
       values: {
         id: "",
-        label: ""
+        label: "",
+        description: ""
       }
     };
   },
@@ -82,63 +98,96 @@ export default {
     );
   },
   methods: {
+    /**
+     * Confirm the modal.
+     * Update the shape ID, name/label and description accordingly.
+     */
     confirm() {
-      const oldID = this.$props.modalProperties.id;
-      const newID = this.values.id;
-      const op = this.$props.modalProperties.nodeShape
-        ? "editNodeShape"
-        : "editPropertyShape";
-      // Update the shape ID.
-      this.$store.dispatch(op, {
-        index: this.$store.getters.indexWithID(oldID),
-        oldID,
-        newID,
-        newLabel: this.values.label
-      });
+      const { id, label, description } = this.values;
+      const modProps = this.$props.modalProperties;
 
-      // Check if the user has filled in a label.
-      const { label } = this.values;
-      if (label && label !== "") {
-        // Update or add the label accordingly.
-        const shape = this.$store.getters.shapeWithID(newID);
-        if (shape[LABEL]) {
-          // Update the value of the existing label constraint.
+      // Close the modal.
+      this.$store.commit("toggleEditShapeModal");
+
+      // Update the shape ID.
+      const op = modProps.nodeShape ? "editNodeShape" : "editPropertyShape";
+      this.$store.dispatch(op, {
+        oldID: modProps.id,
+        newID: id
+      });
+      // Update the shape label/name and description.
+      this.handleConstraint(modProps.nodeShape ? TERM.name : LABEL, label);
+      this.handleConstraint(TERM.description, description);
+    },
+
+    /**
+     * Handle the update of the given constraint.
+     * @param constraintID the key of the constraint.
+     * @param value the value of the constraint.
+     */
+    handleConstraint(constraintID, value) {
+      const shapeID = this.values.id;
+
+      // Check if the user has filled in a value.
+      if (value && value !== "") {
+        console.log(constraintID, value);
+        const shape = this.$store.getters.shapeWithID(shapeID);
+
+        // Update or add the value accordingly.
+        if (shape[constraintID]) {
+          // Update the value of the existing constraint.
           this.$store.dispatch("updateConstraint", {
-            shapeID: newID,
-            constraintID: LABEL,
-            newValue: [{ "@type": XML_DATATYPES.string, "@value": label }]
+            shapeID,
+            constraintID,
+            newValue: [{ "@type": XML_DATATYPES.string, "@value": value }]
           });
         } else {
-          // Add the label predicate to the shape.
+          console.log(constraintID, getValueType(constraintID));
+          // Add the predicate to the shape.
           this.$store.dispatch("addPredicate", {
-            shapeID: newID,
-            predicate: LABEL,
-            valueType: getValueType(LABEL),
-            input: label,
+            shapeID,
+            predicate: constraintID,
+            valueType: getValueType(constraintID),
+            input: value,
             object: XML_DATATYPES.string
           });
         }
       } else {
-        // Delete the label.
+        // Delete the value.
         this.$store.dispatch("deleteConstraintFromShapeWithID", {
-          shapeID: newID,
-          constraintID: LABEL
+          shapeID,
+          constraintID
         });
       }
-      this.$store.commit("toggleEditShapeModal");
     },
+
+    /**
+     * Cancel and close the modal.
+     */
     cancel() {
       this.$store.commit("toggleEditShapeModal");
     },
+
+    /**
+     * Update the data values using the properties.
+     */
     updateValues() {
-      const { id, label } = this.$store.state.mShape.shapeModal;
-      this.values = { id, label };
+      const { id, label, description } = this.$props.modalProperties;
+      this.values = { id, label, description };
     },
+
+    /**
+     * @returns {boolean} value to indicate the validity of the entered date.
+     */
     error() {
       return !(
         IRI_REGEX.test(this.values.id) || BLANK_REGEX.test(this.values.id)
       );
     },
+
+    /**
+     * @returns {boolean} value to indicate if the entered id is unique.
+     */
     unique() {
       return (
         this.values.id === this.$props.modalProperties.id ||

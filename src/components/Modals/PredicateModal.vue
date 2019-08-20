@@ -1,9 +1,9 @@
 <template>
-  <sui-modal v-model="$store.state.mShape.mConstraint.predicateModal.show">
+  <sui-modal v-model="$store.state.mShape.mConstraint.predicateModal.show" @submit.prevent="toggleModal">
     <sui-modal-header>
       {{ $props.modalProperties.editing ? "Edit Predicate" : "Add Predicate" }}
     </sui-modal-header>
-    <sui-modal-content @submit.prevent="toggleModal">
+    <sui-modal-content>
       <sui-form>
         <sui-form-field>
           <label for="selectPreds">Predicate</label>

@@ -43,6 +43,7 @@ const values = new Set([
   TERM.maxLength,
   TERM.name,
   TERM.uniqueLang,
+  TERM.description,
   LABEL
 ]);
 const valueLists = new Set([TERM.ignoredProperties, TERM.languageIn, TERM.in]);
