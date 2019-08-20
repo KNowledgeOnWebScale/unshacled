@@ -4,25 +4,24 @@ import Vuex from "vuex";
 
 // Util
 import { possiblePredicates, possibleObjects } from "../util/vocabulary";
+import { ETF } from "../util/enums/extensionToFormat";
 
 // Translation
 import TranslatorManager from "../translation/translatorManager";
+import ParserManager from "../parsing/parserManager";
+import ShaclTranslator from "../translation/shaclTranslator";
 import { TERM } from "../translation/terminology";
 
 // Modules
 import shapeModule from "./shapeModule";
 import dataModule from "./dataModule";
 import { exampleData, exampleShapes } from "../assets/example";
-import ParserManager from "../parsing/parserManager";
-import { ETF } from "../util/enums/extensionToFormat";
-import ShaclTranslator from "../translation/shaclTranslator";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
     editor: null,
-    showNodeShapeModal: false,
     showClearModal: false,
     showExportModal: false,
     showPathModal: false,
@@ -52,15 +51,6 @@ export default new Vuex.Store({
       event.preventDefault();
       state.mData.showValidationReportModal = !state.mData
         .showValidationReportModal;
-    },
-
-    /**
-     * Toggle the visibility of the node shape modal.
-     * @param state
-     */
-    toggleShapeModal(state) {
-      event.preventDefault();
-      state.showNodeShapeModal = !state.showNodeShapeModal;
     },
 
     /**
@@ -98,7 +88,6 @@ export default new Vuex.Store({
      */
     loadExample({ getters }) {
       const self = this;
-      console.log("Loading example...");
       this.commit("clear"); // Clear the existing data first.
       this.commit("setDataFile", {
         name: "example.ttl",

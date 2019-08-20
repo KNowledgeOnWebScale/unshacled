@@ -1,11 +1,5 @@
 <template>
   <div>
-    <reactive-input
-      ref="reactiveInput"
-      :is-datalist="false"
-      :on-exit="stopEditing"
-    ></reactive-input>
-
     <v-group
       ref="posRef"
       :draggable="true"
@@ -13,24 +7,37 @@
       @mouseleave="hover = false"
       @dragmove="updatePosition"
     >
-      <v-rect :config="shapeConfig"></v-rect>
-      <v-text
-        ref="shapeID"
-        :config="idTextConfig"
-        @click="startEditing"
-      ></v-text>
-      <v-circle
-        v-if="hover"
-        :config="deleteNodeConfig"
-        @click="deleteShape"
-      ></v-circle>
+      <v-group @mouseenter="titleHover = true" @mouseleave="titleHover = false">
+        <!-- Header -->
+        <v-group @click="startEditing">
+          <v-rect :config="shapeConfig"></v-rect>
+          <v-text ref="shapeLabel" :config="getLabelTextConfig()"></v-text>
+          <v-text ref="shapeURI" :config="getURITextConfig()"></v-text>
+        </v-group>
 
-      <v-circle
-        v-if="hover && !adding"
-        :config="addPredicateConfig"
-        @mousedown="addPredicate"
-      ></v-circle>
+        <!-- Description -->
+        <v-group v-if="hasDescription() && titleHover">
+          <v-rect :config="getDescriptionConfig().rect"></v-rect>
+          <v-text :config="getDescriptionConfig().title"></v-text>
+          <v-text :config="getDescriptionConfig().text"></v-text>
+        </v-group>
+      </v-group>
 
+      <!-- Buttons -->
+      <v-group>
+        <v-circle
+          v-if="hover"
+          :config="deleteNodeConfig"
+          @click="deleteShape"
+        ></v-circle>
+        <v-circle
+          v-if="hover && !adding"
+          :config="addPredicateConfig"
+          @mousedown="addPredicate"
+        ></v-circle>
+      </v-group>
+
+      <!-- Constraints -->
       <div v-for="(prop, key) in getConstraints()" :key="key">
         <constraint
           :constraint-i-d="key"
@@ -45,19 +52,29 @@
 
 <script>
 import Constraint from "./Constraint.vue";
-import ReactiveInput from "../FormElements/ReactiveInput.vue";
 import { urlToName } from "../../util/urlParser";
 import {
   DELETE_BUTTON_CONFIG,
-  ID_TEXT_CONFIG,
+  LABEL_TEXT_CONFIG,
   NODE_SHAPE_CONFIG,
   PROPERTY_SHAPE_CONFIG,
-  ADD_PREDICATE_CONFIG
+  ADD_PREDICATE_CONFIG,
+  URI_TEXT_CONFIG,
+  TEXT_OFFSET,
+  OFFSET,
+  DESCRIPTION_RECT_CONFIG,
+  DESCRIPTION_TEXT_CONFIG,
+  MAX_LENGTH,
+  TEXT_SIZE,
+  WIDTH,
+  MARGIN
 } from "../../util/konvaConfigs";
+import { TERM } from "../../translation/terminology";
+import { abbreviate } from "../../util/strings";
 
 export default {
   name: "Shape",
-  components: { ReactiveInput, Constraint },
+  components: { Constraint },
   props: {
     id: {
       type: String,
@@ -71,6 +88,7 @@ export default {
   data() {
     return {
       hover: false,
+      titleHover: false,
       editing: false,
       adding: false,
       shapeConfig: this.$props.nodeShape
@@ -78,7 +96,7 @@ export default {
         : PROPERTY_SHAPE_CONFIG,
       deleteNodeConfig: DELETE_BUTTON_CONFIG,
       idTextConfig: {
-        ...ID_TEXT_CONFIG,
+        ...LABEL_TEXT_CONFIG,
         text: urlToName(this.$props.id)
       },
       addPredicateConfig: ADD_PREDICATE_CONFIG
@@ -95,10 +113,96 @@ export default {
 
     this.$store.watch(
       () => self.$store.getters.shapeConstraints(self.$props.id),
-      () => self.getConstraints()
+      () => {
+        self.getConstraints();
+        self.getDescriptionConfig();
+      }
     );
   },
   methods: {
+    /**
+     * @returns {{}} the configuration of the main text
+     */
+    getLabelTextConfig() {
+      const label = this.$store.getters.labelForId(this.id);
+      const text = label ? abbreviate(label) : abbreviate(urlToName(this.id));
+      return {
+        ...LABEL_TEXT_CONFIG,
+        y: label ? OFFSET : TEXT_OFFSET,
+        text
+      };
+    },
+
+    /**
+     * @returns {{}} the configuration of the URI
+     */
+    getURITextConfig() {
+      const label = this.$store.getters.labelForId(this.id);
+      const text = label ? abbreviate(this.id) : "";
+      return { ...URI_TEXT_CONFIG, text };
+    },
+
+    /**
+     * @returns {boolean} value that indicates if this shape has a description.
+     */
+    hasDescription() {
+      const d = this.$store.getters.shapeWithID(this.id)[TERM.description];
+      if (d) {
+        const description = d[0]["@value"];
+        return description && description !== "";
+      }
+      return false;
+    },
+
+    /**
+     * Get the configuration for the visualization of the description.
+     */
+    getDescriptionConfig() {
+      // Check if the shape has a description.
+      if (this.hasDescription()) {
+        const text = this.$store.getters.shapeWithID(this.id)[
+          TERM.description
+        ][0]["@value"];
+
+        // Constants for the configuration.
+        const x = WIDTH + MARGIN;
+        const textX = x + 2 * MARGIN;
+        const offset = TEXT_OFFSET / 2;
+        let lines = Math.ceil(text.length / MAX_LENGTH);
+        if (lines < 2) lines = 2;
+
+        return {
+          rect: {
+            ...DESCRIPTION_RECT_CONFIG,
+            x,
+            height: lines * TEXT_SIZE + TEXT_OFFSET,
+            width: WIDTH + 4 * MARGIN
+          },
+          title: {
+            ...DESCRIPTION_TEXT_CONFIG,
+            text: "Description",
+            fontStyle: "bold",
+            x: textX,
+            y: offset
+          },
+          text: {
+            ...DESCRIPTION_TEXT_CONFIG,
+            x: textX,
+            y: offset + TEXT_OFFSET,
+            width: WIDTH,
+            text
+          }
+        };
+      }
+
+      // If the shape does not have a description, do not return any configuration.
+      return {
+        rect: {},
+        title: {},
+        text: {}
+      };
+    },
+
     /**
      * Get an object containing all the constraints.
      * @returns an object mapping every constraint name to a (list of) values.
@@ -140,8 +244,16 @@ export default {
      * Call the ReactiveInput component to start editing using the given text node.
      */
     startEditing() {
-      if (this.$refs.reactiveInput)
-        this.$refs.reactiveInput.startEditing(this.$refs.shapeID.getNode());
+      const shape = this.$store.getters.shapeWithID(this.id);
+      const description = shape[TERM.description]
+        ? shape[TERM.description][0]["@value"]
+        : "";
+      this.$store.commit("toggleEditShapeModal", {
+        id: this.id,
+        label: this.$store.getters.labelForId(this.id),
+        description,
+        nodeShape: this.nodeShape
+      });
     },
 
     /**
@@ -156,11 +268,11 @@ export default {
           oldID: this.$props.id,
           newID: newValue
         };
-        if (this.$props.nodeShape) {
-          this.$store.dispatch("editNodeShape", args);
-        } else {
-          this.$store.dispatch("editPropertyShape", args);
-        }
+        // if (this.$props.nodeShape) {
+        //   this.$store.dispatch("editNodeShape", args);
+        // } else {
+        this.$store.dispatch("editPropertyShape", args);
+        // }
       }
     },
 

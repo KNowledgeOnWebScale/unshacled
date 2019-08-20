@@ -1,4 +1,4 @@
-import { CUSTOM_URI } from "../util/constants";
+export const CUSTOM_URI = "https://2019.summerofcode.be/unshacled#";
 
 export const TERM = {
   AbstractResult: `${CUSTOM_URI}AbstractResult`,

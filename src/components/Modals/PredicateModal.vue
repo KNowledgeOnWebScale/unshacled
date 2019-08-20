@@ -1,23 +1,12 @@
 <template>
-  <sui-modal v-model="$store.state.mShape.mConstraint.predicateModal.show">
+  <sui-modal v-model="$store.state.mShape.mConstraint.predicateModal.show" @submit.prevent="toggleModal">
     <sui-modal-header>
       {{ $props.modalProperties.editing ? "Edit Predicate" : "Add Predicate" }}
     </sui-modal-header>
-    <sui-modal-content @submit.prevent="confirmNodeShape">
+    <sui-modal-content>
       <sui-form>
         <sui-form-field>
           <label for="selectPreds">Predicate</label>
-          <!-- <select
-            id="selectPreds"
-            v-model="values.predicate"
-            class="ui fluid search dropdown"
-            :disabled="$props.modalProperties.editing"
-            @change="selectObject"
-          >
-            <option v-for="p in predicates" :key="p" :value="p">
-              {{ p }}
-            </option>
-          </select> -->
           <input
             id="selectPreds"
             v-model="values.predicate"
@@ -127,7 +116,8 @@ import {
 } from "../../util/shaclConstraints";
 import { extractUrl, isUrl, urlToName } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
-import { SCHEMA_URL, XML_DATATYPES } from "../../util/constants";
+import { SCHEMA_URI } from "../../util/constants";
+import {XML_DATATYPES} from "../../util";
 
 export default {
   name: "PredicateModal",
@@ -301,7 +291,7 @@ export default {
       // Add the `schema` url to the path input if necessary.
       if (this.values.category.includes("Property Pair")) {
         if (!isUrl(this.values.input))
-          this.values.input = `${SCHEMA_URL}${this.values.input}`;
+          this.values.input = `${SCHEMA_URI}${this.values.input}`;
       }
 
       if (this.showCheckbox()) {
@@ -405,7 +395,7 @@ export default {
      * @returns {*[]}
      */
     getDataTypes() {
-      return XML_DATATYPES;
+      return Object.values(XML_DATATYPES);
     }
   }
 };

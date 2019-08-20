@@ -3,7 +3,7 @@ import constraintModule from "./constraintModule";
 import { extractUrl, urlToName } from "../util/urlParser";
 import { getNonOverlappingCoordinates } from "../util";
 import coordinateModule from "./coordinateModule";
-import { EXAMPLE_URI, SHACL_URI } from "../util/constants";
+import { LABEL, SHACL_URI } from "../util/constants";
 import { TERM } from "../translation/terminology";
 import getValueType from "../util/enums/ValueType";
 import ShaclTranslator from "../translation/shaclTranslator";
@@ -14,7 +14,15 @@ import ShaclTranslator from "../translation/shaclTranslator";
  */
 const shapeModule = {
   state: {
-    model: []
+    model: [],
+    idToLabel: {},
+    shapeModal: {
+      show: false,
+      id: "",
+      label: "",
+      description: "",
+      nodeShape: false
+    }
   },
   modules: {
     mConstraint: constraintModule,
@@ -26,7 +34,6 @@ const shapeModule = {
      * @param state the current state
      */
     clear(state) {
-      console.log("Clear!");
       state.model = [];
       this.commit("clearLocations");
     },
@@ -58,6 +65,23 @@ const shapeModule = {
         });
         this.commit("updateCoordinates", { shapeID: shape["@id"], x, y });
       }
+    },
+
+    /**
+     * Toggle the visibility of the node shape modal.
+     * @param state
+     * @param args
+     */
+    toggleEditShapeModal(state, args) {
+      event.preventDefault();
+      if (!args) {
+        args = { id: "", label: "", description: "" };
+      } else {
+        args.label = args.label ? args.label : "";
+        args.description = args.description ? args.description : "";
+      }
+      args.show = !state.shapeModal.show;
+      Vue.set(state, "shapeModal", args);
     },
 
     /* ADD ========================================================================================================== */
@@ -94,22 +118,6 @@ const shapeModule = {
     updateShapeID(state, args) {
       const { index, newID } = args;
       Vue.set(state.model[index], "@id", newID);
-    },
-
-    /**
-     * Update the given property shape's ID.
-     * @param state
-     * @param args
-     *            shape the property shapeI that should be updated,
-     *            newID the shape's new ID.
-     */
-    updatePropertyShapeID(state, args) {
-      const { shape, newID } = args;
-      Vue.set(shape, "@id", newID);
-
-      // Update the path with the new ID.
-      const name = urlToName(newID);
-      shape[TERM.path][0]["@id"] = `${EXAMPLE_URI}${name}`;
     },
 
     /**
@@ -184,9 +192,7 @@ const shapeModule = {
     addPropertyShape({ commit, getters }, args) {
       const { id, path } = args;
       // Only do so if there is no property shape with this ID yet.
-      if (getters.shapeWithID(id)) {
-        console.log(`Property shape with id ${id} already exists.`);
-      } else {
+      if (!getters.shapeWithID(id)) {
         const object = { "@id": id };
         object[TERM.path] = [{ "@id": path }];
         commit("addShape", { object, bottomYs: getters.allBottomYs });
@@ -204,7 +210,7 @@ const shapeModule = {
      */
     editNodeShape({ getters, commit }, args) {
       const { oldID, newID } = args;
-      const newURL = extractUrl(oldID) + newID;
+      const newURL = extractUrl(oldID) + urlToName(newID);
 
       // If the ID has changed
       if (oldID !== newURL) {
@@ -221,25 +227,53 @@ const shapeModule = {
      * @param store
      * @param args
      */
-    editPropertyShape({ state, getters, commit }, args) {
+    editPropertyShape({ state, getters, commit, dispatch }, args) {
       const { oldID, newID } = args;
+      // Check if the new ID is different from the old ID to avoid unexpected errors.
       if (oldID !== newID) {
+        // Update the shape's locations.
         commit("updateLocations", { oldID, newID });
 
         // Update the state's shapes.
-        const shape = getters.shapeWithID(oldID);
-        commit("updatePropertyShapeID", { shape, newID });
+        const index = getters.indexWithID(oldID);
+        commit("updateShapeID", { index, newID });
+
+        // Check if another shape has a reference to this one.
         for (const shape of state.model) {
-          if (getters.shapeProperties(shape["@id"]).includes(oldID)) {
-            this.dispatch("addPredicate", {
-              shapeID: shape["@id"],
-              predicate: TERM.property,
-              valueType: getValueType(TERM.property),
-              input: newID
-            });
-            commit("deletePropertyFromShape", { shape, propertyID: oldID });
+          for (const predicate of Object.keys(shape)) {
+            const constraint = shape[predicate];
+            const valueType = getValueType(predicate);
+            if (valueType) {
+              // Determine which list we have to loop.
+              const iter =
+                constraint.length > 1
+                  ? constraint
+                  : valueType.includes("List")
+                  ? constraint[0]["@list"]
+                  : constraint;
+
+              // Iterate over every element.
+              for (const elem of iter) {
+                const key = valueType.includes("id") ? "@id" : "@value";
+                if (elem[key] === oldID) {
+                  // Rename the reference.
+                  dispatch("addPredicate", {
+                    shapeID: shape["@id"],
+                    predicate,
+                    valueType,
+                    input: newID
+                  });
+                  dispatch("deleteConstraintValue", {
+                    shapeID: shape["@id"],
+                    constraintID: predicate,
+                    value: oldID
+                  });
+                }
+              }
+            }
           }
         }
+
         // Update the y values of the properties.
         for (const shape of state.model) {
           commit("updateYValues", {
@@ -270,6 +304,7 @@ const shapeModule = {
     deletePropertyShape({ state, getters, commit }, id) {
       // Check every nodeShape if it contains the given property.
       for (const shape of state.model) {
+        // NOTE: This actually is a valid number of arguments.
         if (getters.shapeProperties(shape["@id"]).includes(id)) {
           commit("deletePropertyFromShape", { shape, propertyID: id });
         }
@@ -280,6 +315,27 @@ const shapeModule = {
     }
   },
   getters: {
+    /**
+     * Get the label of the shape with the given ID.
+     * @param state
+     * @param getters
+     */
+    labelForId: (state, getters) => id => {
+      const output = {};
+      const { shapes } = getters;
+      // Get the label of every shape.
+      for (const shapeID of Object.keys(shapes)) {
+        // PropertyShapes have a name.
+        const name = shapes[shapeID][TERM.name];
+        if (name) output[shapeID] = name[0]["@value"];
+
+        // NodeShapes have a label.
+        const label = shapes[shapeID][LABEL];
+        if (label) output[shapeID] = label[0]["@value"];
+      }
+      return output[id];
+    },
+
     /**
      * Returns a map of the shape ID's to their respective objects.
      * @param state

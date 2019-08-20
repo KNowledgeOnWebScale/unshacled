@@ -1,11 +1,11 @@
 import Vue from "vue";
-import { HEIGHT } from "../util/konvaConfigs";
 import ValueType, {
   getValueTypeFromConstraint,
   ValueTypes
 } from "../util/enums/ValueType";
-import { SINGLE_ENTRY } from "../util/constants";
 import { urlToName } from "../util/urlParser";
+import { HEIGHT } from "../util/konvaConfigs";
+import { IGNORED_PROPERTIES, SINGLE_ENTRY } from "../util/constants";
 
 const coordinateModule = {
   state: {
@@ -59,19 +59,19 @@ const coordinateModule = {
         if (item["@id"] === shapeID) shape = item;
       }
 
-      // The other properties.
-      const ignored = ["@id", "@type"];
-
       // Get the IDs of all the constraints and the number of values for each constraint.
       const constraints = {};
       for (const c in shape) {
-        if (!ignored.includes(c)) {
+        if (!IGNORED_PROPERTIES.includes(c)) {
           const vt = ValueType(c)
             ? ValueType(c)
             : getValueTypeFromConstraint(shape[c]);
-          constraints[c] = vt.includes(ValueTypes.LIST)
-            ? shape[c][0]["@list"].length
-            : shape[c].length;
+          constraints[c] =
+            shape[c].length > 1
+              ? shape[c].length
+              : vt.includes(ValueTypes.LIST)
+              ? shape[c][0]["@list"].length
+              : shape[c].length;
         }
       }
 

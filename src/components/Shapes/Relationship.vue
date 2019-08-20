@@ -25,7 +25,7 @@ import {
 } from "../../util/konvaConfigs";
 import nearestPointOnPerimeter from "../../util/nearestPointOnPerimeter";
 import { urlToName } from "../../util/urlParser";
-import {distance} from "../../util";
+import { distance } from "../../util";
 
 export default {
   name: "Relationship",

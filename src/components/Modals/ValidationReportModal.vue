@@ -2,7 +2,7 @@
   <div>
     <sui-modal
       v-model="this.$store.state.mData.showValidationReportModal"
-      @submit.prevent="confirmNodeShape"
+      @submit.prevent="toggleModal"
     >
       <sui-modal-header>
         Validation report
@@ -78,7 +78,8 @@
 <script>
 import { SHACL_URI } from "../../util/constants";
 import { urlToName } from "../../util/urlParser";
-import { capitalizeFirstLetter, groupBy } from "../../util";
+import { groupBy } from "../../util";
+import {capitalizeFirstLetter} from "../../util/strings";
 
 export default {
   name: "ValidationReportModal",

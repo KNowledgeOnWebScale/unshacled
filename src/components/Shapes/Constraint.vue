@@ -38,7 +38,8 @@ import {
   CONSTRAINT_TEXT_CONFIG,
   DELTA_Y_TEXT,
   DELETE_BUTTON_CONFIG,
-  DELTA_Y_DELETE
+  DELTA_Y_DELETE,
+  MAX_LENGTH
 } from "../../util/konvaConfigs";
 import { urlToName } from "../../util/urlParser";
 import { SINGLE_ENTRY } from "../../util/constants";
@@ -47,6 +48,7 @@ import ValueType, {
   ValueTypes
 } from "../../util/enums/ValueType";
 import { TERM } from "../../translation/terminology";
+import { abbreviate } from "../../util/strings";
 
 export default {
   name: "Constraint",
@@ -187,20 +189,20 @@ export default {
         }
 
         // Get the constraint's value type.
-        let values = constraints[constraintID];
+        const values = constraints[constraintID];
         const vt = ValueType(constraintID)
           ? ValueType(constraintID)
           : getValueTypeFromConstraint(constraints[constraintID]);
 
         // Properties should be listed in a single entry.
+        let iter;
         if (this.isListOfValues()) {
-          const iter = vt.includes(ValueTypes.LIST)
-            ? values[0]["@list"]
-            : values;
-          for (const v of iter) {
-            output.push(v["@id"] ? urlToName(v["@id"]) : urlToName(v));
-          }
-          return [output.toString()];
+          iter =
+            values.length > 1 || !vt.includes(ValueTypes.LIST)
+              ? values
+              : values[0]["@list"];
+        } else {
+          iter = values;
         }
 
         // Other constraints should be visualized as an array of their value representations.
@@ -209,11 +211,23 @@ export default {
           values.length === 1 &&
           values[0]["@list"]
         ) {
-          values = values[0]["@list"];
+          iter = values[0]["@list"];
         }
-        for (const v of values) {
+        for (const v of iter) {
           const key = vt.includes(ValueTypes.ID) ? "@id" : "@value";
-          output.push(v[key] ? v[key] : v);
+          const name = v[key] ? v[key] : v;
+          // If the shape has a label, use it.
+          const text = this.$store.getters.labelForId(name) || urlToName(name);
+          // Abbreviate the label.
+          output.push(abbreviate(text));
+        }
+        if (this.isListOfValues()) {
+          // Abbreviate the label of every element depending on the number of elements in the list.
+          return [
+            output
+              .map(e => abbreviate(e, MAX_LENGTH / output.length))
+              .join(", ")
+          ];
         }
       }
       return output;
