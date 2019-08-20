@@ -394,7 +394,7 @@ export default {
      * @returns {*[]}
      */
     getDataTypes() {
-      return XML_DATATYPES;
+      return Object.values(XML_DATATYPES);
     }
   }
 };

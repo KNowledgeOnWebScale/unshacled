@@ -3,7 +3,7 @@ import constraintModule from "./constraintModule";
 import { extractUrl, urlToName } from "../util/urlParser";
 import { getNonOverlappingCoordinates } from "../util";
 import coordinateModule from "./coordinateModule";
-import { EXAMPLE_URI, SHACL_URI } from "../util/constants";
+import { LABEL, SHACL_URI } from "../util/constants";
 import { TERM } from "../translation/terminology";
 import getValueType from "../util/enums/ValueType";
 import ShaclTranslator from "../translation/shaclTranslator";
@@ -111,7 +111,6 @@ const shapeModule = {
      *            newID the shape's new ID.
      */
     updateShapeID(state, args) {
-      console.log(JSON.stringify(args, null, 2));
       const { index, oldID, newID, label } = args;
       Vue.set(state.model[index], "@id", newID);
 
@@ -298,6 +297,7 @@ const shapeModule = {
     deletePropertyShape({ state, getters, commit }, id) {
       // Check every nodeShape if it contains the given property.
       for (const shape of state.model) {
+        // NOTE: This actually is a valid number of arguments.
         if (getters.shapeProperties(shape["@id"]).includes(id)) {
           commit("deletePropertyFromShape", { shape, propertyID: id });
         }
@@ -309,11 +309,19 @@ const shapeModule = {
   },
   getters: {
     /**
-     * TODO
+     * Get the label of the shape with the given ID.
      * @param state
+     * @param getters
      */
-    labelForId: state => id => {
-      return state.idToLabel[id];
+    labelForId: (state, getters) => id => {
+      const output = {};
+      const { shapes } = getters;
+      // Get the label of every shape.
+      for (const shapeID of Object.keys(shapes)) {
+        const label = shapes[shapeID][LABEL];
+        if (label) output[shapeID] = label[0]["@value"];
+      }
+      return output[id];
     },
 
     /**

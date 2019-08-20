@@ -8,7 +8,7 @@ export const TEXT_OFFSET = 15;
 
 const X = 0;
 const TEXT_SIZE = 12;
-const SMALL_TEXT_SIZE = TEXT_SIZE - 3;
+const SMALL_TEXT_SIZE = TEXT_SIZE - 2;
 const DELETE_BUTTON_OFFSET = 240;
 
 export const SHAPE_CONFIG = {
@@ -64,7 +64,7 @@ export const LABEL_TEXT_CONFIG = {
 
 export const URI_TEXT_CONFIG = {
   x: X,
-  y: OFFSET + TEXT_SIZE,
+  y: OFFSET + TEXT_SIZE + 2,
   fontSize: SMALL_TEXT_SIZE,
   text: "",
   width: WIDTH,

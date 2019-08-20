@@ -10,6 +10,7 @@ import getValueType, {
   getValueTypeFromConstraint,
   ValueTypes
 } from "../util/enums/ValueType";
+import {LABEL} from "../util/constants";
 
 /**
  * This module contains everything to change the shape constraints.
@@ -409,7 +410,7 @@ const constraintModule = {
       const shape = rootGetters.shapeWithID(shapeID);
 
       if (shape) {
-        const ignored = ["@id", "@type"];
+        const ignored = ["@id", "@type", LABEL];
         for (const prop in shape) {
           // Only handle the constraints that are not ignored
           if (!ignored.includes(prop)) {

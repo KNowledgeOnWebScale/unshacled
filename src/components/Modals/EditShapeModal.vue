@@ -43,7 +43,14 @@
 </template>
 
 <script>
-import { BLANK_REGEX, IRI_REGEX } from "../../util/constants";
+import {
+  BLANK_REGEX,
+  IRI_REGEX,
+  LABEL,
+  RDFS_URI,
+  XML_DATATYPES
+} from "../../util/constants";
+import { ValueTypes } from "../../util/enums/ValueType";
 
 export default {
   name: "EditShapeModal",
@@ -78,20 +85,45 @@ export default {
   methods: {
     confirm() {
       const oldID = this.$props.modalProperties.id;
+      const newID = this.values.id;
       const op = this.$props.modalProperties.nodeShape
         ? "editNodeShape"
         : "editPropertyShape";
+      // Update the shape ID.
       this.$store.dispatch(op, {
         index: this.$store.getters.indexWithID(oldID),
         oldID,
-        newID: this.values.id,
+        newID,
         newLabel: this.values.label
       });
 
-      if (this.values.label && this.values.label !== "") {
-        this.$store.commit("updateShapeLabel", {
-          shapeID: this.values.id,
-          label: this.values.label
+      // Check if the user has filled in a label.
+      const { label } = this.values;
+      if (label && label !== "") {
+        // Update or add the label accordingly.
+        const shape = this.$store.getters.shapeWithID(newID);
+        if (shape[LABEL]) {
+          // Update the value of the existing label constraint.
+          this.$store.dispatch("updateConstraint", {
+            shapeID: newID,
+            constraintID: LABEL,
+            newValue: [{ "@type": XML_DATATYPES.string, "@value": label }]
+          });
+        } else {
+          // Add the label predicate to the shape.
+          this.$store.dispatch("addPredicate", {
+            shapeID: newID,
+            predicate: LABEL,
+            valueType: ValueTypes.VALUE,
+            input: label,
+            object: XML_DATATYPES.string
+          });
+        }
+      } else {
+        // Delete the label.
+        this.$store.dispatch("deleteConstraintFromShapeWithID", {
+          shapeID: newID,
+          constraintID: LABEL
         });
       }
       this.$store.commit("toggleEditShapeModal");

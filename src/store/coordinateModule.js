@@ -4,7 +4,7 @@ import ValueType, {
   getValueTypeFromConstraint,
   ValueTypes
 } from "../util/enums/ValueType";
-import { SINGLE_ENTRY } from "../util/constants";
+import {LABEL, SINGLE_ENTRY} from "../util/constants";
 import { urlToName } from "../util/urlParser";
 
 const coordinateModule = {
@@ -60,7 +60,7 @@ const coordinateModule = {
       }
 
       // The other properties.
-      const ignored = ["@id", "@type"];
+      const ignored = ["@id", "@type", LABEL];
 
       // Get the IDs of all the constraints and the number of values for each constraint.
       const constraints = {};
