@@ -1,15 +1,18 @@
 <template>
   <div id="app">
-    <portal-target name="semantic-ui-vue">
-      <nav-bar></nav-bar>
-      <editor></editor>
-    </portal-target>
+    <portal-target name="semantic-ui-vue"></portal-target>
+    <nav-bar></nav-bar>
+    <editor></editor>
   </div>
 </template>
 
 <script>
+import Vue from "vue";
+import PortalVue from "portal-vue";
 import NavBar from "./components/NavBar.vue";
 import Editor from "./components/Editor.vue";
+
+Vue.use(PortalVue);
 
 export default {
   name: "App",

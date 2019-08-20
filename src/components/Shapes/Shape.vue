@@ -7,24 +7,34 @@
       @mouseleave="hover = false"
       @dragmove="updatePosition"
     >
+      <!-- Header -->
       <v-group @click="startEditing">
         <v-rect :config="shapeConfig"></v-rect>
         <v-text ref="shapeLabel" :config="getLabelTextConfig()"></v-text>
         <v-text ref="shapeURI" :config="getURITextConfig()"></v-text>
       </v-group>
 
-      <v-circle
-        v-if="hover"
-        :config="deleteNodeConfig"
-        @click="deleteShape"
-      ></v-circle>
+      <!-- Description -->
+      <v-group>
+        <v-rect></v-rect>
+        <v-text></v-text>
+      </v-group>
 
-      <v-circle
-        v-if="hover && !adding"
-        :config="addPredicateConfig"
-        @mousedown="addPredicate"
-      ></v-circle>
+      <!-- Buttons -->
+      <v-group>
+        <v-circle
+          v-if="hover"
+          :config="deleteNodeConfig"
+          @click="deleteShape"
+        ></v-circle>
+        <v-circle
+          v-if="hover && !adding"
+          :config="addPredicateConfig"
+          @mousedown="addPredicate"
+        ></v-circle>
+      </v-group>
 
+      <!-- Constraints -->
       <div v-for="(prop, key) in getConstraints()" :key="key">
         <constraint
           :constraint-i-d="key"
@@ -184,11 +194,11 @@ export default {
           oldID: this.$props.id,
           newID: newValue
         };
-        if (this.$props.nodeShape) {
-          this.$store.dispatch("editNodeShape", args);
-        } else {
-          this.$store.dispatch("editPropertyShape", args);
-        }
+        // if (this.$props.nodeShape) {
+        //   this.$store.dispatch("editNodeShape", args);
+        // } else {
+        this.$store.dispatch("editPropertyShape", args);
+        // }
       }
     },
 

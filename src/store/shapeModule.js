@@ -230,7 +230,7 @@ const shapeModule = {
      */
     editPropertyShape({ state, getters, commit, dispatch }, args) {
       const { oldID, newID } = args;
-      // Check if the new ID is differen from the old ID to avoid unexpected errors.
+      // Check if the new ID is different from the old ID to avoid unexpected errors.
       if (oldID !== newID) {
         // Update the shape's locations.
         commit("updateLocations", { oldID, newID });
