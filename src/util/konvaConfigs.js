@@ -1,3 +1,5 @@
+/* CONSTANTS ======================================================================================================== */
+
 export const WIDTH = 250;
 export const HEIGHT = 40;
 export const MARGIN = 5;
@@ -11,6 +13,8 @@ const X = 0;
 const TEXT_SIZE = 12;
 const SMALL_TEXT_SIZE = TEXT_SIZE - 2;
 const DELETE_BUTTON_OFFSET = 240;
+
+/* SHAPES =========================================================================================================== */
 
 export const SHAPE_CONFIG = {
   x: X,
@@ -32,6 +36,8 @@ export const PROPERTY_SHAPE_CONFIG = {
   stroke: "blue"
 };
 
+/* CONSTRAINTS ====================================================================================================== */
+
 export const CONSTRAINT_SEPARATION_LINE = {
   points: [0, HEIGHT, WIDTH, HEIGHT], // x y values
   stroke: "lightgrey",
@@ -39,19 +45,16 @@ export const CONSTRAINT_SEPARATION_LINE = {
   dash: [OFFSET, OFFSET] // Segments with a length of 20px with a gap of 10px
 };
 
-export const DELETE_BUTTON_CONFIG = {
-  x: DELETE_BUTTON_OFFSET,
-  y: OFFSET,
-  radius: 6,
-  fill: "red"
+export const CONSTRAINT_CONFIG = {
+  x: X,
+  height: 2 * HEIGHT,
+  width: WIDTH,
+  fill: "white",
+  stroke: "black",
+  strokeWidth: 2
 };
 
-export const ADD_PREDICATE_CONFIG = {
-  x: DELETE_BUTTON_OFFSET,
-  y: OFFSET + HEIGHT / 2,
-  radius: 6,
-  fill: "green"
-};
+/* TEXT ============================================================================================================= */
 
 export const LABEL_TEXT_CONFIG = {
   x: X,
@@ -73,15 +76,6 @@ export const URI_TEXT_CONFIG = {
   fontStyle: "italic"
 };
 
-export const CONSTRAINT_CONFIG = {
-  x: X,
-  height: 2 * HEIGHT,
-  width: WIDTH,
-  fill: "white",
-  stroke: "black",
-  strokeWidth: 2
-};
-
 export const CONSTRAINT_TEXT_CONFIG = {
   x: X,
   fontSize: TEXT_SIZE,
@@ -89,6 +83,24 @@ export const CONSTRAINT_TEXT_CONFIG = {
   width: WIDTH,
   align: "center"
 };
+
+/* BUTTONS ========================================================================================================== */
+
+export const DELETE_BUTTON_CONFIG = {
+  x: DELETE_BUTTON_OFFSET,
+  y: OFFSET,
+  radius: 6,
+  fill: "red"
+};
+
+export const ADD_PREDICATE_CONFIG = {
+  x: DELETE_BUTTON_OFFSET,
+  y: OFFSET + HEIGHT / 2,
+  radius: 6,
+  fill: "green"
+};
+
+/* RELATIONSHIPS ==================================================================================================== */
 
 export const RELATIONSHIP_ARROW_CONFIG = {
   stroke: "black",
