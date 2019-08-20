@@ -130,7 +130,6 @@ export default {
 
       // Check if the user has filled in a value.
       if (value && value !== "") {
-        console.log(constraintID, value);
         const shape = this.$store.getters.shapeWithID(shapeID);
 
         // Update or add the value accordingly.
@@ -142,7 +141,6 @@ export default {
             newValue: [{ "@type": XML_DATATYPES.string, "@value": value }]
           });
         } else {
-          console.log(constraintID, getValueType(constraintID));
           // Add the predicate to the shape.
           this.$store.dispatch("addPredicate", {
             shapeID,

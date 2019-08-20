@@ -50,6 +50,7 @@ import {
   TEXT_OFFSET,
   OFFSET
 } from "../../util/konvaConfigs";
+import { TERM } from "../../translation/terminology";
 
 export default {
   name: "Shape",
@@ -159,9 +160,14 @@ export default {
      * Call the ReactiveInput component to start editing using the given text node.
      */
     startEditing() {
+      const shape = this.$store.getters.shapeWithID(this.id);
+      const description = shape[TERM.description]
+        ? shape[TERM.description][0]["@value"]
+        : "";
       this.$store.commit("toggleEditShapeModal", {
         id: this.id,
         label: this.$store.getters.labelForId(this.id),
+        description,
         nodeShape: this.nodeShape
       });
     },

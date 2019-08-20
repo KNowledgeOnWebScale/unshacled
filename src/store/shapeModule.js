@@ -20,6 +20,7 @@ const shapeModule = {
       show: false,
       id: "",
       label: "",
+      description: "",
       nodeShape: false
     }
   },
@@ -73,9 +74,13 @@ const shapeModule = {
      */
     toggleEditShapeModal(state, args) {
       event.preventDefault();
-      if (!args) args = { id: "", label: "" };
+      if (!args) {
+        args = { id: "", label: "", description: "" };
+      } else {
+        args.label = args.label ? args.label : "";
+        args.description = args.description ? args.description : "";
+      }
       args.show = !state.shapeModal.show;
-      args.label = args.label ? args.label : "";
       Vue.set(state, "shapeModal", args);
     },
 
