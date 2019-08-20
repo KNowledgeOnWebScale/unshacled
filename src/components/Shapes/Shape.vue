@@ -146,10 +146,13 @@ export default {
      * @returns {boolean} value that indicates if this shape has a description.
      */
     hasDescription() {
-      const d = this.$store.getters.shapeWithID(this.id)[TERM.description];
-      if (d) {
-        const description = d[0]["@value"];
-        return description && description !== "";
+      const shape = this.$store.getters.shapeWithID(this.id);
+      if (shape) {
+        const constraint = shape[TERM.description];
+        if (constraint) {
+          const description = constraint[0]["@value"];
+          return description && description !== "";
+        }
       }
       return false;
     },
