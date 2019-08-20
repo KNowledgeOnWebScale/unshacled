@@ -7,12 +7,12 @@
       @mouseleave="hover = false"
       @dragmove="updatePosition"
     >
-      <v-rect :config="shapeConfig"></v-rect>
-      <v-text
-        ref="shapeID"
-        :config="getTextConfig()"
-        @click="startEditing"
-      ></v-text>
+      <v-group @click="startEditing">
+        <v-rect :config="shapeConfig"></v-rect>
+        <v-text ref="shapeLabel" :config="getLabelTextConfig()"></v-text>
+        <v-text ref="shapeURI" :config="getURITextConfig()"></v-text>
+      </v-group>
+
       <v-circle
         v-if="hover"
         :config="deleteNodeConfig"
@@ -42,10 +42,13 @@ import Constraint from "./Constraint.vue";
 import { urlToName } from "../../util/urlParser";
 import {
   DELETE_BUTTON_CONFIG,
-  ID_TEXT_CONFIG,
+  LABEL_TEXT_CONFIG,
   NODE_SHAPE_CONFIG,
   PROPERTY_SHAPE_CONFIG,
-  ADD_PREDICATE_CONFIG
+  ADD_PREDICATE_CONFIG,
+  URI_TEXT_CONFIG,
+  TEXT_OFFSET,
+  OFFSET
 } from "../../util/konvaConfigs";
 
 export default {
@@ -71,7 +74,7 @@ export default {
         : PROPERTY_SHAPE_CONFIG,
       deleteNodeConfig: DELETE_BUTTON_CONFIG,
       idTextConfig: {
-        ...ID_TEXT_CONFIG,
+        ...LABEL_TEXT_CONFIG,
         text: urlToName(this.$props.id)
       },
       addPredicateConfig: ADD_PREDICATE_CONFIG
@@ -93,13 +96,25 @@ export default {
   },
   methods: {
     /**
-     * TODO
+     * @returns the configuration of the main text
      */
-    getTextConfig() {
+    getLabelTextConfig() {
       const label = this.$store.getters.labelForId(this.id);
       return {
-        ...ID_TEXT_CONFIG,
+        ...LABEL_TEXT_CONFIG,
+        y: label ? OFFSET : TEXT_OFFSET,
         text: label || urlToName(this.id)
+      };
+    },
+
+    /**
+     * @returns the configuration of the URI
+     */
+    getURITextConfig() {
+      const label = this.$store.getters.labelForId(this.id);
+      return {
+        ...URI_TEXT_CONFIG,
+        text: label ? this.id : ""
       };
     },
 

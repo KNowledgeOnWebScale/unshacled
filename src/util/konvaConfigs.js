@@ -3,9 +3,12 @@ export const HEIGHT = 40;
 export const MARGIN = 5;
 export const DELTA_Y_TEXT = 15;
 export const DELTA_Y_DELETE = 20;
+export const OFFSET = 10;
+export const TEXT_OFFSET = 15;
 
 const X = 0;
-const TEXT_SIZE = HEIGHT / 2;
+const TEXT_SIZE = 12;
+const SMALL_TEXT_SIZE = TEXT_SIZE - 3;
 const DELETE_BUTTON_OFFSET = 240;
 
 export const SHAPE_CONFIG = {
@@ -32,31 +35,41 @@ export const CONSTRAINT_SEPARATION_LINE = {
   points: [0, HEIGHT, WIDTH, HEIGHT], // x y values
   stroke: "lightgrey",
   strokewidth: 1,
-  dash: [10, 10] // Segments with a length of 20px with a gap of 10px
+  dash: [OFFSET, OFFSET] // Segments with a length of 20px with a gap of 10px
 };
 
 export const DELETE_BUTTON_CONFIG = {
   x: DELETE_BUTTON_OFFSET,
-  y: 10,
+  y: OFFSET,
   radius: 6,
   fill: "red"
 };
 
 export const ADD_PREDICATE_CONFIG = {
   x: DELETE_BUTTON_OFFSET,
-  y: 10 + HEIGHT / 2,
+  y: OFFSET + HEIGHT / 2,
   radius: 6,
   fill: "green"
 };
 
-export const ID_TEXT_CONFIG = {
+export const LABEL_TEXT_CONFIG = {
   x: X,
-  y: 15,
-  size: TEXT_SIZE,
+  y: OFFSET,
+  fontSize: TEXT_SIZE,
   text: "",
   width: WIDTH,
   align: "center",
   fontStyle: "bold"
+};
+
+export const URI_TEXT_CONFIG = {
+  x: X,
+  y: OFFSET + TEXT_SIZE,
+  fontSize: SMALL_TEXT_SIZE,
+  text: "",
+  width: WIDTH,
+  align: "center",
+  fontStyle: "italic"
 };
 
 export const CONSTRAINT_CONFIG = {
@@ -70,7 +83,7 @@ export const CONSTRAINT_CONFIG = {
 
 export const CONSTRAINT_TEXT_CONFIG = {
   x: X,
-  size: TEXT_SIZE,
+  fontSize: TEXT_SIZE,
   text: "",
   width: WIDTH,
   align: "center"
@@ -85,7 +98,7 @@ export const RELATIONSHIP_ARROW_CONFIG = {
 };
 
 export const RELATIONSHIP_LABEL_TEXT_CONFIG = {
-  size: TEXT_SIZE,
+  fontSize: TEXT_SIZE,
   align: "center"
 };
 
