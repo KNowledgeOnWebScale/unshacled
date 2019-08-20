@@ -168,13 +168,14 @@ export default {
         const x = WIDTH + MARGIN;
         const textX = x + 2 * MARGIN;
         const offset = TEXT_OFFSET / 2;
-        const lines = Math.floor(text.length / MAX_LENGTH);
+        let lines = Math.ceil(text.length / MAX_LENGTH);
+        if (lines < 2) lines = 2;
 
         return {
           rect: {
             ...DESCRIPTION_RECT_CONFIG,
             x,
-            height: lines * (TEXT_SIZE + 1) + TEXT_OFFSET,
+            height: lines * TEXT_SIZE + TEXT_OFFSET,
             width: WIDTH + 4 * MARGIN
           },
           title: {

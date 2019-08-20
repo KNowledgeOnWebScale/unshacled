@@ -117,7 +117,6 @@ const shapeModule = {
      */
     updateShapeID(state, args) {
       const { index, newID } = args;
-      console.log(JSON.stringify(args, null, 2));
       Vue.set(state.model[index], "@id", newID);
     },
 
