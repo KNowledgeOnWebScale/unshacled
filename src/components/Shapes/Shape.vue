@@ -7,17 +7,20 @@
       @mouseleave="hover = false"
       @dragmove="updatePosition"
     >
-      <!-- Header -->
-      <v-group @click="startEditing">
-        <v-rect :config="shapeConfig"></v-rect>
-        <v-text ref="shapeLabel" :config="getLabelTextConfig()"></v-text>
-        <v-text ref="shapeURI" :config="getURITextConfig()"></v-text>
-      </v-group>
+      <v-group @mouseenter="titleHover = true" @mouseleave="titleHover = false">
+        <!-- Header -->
+        <v-group @click="startEditing">
+          <v-rect :config="shapeConfig"></v-rect>
+          <v-text ref="shapeLabel" :config="getLabelTextConfig()"></v-text>
+          <v-text ref="shapeURI" :config="getURITextConfig()"></v-text>
+        </v-group>
 
-      <!-- Description -->
-      <v-group>
-        <v-rect></v-rect>
-        <v-text></v-text>
+        <!-- Description -->
+        <v-group v-if="hasDescription() && titleHover">
+          <v-rect :config="getDescriptionConfig().rect"></v-rect>
+          <v-text :config="getDescriptionConfig().title"></v-text>
+          <v-text :config="getDescriptionConfig().text"></v-text>
+        </v-group>
       </v-group>
 
       <!-- Buttons -->
@@ -59,7 +62,12 @@ import {
   URI_TEXT_CONFIG,
   TEXT_OFFSET,
   OFFSET,
-  MAX_LENGTH
+  DESCRIPTION_RECT_CONFIG,
+  DESCRIPTION_TEXT_CONFIG,
+  MAX_LENGTH,
+  TEXT_SIZE,
+  WIDTH,
+  MARGIN
 } from "../../util/konvaConfigs";
 import { TERM } from "../../translation/terminology";
 import { abbreviate } from "../../util/strings";
@@ -80,6 +88,7 @@ export default {
   data() {
     return {
       hover: false,
+      titleHover: false,
       editing: false,
       adding: false,
       shapeConfig: this.$props.nodeShape
@@ -104,7 +113,10 @@ export default {
 
     this.$store.watch(
       () => self.$store.getters.shapeConstraints(self.$props.id),
-      () => self.getConstraints()
+      () => {
+        self.getConstraints();
+        self.getDescriptionConfig();
+      }
     );
   },
   methods: {
@@ -128,6 +140,66 @@ export default {
       const label = this.$store.getters.labelForId(this.id);
       const text = label ? abbreviate(this.id) : "";
       return { ...URI_TEXT_CONFIG, text };
+    },
+
+    /**
+     * @returns {boolean} value that indicates if this shape has a description.
+     */
+    hasDescription() {
+      const d = this.$store.getters.shapeWithID(this.id)[TERM.description];
+      if (d) {
+        const description = d[0]["@value"];
+        return description && description !== "";
+      }
+      return false;
+    },
+
+    /**
+     * Get the configuration for the visualization of the description.
+     */
+    getDescriptionConfig() {
+      // Check if the shape has a description.
+      if (this.hasDescription()) {
+        const text = this.$store.getters.shapeWithID(this.id)[
+          TERM.description
+        ][0]["@value"];
+
+        // Constants for the configuration.
+        const x = WIDTH + MARGIN;
+        const textX = x + 2 * MARGIN;
+        const offset = TEXT_OFFSET / 2;
+        const lines = Math.floor(text.length / MAX_LENGTH);
+
+        return {
+          rect: {
+            ...DESCRIPTION_RECT_CONFIG,
+            x,
+            height: lines * (TEXT_SIZE + 1) + TEXT_OFFSET,
+            width: WIDTH + 4 * MARGIN
+          },
+          title: {
+            ...DESCRIPTION_TEXT_CONFIG,
+            text: "Description",
+            fontStyle: "bold",
+            x: textX,
+            y: offset
+          },
+          text: {
+            ...DESCRIPTION_TEXT_CONFIG,
+            x: textX,
+            y: offset + TEXT_OFFSET,
+            width: WIDTH,
+            text
+          }
+        };
+      }
+
+      // If the shape does not have a description, do not return any configuration.
+      return {
+        rect: {},
+        title: {},
+        text: {}
+      };
     },
 
     /**

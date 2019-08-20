@@ -10,7 +10,7 @@ export const TEXT_OFFSET = 15;
 export const MAX_LENGTH = 30;
 
 const X = 0;
-const TEXT_SIZE = 12;
+export const TEXT_SIZE = 12;
 const SMALL_TEXT_SIZE = TEXT_SIZE - 2;
 const DELETE_BUTTON_OFFSET = 240;
 
@@ -34,6 +34,14 @@ export const PROPERTY_SHAPE_CONFIG = {
   ...SHAPE_CONFIG,
   fill: "lightblue",
   stroke: "blue"
+};
+
+export const DESCRIPTION_RECT_CONFIG = {
+  x: X,
+  width: WIDTH,
+  fill: "white",
+  stroke: "lightgrey",
+  strokeWidth: 1
 };
 
 /* CONSTRAINTS ====================================================================================================== */
@@ -60,28 +68,36 @@ export const LABEL_TEXT_CONFIG = {
   x: X,
   y: OFFSET,
   fontSize: TEXT_SIZE,
-  text: "",
-  width: WIDTH,
+  fontStyle: "bold",
   align: "center",
-  fontStyle: "bold"
+  text: "",
+  width: WIDTH
 };
 
 export const URI_TEXT_CONFIG = {
   x: X,
   y: OFFSET + TEXT_SIZE + 2,
   fontSize: SMALL_TEXT_SIZE,
-  text: "",
-  width: WIDTH,
+  fontStyle: "italic",
   align: "center",
-  fontStyle: "italic"
+  text: "",
+  width: WIDTH
 };
 
 export const CONSTRAINT_TEXT_CONFIG = {
   x: X,
   fontSize: TEXT_SIZE,
+  align: "center",
   text: "",
-  width: WIDTH,
-  align: "center"
+  width: WIDTH
+};
+
+export const DESCRIPTION_TEXT_CONFIG = {
+  x: X,
+  fontSize: TEXT_SIZE,
+  align: "left",
+  text: "",
+  width: WIDTH
 };
 
 /* BUTTONS ========================================================================================================== */
