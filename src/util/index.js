@@ -3,6 +3,7 @@ import { clone } from "ramda";
 
 export { default as getNonOverlappingCoordinates } from "./getNonOverlappingCoordinates"; // prettier-ignore
 export { default as traverse } from "./traverse";
+export { default as XML_DATATYPES } from "./enums/xmlDatatypes";
 
 /**
  * Prompt to download a file with the given filename and contents.
@@ -41,15 +42,6 @@ export function groupBy(dictionary, key, deleteKey = false) {
     }
   }
   return output;
-}
-
-/**
- * Returns `string` with the first letter capitalized.
- * @param string
- * @returns {string}
- */
-export function capitalizeFirstLetter(string) {
-  return string[0].toUpperCase() + string.slice(1);
 }
 
 /**

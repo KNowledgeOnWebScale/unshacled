@@ -57,14 +57,10 @@
 </template>
 
 <script>
-import {
-  BLANK_REGEX,
-  IRI_REGEX,
-  LABEL,
-  XML_DATATYPES
-} from "../../util/constants";
-import getValueType from "../../util/enums/ValueType";
+import { XML_DATATYPES } from "../../util";
 import { TERM } from "../../translation/terminology";
+import { BLANK_REGEX, IRI_REGEX, LABEL } from "../../util/constants";
+import getValueType from "../../util/enums/ValueType";
 
 export default {
   name: "EditShapeModal",

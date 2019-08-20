@@ -116,7 +116,8 @@ import {
 } from "../../util/shaclConstraints";
 import { extractUrl, isUrl, urlToName } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
-import { SCHEMA_URI, XML_DATATYPES } from "../../util/constants";
+import { SCHEMA_URI } from "../../util/constants";
+import {XML_DATATYPES} from "../../util";
 
 export default {
   name: "PredicateModal",

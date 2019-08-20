@@ -5,6 +5,7 @@ export const DELTA_Y_TEXT = 15;
 export const DELTA_Y_DELETE = 20;
 export const OFFSET = 10;
 export const TEXT_OFFSET = 15;
+export const MAX_LENGTH = 30;
 
 const X = 0;
 const TEXT_SIZE = 12;

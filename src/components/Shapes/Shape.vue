@@ -58,9 +58,11 @@ import {
   ADD_PREDICATE_CONFIG,
   URI_TEXT_CONFIG,
   TEXT_OFFSET,
-  OFFSET
+  OFFSET,
+  MAX_LENGTH
 } from "../../util/konvaConfigs";
 import { TERM } from "../../translation/terminology";
+import { abbreviate } from "../../util/strings";
 
 export default {
   name: "Shape",
@@ -107,26 +109,25 @@ export default {
   },
   methods: {
     /**
-     * @returns the configuration of the main text
+     * @returns {{}} the configuration of the main text
      */
     getLabelTextConfig() {
       const label = this.$store.getters.labelForId(this.id);
+      const text = label ? abbreviate(label) : abbreviate(urlToName(this.id));
       return {
         ...LABEL_TEXT_CONFIG,
         y: label ? OFFSET : TEXT_OFFSET,
-        text: label || urlToName(this.id)
+        text
       };
     },
 
     /**
-     * @returns the configuration of the URI
+     * @returns {{}} the configuration of the URI
      */
     getURITextConfig() {
       const label = this.$store.getters.labelForId(this.id);
-      return {
-        ...URI_TEXT_CONFIG,
-        text: label ? this.id : ""
-      };
+      const text = label ? abbreviate(this.id) : "";
+      return { ...URI_TEXT_CONFIG, text };
     },
 
     /**
