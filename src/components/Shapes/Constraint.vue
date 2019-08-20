@@ -204,7 +204,7 @@ export default {
               this.$store.getters.labelForId(name) || urlToName(name)
             );
           }
-          return [output.toString()];
+          return [output.join(", ")];
         }
 
         // Other constraints should be visualized as an array of their value representations.

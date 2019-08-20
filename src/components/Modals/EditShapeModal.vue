@@ -47,10 +47,9 @@ import {
   BLANK_REGEX,
   IRI_REGEX,
   LABEL,
-  RDFS_URI,
   XML_DATATYPES
 } from "../../util/constants";
-import { ValueTypes } from "../../util/enums/ValueType";
+import getValueType from "../../util/enums/ValueType";
 
 export default {
   name: "EditShapeModal",
@@ -114,7 +113,7 @@ export default {
           this.$store.dispatch("addPredicate", {
             shapeID: newID,
             predicate: LABEL,
-            valueType: ValueTypes.VALUE,
+            valueType: getValueType(LABEL),
             input: label,
             object: XML_DATATYPES.string
           });

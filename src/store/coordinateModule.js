@@ -4,7 +4,7 @@ import ValueType, {
   getValueTypeFromConstraint,
   ValueTypes
 } from "../util/enums/ValueType";
-import {LABEL, SINGLE_ENTRY} from "../util/constants";
+import { LABEL, SINGLE_ENTRY } from "../util/constants";
 import { urlToName } from "../util/urlParser";
 
 const coordinateModule = {

@@ -1,4 +1,5 @@
 import { TERM } from "../../translation/terminology";
+import { LABEL } from "../constants";
 
 export const ValueTypes = {
   ID: "id",
@@ -41,7 +42,8 @@ const values = new Set([
   TERM.minLength,
   TERM.maxLength,
   TERM.name,
-  TERM.uniqueLang
+  TERM.uniqueLang,
+  LABEL
 ]);
 const valueLists = new Set([TERM.ignoredProperties, TERM.languageIn, TERM.in]);
 const idLists = new Set([TERM.and, TERM.or, TERM.xone]);

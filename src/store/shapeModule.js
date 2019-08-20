@@ -120,18 +120,6 @@ const shapeModule = {
     },
 
     /**
-     * Update the label of the shape with the given id.
-     * @param state
-     * @param args
-     *            id the shape's ID.
-     *            label the new label for the given shape.
-     */
-    updateShapeLabel(state, args) {
-      const { shapeID, label } = args;
-      Vue.set(state.idToLabel, shapeID, label);
-    },
-
-    /**
      * Update the value of the shape with the given ID to the given value.
      * @param state
      * @param args
@@ -243,9 +231,11 @@ const shapeModule = {
      * @param store
      * @param args
      */
-    editPropertyShape({ state, getters, commit }, args) {
+    editPropertyShape({ state, getters, commit, dispatch }, args) {
       const { oldID, newID, newLabel } = args;
+      // Check if the new ID is differen from the old ID to avoid unexpected errors.
       if (oldID !== newID) {
+        // Update the shape's locations.
         commit("updateLocations", { oldID, newID });
 
         // Update the state's shapes.
@@ -256,17 +246,43 @@ const shapeModule = {
           newID,
           label: newLabel
         });
+
+        // Check if another shape has a reference to this one.
         for (const shape of state.model) {
-          if (getters.shapeProperties(shape["@id"]).includes(oldID)) {
-            this.dispatch("addPredicate", {
-              shapeID: shape["@id"],
-              predicate: TERM.property,
-              valueType: getValueType(TERM.property),
-              input: newID
-            });
-            commit("deletePropertyFromShape", { shape, propertyID: oldID });
+          for (const predicate of Object.keys(shape)) {
+            const constraint = shape[predicate];
+            const valueType = getValueType(predicate);
+            if (valueType) {
+              // Determine which list we have to loop.
+              const iter =
+                constraint.length > 1
+                  ? constraint
+                  : valueType.includes("List")
+                  ? constraint[0]["@list"]
+                  : constraint;
+
+              // Iterate over every element.
+              for (const elem of iter) {
+                const key = valueType.includes("id") ? "@id" : "@value";
+                if (elem[key] === oldID) {
+                  // Rename the reference.
+                  dispatch("addPredicate", {
+                    shapeID: shape["@id"],
+                    predicate,
+                    valueType,
+                    input: newID
+                  });
+                  dispatch("deleteConstraintValue", {
+                    shapeID: shape["@id"],
+                    constraintID: predicate,
+                    value: oldID
+                  });
+                }
+              }
+            }
           }
         }
+
         // Update the y values of the properties.
         for (const shape of state.model) {
           commit("updateYValues", {

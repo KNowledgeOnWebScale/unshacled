@@ -10,7 +10,7 @@ import getValueType, {
   getValueTypeFromConstraint,
   ValueTypes
 } from "../util/enums/ValueType";
-import {LABEL} from "../util/constants";
+import { LABEL } from "../util/constants";
 
 /**
  * This module contains everything to change the shape constraints.
@@ -142,7 +142,7 @@ const constraintModule = {
       });
 
       // Add a property shape if needed.
-      if (predicate.includes("property")) {
+      if (predicate === TERM.property) {
         dispatch("addPropertyShape", { id: input, path: "(undefined)" });
       }
 
