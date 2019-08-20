@@ -268,11 +268,7 @@ export default {
           oldID: this.$props.id,
           newID: newValue
         };
-        // if (this.$props.nodeShape) {
-        //   this.$store.dispatch("editNodeShape", args);
-        // } else {
-        this.$store.dispatch("editPropertyShape", args);
-        // }
+        this.$store.dispatch("editShape", args);
       }
     },
 

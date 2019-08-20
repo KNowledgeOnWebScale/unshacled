@@ -106,8 +106,7 @@ export default {
       this.$store.commit("toggleEditShapeModal");
 
       // Update the shape ID.
-      // const op = modProps.nodeShape ? "editNodeShape" : "editPropertyShape";
-      this.$store.dispatch("editPropertyShape", {
+      this.$store.dispatch("editShape", {
         oldID: modProps.id,
         newID: id
       });

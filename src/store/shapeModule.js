@@ -202,32 +202,12 @@ const shapeModule = {
     /* EDIT ========================================================================================================= */
 
     /**
-     * Edit the id of the given node shape.
-     * @param store
-     * @param args
-     *    oldID: the old ID we want to change.
-     *    newID: the new ID for the node shape.
-     */
-    editNodeShape({ getters, commit }, args) {
-      const { oldID, newID } = args;
-      const newURL = extractUrl(oldID) + urlToName(newID);
-
-      // If the ID has changed
-      if (oldID !== newURL) {
-        // Update the shape's ID and locations
-        const index = getters.indexWithID(oldID);
-        commit("updateShapeID", { index, newID: newURL });
-        commit("updateLocations", { oldID, newID: newURL });
-      }
-    },
-
-    /**
-     * Edit the ID of a property shape.
-     * This will update the property list of every node shape that contains this property shape.
+     * Edit the ID of a shape.
+     * This will update the constraint values of every node shape that contains this shape.
      * @param store
      * @param args
      */
-    editPropertyShape({ state, getters, commit, dispatch }, args) {
+    editShape({ state, getters, commit, dispatch }, args) {
       const { oldID, newID } = args;
       // Check if the new ID is different from the old ID to avoid unexpected errors.
       if (oldID !== newID) {

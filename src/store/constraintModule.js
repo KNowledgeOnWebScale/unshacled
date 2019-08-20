@@ -106,52 +106,64 @@ const constraintModule = {
     addPredicate({ getters, commit, dispatch, rootState }, args) {
       const { shapeID, predicate, valueType, input, object } = args;
       const shape = getters.shapeWithID(shapeID);
+      const isID = valueType.includes(ValueTypes.ID);
+      const isList = valueType.includes(ValueTypes.LIST);
+      let duplicate = false;
 
-      // Create an empty list to add to if necessary.
-      if (!shape[predicate]) {
-        shape[predicate] = [];
-        if (valueType.includes(ValueTypes.LIST))
-          shape[predicate].push({ "@list": [] });
-      }
-
-      // Create the object we want to add.
-      const value = valueType.includes(ValueTypes.ID)
-        ? { "@id": input }
-        : { "@type": object, "@value": input };
-
-      if (valueType === "type") {
-        // Replace the value.
-        Vue.set(shape[predicate], 0, value);
+      if (shape[predicate]) {
+        const iter = isList ? shape[predicate][0]["@list"] : shape[predicate];
+        // Check if this new value is a duplicate.
+        const key = isID ? "@id" : "@value";
+        for (const j in iter) {
+          if (iter[j][key] === input) duplicate = true;
+        }
       } else {
-        // Determine which list we want to add the predicate to.
-        const list = valueType.includes(ValueTypes.LIST)
-          ? shape[predicate][0]["@list"]
-          : shape[predicate];
-        list.push(value);
+        // Create an empty list to add to if necessary.
+        shape[predicate] = [];
+        if (isList) shape[predicate].push({ "@list": [] });
+
       }
 
-      // Add the predicate to the shape.
-      commit("setConstraintValue", {
-        shape,
-        constraintID: predicate,
-        value: shape[predicate]
-      });
-      commit("updateShape", {
-        shapeID,
-        value: rootState.mShape.model[shapeID]
-      });
+      // Don't add the value if it is a duplicate.
+      if (!duplicate) {
+        // Create the object we want to add.
+        const value = isID
+          ? { "@id": input }
+          : { "@type": object, "@value": input };
 
-      // Add a property shape if needed.
-      if (predicate === TERM.property) {
-        dispatch("addPropertyShape", { id: input, path: "(undefined)" });
+        if (valueType === "type") {
+          // Replace the value.
+          Vue.set(shape[predicate], 0, value);
+        } else {
+          // Determine which list we want to add the predicate to.
+          const list = isList ? shape[predicate][0]["@list"] : shape[predicate];
+          list.push(value);
+        }
+
+        // Add the predicate to the shape.
+        commit("setConstraintValue", {
+          shape,
+          constraintID: predicate,
+          value: shape[predicate]
+        });
+        commit("updateShape", {
+          shapeID,
+          value: rootState.mShape.model[shapeID]
+        });
+
+        // Add a property shape if needed.
+        if (predicate === TERM.property) {
+          dispatch("addPropertyShape", { id: input, path: "(undefined)" });
+        }
+
+        // Update the y values.
+        commit(
+          "updateYValues",
+          { shapeID, shapes: rootState.mShape.model },
+          { root: true }
+        );
       }
 
-      // Update the y values.
-      commit(
-        "updateYValues",
-        { shapeID, shapes: rootState.mShape.model },
-        { root: true }
-      );
       // Toggle the predicate modal.
       if (rootState.mShape.mConstraint.predicateModal.show)
         commit("togglePredicateModal", undefined, { root: true });
@@ -160,7 +172,7 @@ const constraintModule = {
     /* EDIT ========================================================================================================= */
 
     /**
-     * TODO
+     * Prepare and toggle the predicate modal.
      * @param state
      * @param args
      */
@@ -187,7 +199,7 @@ const constraintModule = {
     },
 
     /**
-     * TODO
+     * Get the values from the predicate model and execute the edit.
      * @param state
      * @param rootGetters
      * @param args
@@ -223,9 +235,9 @@ const constraintModule = {
 
       // Check if this new value is a duplicate.
       let duplicate = false;
-      const field = valueType.includes(ValueTypes.ID) ? "@id" : "@value";
+      const key = valueType.includes(ValueTypes.ID) ? "@id" : "@value";
       for (const j in iter) {
-        if (i !== j && iter[j][field] === name) duplicate = true;
+        if (i !== j && iter[j][key] === name) duplicate = true;
       }
 
       // Update this value in the original constraint object.
