@@ -3,49 +3,103 @@
     <sui-modal-header>
       {{ $props.modalProperties.editing ? "Edit Predicate" : "Add Predicate" }}
     </sui-modal-header>
-    <sui-modal-content>
-      <sui-form @submit.prevent="exit">
-        <sui-form-field>
-          <label for="selectPreds">Predicate</label>
-          <input
-            id="selectPreds"
-            v-model="values.predicate"
-            class="ui fluid search dropdown"
-            list="predicates"
-            :disabled="$props.modalProperties.editing"
-            @input="selectObject"
-          />
-          <sui-label
-            v-if="
-              values.predicate !== '' && !$store.getters.objects(predicateUrl())
-            "
-            basic
-            pointing
-            color="red"
-          >
-            Please enter a valid predicate
-          </sui-label>
-          <datalist id="predicates">
-            <option v-for="p in predicates" :key="p" :value="p">{{ p }}</option>
-          </datalist>
-        </sui-form-field>
+    <sui-modal-content scrolling>
+      <sui-form @submit.prevent="() => {}">
+        <!--
+                <sui-form-field>
+                  <label for="selectCategory">Type of Constraint</label>
+                  <select
+                    v-if="categories"
+                    id="selectCategory"
+                    v-model="values.category"
+                    :disabled="$props.modalProperties.editing"
+                    @change="values.predicate = ''"
+                  >
+                    <option :value="''">All types</option>
+                    <option v-for="(val, key) in categories" :key="key" :value="key">
+                      {{ val }}
+                    </option>
+                  </select>
+                </sui-form-field>
+        -->
 
         <sui-form-field>
-          <label for="selectCategory">Category</label>
-          <select
-            v-if="categories"
-            id="selectCategory"
-            v-model="values.category"
-            :disabled="$props.modalProperties.editing"
-            @change="values.predicate = ''"
-          >
-            <option :value="''">All categories</option>
-            <option v-for="c in categories" :key="c" :value="c">
-              {{ c }}
-            </option>
-          </select>
+          <label for="search">Search</label>
+          <input id="search" v-model="values.search" @input="onSearch" />
+          <!--
+                    <input
+                      id="selectPreds"
+                      v-model="values.predicate"
+                      class="ui fluid search dropdown"
+                      list="predicates"
+                      :disabled="$props.modalProperties.editing"
+                      @input="selectObject"
+                    />
+                    <sui-label
+                      v-if="
+                        values.predicate !== '' && !$store.getters.objects(predicateUrl())
+                      "
+                      basic
+                      pointing
+                      color="red"
+                    >
+                      Please enter a valid predicate
+                    </sui-label>
+                    <datalist id="predicates">
+                      <option v-for="p in predicates" :key="p" :value="p">{{ p }}</option>
+                    </datalist>
+          -->
         </sui-form-field>
 
+        <table>
+          <tr class="table">
+            <td class="table">
+              <sui-table class="table">
+                <sui-table-header>
+                  <sui-table-row>
+                    <sui-table-header-cell class="predicate">
+                      Predicate
+                    </sui-table-header-cell>
+                    <sui-table-header-cell class="description">
+                      Description
+                    </sui-table-header-cell>
+                    <sui-table-header-cell class="type">
+                      Type
+                    </sui-table-header-cell>
+                  </sui-table-row>
+                </sui-table-header>
+              </sui-table>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="table-body">
+                <sui-table selectable>
+                  <sui-table-body>
+                    <sui-table-row
+                      v-for="(value, key) of table()"
+                      :key="key"
+                      :ref="key"
+                    >
+                      <sui-table-cell class="predicate">
+                        {{ value.label }}
+                      </sui-table-cell>
+                      <sui-table-cell class="description">
+                        {{ value.description }}
+                      </sui-table-cell>
+                      <sui-table-cell class="type">
+                        {{ value.category.replace(" Constraints", "") }}
+                      </sui-table-cell>
+                    </sui-table-row>
+                  </sui-table-body>
+                </sui-table>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <!--
         <sui-form-field
           v-if="$store.getters.objects(predicateUrl())"
           class="field"
@@ -111,6 +165,7 @@
             @keyup="handleKeyPress"
           />
         </sui-form-field>
+        -->
       </sui-form>
 
       <sui-segment v-if="error" color="red">
@@ -132,7 +187,8 @@ import ValueType from "../../util/enums/ValueType";
 import {
   constraintsByTypes,
   customConstraintsByCategory,
-  getConstraintValueType
+  getConstraintValueType,
+  tableContents
 } from "../../util/shaclConstraints";
 import { extractUrl, isUrl, urlToName } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
@@ -156,14 +212,20 @@ export default {
         input: "",
         inputBool: false,
         object: "",
-        constraintType: ""
+        constraintType: "",
+        search: ""
       },
       error: false
     };
   },
   computed: {
     categories() {
-      return Object.keys(constraintsByTypes);
+      const cs = Object.keys(constraintsByTypes);
+      const output = {};
+      cs.map(cat => {
+        output[cat] = cat.replace(" Constraints", "");
+      });
+      return output;
     },
 
     predicates() {
@@ -251,6 +313,13 @@ export default {
       return `${urls[predicate]}#${predicate}`;
     },
 
+    table() {
+      return tableContents();
+    },
+    onSearch() {
+      console.log(this.values.search);
+    },
+
     showCheckbox() {
       return this.values.constraintType.includes("boolean");
     },
@@ -276,6 +345,7 @@ export default {
       );
     },
     showOther() {
+      console.log(this.values.category, this.values.constraintType);
       return !(
         this.showCheckbox() ||
         this.showInteger() ||
@@ -429,4 +499,24 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.table {
+  width: 100%;
+}
+.table-body {
+  height: 40vh;
+  min-height: 40vh;
+  max-height: 40vh;
+  overflow: auto;
+}
+
+.predicate {
+  width: 25%;
+}
+.description {
+  width: 55%;
+}
+.type {
+  width: 20%;
+}
+</style>
