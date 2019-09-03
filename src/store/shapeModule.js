@@ -1,6 +1,5 @@
 import Vue from "vue";
 import constraintModule from "./constraintModule";
-import { extractUrl, urlToName } from "../util/urlParser";
 import { getNonOverlappingCoordinates } from "../util";
 import coordinateModule from "./coordinateModule";
 import { LABEL, SHACL_URI } from "../util/constants";
@@ -330,6 +329,7 @@ const shapeModule = {
 
     /**
      * Returns a list of the shape IDs.
+     * NOTE: Your IDE might say that this method is not used, but it is. Do not delete.
      * @param state
      * @param getters
      */
