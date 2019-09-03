@@ -1,10 +1,10 @@
 <template>
-  <sui-modal v-model="$store.state.mShape.mConstraint.predicateModal.show" @submit.prevent="toggleModal">
+  <sui-modal v-model="$store.state.mShape.mConstraint.predicateModal.show">
     <sui-modal-header>
       {{ $props.modalProperties.editing ? "Edit Predicate" : "Add Predicate" }}
     </sui-modal-header>
     <sui-modal-content>
-      <sui-form>
+      <sui-form @submit.prevent="exit">
         <sui-form-field>
           <label for="selectPreds">Predicate</label>
           <input
@@ -55,15 +55,26 @@
             v-if="showString()"
             v-model="values.inputWithoutUrl"
             type="text"
+            @keyup="handleKeyPress"
           />
           <input
             v-if="showCheckbox()"
             v-model="values.inputBool"
             type="checkbox"
           />
-          <input v-if="showInteger()" v-model="values.input" type="number" />
+          <input
+            v-if="showInteger()"
+            v-model="values.input"
+            type="number"
+            @keyup="handleKeyPress"
+          />
 
-          <input v-if="showShapes()" v-model="values.input" list="shapeList" />
+          <input
+            v-if="showShapes()"
+            v-model="values.input"
+            list="shapeList"
+            @keyup="handleKeyPress"
+          />
           <datalist v-if="showShapes()" id="shapeList" type="text">
             <option
               v-for="key in getShapeOptions()"
@@ -76,6 +87,7 @@
             v-if="showPaths()"
             v-model="values.inputWithoutUrl"
             list="pathList"
+            @keyup="handleKeyPress"
           />
           <datalist v-if="showPaths()" id="pathList" type="text">
             <option v-for="key in getPathOptions()" :key="key" :value="key">
@@ -83,13 +95,21 @@
             </option>
           </datalist>
 
-          <select v-if="showDataTypes()" v-model="values.input">
+          <select
+            v-if="showDataTypes()"
+            v-model="values.input"
+            @keyup="handleKeyPress"
+          >
             <option v-for="key in getDataTypes()" :key="key" :value="key">
               {{ getName(key) }}
             </option>
           </select>
 
-          <input v-if="showOther()" v-model="values.inputWithoutUrl" />
+          <input
+            v-if="showOther()"
+            v-model="values.inputWithoutUrl"
+            @keyup="handleKeyPress"
+          />
         </sui-form-field>
       </sui-form>
 
@@ -98,8 +118,8 @@
       </sui-segment>
     </sui-modal-content>
     <sui-modal-actions>
-      <sui-button @click="toggleModal">Cancel</sui-button>
-      <sui-button positive @click="exit">
+      <sui-button tab-index="0" @click="toggleModal">Cancel</sui-button>
+      <sui-button tab-index="0" positive @click="exit">
         {{ $props.modalProperties.editing ? "Confirm" : "Add" }}
       </sui-button>
     </sui-modal-actions>
@@ -117,7 +137,7 @@ import {
 import { extractUrl, isUrl, urlToName } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
 import { SCHEMA_URI } from "../../util/constants";
-import {XML_DATATYPES} from "../../util";
+import { XML_DATATYPES } from "../../util";
 
 export default {
   name: "PredicateModal",
@@ -185,6 +205,14 @@ export default {
     );
   },
   methods: {
+    /**
+     * Confirm on enter press.
+     * @param e key press event
+     */
+    handleKeyPress(e) {
+      if (e.keyCode === 13) this.exit();
+    },
+
     /**
      * Get the values passed on by the parent.
      */

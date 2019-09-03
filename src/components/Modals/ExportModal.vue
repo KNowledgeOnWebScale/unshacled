@@ -1,16 +1,20 @@
 <template>
   <div>
-    <sui-modal v-model="this.$store.state.showExportModal">
+    <sui-modal v-model="$store.state.showExportModal">
       <sui-modal-header>
         Export Shapes as {{ $store.state.exportType }}
       </sui-modal-header>
       <sui-modal-content>
-        <sui-form>
+        <sui-form @submit.prevent="confirm">
           <sui-form-field inline>
             <label>Filename</label>
-            <input v-model="filename" />
+            <input v-model="filename" @keyup="handleKeyPress" />
             .
-            <select v-model="extension" class="field ui fluid dropdown">
+            <select
+              v-model="extension"
+              class="field ui fluid dropdown"
+              @keyup="handleKeyPress"
+            >
               <option>json</option>
               <option>ttl</option>
             </select>
@@ -22,16 +26,16 @@
         </sui-segment>
       </sui-modal-content>
       <sui-modal-actions>
-        <sui-button @click="cancel">Cancel</sui-button>
-        <sui-button positive @click.native="confirm">Export</sui-button>
+        <sui-button tab-index="0" @click="cancel">Cancel</sui-button>
+        <sui-button tab-index="0" positive @click.native="confirm">
+          Export
+        </sui-button>
       </sui-modal-actions>
     </sui-modal>
   </div>
 </template>
 
 <script>
-import { ETF } from "../../util/enums/extensionToFormat";
-
 export default {
   name: "ExportModal",
   data() {
@@ -42,6 +46,14 @@ export default {
     };
   },
   methods: {
+    /**
+     * Confirm on enter press.
+     * @param e key press event
+     */
+    handleKeyPress(e) {
+      if (e.keyCode === 13) this.confirm();
+    },
+
     /**
      * Check if the entered filename is valid.
      * If so, export the file and close the modal.
@@ -54,21 +66,21 @@ export default {
           filename: output,
           extension: this.extension
         });
-        this.toggleExportModal();
+        this.closeExportModal();
       }
     },
 
     cancel() {
-      this.toggleExportModal();
+      this.closeExportModal();
     },
 
     /**
      * Clear the field and close the modal.
      */
-    toggleExportModal() {
+    closeExportModal() {
+      this.$store.commit("toggleExportModal", "");
       this.filename = "";
       this.extension = "json";
-      this.$store.commit("toggleExportModal", "");
     },
 
     /**

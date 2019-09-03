@@ -34,6 +34,31 @@ const constraintModule = {
     constraintIndex: 0
   },
   mutations: {
+    /**
+     * Set the value of the constraint with the given ID to the given value.
+     * @param state
+     * @param args
+     *            shape the shape object that has to be updated.
+     *            constraintID the ID of the constraint that should be updated.
+     *            value the new value of the given constraint.
+     */
+    setConstraintValue(state, args) {
+      const { shape, constraintID, value } = args;
+      Vue.set(shape, constraintID, value);
+    },
+
+    /**
+     * Delete the given constraint from the given shape object.
+     * @param state
+     * @param args
+     *            shape the shape object that should be updated.
+     *            constraint the ID of the constraint that should be deleted.
+     */
+    deleteConstraintFromShape(state, args) {
+      const { shape, constraintID } = args;
+      Vue.delete(shape, constraintID);
+    },
+
     /* PREDICATE MODAL ============================================================================================== */
 
     /**
@@ -73,36 +98,19 @@ const constraintModule = {
         editing: false,
         onExit: undefined
       };
-    },
-
-    /**
-     * Set the value of the constraint with the given ID to the given value.
-     * @param state
-     * @param args
-     *            shape the shape object that has to be updated.
-     *            constraintID the ID of the constraint that should be updated.
-     *            value the new value of the given constraint.
-     */
-    setConstraintValue(state, args) {
-      const { shape, constraintID, value } = args;
-      Vue.set(shape, constraintID, value);
-    },
-
-    /**
-     * Delete the given constraint from the given shape object.
-     * @param state
-     * @param args
-     *            shape the shape object that should be updated.
-     *            constraint the ID of the constraint that should be deleted.
-     */
-    deleteConstraintFromShape(state, args) {
-      const { shape, constraintID } = args;
-      Vue.delete(shape, constraintID);
     }
   },
   actions: {
     /* ADD ========================================================================================================== */
 
+    /**
+     * TODO
+     * @param getters
+     * @param commit
+     * @param dispatch
+     * @param rootState
+     * @param args
+     */
     addPredicate({ getters, commit, dispatch, rootState }, args) {
       const { shapeID, predicate, valueType, input, object } = args;
       const shape = getters.shapeWithID(shapeID);
@@ -121,7 +129,6 @@ const constraintModule = {
         // Create an empty list to add to if necessary.
         shape[predicate] = [];
         if (isList) shape[predicate].push({ "@list": [] });
-
       }
 
       // Don't add the value if it is a duplicate.
@@ -141,11 +148,6 @@ const constraintModule = {
         }
 
         // Add the predicate to the shape.
-        commit("setConstraintValue", {
-          shape,
-          constraintID: predicate,
-          value: shape[predicate]
-        });
         commit("updateShape", {
           shapeID,
           value: rootState.mShape.model[shapeID]

@@ -22,9 +22,13 @@ export default {
   }
 };
 
+/*
+TODO enable this again
 window.onbeforeunload = function() {
   return "Are you sure you want to quit without saving? Any unsaved progress will be lost.";
 };
+)/
+ */
 </script>
 
 <style lang="scss">

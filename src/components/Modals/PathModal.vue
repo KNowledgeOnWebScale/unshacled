@@ -1,14 +1,14 @@
 <template>
   <div>
-    <sui-modal v-model="this.$store.state.showPathModal">
+    <sui-modal v-model="$store.state.showPathModal">
       <sui-modal-header>
         New Property Shape
       </sui-modal-header>
       <sui-modal-content>
-        <sui-form>
+        <sui-form @submit.prevent="error">
           <sui-form-field>
             <label for="path">Path</label>
-            <input id="path" v-model="path" />
+            <input id="path" v-model="path" @keyup="handleKeyPress" />
             <sui-label v-if="path !== '' && error()" basic pointing color="red">
               Please enter a valid IRI
             </sui-label>
@@ -41,9 +41,25 @@ export default {
     };
   },
   methods: {
+    /**
+     * Confirm on enter press.
+     * @param e key press event
+     */
+    handleKeyPress(e) {
+      if (e.keyCode === 13) this.confirm();
+    },
+
+    /**
+     * Cancel the modal.
+     */
     cancel() {
       this.$store.commit("togglePathModal");
     },
+
+    /**
+     * Check if the entered value is valid and confirm the modal if so.
+     * Otherwise, show an error message.
+     */
     confirm() {
       if (!this.error()) {
         this.$store.dispatch("addPropertyShape", {
@@ -53,6 +69,11 @@ export default {
         this.$store.commit("togglePathModal");
       }
     },
+
+    /**
+     * Check if the entered values passes the regex test.
+     * @returns {boolean} value that indicates if the entered value is not valid.
+     */
     error() {
       return !IRI_REGEX.test(this.path);
     }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <sui-modal v-model="this.$store.state.showClearModal">
+    <sui-modal v-model="$store.state.showClearModal">
       <sui-modal-header>
         Clear page?
       </sui-modal-header>
@@ -8,8 +8,12 @@
         All your unsaved changes will be lost.
       </sui-modal-content>
       <sui-modal-actions>
-        <sui-button @click="cancel">Cancel</sui-button>
-        <sui-button negative @click="confirm">Clear</sui-button>
+        <sui-button tab-index="0" @click="cancel">
+          Cancel
+        </sui-button>
+        <sui-button tab-index="0" type="submit" negative @click="confirm">
+          Clear
+        </sui-button>
       </sui-modal-actions>
     </sui-modal>
   </div>
