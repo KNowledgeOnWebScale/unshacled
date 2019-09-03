@@ -1,7 +1,7 @@
 <template>
   <div>
     <sui-modal
-      v-model="this.$store.state.mShape.shapeModal.show"
+      v-model="$store.state.mShape.shapeModal.show"
       @submit.prevent="cancel"
     >
       <sui-modal-header>
@@ -11,7 +11,7 @@
         <sui-form>
           <sui-form-field>
             <label for="id">IRI</label>
-            <input id="id" v-model="values.id" />
+            <input id="id" v-model="values.id" @keyup="handleKeyPress" />
             <sui-label
               v-if="values.id !== '' && error()"
               basic
@@ -38,17 +38,21 @@
               <!-- A property shape has a name. -->
               Name
             </label>
-            <input id="label" v-model="values.label" />
+            <input id="label" v-model="values.label" @keyup="handleKeyPress" />
           </sui-form-field>
           <sui-form-field>
             <label for="description">Description</label>
-            <input id="description" v-model="values.description" />
+            <input
+              id="description"
+              v-model="values.description"
+              @keyup="handleKeyPress"
+            />
           </sui-form-field>
         </sui-form>
       </sui-modal-content>
       <sui-modal-actions>
-        <sui-button @click="cancel">Cancel</sui-button>
-        <sui-button positive :disabled="error()" @click="confirm">
+        <sui-button tab-index="0" @click="cancel">Cancel</sui-button>
+        <sui-button tab-index="0" positive :disabled="error()" @click="confirm">
           Confirm
         </sui-button>
       </sui-modal-actions>
@@ -94,6 +98,14 @@ export default {
     );
   },
   methods: {
+    /**
+     * Confirm on enter press.
+     * @param e key press event
+     */
+    handleKeyPress(e) {
+      if (e.keyCode === 13 && !this.error()) this.confirm();
+    },
+
     /**
      * Confirm the modal.
      * Update the shape ID, name/label and description accordingly.

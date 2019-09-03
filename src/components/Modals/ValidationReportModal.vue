@@ -1,7 +1,7 @@
 <template>
   <div>
     <sui-modal
-      v-model="this.$store.state.mData.showValidationReportModal"
+      v-model="$store.state.mData.showValidationReportModal"
       @submit.prevent="toggleModal"
     >
       <sui-modal-header>
@@ -69,7 +69,7 @@
         </sui-segment>
       </sui-modal-content>
       <sui-modal-actions>
-        <sui-button @click="toggleModal">Close</sui-button>
+        <sui-button tab-index="0" @click="toggleModal">Close</sui-button>
       </sui-modal-actions>
     </sui-modal>
   </div>
@@ -79,7 +79,7 @@
 import { SHACL_URI } from "../../util/constants";
 import { urlToName } from "../../util/urlParser";
 import { groupBy } from "../../util";
-import {capitalizeFirstLetter} from "../../util/strings";
+import { capitalizeFirstLetter } from "../../util/strings";
 
 export default {
   name: "ValidationReportModal",
@@ -90,6 +90,9 @@ export default {
     }
   },
   methods: {
+    /**
+     * Toggle the visibility of the modal.
+     */
     toggleModal() {
       this.$store.commit("toggleValidationReport");
     },

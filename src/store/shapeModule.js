@@ -73,11 +73,11 @@ const shapeModule = {
      */
     toggleEditShapeModal(state, args) {
       event.preventDefault();
-      if (!args) {
-        args = { id: "", label: "", description: "" };
-      } else {
+      if (args) {
         args.label = args.label ? args.label : "";
         args.description = args.description ? args.description : "";
+      } else {
+        args = { id: "", label: "", description: "" };
       }
       args.show = !state.shapeModal.show;
       Vue.set(state, "shapeModal", args);
