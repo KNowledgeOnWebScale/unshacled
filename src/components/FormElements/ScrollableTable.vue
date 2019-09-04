@@ -112,9 +112,9 @@ export default {
       required: false,
       default() {
         return {
-          sorted: false, // Is the table sorted?
-          sortBy: "", // What field is the table sorted with?
-          ascending: false // Is the table sorted ascending?
+          sorted: true, // Is the table sorted?
+          sortBy: "predicate", // What field is the table sorted with?
+          ascending: true // Is the table sorted ascending?
         };
       }
     }

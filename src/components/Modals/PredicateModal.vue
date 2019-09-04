@@ -282,7 +282,7 @@ export default {
       const possibilities = ["Property", "PropertyShape", "NodeShape", "Shape"];
       return (
         !this.showPaths() &&
-        (possibilities.includes(this.values.constraintType) ||
+        (possibilities.includes(urlToName(this.values.constraintType)) ||
           this.values.predicate === "property" ||
           this.values.category.includes("Logical"))
       );

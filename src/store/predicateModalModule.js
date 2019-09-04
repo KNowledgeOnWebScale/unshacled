@@ -12,9 +12,9 @@ const predicateModalModule = {
     onExit: undefined,
     selected: "",
     sorting: {
-      sorted: false,
-      sortBy: "",
-      ascending: false
+      sorted: true,
+      sortBy: "predicate",
+      ascending: true
     }
   },
   mutations: {
@@ -36,9 +36,9 @@ const predicateModalModule = {
       Vue.set(state, "onExit", onExit);
       Vue.set(state, "selected", selected || "");
       Vue.set(state, "sorting", {
-        sorted: false,
-        sortBy: "",
-        ascending: false
+        sorted: true,
+        sortBy: "predicate",
+        ascending: true
       });
     },
 
@@ -83,9 +83,9 @@ const predicateModalModule = {
       Vue.set(state, "onExit", undefined);
       Vue.set(state, "urls", {});
       Vue.set(state, "sorting", {
-        sorted: false,
-        sortBy: "",
-        ascending: false
+        sorted: true,
+        sortBy: "predicate",
+        ascending: true
       });
     }
   },
