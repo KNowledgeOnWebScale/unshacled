@@ -1,10 +1,6 @@
 import { clone } from "ramda";
 import Vue from "vue";
 import { TERM } from "../translation/terminology";
-import {
-  getConstraintCategory,
-  getConstraintValueType
-} from "../util/shaclConstraints";
 import { extractUrl, urlToName } from "../util/urlParser";
 import getValueType, {
   getValueTypeFromConstraint,
@@ -132,21 +128,13 @@ const constraintModule = {
       const { shapeID, shapeType, constraintID, index, value } = args;
 
       state.constraintIndex = index;
-      state.predicateModal = {
-        ...state.predicateModal,
-        shapeID,
-        shapeType,
-        category: getConstraintCategory(constraintID),
-        predicate: urlToName(constraintID),
-        input: value,
-        constraintType: getConstraintValueType(constraintID),
-        editing: true
-      };
       commit("togglePredicateModal", {
         shapeID,
         shapeType,
+        editing: true,
+        input: value,
         onExit: "stopConstraintEdit",
-        editing: true
+        selected: constraintID
       });
     },
 

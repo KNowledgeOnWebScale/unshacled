@@ -6423,7 +6423,7 @@ const json = [
 export const constraintsByTypes = {
   "Value Type Constraints": [
     "http://www.w3.org/ns/shacl#class",
-    "http://www.w3.org/ns/shacl#path",
+    // "http://www.w3.org/ns/shacl#path",
     "http://www.w3.org/ns/shacl#datatype",
     "http://www.w3.org/ns/shacl#nodeKind"
   ],

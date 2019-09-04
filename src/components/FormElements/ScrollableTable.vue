@@ -224,9 +224,9 @@ function compareType(a, b) {
   max-width: 100%;
 }
 .table-body {
-  height: 40vh;
-  min-height: 40vh;
-  max-height: 40vh;
+  height: 35vh;
+  min-height: 20vh;
+  max-height: 35vh;
   overflow: auto;
 }
 

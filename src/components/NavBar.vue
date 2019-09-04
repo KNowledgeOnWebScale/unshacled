@@ -64,9 +64,11 @@
         @click="toggleClearModal"
       ></sui-menu-item>
 
+      <!--
       <sui-menu-menu position="right">
         <sui-menu-item class="clickable" icon="user"></sui-menu-item>
       </sui-menu-menu>
+      -->
     </sui-menu>
 
     <clear-modal></clear-modal>

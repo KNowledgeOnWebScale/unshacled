@@ -5,12 +5,9 @@ const predicateModalModule = {
     show: false,
     shapeID: "",
     shapeType: "",
-    category: "",
-    predicate: "",
     urls: {},
     input: "",
     object: "",
-    constraintType: "",
     editing: false,
     onExit: undefined,
     selected: "",
@@ -29,12 +26,15 @@ const predicateModalModule = {
     togglePredicateModal(state, args) {
       if (!args)
         args = { shapeID: "", shapeType: "", onExit: "", editing: false };
+      const { shapeID, shapeType, editing, onExit, selected, input } = args;
 
       Vue.set(state, "show", !state.show);
-      Vue.set(state, "shapeID", args.shapeID);
-      Vue.set(state, "shapeType", args.shapeType);
-      Vue.set(state, "editing", args.editing);
-      Vue.set(state, "onExit", args.onExit);
+      Vue.set(state, "shapeID", shapeID);
+      Vue.set(state, "shapeType", shapeType);
+      Vue.set(state, "editing", editing);
+      Vue.set(state, "input", input || "");
+      Vue.set(state, "onExit", onExit);
+      Vue.set(state, "selected", selected || "");
       Vue.set(state, "sorting", {
         sorted: false,
         sortBy: "",
@@ -77,9 +77,6 @@ const predicateModalModule = {
       Vue.set(state, "show", false);
       Vue.set(state, "shapeID", "");
       Vue.set(state, "shapeType", "");
-      Vue.set(state, "constraintType", "");
-      Vue.set(state, "category", "");
-      Vue.set(state, "predicate", "");
       Vue.set(state, "input", "");
       Vue.set(state, "object", "");
       Vue.set(state, "editing", false);

@@ -17,12 +17,11 @@
           :sorting="$store.state.mShape.mConstraint.mModal.sorting"
         ></scrollable-table>
 
+        <br />
         <sui-form-field
-          v-if="$props.modalProperties.selected !== ''"
+          v-if="$store.getters.objects($props.modalProperties.selected)"
           class="field"
         >
-          {{ $props.modalProperties.selected }}
-          <!--
           <label>Value</label>
           <input
             v-if="showString()"
@@ -83,7 +82,6 @@
             v-model="values.inputWithoutUrl"
             @keyup="handleKeyPress"
           />
-          -->
         </sui-form-field>
       </sui-form>
 
@@ -93,7 +91,12 @@
     </sui-modal-content>
     <sui-modal-actions>
       <sui-button tab-index="0" @click="toggleModal">Cancel</sui-button>
-      <sui-button tab-index="0" positive @click="exit">
+      <sui-button
+        tab-index="0"
+        positive
+        :disabled="$props.modalProperties.selected === ''"
+        @click="exit"
+      >
         {{ $props.modalProperties.editing ? "Confirm" : "Add" }}
       </sui-button>
     </sui-modal-actions>
@@ -101,10 +104,9 @@
 </template>
 
 <script>
-import Vue from "vue";
 import ValueType from "../../util/enums/ValueType";
 import {
-  customConstraintsByCategory,
+  getConstraintCategory,
   getConstraintValueType,
   tableContents
 } from "../../util/shaclConstraints";
@@ -138,31 +140,6 @@ export default {
       error: false
     };
   },
-  computed: {
-    predicates() {
-      const predsWithoutUrl = [];
-
-      if (this.$props.modalProperties.shapeType) {
-        const preds = this.$store.getters.predicates(
-          this.$props.modalProperties.shapeType
-        );
-        const iter =
-          this.values.category === ""
-            ? Object.values(customConstraintsByCategory()).flat()
-            : customConstraintsByCategory()[this.values.category];
-
-        if (preds)
-          preds.forEach(pred => {
-            if (iter.includes(pred)) {
-              const value = pred.split("#")[1];
-              Vue.set(this.values.urls, value, pred.split("#")[0]);
-              predsWithoutUrl.push(value);
-            }
-          });
-      }
-      return predsWithoutUrl;
-    }
-  },
   mounted() {
     /*
     The reason this watch is implemented is that this modal cannot work with `v-model="$props.something`.
@@ -173,7 +150,7 @@ export default {
      */
     const self = this;
     this.$store.watch(
-      () => self.$store.state.mShape.mConstraint.mModal,
+      () => self.$store.state.mShape.mConstraint.mModal.selected,
       () => self.updateValues()
     );
   },
@@ -190,21 +167,17 @@ export default {
      * Get the values passed on by the parent.
      */
     updateValues() {
-      const {
-        category,
-        predicate,
-        input,
-        constraintType
-      } = this.$props.modalProperties;
-
+      const { selected, input } = this.$props.modalProperties;
+      const s = selected && selected !== "";
+      console.log(JSON.stringify(this.$props.modalProperties, null, 2));
       this.values = {
         ...this.values,
-        category,
-        predicate,
+        category: s ? getConstraintCategory(selected) : "",
+        predicate: selected,
         input,
         inputBool: input === "true",
         inputWithoutUrl: urlToName(input),
-        constraintType
+        constraintType: s ? getConstraintValueType(selected) : ""
       };
     },
 
@@ -217,14 +190,6 @@ export default {
     },
 
     /**
-     * Select the given predicate.
-     */
-    predicateUrl() {
-      const { urls, predicate } = this.values;
-      return `${urls[predicate]}#${predicate}`;
-    },
-
-    /**
      * Returns the contents of the table.
      * This method exists since `tableContents()` cannot be called directly from the HTML above.
      */
@@ -233,60 +198,45 @@ export default {
     },
 
     /**
-     * Select the object given the selected predicate, assuming that there's only one possible object.
-     */
-    selectObject() {
-      // Reset the constraintType and input values.
-      this.values = {
-        ...this.values,
-        input: "",
-        constraintType: ""
-      };
-
-      if (this.values.predicate) {
-        const object = this.$store.getters.objects(this.predicateUrl());
-        if (object) {
-          this.values.object = object[0];
-          const typeUrl = getConstraintValueType(this.predicateUrl());
-          if (typeUrl) this.values.constraintType = urlToName(typeUrl);
-        } else {
-          this.values.object = "";
-        }
-      } else {
-        this.values.object = "";
-      }
-    },
-
-    /**
      * Execute the changes.
      * Close the modal.
      */
     exit() {
-      const predicate = this.predicateUrl();
+      const {
+        predicate,
+        category,
+        input,
+        inputBool,
+        inputWithoutUrl
+      } = this.values;
+      let finalInput = input;
       const valueType = ValueType(predicate);
       this.error = valueType === undefined;
 
       // Add the `schema` url to the path input if necessary.
-      if (this.values.category.includes("Property Pair")) {
-        if (!isUrl(this.values.input))
-          this.values.input = `${SCHEMA_URI}${this.values.input}`;
+      if (category.includes("Property Pair")) {
+        if (!isUrl(input)) {
+          finalInput = `${SCHEMA_URI}${input}`;
+        }
       }
 
       if (this.showCheckbox()) {
         // Set the input to the value of the checkbox, as a string.
-        this.values.input = this.values.inputBool.toString();
+        finalInput = inputBool.toString();
       } else if (this.showString() || this.showPaths() || this.showOther()) {
         // Add the base URL back to the input.
-        const url = extractUrl(this.values.input);
-        this.values.input = `${url}${urlToName(this.values.inputWithoutUrl)}`;
+        const url = extractUrl(input);
+        finalInput = `${url}${urlToName(inputWithoutUrl)}`;
       }
+      if (this.values.constraintType.includes("integer") && input === "")
+        finalInput = "0";
 
       if (!this.error) {
         this.$store.dispatch(this.$props.modalProperties.onExit, {
           predicate,
           valueType,
           shapeID: this.$props.modalProperties.shapeID,
-          input: this.values.input,
+          input: finalInput,
           object: this.$store.getters.objects(predicate)[0]
         });
         this.reset();
@@ -307,6 +257,8 @@ export default {
         search: ""
       };
       this.error = false;
+      // Deselect the selected row.
+      this.$store.commit("selectRow", { key: "" });
     },
 
     /* SHOW VALUE INPUT FIELD ======================================================================================= */
