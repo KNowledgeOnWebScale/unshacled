@@ -176,7 +176,8 @@ const constraintModule = {
       // Check if this new value is a duplicate.
       let duplicate = false;
       const key = valueType.includes(ValueTypes.ID) ? "@id" : "@value";
-      for (const j in iter) {
+      for (let j in iter) {
+        j = Number(j);
         if (i !== j && iter[j][key] === name) duplicate = true;
       }
 

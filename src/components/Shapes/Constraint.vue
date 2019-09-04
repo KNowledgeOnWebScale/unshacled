@@ -114,8 +114,26 @@ export default {
      * Start editing the value of the given constraint.
      * NOTE: We don't want to edit properties this way; they will be edited using the visual relationships.
      */
-    editValue(index, value) {
-      if (!this.$props.constraintID.includes("property")) {
+    editValue(index) {
+      const { constraintID } = this.$props;
+      const shape = this.$store.getters.shapeWithID(this.$props.shapeID);
+      const values = shape[constraintID];
+      const vt = ValueType(constraintID)
+        ? ValueType(constraintID)
+        : getValueTypeFromConstraint(values);
+
+      let iter = values;
+      if (
+        vt.includes(ValueTypes.LIST) &&
+        values.length === 1 &&
+        values[0]["@list"]
+      ) {
+        iter = values[0]["@list"];
+      }
+      const key = vt.includes(ValueTypes.ID) ? "@id" : "@value";
+      const value = iter[index][key];
+
+      if (!this.isListOfValues()) {
         this.$store.dispatch("startConstraintEdit", {
           shapeID: this.$props.shapeID,
           shapeType: this.$props.nodeShape ? "NodeShape" : "PropertyShape",
@@ -222,12 +240,16 @@ export default {
           output.push(abbreviate(text));
         }
         if (this.isListOfValues()) {
+          const joined = output.join(", ");
           // Abbreviate the label of every element depending on the number of elements in the list.
-          return [
-            output
-              .map(e => abbreviate(e, MAX_LENGTH / output.length))
-              .join(", ")
-          ];
+          if (joined.length > MAX_LENGTH - 8) {
+            return [
+              output
+                .map(e => abbreviate(e, (2 * MAX_LENGTH) / output.length))
+                .join(", ")
+            ];
+          }
+          return [joined];
         }
       }
       return output;
@@ -259,6 +281,9 @@ export default {
       ];
     },
 
+    /**
+     * TODO
+     */
     getConfigs() {
       const y = this.getYValue();
       const points = [...this.lineConfig.points];
@@ -295,9 +320,10 @@ export default {
      * @returns {{y: *, text: *}}
      */
     getValueConfig(value, index) {
+      const move = value.length > MAX_LENGTH ? -HEIGHT / 6 : 0;
       return {
         ...this.valueConfig,
-        y: this.valueConfig.y + this.getYValue() + index * HEIGHT,
+        y: this.valueConfig.y + this.getYValue() + index * HEIGHT + move,
         text: this.$props.constraintID === TERM.path ? value : urlToName(value)
       };
     },

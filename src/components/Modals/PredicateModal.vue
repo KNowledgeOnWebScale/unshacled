@@ -185,8 +185,8 @@ export default {
      * Toggle the visibility of the modal.
      */
     toggleModal() {
-      this.reset(); // Reset modal values
       this.$store.commit("togglePredicateModal");
+      this.reset(); // Reset modal values
     },
 
     /**

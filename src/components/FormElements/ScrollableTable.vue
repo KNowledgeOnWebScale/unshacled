@@ -47,7 +47,7 @@
 
       <tr>
         <td>
-          <div class="table-body">
+          <div :class="{ 'table-body': !editing }">
             <sui-table :selectable="!editing">
               <sui-table-body>
                 <sui-table-row
@@ -74,7 +74,7 @@
       </tr>
     </table>
 
-    <sui-segment v-if="editing" color="orange">
+    <sui-segment v-if="editing" emphasis="secondary">
       <!-- TODO allow predicate editing -->
       <div>
         You cannot change the predicate while editing.
