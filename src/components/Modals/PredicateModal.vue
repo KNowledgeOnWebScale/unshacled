@@ -13,8 +13,78 @@
         <scrollable-table
           :contents="table()"
           :filter="values.search"
+          :selected="$props.modalProperties.selected"
           :sorting="$props.modalProperties.sorting"
         ></scrollable-table>
+
+        <sui-form-field
+          v-if="$props.modalProperties.selected !== ''"
+          class="field"
+        >
+          {{ $props.modalProperties.selected }}
+          <!--
+          <label>Value</label>
+          <input
+            v-if="showString()"
+            v-model="values.inputWithoutUrl"
+            type="text"
+            @keyup="handleKeyPress"
+          />
+          <input
+            v-if="showCheckbox()"
+            v-model="values.inputBool"
+            type="checkbox"
+          />
+          <input
+            v-if="showInteger()"
+            v-model="values.input"
+            type="number"
+            @keyup="handleKeyPress"
+          />
+
+          <input
+            v-if="showShapes()"
+            v-model="values.input"
+            list="shapeList"
+            @keyup="handleKeyPress"
+          />
+          <datalist v-if="showShapes()" id="shapeList" type="text">
+            <option
+              v-for="key in getShapeOptions()"
+              :key="getOptionID(key)"
+              :value="getOptionID(key)"
+            ></option>
+          </datalist>
+
+          <input
+            v-if="showPaths()"
+            v-model="values.inputWithoutUrl"
+            list="pathList"
+            @keyup="handleKeyPress"
+          />
+          <datalist v-if="showPaths()" id="pathList" type="text">
+            <option v-for="key in getPathOptions()" :key="key" :value="key">
+              {{ getName(key) }}
+            </option>
+          </datalist>
+
+          <select
+            v-if="showDataTypes()"
+            v-model="values.input"
+            @keyup="handleKeyPress"
+          >
+            <option v-for="key in getDataTypes()" :key="key" :value="key">
+              {{ getName(key) }}
+            </option>
+          </select>
+
+          <input
+            v-if="showOther()"
+            v-model="values.inputWithoutUrl"
+            @keyup="handleKeyPress"
+          />
+          -->
+        </sui-form-field>
       </sui-form>
 
       <sui-segment v-if="error" color="red">
@@ -34,7 +104,6 @@
 import Vue from "vue";
 import ValueType from "../../util/enums/ValueType";
 import {
-  constraintsByTypes,
   customConstraintsByCategory,
   getConstraintValueType,
   tableContents
@@ -70,15 +139,6 @@ export default {
     };
   },
   computed: {
-    categories() {
-      const cs = Object.keys(constraintsByTypes);
-      const output = {};
-      cs.map(cat => {
-        output[cat] = cat.replace(" Constraints", "");
-      });
-      return output;
-    },
-
     predicates() {
       const predsWithoutUrl = [];
 
@@ -164,47 +224,12 @@ export default {
       return `${urls[predicate]}#${predicate}`;
     },
 
+    /**
+     * Returns the contents of the table.
+     * This method exists since `tableContents()` cannot be called directly from the HTML above.
+     */
     table() {
       return tableContents();
-    },
-    onSearch() {
-      console.log(this.values.search);
-    },
-
-    showCheckbox() {
-      return this.values.constraintType.includes("boolean");
-    },
-    showInteger() {
-      return this.values.constraintType.includes("integer");
-    },
-    showString() {
-      return this.values.constraintType.includes("string");
-    },
-    showPaths() {
-      return this.values.category.includes("Property Pair");
-    },
-    showDataTypes() {
-      return urlToName(this.values.predicate).includes("datatype");
-    },
-    showShapes() {
-      const possibilities = ["Property", "PropertyShape", "NodeShape", "Shape"];
-      return (
-        !this.showPaths() &&
-        (possibilities.includes(this.values.constraintType) ||
-          this.values.predicate === "property" ||
-          this.values.category.includes("Logical"))
-      );
-    },
-    showOther() {
-      console.log(this.values.category, this.values.constraintType);
-      return !(
-        this.showCheckbox() ||
-        this.showInteger() ||
-        this.showString() ||
-        this.showShapes() ||
-        this.showPaths() ||
-        this.showDataTypes()
-      );
     },
 
     /**
@@ -232,6 +257,10 @@ export default {
       }
     },
 
+    /**
+     * Execute the changes.
+     * Close the modal.
+     */
     exit() {
       const predicate = this.predicateUrl();
       const valueType = ValueType(predicate);
@@ -277,6 +306,43 @@ export default {
         constraintType: ""
       };
       this.error = false;
+    },
+
+    /* SHOW VALUE INPUT FIELD ======================================================================================= */
+
+    showCheckbox() {
+      return this.values.constraintType.includes("boolean");
+    },
+    showInteger() {
+      return this.values.constraintType.includes("integer");
+    },
+    showString() {
+      return this.values.constraintType.includes("string");
+    },
+    showPaths() {
+      return this.values.category.includes("Property Pair");
+    },
+    showDataTypes() {
+      return urlToName(this.values.predicate).includes("datatype");
+    },
+    showShapes() {
+      const possibilities = ["Property", "PropertyShape", "NodeShape", "Shape"];
+      return (
+        !this.showPaths() &&
+        (possibilities.includes(this.values.constraintType) ||
+          this.values.predicate === "property" ||
+          this.values.category.includes("Logical"))
+      );
+    },
+    showOther() {
+      return !(
+        this.showCheckbox() ||
+        this.showInteger() ||
+        this.showString() ||
+        this.showShapes() ||
+        this.showPaths() ||
+        this.showDataTypes()
+      );
     },
 
     /* POPULATING =================================================================================================== */

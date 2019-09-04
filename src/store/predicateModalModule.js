@@ -13,6 +13,7 @@ const predicateModalModule = {
     constraintType: "",
     editing: false,
     onExit: undefined,
+    selected: "",
     sorting: {
       sorted: false,
       sortBy: "",
@@ -51,6 +52,18 @@ const predicateModalModule = {
      */
     sortPredicateModal(state, args) {
       Vue.set(state, "sorting", args);
+    },
+
+    /**
+     * Select the row with the given key (constraint ID).
+     * If the row was already selected, then deselect it.
+     * @param state
+     * @param args
+     */
+    selectRow(state, args) {
+      const { key } = args;
+      const selected = state.selected === key ? "" : key;
+      Vue.set(state, "selected", selected);
     },
 
     /**

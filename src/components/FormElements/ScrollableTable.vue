@@ -1,8 +1,8 @@
 <template>
-  <table>
-    <tr class="table">
-      <td class="table">
-        <sui-table class="table">
+  <table class="table">
+    <tr>
+      <td>
+        <sui-table>
           <sui-table-header>
             <sui-table-row>
               <sui-table-header-cell class="predicate">
@@ -50,19 +50,20 @@
           <sui-table selectable>
             <sui-table-body>
               <sui-table-row
-                v-for="(value, key) of getContents()"
-                :key="key"
-                :ref="key"
-                @click="selectConstraint(key)"
+                v-for="object of sortList(filterContents())"
+                :key="object.id"
+                :ref="object.id"
+                :active="selected === object.id"
+                @click="selectConstraint(object.id)"
               >
                 <sui-table-cell class="predicate">
-                  {{ value.predicate }}
+                  {{ object.predicate }}
                 </sui-table-cell>
                 <sui-table-cell class="description">
-                  {{ value.description }}
+                  {{ object.description }}
                 </sui-table-cell>
                 <sui-table-cell class="type">
-                  {{ value.type.replace(" Constraints", "") }}
+                  {{ object.type.replace(" Constraints", "") }}
                 </sui-table-cell>
               </sui-table-row>
             </sui-table-body>
@@ -78,12 +79,17 @@ export default {
   name: "ScrollableTable",
   props: {
     contents: {
-      type: Object,
+      type: Array,
       required: true
     },
     filter: {
       type: String,
       required: true
+    },
+    selected: {
+      type: String,
+      required: false,
+      default: ""
     },
     sorting: {
       type: Object,
@@ -113,27 +119,27 @@ export default {
     },
 
     /**
-     *
-     */
-    getContents() {
-      return this.sortList(this.filterContents());
-    },
-
-    /**
-     * TODO
-     * @returns {Set<*>[]|any}
+     * Filter the table contents according to the entered search term.
+     * If no search term is entered, show everything.
+     * Otherwise, check for each row if the search term occurs in the predicate or type.
+     * The selected predicate will always be shown.
+     * @returns {[]} List of constraint objects: {id, predicate, description, type}
      */
     filterContents() {
-      const { contents } = this.$props;
+      const { contents, selected } = this.$props;
       if (this.filter === "") {
         // No filter. Show every entry.
-        return contents;
+        return Object.values(contents);
       }
       // Otherwise, filter the table contents.
       const filtered = [];
-      for (const obj of Object.values(contents)) {
+      for (const obj of contents) {
         const type = obj["type"].replace(" Constraints", "");
-        if (this.matches(type) || this.matches(obj["predicate"]))
+        if (
+          obj.id === selected || // Always show the selected predicate.
+          this.matches(type) || // Check if the search term matches the type.
+          this.matches(obj.predicate) // Check if the search term matches the predicate.
+        )
           filtered.push(obj);
       }
       return filtered;
@@ -150,7 +156,10 @@ export default {
     },
 
     /**
-     * TODO
+     * Sort the given list using the sorting properties.
+     * `sorted` {boolean} indicates if the list should be sorted.
+     * `sortBy` {string} indicates which field the list should be sorted with.
+     * `ascending` {boolean} indicates if the list should be sorted ascendingly.
      * @param list
      * @returns {*}
      */
@@ -171,12 +180,12 @@ export default {
     },
 
     /**
-     * TODO
+     * Select the constraint with the given key.
+     * This will activate the row.
      * @param key
      */
     selectConstraint(key) {
-      console.log("selected", key);
-      // TODO
+      this.$store.commit("selectRow", { key });
     }
   }
 };
@@ -188,7 +197,6 @@ export default {
  * @returns {number}
  */
 function comparePredicates(a, b) {
-  console.log(JSON.stringify(a, null, 2));
   if (a["predicate"] < b["predicate"]) return -1;
   if (a["predicate"] > b["predicate"]) return 1;
   return 0;
@@ -201,7 +209,6 @@ function comparePredicates(a, b) {
  * @returns {number}
  */
 function compareType(a, b) {
-  console.log(JSON.stringify(a, null, 2));
   if (a["type"] < b["type"]) return -1;
   if (a["type"] > b["type"]) return 1;
   return 0;
