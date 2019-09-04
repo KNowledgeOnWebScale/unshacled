@@ -74,7 +74,7 @@
       </tr>
     </table>
 
-    <sui-segment v-if="editing" emphasis="secondary">
+    <sui-segment v-if="editing && clicked" emphasis="secondary">
       <!-- TODO allow predicate editing -->
       <div>
         You cannot change the predicate while editing.
@@ -118,6 +118,20 @@ export default {
         };
       }
     }
+  },
+  data() {
+    return {
+      clicked: false
+    };
+  },
+  mounted() {
+    const self = this;
+    this.$store.watch(
+      () => self.$store.state.mShape.mConstraint.mModal.selected,
+      () => {
+        self.clicked = false;
+      }
+    );
   },
   methods: {
     /**
@@ -208,7 +222,11 @@ export default {
      * @param key
      */
     selectConstraint(key) {
-      if (!this.editing) this.$store.commit("selectRow", { key });
+      if (!this.editing) {
+        this.$store.commit("selectRow", { key });
+      } else {
+        this.clicked = true;
+      }
     }
   }
 };
