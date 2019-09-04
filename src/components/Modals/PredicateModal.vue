@@ -5,7 +5,7 @@
     </sui-modal-header>
     <sui-modal-content scrolling>
       <sui-form @submit.prevent="() => {}">
-        <sui-form-field>
+        <sui-form-field v-if="!$props.modalProperties.editing">
           <label for="search">Search</label>
           <input id="search" v-model="values.search" />
         </sui-form-field>
@@ -14,6 +14,7 @@
           :contents="table()"
           :filter="values.search"
           :selected="$props.modalProperties.selected"
+          :editing="$props.modalProperties.editing"
           :sorting="$store.state.mShape.mConstraint.mModal.sorting"
         ></scrollable-table>
 
@@ -169,7 +170,6 @@ export default {
     updateValues() {
       const { selected, input } = this.$props.modalProperties;
       const s = selected && selected !== "";
-      console.log(JSON.stringify(this.$props.modalProperties, null, 2));
       this.values = {
         ...this.values,
         category: s ? getConstraintCategory(selected) : "",

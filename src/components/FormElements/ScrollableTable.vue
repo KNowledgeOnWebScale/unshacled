@@ -1,77 +1,89 @@
 <template>
-  <table class="table">
-    <tr>
-      <td>
-        <sui-table color="green" inverted>
-          <sui-table-header>
-            <sui-table-row>
-              <sui-table-header-cell class="predicate">
-                <div class="clickable" @click="setSorting(true, 'predicate')">
-                  Predicate
-                  <span v-if="$props.sorting.sortBy === 'predicate'">
-                    <sui-icon
-                      v-if="$props.sorting.ascending"
-                      name="sort up"
-                    ></sui-icon>
-                    <sui-icon
-                      v-if="!$props.sorting.ascending"
-                      name="sort down"
-                    ></sui-icon>
+  <div>
+    <table class="table">
+      <tr>
+        <td>
+          <sui-table color="green" inverted>
+            <sui-table-header>
+              <sui-table-row>
+                <sui-table-header-cell class="predicate">
+                  <div class="clickable" @click="setSorting(true, 'predicate')">
+                    Predicate
+                    <span v-if="$props.sorting.sortBy === 'predicate'">
+                      <sui-icon
+                        v-if="$props.sorting.ascending"
+                        name="sort up"
+                      ></sui-icon>
+                      <sui-icon
+                        v-if="!$props.sorting.ascending"
+                        name="sort down"
+                      ></sui-icon>
+                    </span>
+                  </div>
+                </sui-table-header-cell>
+                <sui-table-header-cell class="description">
+                  Description
+                </sui-table-header-cell>
+                <sui-table-header-cell class="type">
+                  <span class="clickable" @click="setSorting(true, 'type')">
+                    Type
+                    <span v-if="$props.sorting.sortBy === 'type'">
+                      <sui-icon
+                        v-if="$props.sorting.ascending"
+                        name="sort up"
+                      ></sui-icon>
+                      <sui-icon
+                        v-if="!$props.sorting.ascending"
+                        name="sort down"
+                      ></sui-icon>
+                    </span>
                   </span>
-                </div>
-              </sui-table-header-cell>
-              <sui-table-header-cell class="description">
-                Description
-              </sui-table-header-cell>
-              <sui-table-header-cell class="type">
-                <span class="clickable" @click="setSorting(true, 'type')">
-                  Type
-                  <span v-if="$props.sorting.sortBy === 'type'">
-                    <sui-icon
-                      v-if="$props.sorting.ascending"
-                      name="sort up"
-                    ></sui-icon>
-                    <sui-icon
-                      v-if="!$props.sorting.ascending"
-                      name="sort down"
-                    ></sui-icon>
-                  </span>
-                </span>
-              </sui-table-header-cell>
-            </sui-table-row>
-          </sui-table-header>
-        </sui-table>
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        <div class="table-body">
-          <sui-table selectable>
-            <sui-table-body>
-              <sui-table-row
-                v-for="object of sortList(filterContents())"
-                :key="object.id"
-                :ref="object.id"
-                :active="selected === object.id"
-                @click="selectConstraint(object.id)"
-              >
-                <sui-table-cell class="predicate">
-                  {{ object.predicate }}
-                </sui-table-cell>
-                <sui-table-cell class="description">
-                  {{ object.description }}
-                </sui-table-cell>
-                <sui-table-cell class="type">
-                  {{ object.type.replace(" Constraints", "") }}
-                </sui-table-cell>
+                </sui-table-header-cell>
               </sui-table-row>
-            </sui-table-body>
+            </sui-table-header>
           </sui-table>
-        </div>
-      </td>
-    </tr>
-  </table>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <div class="table-body">
+            <sui-table :selectable="!editing">
+              <sui-table-body>
+                <sui-table-row
+                  v-for="object of sortList(filterContents())"
+                  :key="object.id"
+                  :ref="object.id"
+                  :active="!editing && selected === object.id"
+                  @click="selectConstraint(object.id)"
+                >
+                  <sui-table-cell class="predicate">
+                    {{ object.predicate }}
+                  </sui-table-cell>
+                  <sui-table-cell class="description">
+                    {{ object.description }}
+                  </sui-table-cell>
+                  <sui-table-cell class="type">
+                    {{ object.type.replace(" Constraints", "") }}
+                  </sui-table-cell>
+                </sui-table-row>
+              </sui-table-body>
+            </sui-table>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <sui-segment v-if="editing" color="orange">
+      <!-- TODO allow predicate editing -->
+      <div>
+        You cannot change the predicate while editing.
+      </div>
+      <div>
+        To change it, remove this constraint and add the wanted predicate.
+      </div>
+    </sui-segment>
+  </div>
 </template>
 
 <script>
@@ -90,6 +102,10 @@ export default {
       type: String,
       required: false,
       default: ""
+    },
+    editing: {
+      type: Boolean,
+      required: true
     },
     sorting: {
       type: Object,
@@ -122,6 +138,7 @@ export default {
 
     /**
      * Filter the table contents according to the entered search term.
+     * If the user is editing the constraint, only show the selected constraint.
      * If no search term is entered, show everything.
      * Otherwise, check for each row if the search term occurs in the predicate or type.
      * The selected predicate will always be shown.
@@ -129,6 +146,9 @@ export default {
      */
     filterContents() {
       const { contents, selected } = this.$props;
+      if (this.editing) {
+        return contents.filter(obj => obj.id === selected);
+      }
       if (this.filter === "") {
         // No filter. Show every entry.
         return Object.values(contents);
@@ -184,10 +204,11 @@ export default {
     /**
      * Select the constraint with the given key.
      * This will activate the row.
+     * Only allow selecting if the user is not editing the constraint.
      * @param key
      */
     selectConstraint(key) {
-      this.$store.commit("selectRow", { key });
+      if (!this.editing) this.$store.commit("selectRow", { key });
     }
   }
 };
