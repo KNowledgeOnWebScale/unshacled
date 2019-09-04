@@ -165,7 +165,9 @@ const constraintModule = {
       // Create a new value object.
       let newValue;
       let name;
-      if (valueType.includes(ValueTypes.ID)) {
+      if (constraintID === TERM.path) {
+        newValue = { "@id": input };
+      } else if (valueType.includes(ValueTypes.ID)) {
         name = `${extractUrl(original["@id"])}${urlToName(input)}`;
         newValue = { "@id": name };
       } else {

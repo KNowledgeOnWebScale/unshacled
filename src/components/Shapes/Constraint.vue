@@ -133,7 +133,12 @@ export default {
       const key = vt.includes(ValueTypes.ID) ? "@id" : "@value";
       const value = iter[index][key];
 
-      if (!this.isListOfValues()) {
+      if (constraintID === TERM.path) {
+        this.$store.commit("togglePathModal", {
+          shapeID: this.$props.shapeID,
+          editing: true
+        });
+      } else if (!this.isListOfValues()) {
         this.$store.dispatch("startConstraintEdit", {
           shapeID: this.$props.shapeID,
           shapeType: this.$props.nodeShape ? "NodeShape" : "PropertyShape",

@@ -73,7 +73,10 @@
 
     <clear-modal></clear-modal>
     <export-modal></export-modal>
-    <path-modal></path-modal>
+    <path-modal
+      :editing="$store.state.pathModal.editing"
+      :shape-i-d="$store.state.pathModal.shapeID"
+    ></path-modal>
     <validation-report-modal
       :report="this.$store.state.mData.validationReport"
     ></validation-report-modal>
