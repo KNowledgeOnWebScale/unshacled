@@ -25,30 +25,20 @@
         >
           <label>Value</label>
           <input
-            v-if="showString()"
-            v-model="values.inputWithoutUrl"
-            type="text"
-            @keyup="handleKeyPress"
-          />
-          <input
-            v-if="showCheckbox()"
-            v-model="values.inputBool"
-            type="checkbox"
-          />
-          <input
-            v-if="showInteger()"
-            v-model="values.input"
-            type="number"
+            v-if="!showDataTypes()"
+            id="field"
+            v-model="values[getModel()]"
+            :list="getDataList()"
+            :type="getType()"
             @keyup="handleKeyPress"
           />
 
-          <input
-            v-if="showShapes()"
-            v-model="values.input"
-            list="shapeList"
-            @keyup="handleKeyPress"
-          />
-          <datalist v-if="showShapes()" id="shapeList" type="text">
+          <datalist v-if="showPaths()" id="pathList" :type="getType()">
+            <option v-for="key in getPathOptions()" :key="key" :value="key">
+              {{ getName(key) }}
+            </option>
+          </datalist>
+          <datalist v-if="showShapes()" id="shapeList" :type="getType()">
             <option
               v-for="key in getShapeOptions()"
               :key="getOptionID(key)"
@@ -56,33 +46,17 @@
             ></option>
           </datalist>
 
-          <input
-            v-if="showPaths()"
-            v-model="values.inputWithoutUrl"
-            list="pathList"
-            @keyup="handleKeyPress"
-          />
-          <datalist v-if="showPaths()" id="pathList" type="text">
-            <option v-for="key in getPathOptions()" :key="key" :value="key">
-              {{ getName(key) }}
-            </option>
-          </datalist>
-
           <select
             v-if="showDataTypes()"
-            v-model="values.input"
+            id="dataTypes"
+            v-model="values[getModel()]"
+            :type="getType()"
             @keyup="handleKeyPress"
           >
             <option v-for="key in getDataTypes()" :key="key" :value="key">
               {{ getName(key) }}
             </option>
           </select>
-
-          <input
-            v-if="showOther()"
-            v-model="values.inputWithoutUrl"
-            @keyup="handleKeyPress"
-          />
         </sui-form-field>
       </sui-form>
 
@@ -152,18 +126,30 @@ export default {
     const self = this;
     this.$store.watch(
       () => self.$store.state.mShape.mConstraint.mModal.selected,
-      () => self.updateValues()
+      () => {
+        self.updateValues();
+        const id = self.showPaths()
+          ? "pathList"
+          : self.showShapes()
+          ? "shapeList"
+          : self.showDataTypes()
+          ? "dataTypes"
+          : "field";
+        const field = document.getElementById(id);
+        if (field) field.focus();
+      }
+    );
+
+    // Focus the input field when the modal is called.
+    this.$store.watch(
+      () => self.$store.state.mShape.mConstraint.mModal.show,
+      () => {
+        if (self.$store.state.mShape.mConstraint.mModal.show)
+          document.getElementById("search").focus();
+      }
     );
   },
   methods: {
-    /**
-     * Confirm on enter press.
-     * @param e key press event
-     */
-    handleKeyPress(e) {
-      if (e.keyCode === 13) this.exit();
-    },
-
     /**
      * Get the values passed on by the parent.
      */
@@ -259,6 +245,49 @@ export default {
       this.error = false;
       // Deselect the selected row.
       this.$store.commit("selectRow", { key: "" });
+    },
+
+    /* INPUT FIELD HELPERS ========================================================================================== */
+
+    /**
+     * Get the wanted model.
+     */
+    getModel() {
+      return this.showCheckbox()
+        ? "inputBool"
+        : this.showString() || this.showPaths() || this.showOther()
+        ? "inputWithoutUrl"
+        : "input";
+    },
+
+    /**
+     * Get the wanted input type.
+     */
+    getType() {
+      return this.showCheckbox()
+        ? "checkbox"
+        : this.showInteger()
+        ? "number"
+        : "text";
+    },
+
+    /**
+     * Get the wanted data list.
+     */
+    getDataList() {
+      return this.showPaths()
+        ? "pathList"
+        : this.showShapes()
+        ? "shapeList"
+        : "";
+    },
+
+    /**
+     * Confirm on enter press.
+     * @param e key press event
+     */
+    handleKeyPress(e) {
+      if (e.keyCode === 13) this.exit();
     },
 
     /* SHOW VALUE INPUT FIELD ======================================================================================= */

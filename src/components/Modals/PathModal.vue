@@ -64,6 +64,15 @@ export default {
         }
       }
     );
+
+    // Focus the input field when the modal is called.
+    this.$store.watch(
+      () => self.$store.state.pathModal.show,
+      () => {
+        if (self.$store.state.pathModal.show)
+          document.getElementById("path").focus();
+      }
+    );
   },
   methods: {
     /**
