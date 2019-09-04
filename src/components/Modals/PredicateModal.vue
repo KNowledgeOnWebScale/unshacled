@@ -1,171 +1,20 @@
 <template>
-  <sui-modal v-model="$store.state.mShape.mConstraint.predicateModal.show">
+  <sui-modal v-model="$store.state.mShape.mConstraint.mModal.show">
     <sui-modal-header>
       {{ $props.modalProperties.editing ? "Edit Predicate" : "Add Predicate" }}
     </sui-modal-header>
     <sui-modal-content scrolling>
       <sui-form @submit.prevent="() => {}">
-        <!--
-                <sui-form-field>
-                  <label for="selectCategory">Type of Constraint</label>
-                  <select
-                    v-if="categories"
-                    id="selectCategory"
-                    v-model="values.category"
-                    :disabled="$props.modalProperties.editing"
-                    @change="values.predicate = ''"
-                  >
-                    <option :value="''">All types</option>
-                    <option v-for="(val, key) in categories" :key="key" :value="key">
-                      {{ val }}
-                    </option>
-                  </select>
-                </sui-form-field>
-        -->
-
         <sui-form-field>
           <label for="search">Search</label>
-          <input id="search" v-model="values.search" @input="onSearch" />
-          <!--
-                    <input
-                      id="selectPreds"
-                      v-model="values.predicate"
-                      class="ui fluid search dropdown"
-                      list="predicates"
-                      :disabled="$props.modalProperties.editing"
-                      @input="selectObject"
-                    />
-                    <sui-label
-                      v-if="
-                        values.predicate !== '' && !$store.getters.objects(predicateUrl())
-                      "
-                      basic
-                      pointing
-                      color="red"
-                    >
-                      Please enter a valid predicate
-                    </sui-label>
-                    <datalist id="predicates">
-                      <option v-for="p in predicates" :key="p" :value="p">{{ p }}</option>
-                    </datalist>
-          -->
+          <input id="search" v-model="values.search" />
         </sui-form-field>
 
-        <table>
-          <tr class="table">
-            <td class="table">
-              <sui-table class="table">
-                <sui-table-header>
-                  <sui-table-row>
-                    <sui-table-header-cell class="predicate">
-                      Predicate
-                    </sui-table-header-cell>
-                    <sui-table-header-cell class="description">
-                      Description
-                    </sui-table-header-cell>
-                    <sui-table-header-cell class="type">
-                      Type
-                    </sui-table-header-cell>
-                  </sui-table-row>
-                </sui-table-header>
-              </sui-table>
-            </td>
-          </tr>
-
-          <tr>
-            <td>
-              <div class="table-body">
-                <sui-table selectable>
-                  <sui-table-body>
-                    <sui-table-row
-                      v-for="(value, key) of table()"
-                      :key="key"
-                      :ref="key"
-                    >
-                      <sui-table-cell class="predicate">
-                        {{ value.label }}
-                      </sui-table-cell>
-                      <sui-table-cell class="description">
-                        {{ value.description }}
-                      </sui-table-cell>
-                      <sui-table-cell class="type">
-                        {{ value.category.replace(" Constraints", "") }}
-                      </sui-table-cell>
-                    </sui-table-row>
-                  </sui-table-body>
-                </sui-table>
-              </div>
-            </td>
-          </tr>
-        </table>
-
-        <!--
-        <sui-form-field
-          v-if="$store.getters.objects(predicateUrl())"
-          class="field"
-        >
-          <label>Value</label>
-          <input
-            v-if="showString()"
-            v-model="values.inputWithoutUrl"
-            type="text"
-            @keyup="handleKeyPress"
-          />
-          <input
-            v-if="showCheckbox()"
-            v-model="values.inputBool"
-            type="checkbox"
-          />
-          <input
-            v-if="showInteger()"
-            v-model="values.input"
-            type="number"
-            @keyup="handleKeyPress"
-          />
-
-          <input
-            v-if="showShapes()"
-            v-model="values.input"
-            list="shapeList"
-            @keyup="handleKeyPress"
-          />
-          <datalist v-if="showShapes()" id="shapeList" type="text">
-            <option
-              v-for="key in getShapeOptions()"
-              :key="getOptionID(key)"
-              :value="getOptionID(key)"
-            ></option>
-          </datalist>
-
-          <input
-            v-if="showPaths()"
-            v-model="values.inputWithoutUrl"
-            list="pathList"
-            @keyup="handleKeyPress"
-          />
-          <datalist v-if="showPaths()" id="pathList" type="text">
-            <option v-for="key in getPathOptions()" :key="key" :value="key">
-              {{ getName(key) }}
-            </option>
-          </datalist>
-
-          <select
-            v-if="showDataTypes()"
-            v-model="values.input"
-            @keyup="handleKeyPress"
-          >
-            <option v-for="key in getDataTypes()" :key="key" :value="key">
-              {{ getName(key) }}
-            </option>
-          </select>
-
-          <input
-            v-if="showOther()"
-            v-model="values.inputWithoutUrl"
-            @keyup="handleKeyPress"
-          />
-        </sui-form-field>
-        -->
+        <scrollable-table
+          :contents="table()"
+          :filter="values.search"
+          :sorting="$props.modalProperties.sorting"
+        ></scrollable-table>
       </sui-form>
 
       <sui-segment v-if="error" color="red">
@@ -194,9 +43,11 @@ import { extractUrl, isUrl, urlToName } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
 import { SCHEMA_URI } from "../../util/constants";
 import { XML_DATATYPES } from "../../util";
+import ScrollableTable from "../FormElements/ScrollableTable.vue";
 
 export default {
   name: "PredicateModal",
+  components: { ScrollableTable },
   props: {
     modalProperties: {
       required: true,
@@ -257,12 +108,12 @@ export default {
     The reason this watch is implemented is that this modal cannot work with `v-model="$props.something`.
     A component should not edit his properties directly, since a re-render in the parent component causes them
     to update (and override) their values. That's why this component keeps a copy of his properties, which he actually
-    can modify directly. With every update of his properties (in `mConstraint.predicateModal`), he copies these values
+    can modify directly. With every update of his properties (in `mConstraint.mModal`), he copies these values
     to his own state.
      */
     const self = this;
     this.$store.watch(
-      () => self.$store.state.mShape.mConstraint.predicateModal,
+      () => self.$store.state.mShape.mConstraint.mModal,
       () => self.updateValues()
     );
   },
@@ -499,24 +350,4 @@ export default {
 };
 </script>
 
-<style scoped>
-.table {
-  width: 100%;
-}
-.table-body {
-  height: 40vh;
-  min-height: 40vh;
-  max-height: 40vh;
-  overflow: auto;
-}
-
-.predicate {
-  width: 25%;
-}
-.description {
-  width: 55%;
-}
-.type {
-  width: 20%;
-}
-</style>
+<style scoped></style>

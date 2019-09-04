@@ -6499,8 +6499,8 @@ export function tableContents() {
   allConstraints.map(constraint => {
     const id = ShaclTranslator.toModelSimple(constraint);
     contents[id] = {
-      label: urlToName(id),
-      category: getConstraintCategory(id),
+      predicate: urlToName(id),
+      type: getConstraintCategory(id),
       description: json.filter(obj => obj["@id"] === constraint)[0][
         "http://www.w3.org/2000/01/rdf-schema#comment"
       ][0]["@value"]

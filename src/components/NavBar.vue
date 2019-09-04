@@ -77,7 +77,7 @@
     ></validation-report-modal>
 
     <predicate-modal
-      :modal-properties="$store.state.mShape.mConstraint.predicateModal"
+      :modal-properties="$store.state.mShape.mConstraint.mModal"
     ></predicate-modal>
     <edit-shape-modal
       :modal-properties="$store.state.mShape.shapeModal"
