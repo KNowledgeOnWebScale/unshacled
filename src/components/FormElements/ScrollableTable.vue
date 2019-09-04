@@ -2,7 +2,7 @@
   <table class="table">
     <tr>
       <td>
-        <sui-table>
+        <sui-table color="green" inverted>
           <sui-table-header>
             <sui-table-row>
               <sui-table-header-cell class="predicate">
@@ -26,7 +26,7 @@
               <sui-table-header-cell class="type">
                 <span class="clickable" @click="setSorting(true, 'type')">
                   Type
-                  <div v-if="$props.sorting.sortBy === 'type'">
+                  <span v-if="$props.sorting.sortBy === 'type'">
                     <sui-icon
                       v-if="$props.sorting.ascending"
                       name="sort up"
@@ -35,7 +35,7 @@
                       v-if="!$props.sorting.ascending"
                       name="sort down"
                     ></sui-icon>
-                  </div>
+                  </span>
                 </span>
               </sui-table-header-cell>
             </sui-table-row>
@@ -110,11 +110,13 @@ export default {
      * @param sortBy
      */
     setSorting(sorted, sortBy) {
-      console.log("setSorting", JSON.stringify(this.$props.sorting, null, 2));
+      const p = this.$props.sorting;
+      // Invert the order if the sorting criterium stays the same, otherwise sort ascendingly.
+      const ascending = p.sortBy === sortBy ? !p.ascending : true;
       this.$store.commit("sortPredicateModal", {
         sorted,
         sortBy,
-        ascending: !this.$props.sorting.ascending
+        ascending
       });
     },
 
@@ -164,7 +166,7 @@ export default {
      * @returns {*}
      */
     sortList(list) {
-      const { sorted, sortBy, ascending } = this.$props;
+      const { sorted, sortBy, ascending } = this.$props.sorting;
       if (sorted) {
         // Sort the list.
         sortBy === "predicate"

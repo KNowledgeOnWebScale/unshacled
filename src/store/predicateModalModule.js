@@ -51,7 +51,10 @@ const predicateModalModule = {
      *            ascending {boolean}
      */
     sortPredicateModal(state, args) {
-      Vue.set(state, "sorting", args);
+      const { sorted, sortBy, ascending } = args;
+      Vue.set(state.sorting, "sorted", sorted);
+      Vue.set(state.sorting, "sortBy", sortBy);
+      Vue.set(state.sorting, "ascending", ascending);
     },
 
     /**

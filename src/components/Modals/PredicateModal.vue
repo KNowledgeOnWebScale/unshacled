@@ -14,7 +14,7 @@
           :contents="table()"
           :filter="values.search"
           :selected="$props.modalProperties.selected"
-          :sorting="$props.modalProperties.sorting"
+          :sorting="$store.state.mShape.mConstraint.mModal.sorting"
         ></scrollable-table>
 
         <sui-form-field
@@ -303,7 +303,8 @@ export default {
         predicate: "",
         input: "",
         object: "",
-        constraintType: ""
+        constraintType: "",
+        search: ""
       };
       this.error = false;
     },
