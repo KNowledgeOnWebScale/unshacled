@@ -1,5 +1,5 @@
-import ShaclTranslator from "../translation/shaclTranslator";
-import { urlToName } from "./urlParser";
+import ShaclTranslator from "../../translation/shaclTranslator";
+import { urlToName } from "../urlParser";
 
 getReady;
 const initialConstraints = [];

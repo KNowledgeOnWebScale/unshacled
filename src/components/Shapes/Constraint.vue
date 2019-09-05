@@ -40,7 +40,7 @@ import {
   DELETE_BUTTON_CONFIG,
   DELTA_Y_DELETE,
   MAX_LENGTH
-} from "../../util/konvaConfigs";
+} from "../../config/konvaConfigs";
 import { urlToName } from "../../util/urlParser";
 import { SINGLE_ENTRY } from "../../util/constants";
 import ValueType, {

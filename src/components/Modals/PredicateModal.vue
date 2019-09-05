@@ -85,7 +85,7 @@ import {
   getConstraintCategory,
   getConstraintValueType,
   tableContents
-} from "../../util/shaclConstraints";
+} from "../../util/shacl/shaclConstraints";
 import { extractUrl, isUrl, urlToName } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
 import { SCHEMA_URI } from "../../util/constants";

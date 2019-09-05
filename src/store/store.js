@@ -3,7 +3,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 
 // Util
-import { possiblePredicates, possibleObjects } from "../util/vocabulary";
+import { possiblePredicates, possibleObjects } from "../util/shacl/vocabulary";
 import { ETF } from "../util/enums/extensionToFormat";
 
 // Translation

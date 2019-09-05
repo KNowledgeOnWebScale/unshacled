@@ -22,10 +22,9 @@ import {
   RELATIONSHIP_LABEL_RECT_CONFIG,
   RELATIONSHIP_LABEL_TEXT_CONFIG,
   MARGIN
-} from "../../util/konvaConfigs";
-import nearestPointOnPerimeter from "../../util/nearestPointOnPerimeter";
+} from "../../config/konvaConfigs";
+import { nearestPointOnPerimeter, distance } from "../../util/calculations";
 import { urlToName } from "../../util/urlParser";
-import { distance } from "../../util";
 
 export default {
   name: "Relationship",

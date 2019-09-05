@@ -1,6 +1,6 @@
 import shacl from "./shacl";
-import { TERM } from "../translation/terminology";
-import SHACLTranslator from "../translation/shaclTranslator";
+import { TERM } from "../../translation/terminology";
+import SHACLTranslator from "../../translation/shaclTranslator";
 
 /** Dictionary with distinct Types
  {

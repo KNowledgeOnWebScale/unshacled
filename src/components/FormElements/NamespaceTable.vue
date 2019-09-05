@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import namespaces from "../../util/enums/namespaces";
+import namespaces from "../../config/config";
 
 export default {
   name: "NamespaceTable",

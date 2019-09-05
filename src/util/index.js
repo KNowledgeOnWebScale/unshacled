@@ -45,18 +45,6 @@ export function groupBy(dictionary, key, deleteKey = false) {
 }
 
 /**
- * Calculate the distance between the two given points.
- * @returns {number}
- * @param x1
- * @param y1
- * @param x2
- * @param y2
- */
-export function distance(x1, y1, x2, y2) {
-  return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-}
-
-/**
  * Swap the keys and values form `namespaces`.
  */
 export function swapKeyValue(object) {

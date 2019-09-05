@@ -4,7 +4,7 @@ import ValueType, {
   ValueTypes
 } from "../util/enums/ValueType";
 import { urlToName } from "../util/urlParser";
-import { HEIGHT } from "../util/konvaConfigs";
+import { HEIGHT } from "../config/konvaConfigs";
 import { IGNORED_PROPERTIES, SINGLE_ENTRY } from "../util/constants";
 
 const coordinateModule = {

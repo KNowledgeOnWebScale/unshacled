@@ -1,4 +1,4 @@
-import { groupedConstraints } from "./shaclConstraints";
+import { groupedConstraints } from "./shacl/shaclConstraints";
 import language from "./enums/languages";
 
 /**

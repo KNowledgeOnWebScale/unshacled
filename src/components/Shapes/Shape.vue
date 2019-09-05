@@ -68,7 +68,7 @@ import {
   TEXT_SIZE,
   WIDTH,
   MARGIN
-} from "../../util/konvaConfigs";
+} from "../../config/konvaConfigs";
 import { TERM } from "../../translation/terminology";
 import { abbreviate } from "../../util/strings";
 import { LABEL } from "../../util/constants";
