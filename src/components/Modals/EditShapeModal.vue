@@ -29,25 +29,53 @@
               Please enter a unique IRI
             </sui-label>
           </sui-form-field>
-          <sui-form-field>
-            <label v-if="this.$props.modalProperties.nodeShape" for="label">
-              <!-- A node shape has a label. -->
-              Label
-            </label>
-            <label v-if="!this.$props.modalProperties.nodeShape" for="label">
-              <!-- A property shape has a name. -->
-              Name
-            </label>
-            <input id="label" v-model="values.label" @keyup="handleKeyPress" />
-          </sui-form-field>
-          <sui-form-field>
-            <label for="description">Description</label>
-            <input
-              id="description"
-              v-model="values.description"
-              @keyup="handleKeyPress"
-            />
-          </sui-form-field>
+          <sui-form-fields class="two">
+            <sui-form-field class="fourteen wide">
+              <label for="label">
+                <!-- Node shape has a label, property shape has a name. -->
+                {{ this.$props.modalProperties.nodeShape ? "Label" : "Name" }}
+              </label>
+              <input
+                id="label"
+                v-model="values.label"
+                @keyup="handleKeyPress"
+              />
+            </sui-form-field>
+            <sui-form-field class="two wide">
+              <label for="labelLang">Language</label>
+              <select
+                id="labelLang"
+                v-model="values.labelLang"
+                class="ui fluid dropdown"
+              >
+                <option v-for="language of getLanguageTags()" :key="language">
+                  {{ language }}
+                </option>
+              </select>
+            </sui-form-field>
+          </sui-form-fields>
+
+          <sui-form-fields class="two">
+            <sui-form-field class="fourteen wide">
+              <label for="description">Description</label>
+              <input
+                id="description"
+                v-model="values.description"
+                @keyup="handleKeyPress"
+            /></sui-form-field>
+            <sui-form-field class="two wide">
+              <label for="descrLang">Language</label>
+              <select
+                id="descrLang"
+                v-model="values.descrLang"
+                class="ui fluid dropdown"
+              >
+                <option v-for="language of getLanguageTags()" :key="language">
+                  {{ language }}
+                </option>
+              </select>
+            </sui-form-field>
+          </sui-form-fields>
         </sui-form>
       </sui-modal-content>
       <sui-modal-actions>
@@ -65,6 +93,7 @@ import { XML_DATATYPES } from "../../util";
 import { TERM } from "../../translation/terminology";
 import { BLANK_REGEX, IRI_REGEX, LABEL } from "../../util/constants";
 import getValueType from "../../util/enums/ValueType";
+import isoLangs from "../../util/enums/isoLangs";
 
 export default {
   name: "EditShapeModal",
@@ -79,7 +108,9 @@ export default {
       values: {
         id: "",
         label: "",
-        description: ""
+        labelLang: "en",
+        description: "",
+        descrLang: "en"
       }
     };
   },
@@ -108,6 +139,13 @@ export default {
   },
   methods: {
     /**
+     * Get a list of language tags.
+     */
+    getLanguageTags() {
+      return Object.keys(isoLangs).sort();
+    },
+
+    /**
      * Confirm on enter press.
      * @param e key press event
      */
@@ -120,7 +158,7 @@ export default {
      * Update the shape ID, name/label and description accordingly.
      */
     confirm() {
-      const { id, label, description } = this.values;
+      const { id, label, labelLang, description, descrLang } = this.values;
       const modProps = this.$props.modalProperties;
 
       // Close the modal.
@@ -132,16 +170,21 @@ export default {
         newID: id
       });
       // Update the shape label/name and description.
-      this.handleConstraint(modProps.nodeShape ? TERM.name : LABEL, label);
-      this.handleConstraint(TERM.description, description);
+      this.handleConstraint(
+        modProps.nodeShape ? LABEL : TERM.name,
+        label,
+        labelLang
+      );
+      this.handleConstraint(TERM.description, description, descrLang);
     },
 
     /**
      * Handle the update of the given constraint.
      * @param constraintID the key of the constraint.
      * @param value the value of the constraint.
+     * @param language the language tag for this value.
      */
-    handleConstraint(constraintID, value) {
+    handleConstraint(constraintID, value, language) {
       const shapeID = this.values.id;
 
       // Check if the user has filled in a value.
@@ -154,7 +197,13 @@ export default {
           this.$store.dispatch("updateConstraint", {
             shapeID,
             constraintID,
-            newValue: [{ "@type": XML_DATATYPES.string, "@value": value }]
+            newValue: [
+              {
+                // "@type": XML_DATATYPES.string,
+                "@value": value,
+                "@language": language
+              }
+            ]
           });
         } else {
           // Add the predicate to the shape.
@@ -163,7 +212,8 @@ export default {
             predicate: constraintID,
             valueType: getValueType(constraintID),
             input: value,
-            object: XML_DATATYPES.string
+            object: XML_DATATYPES.string,
+            language
           });
         }
       } else {
@@ -186,8 +236,14 @@ export default {
      * Update the data values using the properties.
      */
     updateValues() {
-      const { id, label, description } = this.$props.modalProperties;
-      this.values = { id, label, description };
+      const {
+        id,
+        label,
+        labelLang,
+        description,
+        descrLang
+      } = this.$props.modalProperties;
+      this.values = { id, label, labelLang, description, descrLang };
     },
 
     /**

@@ -19,7 +19,9 @@ const shapeModule = {
       show: false,
       id: "",
       label: "",
+      labelLang: "em",
       description: "",
+      descrLang: "en",
       nodeShape: false
     }
   },
@@ -75,9 +77,17 @@ const shapeModule = {
       event.preventDefault();
       if (args) {
         args.label = args.label ? args.label : "";
+        args.labelLang = args.labelLang ? args.labelLang : "en";
         args.description = args.description ? args.description : "";
+        args.descrLang = args.descrLang ? args.descrLang : "en";
       } else {
-        args = { id: "", label: "", description: "" };
+        args = {
+          id: "",
+          label: "",
+          labelLang: "en",
+          description: "",
+          descrLang: "en"
+        };
       }
       args.show = !state.shapeModal.show;
       Vue.set(state, "shapeModal", args);

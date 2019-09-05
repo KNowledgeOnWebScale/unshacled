@@ -71,6 +71,7 @@ import {
 } from "../../util/konvaConfigs";
 import { TERM } from "../../translation/terminology";
 import { abbreviate } from "../../util/strings";
+import { LABEL } from "../../util/constants";
 
 export default {
   name: "Shape",
@@ -248,13 +249,33 @@ export default {
      */
     startEditing() {
       const shape = this.$store.getters.shapeWithID(this.id);
+
+      // Get the label and its language.
+      const labelConstraint = shape[TERM.name]
+        ? shape[TERM.name]
+        : shape[LABEL]
+        ? shape[LABEL]
+        : null;
+      const label = labelConstraint ? labelConstraint[0]["@value"] : "";
+      const labelLang = labelConstraint
+        ? labelConstraint[0]["@language"]
+        : "en";
+
+      // Get the description and its language.
       const description = shape[TERM.description]
         ? shape[TERM.description][0]["@value"]
         : "";
+      const descrLang = shape[TERM.description]
+        ? shape[TERM.description][0]["@language"]
+        : "en";
+
+      // Toggle the modal.
       this.$store.commit("toggleEditShapeModal", {
         id: this.id,
-        label: this.$store.getters.labelForId(this.id),
+        label,
+        labelLang: labelLang || "en",
         description,
+        descrLang,
         nodeShape: this.nodeShape
       });
     },
