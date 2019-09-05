@@ -391,7 +391,7 @@ export default {
      * @returns {*}
      */
     getName(key) {
-      return urlToName(key);
+      return uriToPrefix(key);
     },
 
     /**

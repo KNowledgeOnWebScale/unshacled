@@ -17,7 +17,7 @@
       <div v-for="(value, index) of getConstraintValues()" :key="index">
         <v-text
           :config="getValueConfig(value, index)"
-          @click="editValue(index, value)"
+          @click="editValue(index)"
         ></v-text>
         <v-circle
           v-if="hoverValues && !isListOfValues() && canBeDeleted()"
