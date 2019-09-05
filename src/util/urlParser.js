@@ -1,5 +1,5 @@
-import { EXAMPLE_URI } from "./constants";
-import { CUSTOM_URI } from "../translation/terminology";
+import namespaces from "../config/config";
+import { swapKeyValue } from "./index";
 
 /**
  * Takes the name out of an url if possible.
@@ -11,13 +11,34 @@ export function urlToName(url) {
   if (!url) return "(undefined)";
   if (url.indexOf("#") !== -1) return url.substring(url.indexOf("#") + 1);
   if (url.indexOf("/") !== -1) return url.substring(url.lastIndexOf("/") + 1);
+  if (url.indexOf(":") !== -1) return url.substring(url.indexOf(":") + 1); // in case of prefixes
   return url;
 }
 
 /**
+ * Change the URI in the given string to the matching prefix.
+ * @param string {string}
+ * @returns {string}
+ */
+export function uriToPrefix(string) {
+  const uri = extractUrl(string);
+  return string.replace(uri, swapKeyValue(namespaces)[uri]);
+}
+
+/**
+ * Change the prefix in the given string to the matching URI.
+ * @param string {string}
+ * @returns {string}
+ */
+export function prefixToUri(string) {
+  const prefix = extractPrefix(string);
+  return string.replace(prefix, namespaces[prefix]);
+}
+
+/**
  * Get the base url from a string.
- * @param string
- * @returns {*}
+ * @param string {string}
+ * @returns {string}
  */
 export function extractUrl(string) {
   if (string.indexOf("#") !== -1)
@@ -28,27 +49,22 @@ export function extractUrl(string) {
 }
 
 /**
+ * Get the prefix from a string.
+ * @param string {string}
+ * @returns {string}
+ */
+export function extractPrefix(string) {
+  if (string.indexOf(":") !== -1) {
+    return string.substring(0, string.indexOf(":"));
+  }
+  return "";
+}
+
+/**
  * Check if the given string is an url.
  * @param string
- * @returns {f1|*|boolean}
+ * @returns {boolean}
  */
 export function isUrl(string) {
   return string.includes("/");
-}
-
-/**
- * Create an example URL using the given ID.
- * @param id
- * @returns {string}
- */
-export function createUrl(id) {
-  return EXAMPLE_URI + id;
-}
-
-/**
- * TODO
- * @param url
- */
-export function urlToCuston(url) {
-  return `${CUSTOM_URI}${urlToName(url)}`;
 }
