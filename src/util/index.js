@@ -55,3 +55,14 @@ export function groupBy(dictionary, key, deleteKey = false) {
 export function distance(x1, y1, x2, y2) {
   return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 }
+
+/**
+ * Swap the keys and values form `namespaces`.
+ */
+export function swapKeyValue(object) {
+  const output = {};
+  object.map((key, value) => {
+    output[value] = key;
+  });
+  return output;
+}

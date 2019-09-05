@@ -7,7 +7,7 @@ import getValueType, {
   ValueTypes
 } from "../util/enums/ValueType";
 import { IGNORED_PROPERTIES } from "../util/constants";
-import predicateModalModule from "./predicateModalModule";
+import predicateModalModule from "./modals/predicateModalModule";
 
 /**
  * This module contains everything to change the shape constraints.

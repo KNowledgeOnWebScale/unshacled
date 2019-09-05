@@ -36,6 +36,9 @@
           </sui-dropdown-item>
         </sui-dropdown-menu>
       </sui-dropdown>
+      <sui-menu-item class="clickable" @click="toggleNamespaceModal">
+        Namespaces
+      </sui-menu-item>
       <sui-menu-item class="clickable" icon="add" @click="createNodeShape">
         Shape
       </sui-menu-item>
@@ -73,6 +76,8 @@
 
     <clear-modal></clear-modal>
     <export-modal></export-modal>
+    <namespace-modal></namespace-modal>
+
     <path-modal
       :editing="$store.state.pathModal.editing"
       :shape-i-d="$store.state.pathModal.shapeID"
@@ -102,10 +107,12 @@ import PredicateModal from "./Modals/PredicateModal.vue";
 import ExportModal from "./Modals/ExportModal.vue";
 import PathModal from "./Modals/PathModal.vue";
 import EditShapeModal from "./Modals/EditShapeModal.vue";
+import NamespaceModal from "./Modals/NamespaceModal.vue";
 
 export default {
   name: "NavBar",
   components: {
+    NamespaceModal,
     EditShapeModal,
     PathModal,
     ExportModal,
@@ -125,6 +132,9 @@ export default {
   methods: {
     toggleClearModal() {
       this.$store.commit("toggleClearModal");
+    },
+    toggleNamespaceModal() {
+      this.$store.commit("toggleNamespaceModal");
     },
     createNodeShape() {
       this.$store.dispatch("addNodeShape", this.uuid());

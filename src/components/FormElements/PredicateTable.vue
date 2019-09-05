@@ -88,7 +88,7 @@
 
 <script>
 export default {
-  name: "ScrollableTable",
+  name: "PredicateTable",
   props: {
     contents: {
       type: Array,

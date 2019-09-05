@@ -29,6 +29,9 @@ export default new Vuex.Store({
       editing: false,
       shapeID: ""
     },
+    namespaceModal: {
+      show: false
+    },
     exportType: ""
   },
   modules: {
@@ -64,6 +67,16 @@ export default new Vuex.Store({
     toggleClearModal(state) {
       event.preventDefault();
       state.showClearModal = !state.showClearModal;
+    },
+
+    /**
+     * Toggle the visibility of the namespace modal.
+     * @param state
+     * @param bool {boolean} indicates if the modal should be shown.
+     */
+    toggleNamespaceModal(state, bool = true) {
+      event.preventDefault();
+      Vue.set(state.namespaceModal, "show", bool);
     },
 
     /**

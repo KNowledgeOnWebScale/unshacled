@@ -10,13 +10,13 @@
           <input id="search" v-model="values.search" />
         </sui-form-field>
 
-        <scrollable-table
+        <predicate-table
           :contents="table()"
           :filter="values.search"
           :selected="$props.modalProperties.selected"
           :editing="$props.modalProperties.editing"
           :sorting="$store.state.mShape.mConstraint.mModal.sorting"
-        ></scrollable-table>
+        ></predicate-table>
 
         <br />
         <sui-form-field
@@ -90,11 +90,11 @@ import { extractUrl, isUrl, urlToName } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
 import { SCHEMA_URI } from "../../util/constants";
 import { XML_DATATYPES } from "../../util";
-import ScrollableTable from "../FormElements/ScrollableTable.vue";
+import PredicateTable from "../FormElements/PredicateTable.vue";
 
 export default {
   name: "PredicateModal",
-  components: { ScrollableTable },
+  components: { PredicateTable },
   props: {
     modalProperties: {
       required: true,
