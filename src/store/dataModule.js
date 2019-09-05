@@ -25,6 +25,7 @@ const dataModule = {
     /**
      * Set the data file to the given contents.
      * @param state
+     * @param name
      * @param contents the contents of a read data file.
      * @param extension the extension of the data file.
      */

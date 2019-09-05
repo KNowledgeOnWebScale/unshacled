@@ -24,7 +24,7 @@ import {
   MARGIN
 } from "../../config/konvaConfigs";
 import { nearestPointOnPerimeter, distance } from "../../util/calculations";
-import { urlToName } from "../../util/urlParser";
+import { uriToPrefix } from "../../util/urlParser";
 
 export default {
   name: "Relationship",
@@ -121,7 +121,7 @@ export default {
         },
         text: {
           ...RELATIONSHIP_LABEL_TEXT_CONFIG,
-          text: urlToName(this.$props.constraintID)
+          text: uriToPrefix(this.$props.constraintID)
         },
         rect: {
           ...RELATIONSHIP_LABEL_RECT_CONFIG,

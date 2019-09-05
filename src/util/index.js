@@ -49,8 +49,8 @@ export function groupBy(dictionary, key, deleteKey = false) {
  */
 export function swapKeyValue(object) {
   const output = {};
-  object.map((key, value) => {
-    output[value] = key;
+  Object.keys(object).map(key => {
+    output[object[key]] = key;
   });
   return output;
 }

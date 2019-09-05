@@ -41,7 +41,7 @@ import {
   DELTA_Y_DELETE,
   MAX_LENGTH
 } from "../../config/konvaConfigs";
-import { urlToName } from "../../util/urlParser";
+import { uriToPrefix, urlToName } from "../../util/urlParser";
 import { SINGLE_ENTRY } from "../../util/constants";
 import ValueType, {
   getValueTypeFromConstraint,
@@ -88,7 +88,7 @@ export default {
         ...CONSTRAINT_TEXT_CONFIG,
         y: DELTA_Y_TEXT,
         fontStyle: "italic",
-        text: urlToName(this.$props.constraintID)
+        text: uriToPrefix(this.$props.constraintID)
       },
       valueConfig: {
         ...CONSTRAINT_TEXT_CONFIG,
@@ -240,7 +240,8 @@ export default {
           const key = vt.includes(ValueTypes.ID) ? "@id" : "@value";
           const name = v[key] ? v[key] : v;
           // If the shape has a label, use it.
-          const text = this.$store.getters.labelForId(name) || urlToName(name);
+          const text =
+            this.$store.getters.labelForId(name) || uriToPrefix(name);
           // Abbreviate the label.
           output.push(abbreviate(text));
         }
@@ -325,11 +326,12 @@ export default {
      * @returns {{y: *, text: *}}
      */
     getValueConfig(value, index) {
-      const move = value.length - 2 > MAX_LENGTH ? -HEIGHT / 6 : 0;
+      const text = uriToPrefix(value);
+      const move = text.length - 2 > MAX_LENGTH ? -HEIGHT / 6 : 0;
       return {
         ...this.valueConfig,
         y: this.valueConfig.y + this.getYValue() + index * HEIGHT + move,
-        text: this.$props.constraintID === TERM.path ? value : urlToName(value)
+        text
       };
     },
 

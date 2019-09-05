@@ -18,7 +18,7 @@ export default class ShaclTranslator {
   /**
    * Replaces all SHACL URI's with model URI's.
    * @param shacl SHACL in JSON-LD
-   * @returns {any} Translated document
+   * @returns {any|string} Translated document
    */
   static toModelSimple(shacl) {
     return JSON.parse(
@@ -29,7 +29,7 @@ export default class ShaclTranslator {
   /**
    * Replaces all model URI's with SHACL URI's.
    * @param model Model in JSON-LD
-   * @returns {any} Translated document
+   * @returns {any|string} Translated document
    */
   static toSHACL(model) {
     return ShaclTranslator.translate(model, dictionary.SHACL);
@@ -38,7 +38,7 @@ export default class ShaclTranslator {
   /**
    * Replaces all model URI's with SHACL URI's.
    * @param model Model in JSON-LD
-   * @returns {any} Translated document
+   * @returns {any|string} Translated document
    */
   static toSHACLSimple(model) {
     return JSON.parse(
@@ -50,7 +50,7 @@ export default class ShaclTranslator {
    * Translates by replacing URI's found in dictionary.
    * @param document Document in JSON-LD
    * @param dict Dictionary which contains URI's to be translated
-   * @returns {any} Translated document
+   * @returns {any|string} Translated document
    */
   static translate(document, dict) {
     for (const property in document) {

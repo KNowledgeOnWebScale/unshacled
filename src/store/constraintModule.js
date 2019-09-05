@@ -1,7 +1,7 @@
 import { clone } from "ramda";
 import Vue from "vue";
 import { TERM } from "../translation/terminology";
-import { extractUrl, urlToName } from "../util/urlParser";
+import { prefixToUri } from "../util/urlParser";
 import getValueType, {
   getValueTypeFromConstraint,
   ValueTypes
@@ -165,7 +165,6 @@ const constraintModule = {
       const iter = valueType.includes(ValueTypes.LIST)
         ? updated[0]["@list"]
         : updated;
-      const original = iter[i];
 
       // Create a new value object.
       let newValue;
@@ -173,11 +172,9 @@ const constraintModule = {
       if (constraintID === TERM.path) {
         newValue = { "@id": input };
       } else if (valueType.includes(ValueTypes.ID)) {
-        name = `${extractUrl(original["@id"])}${urlToName(input)}`;
-        newValue = { "@id": name };
+        newValue = { "@id": prefixToUri(input) };
       } else {
-        name = `${extractUrl(original["@value"])}${urlToName(input)}`;
-        newValue = { "@type": object, "@value": name };
+        newValue = { "@type": object, "@value": prefixToUri(input) };
       }
 
       // Check if this new value is a duplicate.

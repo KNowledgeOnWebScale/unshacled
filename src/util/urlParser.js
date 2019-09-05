@@ -1,5 +1,6 @@
 import namespaces from "../config/config";
 import { swapKeyValue } from "./index";
+import {CUSTOM_URI} from "../translation/terminology";
 
 /**
  * Takes the name out of an url if possible.
@@ -11,7 +12,8 @@ export function urlToName(url) {
   if (!url) return "(undefined)";
   if (url.indexOf("#") !== -1) return url.substring(url.indexOf("#") + 1);
   if (url.indexOf("/") !== -1) return url.substring(url.lastIndexOf("/") + 1);
-  if (url.indexOf(":") !== -1) return url.substring(url.indexOf(":") + 1); // in case of prefixes
+  if (url.indexOf(":") !== -1 && url.indexOf("://") === -1)
+    return url.substring(url.indexOf(":") + 1); // in case of prefixes
   return url;
 }
 
@@ -21,18 +23,29 @@ export function urlToName(url) {
  * @returns {string}
  */
 export function uriToPrefix(string) {
+  if (
+    string.indexOf("_:") === 0 ||
+    (string.indexOf(":") !== -1 && string.indexOf("://") === -1)
+  )
+    return string;
   const uri = extractUrl(string);
-  return string.replace(uri, swapKeyValue(namespaces)[uri]);
+  if (uri === CUSTOM_URI) return urlToName(string);
+  if (swapKeyValue(namespaces)[uri])
+    return string.replace(uri, `${swapKeyValue(namespaces)[uri]}:`);
+  return string;
 }
 
 /**
  * Change the prefix in the given string to the matching URI.
+ * If there is no URI defined for the given prefix, return the string unchanged.
  * @param string {string}
  * @returns {string}
  */
 export function prefixToUri(string) {
   const prefix = extractPrefix(string);
-  return string.replace(prefix, namespaces[prefix]);
+  if (namespaces[prefix])
+    return string.replace(`${extractPrefix(string)}:`, namespaces[prefix]);
+  return string;
 }
 
 /**
@@ -54,7 +67,7 @@ export function extractUrl(string) {
  * @returns {string}
  */
 export function extractPrefix(string) {
-  if (string.indexOf(":") !== -1) {
+  if (string.indexOf(":") !== -1 && string.indexOf("://") === -1) {
     return string.substring(0, string.indexOf(":"));
   }
   return "";

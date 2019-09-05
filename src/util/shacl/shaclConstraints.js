@@ -1,5 +1,5 @@
 import ShaclTranslator from "../../translation/shaclTranslator";
-import { urlToName } from "../urlParser";
+import { uriToPrefix } from "../urlParser";
 
 getReady;
 const initialConstraints = [];
@@ -6508,7 +6508,7 @@ export function tableContents() {
     const id = ShaclTranslator.toModelSimple(constraint);
     contents.push({
       id,
-      predicate: urlToName(id),
+      predicate: uriToPrefix(id),
       type: getConstraintCategory(id).replace(" Constraints", ""),
       description: json.filter(obj => obj["@id"] === constraint)[0][
         "http://www.w3.org/2000/01/rdf-schema#comment"

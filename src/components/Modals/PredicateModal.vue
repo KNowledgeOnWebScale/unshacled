@@ -86,7 +86,12 @@ import {
   getConstraintValueType,
   tableContents
 } from "../../util/shacl/shaclConstraints";
-import { extractUrl, isUrl, urlToName } from "../../util/urlParser";
+import {
+  extractUrl,
+  isUrl,
+  uriToPrefix,
+  urlToName
+} from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
 import { SCHEMA_URI } from "../../util/constants";
 import { XML_DATATYPES } from "../../util";
@@ -165,7 +170,7 @@ export default {
         predicate: selected,
         input,
         inputBool: input === "true",
-        inputWithoutUrl: urlToName(input),
+        inputWithoutUrl: uriToPrefix(input),
         constraintType: s ? getConstraintValueType(selected) : ""
       };
     },

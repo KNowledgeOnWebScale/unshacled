@@ -52,7 +52,7 @@
 
 <script>
 import Constraint from "./Constraint.vue";
-import { urlToName } from "../../util/urlParser";
+import { uriToPrefix } from "../../util/urlParser";
 import {
   DELETE_BUTTON_CONFIG,
   LABEL_TEXT_CONFIG,
@@ -98,7 +98,7 @@ export default {
       deleteNodeConfig: DELETE_BUTTON_CONFIG,
       idTextConfig: {
         ...LABEL_TEXT_CONFIG,
-        text: urlToName(this.$props.id)
+        text: uriToPrefix(this.$props.id)
       },
       addPredicateConfig: ADD_PREDICATE_CONFIG
     };
@@ -126,7 +126,7 @@ export default {
      */
     getLabelTextConfig() {
       const label = this.$store.getters.labelForId(this.id);
-      const text = label ? abbreviate(label) : abbreviate(urlToName(this.id));
+      const text = label ? abbreviate(label) : abbreviate(uriToPrefix(this.id));
       return {
         ...LABEL_TEXT_CONFIG,
         y: label ? OFFSET : TEXT_OFFSET,
