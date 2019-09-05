@@ -58,7 +58,7 @@ const constraintModule = {
      * @param args
      */
     addPredicate({ state, getters, commit, dispatch, rootState }, args) {
-      const { shapeID, predicate, valueType, input, object } = args;
+      const { shapeID, predicate, valueType, input, object, language } = args;
       const shape = getters.shapeWithID(shapeID);
       const isID = valueType.includes(ValueTypes.ID);
       const isList = valueType.includes(ValueTypes.LIST);
@@ -83,7 +83,9 @@ const constraintModule = {
         const value = isID
           ? { "@id": input }
           : { "@type": object, "@value": input };
+        if (language) value["@language"] = language;
 
+        // TODO take multiple languages into account
         if (valueType === "type") {
           // Replace the value.
           Vue.set(shape[predicate], 0, value);
