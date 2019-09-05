@@ -1,16 +1,13 @@
 import { clone } from "ramda";
 import Vue from "vue";
 import { TERM } from "../translation/terminology";
-import {
-  getConstraintCategory,
-  getConstraintValueType
-} from "../util/shaclConstraints";
 import { extractUrl, urlToName } from "../util/urlParser";
 import getValueType, {
   getValueTypeFromConstraint,
   ValueTypes
 } from "../util/enums/ValueType";
 import { IGNORED_PROPERTIES } from "../util/constants";
+import predicateModalModule from "./predicateModalModule";
 
 /**
  * This module contains everything to change the shape constraints.
@@ -18,20 +15,10 @@ import { IGNORED_PROPERTIES } from "../util/constants";
  */
 const constraintModule = {
   state: {
-    predicateModal: {
-      show: false,
-      shapeID: "",
-      shapeType: "",
-      category: "",
-      predicate: "",
-      urls: {},
-      input: "",
-      object: "",
-      constraintType: "",
-      editing: false,
-      onExit: undefined
-    },
     constraintIndex: 0
+  },
+  modules: {
+    mModal: predicateModalModule
   },
   mutations: {
     /**
@@ -57,47 +44,6 @@ const constraintModule = {
     deleteConstraintFromShape(state, args) {
       const { shape, constraintID } = args;
       Vue.delete(shape, constraintID);
-    },
-
-    /* PREDICATE MODAL ============================================================================================== */
-
-    /**
-     * Toggle the visibility of the predicate modal.
-     * @param state
-     * @param args
-     */
-    togglePredicateModal(state, args) {
-      if (!args)
-        args = { shapeID: "", shapeType: "", onExit: "", editing: false };
-
-      state.predicateModal = {
-        ...state.predicateModal,
-        show: !state.predicateModal.show,
-        shapeID: args.shapeID,
-        shapeType: args.shapeType,
-        editing: args.editing,
-        onExit: args.onExit
-      };
-    },
-
-    /**
-     * Reset the properties of the predicate modal.
-     * @param state
-     */
-    resetPredicateModal(state) {
-      state.predicateModal = {
-        show: false,
-        shapeID: "",
-        shapeType: "",
-        category: "",
-        predicate: "",
-        urls: {},
-        input: "",
-        object: "",
-        constraintType: "",
-        editing: false,
-        onExit: undefined
-      };
     }
   },
   actions: {
@@ -111,7 +57,7 @@ const constraintModule = {
      * @param rootState
      * @param args
      */
-    addPredicate({ getters, commit, dispatch, rootState }, args) {
+    addPredicate({ state, getters, commit, dispatch, rootState }, args) {
       const { shapeID, predicate, valueType, input, object } = args;
       const shape = getters.shapeWithID(shapeID);
       const isID = valueType.includes(ValueTypes.ID);
@@ -167,8 +113,7 @@ const constraintModule = {
       }
 
       // Toggle the predicate modal.
-      if (rootState.mShape.mConstraint.predicateModal.show)
-        commit("togglePredicateModal", undefined, { root: true });
+      if (state.mModal.show) commit("togglePredicateModal", undefined);
     },
 
     /* EDIT ========================================================================================================= */
@@ -176,27 +121,20 @@ const constraintModule = {
     /**
      * Prepare and toggle the predicate modal.
      * @param state
+     * @param commit
      * @param args
      */
-    startConstraintEdit({ state }, args) {
+    startConstraintEdit({ state, commit }, args) {
       const { shapeID, shapeType, constraintID, index, value } = args;
 
       state.constraintIndex = index;
-      state.predicateModal = {
-        ...state.predicateModal,
+      commit("togglePredicateModal", {
         shapeID,
         shapeType,
-        category: getConstraintCategory(constraintID),
-        predicate: urlToName(constraintID),
+        editing: true,
         input: value,
-        constraintType: getConstraintValueType(constraintID),
-        editing: true
-      };
-      this.commit("togglePredicateModal", {
-        shapeID,
-        shapeType,
         onExit: "stopConstraintEdit",
-        editing: true
+        selected: constraintID
       });
     },
 
@@ -208,8 +146,8 @@ const constraintModule = {
      */
     stopConstraintEdit({ state, rootGetters }, args) {
       // Update the modal state.
-      state.predicateModal.show = false;
-      state.predicateModal.editing = false;
+      Vue.set(state.mModal, "show", false);
+      Vue.set(state.mModal, "editing", false);
 
       const { shapeID, predicate: constraintID, object, valueType } = args;
       const i = state.constraintIndex;
@@ -227,7 +165,9 @@ const constraintModule = {
       // Create a new value object.
       let newValue;
       let name;
-      if (valueType.includes(ValueTypes.ID)) {
+      if (constraintID === TERM.path) {
+        newValue = { "@id": input };
+      } else if (valueType.includes(ValueTypes.ID)) {
         name = `${extractUrl(original["@id"])}${urlToName(input)}`;
         newValue = { "@id": name };
       } else {
@@ -238,7 +178,8 @@ const constraintModule = {
       // Check if this new value is a duplicate.
       let duplicate = false;
       const key = valueType.includes(ValueTypes.ID) ? "@id" : "@value";
-      for (const j in iter) {
+      for (let j in iter) {
+        j = Number(j);
         if (i !== j && iter[j][key] === name) duplicate = true;
       }
 

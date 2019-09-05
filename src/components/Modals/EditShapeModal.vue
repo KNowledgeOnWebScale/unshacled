@@ -96,6 +96,15 @@ export default {
       () => self.$store.state.mShape.shapeModal,
       () => self.updateValues()
     );
+
+    // Focus the id input field when the modal is called.
+    this.$store.watch(
+      () => self.$store.state.mShape.shapeModal.show,
+      () => {
+        if (self.$store.state.mShape.shapeModal.show)
+          document.getElementById("id").focus();
+      }
+    );
   },
   methods: {
     /**

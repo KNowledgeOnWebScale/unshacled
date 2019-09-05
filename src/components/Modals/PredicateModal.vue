@@ -1,81 +1,45 @@
 <template>
-  <sui-modal v-model="$store.state.mShape.mConstraint.predicateModal.show">
+  <sui-modal v-model="$store.state.mShape.mConstraint.mModal.show">
     <sui-modal-header>
       {{ $props.modalProperties.editing ? "Edit Predicate" : "Add Predicate" }}
     </sui-modal-header>
-    <sui-modal-content>
-      <sui-form @submit.prevent="exit">
-        <sui-form-field>
-          <label for="selectPreds">Predicate</label>
-          <input
-            id="selectPreds"
-            v-model="values.predicate"
-            class="ui fluid search dropdown"
-            list="predicates"
-            :disabled="$props.modalProperties.editing"
-            @input="selectObject"
-          />
-          <sui-label
-            v-if="
-              values.predicate !== '' && !$store.getters.objects(predicateUrl())
-            "
-            basic
-            pointing
-            color="red"
-          >
-            Please enter a valid predicate
-          </sui-label>
-          <datalist id="predicates">
-            <option v-for="p in predicates" :key="p" :value="p">{{ p }}</option>
-          </datalist>
+    <sui-modal-content scrolling>
+      <sui-form @submit.prevent="() => {}">
+        <sui-form-field v-if="!$props.modalProperties.editing">
+          <label for="search">Search</label>
+          <input id="search" v-model="values.search" />
         </sui-form-field>
 
-        <sui-form-field>
-          <label for="selectCategory">Category</label>
-          <select
-            v-if="categories"
-            id="selectCategory"
-            v-model="values.category"
-            :disabled="$props.modalProperties.editing"
-            @change="values.predicate = ''"
-          >
-            <option :value="''">All categories</option>
-            <option v-for="c in categories" :key="c" :value="c">
-              {{ c }}
-            </option>
-          </select>
-        </sui-form-field>
+        <scrollable-table
+          :contents="table()"
+          :filter="values.search"
+          :selected="$props.modalProperties.selected"
+          :editing="$props.modalProperties.editing"
+          :sorting="$store.state.mShape.mConstraint.mModal.sorting"
+        ></scrollable-table>
 
+        <br />
         <sui-form-field
-          v-if="$store.getters.objects(predicateUrl())"
+          v-if="$store.getters.objects($props.modalProperties.selected)"
           class="field"
+          :inline="true"
         >
           <label>Value</label>
           <input
-            v-if="showString()"
-            v-model="values.inputWithoutUrl"
-            type="text"
-            @keyup="handleKeyPress"
-          />
-          <input
-            v-if="showCheckbox()"
-            v-model="values.inputBool"
-            type="checkbox"
-          />
-          <input
-            v-if="showInteger()"
-            v-model="values.input"
-            type="number"
+            v-if="!showDataTypes()"
+            id="field"
+            v-model="values[getModel()]"
+            :list="getDataList()"
+            :type="getType()"
             @keyup="handleKeyPress"
           />
 
-          <input
-            v-if="showShapes()"
-            v-model="values.input"
-            list="shapeList"
-            @keyup="handleKeyPress"
-          />
-          <datalist v-if="showShapes()" id="shapeList" type="text">
+          <datalist v-if="showPaths()" id="pathList" :type="getType()">
+            <option v-for="key in getPathOptions()" :key="key" :value="key">
+              {{ getName(key) }}
+            </option>
+          </datalist>
+          <datalist v-if="showShapes()" id="shapeList" :type="getType()">
             <option
               v-for="key in getShapeOptions()"
               :key="getOptionID(key)"
@@ -83,33 +47,17 @@
             ></option>
           </datalist>
 
-          <input
-            v-if="showPaths()"
-            v-model="values.inputWithoutUrl"
-            list="pathList"
-            @keyup="handleKeyPress"
-          />
-          <datalist v-if="showPaths()" id="pathList" type="text">
-            <option v-for="key in getPathOptions()" :key="key" :value="key">
-              {{ getName(key) }}
-            </option>
-          </datalist>
-
           <select
             v-if="showDataTypes()"
-            v-model="values.input"
+            id="dataTypes"
+            v-model="values[getModel()]"
+            :type="getType()"
             @keyup="handleKeyPress"
           >
             <option v-for="key in getDataTypes()" :key="key" :value="key">
               {{ getName(key) }}
             </option>
           </select>
-
-          <input
-            v-if="showOther()"
-            v-model="values.inputWithoutUrl"
-            @keyup="handleKeyPress"
-          />
         </sui-form-field>
       </sui-form>
 
@@ -119,7 +67,12 @@
     </sui-modal-content>
     <sui-modal-actions>
       <sui-button tab-index="0" @click="toggleModal">Cancel</sui-button>
-      <sui-button tab-index="0" positive @click="exit">
+      <sui-button
+        tab-index="0"
+        positive
+        :disabled="$props.modalProperties.selected === ''"
+        @click="exit"
+      >
         {{ $props.modalProperties.editing ? "Confirm" : "Add" }}
       </sui-button>
     </sui-modal-actions>
@@ -127,20 +80,21 @@
 </template>
 
 <script>
-import Vue from "vue";
 import ValueType from "../../util/enums/ValueType";
 import {
-  constraintsByTypes,
-  customConstraintsByCategory,
-  getConstraintValueType
+  getConstraintCategory,
+  getConstraintValueType,
+  tableContents
 } from "../../util/shaclConstraints";
 import { extractUrl, isUrl, urlToName } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
 import { SCHEMA_URI } from "../../util/constants";
 import { XML_DATATYPES } from "../../util";
+import ScrollableTable from "../FormElements/ScrollableTable.vue";
 
 export default {
   name: "PredicateModal",
+  components: { ScrollableTable },
   props: {
     modalProperties: {
       required: true,
@@ -156,55 +110,181 @@ export default {
         input: "",
         inputBool: false,
         object: "",
-        constraintType: ""
+        constraintType: "",
+        search: ""
       },
       error: false
     };
-  },
-  computed: {
-    categories() {
-      return Object.keys(constraintsByTypes);
-    },
-
-    predicates() {
-      const predsWithoutUrl = [];
-
-      if (this.$props.modalProperties.shapeType) {
-        const preds = this.$store.getters.predicates(
-          this.$props.modalProperties.shapeType
-        );
-        const iter =
-          this.values.category === ""
-            ? Object.values(customConstraintsByCategory()).flat()
-            : customConstraintsByCategory()[this.values.category];
-
-        if (preds)
-          preds.forEach(pred => {
-            if (iter.includes(pred)) {
-              const value = pred.split("#")[1];
-              Vue.set(this.values.urls, value, pred.split("#")[0]);
-              predsWithoutUrl.push(value);
-            }
-          });
-      }
-      return predsWithoutUrl;
-    }
   },
   mounted() {
     /*
     The reason this watch is implemented is that this modal cannot work with `v-model="$props.something`.
     A component should not edit his properties directly, since a re-render in the parent component causes them
     to update (and override) their values. That's why this component keeps a copy of his properties, which he actually
-    can modify directly. With every update of his properties (in `mConstraint.predicateModal`), he copies these values
+    can modify directly. With every update of his properties (in `mConstraint.mModal`), he copies these values
     to his own state.
      */
     const self = this;
     this.$store.watch(
-      () => self.$store.state.mShape.mConstraint.predicateModal,
-      () => self.updateValues()
+      () => self.$store.state.mShape.mConstraint.mModal.selected,
+      () => {
+        self.updateValues();
+        const id = self.showPaths()
+          ? "pathList"
+          : self.showShapes()
+          ? "shapeList"
+          : self.showDataTypes()
+          ? "dataTypes"
+          : "field";
+        const field = document.getElementById(id);
+        if (field) field.focus();
+      }
+    );
+
+    // Focus the input field when the modal is called.
+    this.$store.watch(
+      () => self.$store.state.mShape.mConstraint.mModal.show,
+      () => {
+        if (self.$store.state.mShape.mConstraint.mModal.show) {
+          const field = document.getElementById("search");
+          if (field) field.focus();
+        }
+      }
     );
   },
   methods: {
+    /**
+     * Get the values passed on by the parent.
+     */
+    updateValues() {
+      const { selected, input } = this.$props.modalProperties;
+      const s = selected && selected !== "";
+      this.values = {
+        ...this.values,
+        category: s ? getConstraintCategory(selected) : "",
+        predicate: selected,
+        input,
+        inputBool: input === "true",
+        inputWithoutUrl: urlToName(input),
+        constraintType: s ? getConstraintValueType(selected) : ""
+      };
+    },
+
+    /**
+     * Toggle the visibility of the modal.
+     */
+    toggleModal() {
+      this.$store.commit("togglePredicateModal");
+      this.reset(); // Reset modal values
+    },
+
+    /**
+     * Returns the contents of the table.
+     * This method exists since `tableContents()` cannot be called directly from the HTML above.
+     */
+    table() {
+      return tableContents();
+    },
+
+    /**
+     * Execute the changes.
+     * Close the modal.
+     */
+    exit() {
+      const {
+        predicate,
+        category,
+        input,
+        inputBool,
+        inputWithoutUrl
+      } = this.values;
+      let finalInput = input;
+      const valueType = ValueType(predicate);
+      this.error = valueType === undefined;
+
+      // Add the `schema` url to the path input if necessary.
+      if (category.includes("Property Pair")) {
+        if (!isUrl(input)) {
+          finalInput = `${SCHEMA_URI}${input}`;
+        }
+      }
+
+      if (this.showCheckbox()) {
+        // Set the input to the value of the checkbox, as a string.
+        finalInput = inputBool.toString();
+      } else if (this.showString() || this.showPaths() || this.showOther()) {
+        // Add the base URL back to the input.
+        const url = extractUrl(input);
+        finalInput = `${url}${urlToName(inputWithoutUrl)}`;
+      }
+      if (this.values.constraintType.includes("integer") && input === "")
+        finalInput = "0";
+
+      if (!this.error) {
+        this.$store.dispatch(this.$props.modalProperties.onExit, {
+          predicate,
+          valueType,
+          shapeID: this.$props.modalProperties.shapeID,
+          input: finalInput,
+          object: this.$store.getters.objects(predicate)[0]
+        });
+        this.reset();
+      }
+    },
+
+    /**
+     * Reset the data from the modal.
+     */
+    reset() {
+      this.values = {
+        urls: {},
+        category: "",
+        predicate: "",
+        input: "",
+        object: "",
+        constraintType: "",
+        search: ""
+      };
+      this.error = false;
+      // Deselect the selected row.
+      this.$store.commit("selectRow", { key: "" });
+    },
+
+    /* INPUT FIELD HELPERS ========================================================================================== */
+
+    /**
+     * Get the wanted model.
+     */
+    getModel() {
+      return this.showCheckbox()
+        ? "inputBool"
+        : this.showString() || this.showPaths() || this.showOther()
+        ? "inputWithoutUrl"
+        : "input";
+    },
+
+    /**
+     * Get the wanted input type.
+     */
+    getType() {
+      return this.showCheckbox()
+        ? "checkbox"
+        : this.showInteger()
+        ? "number"
+        : "text";
+    },
+
+    /**
+     * Get the wanted data list.
+     */
+    getDataList() {
+      return this.showPaths()
+        ? "pathList"
+        : this.showShapes()
+        ? "shapeList"
+        : "";
+    },
+
     /**
      * Confirm on enter press.
      * @param e key press event
@@ -213,43 +293,7 @@ export default {
       if (e.keyCode === 13) this.exit();
     },
 
-    /**
-     * Get the values passed on by the parent.
-     */
-    updateValues() {
-      const {
-        category,
-        predicate,
-        input,
-        constraintType
-      } = this.$props.modalProperties;
-
-      this.values = {
-        ...this.values,
-        category,
-        predicate,
-        input,
-        inputBool: input === "true",
-        inputWithoutUrl: urlToName(input),
-        constraintType
-      };
-    },
-
-    /**
-     * Toggle the visibility of the modal.
-     */
-    toggleModal() {
-      this.reset(); // Reset modal values
-      this.$store.commit("togglePredicateModal");
-    },
-
-    /**
-     * Select the given predicate.
-     */
-    predicateUrl() {
-      const { urls, predicate } = this.values;
-      return `${urls[predicate]}#${predicate}`;
-    },
+    /* SHOW VALUE INPUT FIELD ======================================================================================= */
 
     showCheckbox() {
       return this.values.constraintType.includes("boolean");
@@ -270,7 +314,7 @@ export default {
       const possibilities = ["Property", "PropertyShape", "NodeShape", "Shape"];
       return (
         !this.showPaths() &&
-        (possibilities.includes(this.values.constraintType) ||
+        (possibilities.includes(urlToName(this.values.constraintType)) ||
           this.values.predicate === "property" ||
           this.values.category.includes("Logical"))
       );
@@ -284,78 +328,6 @@ export default {
         this.showPaths() ||
         this.showDataTypes()
       );
-    },
-
-    /**
-     * Select the object given the selected predicate, assuming that there's only one possible object.
-     */
-    selectObject() {
-      // Reset the constraintType and input values.
-      this.values = {
-        ...this.values,
-        input: "",
-        constraintType: ""
-      };
-
-      if (this.values.predicate) {
-        const object = this.$store.getters.objects(this.predicateUrl());
-        if (object) {
-          this.values.object = object[0];
-          const typeUrl = getConstraintValueType(this.predicateUrl());
-          if (typeUrl) this.values.constraintType = urlToName(typeUrl);
-        } else {
-          this.values.object = "";
-        }
-      } else {
-        this.values.object = "";
-      }
-    },
-
-    exit() {
-      const predicate = this.predicateUrl();
-      const valueType = ValueType(predicate);
-      this.error = valueType === undefined;
-
-      // Add the `schema` url to the path input if necessary.
-      if (this.values.category.includes("Property Pair")) {
-        if (!isUrl(this.values.input))
-          this.values.input = `${SCHEMA_URI}${this.values.input}`;
-      }
-
-      if (this.showCheckbox()) {
-        // Set the input to the value of the checkbox, as a string.
-        this.values.input = this.values.inputBool.toString();
-      } else if (this.showString() || this.showPaths() || this.showOther()) {
-        // Add the base URL back to the input.
-        const url = extractUrl(this.values.input);
-        this.values.input = `${url}${urlToName(this.values.inputWithoutUrl)}`;
-      }
-
-      if (!this.error) {
-        this.$store.dispatch(this.$props.modalProperties.onExit, {
-          predicate,
-          valueType,
-          shapeID: this.$props.modalProperties.shapeID,
-          input: this.values.input,
-          object: this.$store.getters.objects(predicate)[0]
-        });
-        this.reset();
-      }
-    },
-
-    /**
-     * Reset the data from the modal.
-     */
-    reset() {
-      this.values = {
-        urls: {},
-        category: "",
-        predicate: "",
-        input: "",
-        object: "",
-        constraintType: ""
-      };
-      this.error = false;
     },
 
     /* POPULATING =================================================================================================== */

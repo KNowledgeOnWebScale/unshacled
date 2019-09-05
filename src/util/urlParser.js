@@ -1,4 +1,5 @@
-import { CUSTOM_URI, EXAMPLE_URI } from "./constants";
+import { EXAMPLE_URI } from "./constants";
+import { CUSTOM_URI } from "../translation/terminology";
 
 /**
  * Takes the name out of an url if possible.

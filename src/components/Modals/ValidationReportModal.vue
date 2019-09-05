@@ -69,7 +69,9 @@
         </sui-segment>
       </sui-modal-content>
       <sui-modal-actions>
-        <sui-button tab-index="0" @click="toggleModal">Close</sui-button>
+        <sui-button id="close" tab-index="0" @click="toggleModal">
+          Close
+        </sui-button>
       </sui-modal-actions>
     </sui-modal>
   </div>
@@ -88,6 +90,17 @@ export default {
       required: true,
       type: Object
     }
+  },
+  mounted() {
+    // Focus the clear button when the modal is called.
+    const self = this;
+    this.$store.watch(
+      () => self.$store.state.mData.showValidationReportModal,
+      () => {
+        if (self.$store.state.mData.showValidationReportModal)
+          document.getElementById("close").focus();
+      }
+    );
   },
   methods: {
     /**

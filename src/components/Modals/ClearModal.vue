@@ -11,7 +11,13 @@
         <sui-button tab-index="0" @click="cancel">
           Cancel
         </sui-button>
-        <sui-button tab-index="0" type="submit" negative @click="confirm">
+        <sui-button
+          id="clear"
+          tab-index="0"
+          type="submit"
+          negative
+          @click="confirm"
+        >
           Clear
         </sui-button>
       </sui-modal-actions>
@@ -22,6 +28,17 @@
 <script>
 export default {
   name: "ClearModal",
+  mounted() {
+    // Focus the clear button when the modal is called.
+    const self = this;
+    this.$store.watch(
+      () => self.$store.state.showClearModal,
+      () => {
+        if (self.$store.state.showClearModal)
+          document.getElementById("clear").focus();
+      }
+    );
+  },
   methods: {
     confirm() {
       this.$store.commit("clear");

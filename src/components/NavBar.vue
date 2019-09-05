@@ -64,20 +64,25 @@
         @click="toggleClearModal"
       ></sui-menu-item>
 
+      <!--
       <sui-menu-menu position="right">
         <sui-menu-item class="clickable" icon="user"></sui-menu-item>
       </sui-menu-menu>
+      -->
     </sui-menu>
 
     <clear-modal></clear-modal>
     <export-modal></export-modal>
-    <path-modal></path-modal>
+    <path-modal
+      :editing="$store.state.pathModal.editing"
+      :shape-i-d="$store.state.pathModal.shapeID"
+    ></path-modal>
     <validation-report-modal
       :report="this.$store.state.mData.validationReport"
     ></validation-report-modal>
 
     <predicate-modal
-      :modal-properties="$store.state.mShape.mConstraint.predicateModal"
+      :modal-properties="$store.state.mShape.mConstraint.mModal"
     ></predicate-modal>
     <edit-shape-modal
       :modal-properties="$store.state.mShape.shapeModal"

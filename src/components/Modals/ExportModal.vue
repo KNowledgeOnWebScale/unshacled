@@ -8,7 +8,7 @@
         <sui-form @submit.prevent="confirm">
           <sui-form-field inline>
             <label>Filename</label>
-            <input v-model="filename" @keyup="handleKeyPress" />
+            <input v-model="filename" @keyup="handleKeyPress" id="filename" />
             .
             <select
               v-model="extension"
@@ -44,6 +44,17 @@ export default {
       extension: "json",
       error: false
     };
+  },
+  mounted() {
+    // Focus the input field when the modal is called.
+    const self = this;
+    this.$store.watch(
+      () => self.$store.state.showExportModal,
+      () => {
+        if (self.$store.state.showExportModal)
+          document.getElementById("filename").focus();
+      }
+    );
   },
   methods: {
     /**

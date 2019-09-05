@@ -1,4 +1,5 @@
 import ShaclTranslator from "../translation/shaclTranslator";
+import { urlToName } from "./urlParser";
 
 getReady;
 const initialConstraints = [];
@@ -6422,7 +6423,7 @@ const json = [
 export const constraintsByTypes = {
   "Value Type Constraints": [
     "http://www.w3.org/ns/shacl#class",
-    "http://www.w3.org/ns/shacl#path",
+    // "http://www.w3.org/ns/shacl#path",
     "http://www.w3.org/ns/shacl#datatype",
     "http://www.w3.org/ns/shacl#nodeKind"
   ],
@@ -6487,6 +6488,34 @@ export function customConstraintsByCategory() {
     output[type] = byType;
   }
   return output;
+}
+
+/**
+ * Get the table contents of the possible constraints.
+ * Every constraint will be transformed into an object:
+ * {
+ *   id {string} the full ID of the constraint,
+ *   predicate {string} the name of the predicate that will be used to visualize,
+ *   type {string} the name of the category,
+ *   description {string} the description of the constraint
+ * }
+ * @returns {[]} list of constraint objects meant for visualization.
+ */
+export function tableContents() {
+  const allConstraints = [].concat(...Object.values(constraintsByTypes));
+  const contents = [];
+  allConstraints.map(constraint => {
+    const id = ShaclTranslator.toModelSimple(constraint);
+    contents.push({
+      id,
+      predicate: urlToName(id),
+      type: getConstraintCategory(id).replace(" Constraints", ""),
+      description: json.filter(obj => obj["@id"] === constraint)[0][
+        "http://www.w3.org/2000/01/rdf-schema#comment"
+      ][0]["@value"]
+    });
+  });
+  return contents;
 }
 
 /**
