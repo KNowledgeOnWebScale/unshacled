@@ -53,12 +53,9 @@ Dictionary[PropertyShape].forEach(predicate => {
   const range = findObjectWithId(shacl, predicate)[
     "http://www.w3.org/2000/01/rdf-schema#range"
   ];
-  if (range) {
-    // TODO is it correct that if path is not defined it's supposed to be a Resource??
-    Dictionary[predicate].push(range[0]["@id"]);
-  } else {
-    Dictionary[predicate].push("http://www.w3.org/2000/01/rdf-schema#Resource");
-  }
+  Dictionary[predicate].push(
+    range ? range[0]["@id"] : "http://www.w3.org/2000/01/rdf-schema#Resource"
+  );
 });
 
 // Translate to internal terminology

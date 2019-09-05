@@ -288,7 +288,8 @@ export default {
     },
 
     /**
-     * TODO
+     * Get the configurations for the different visualization components.
+     * This is mainly to set the y values and heights of the different components.
      */
     getConfigs() {
       const y = this.getYValue();

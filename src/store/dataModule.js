@@ -153,7 +153,7 @@ const dataModule = {
     },
 
     /**
-     * TODO
+     * Get the validation report.
      * @param state
      * @returns {string}
      */
