@@ -199,7 +199,7 @@ export default {
             constraintID,
             newValue: [
               {
-                "@type": XML_DATATYPES.string,
+                // "@type": XML_DATATYPES.string,
                 "@value": value,
                 "@language": language
               }

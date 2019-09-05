@@ -83,7 +83,10 @@ const constraintModule = {
         const value = isID
           ? { "@id": input }
           : { "@type": object, "@value": input };
-        if (language) value["@language"] = language;
+        if (language) {
+          value["@language"] = language;
+          Vue.delete(value, "@type");
+        }
 
         // TODO take multiple languages into account
         if (valueType === "type") {
