@@ -325,7 +325,7 @@ export default {
      * @returns {{y: *, text: *}}
      */
     getValueConfig(value, index) {
-      const move = value.length > MAX_LENGTH ? -HEIGHT / 6 : 0;
+      const move = value.length - 2 > MAX_LENGTH ? -HEIGHT / 6 : 0;
       return {
         ...this.valueConfig,
         y: this.valueConfig.y + this.getYValue() + index * HEIGHT + move,

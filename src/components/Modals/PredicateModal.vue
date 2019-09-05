@@ -22,6 +22,7 @@
         <sui-form-field
           v-if="$store.getters.objects($props.modalProperties.selected)"
           class="field"
+          :inline="true"
         >
           <label>Value</label>
           <input
@@ -144,8 +145,10 @@ export default {
     this.$store.watch(
       () => self.$store.state.mShape.mConstraint.mModal.show,
       () => {
-        if (self.$store.state.mShape.mConstraint.mModal.show)
-          document.getElementById("search").focus();
+        if (self.$store.state.mShape.mConstraint.mModal.show) {
+          const field = document.getElementById("search");
+          if (field) field.focus();
+        }
       }
     );
   },
