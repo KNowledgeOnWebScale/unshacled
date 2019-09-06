@@ -1,5 +1,5 @@
 import Vue from "vue";
-import namespaces from "../config/config";
+import { swapKeyValue } from "../util";
 
 const configModule = {
   state: {
@@ -62,6 +62,16 @@ const configModule = {
     },
 
     /**
+     * Add the given prefix to the namespaces.
+     * @param state
+     * @param args
+     */
+    addPrefix(state, args) {
+      const { prefix, uri } = args;
+      Vue.set(state.namespaces, prefix, uri);
+    },
+
+    /**
      * Delete the given prefix from the namespaces.
      * @param state
      * @param args
@@ -84,7 +94,7 @@ const configModule = {
     },
 
     /**
-     * TODO
+     * Start editing the given row and field.
      * @param state
      * @param args
      */
@@ -105,7 +115,8 @@ const configModule = {
   },
   actions: {
     /**
-     * TODO
+     * Stop editing the namespaces.
+     * Get the entered values and update the namespaces.
      * @param state
      * @param commit
      * @param args
@@ -113,27 +124,24 @@ const configModule = {
     stopEditingNamespace({ state, commit }, args) {
       const { input } = args;
       const { editRow, editField } = state.namespaceModal;
-      if (editField === "prefix") {
+      // Only execute the update if the value has actually changed.
+      if (editField === "prefix" && editRow !== input) {
+        // Update the given prefix.
         commit("updateNamespacePrefix", {
           oldPrefix: editRow,
           newPrefix: input
         });
-
-        // Since the key is replaced (removed and added again), it gets appended to the bottom of the list.
-        // Scroll to the bottom of the table to make the change visible.
-        const body = document.getElementById("table-body");
-        body.scrollTop = body.scrollHeight;
-      } else {
+      } else if (editField === "uri" && state.namespaces[editRow] !== input) {
+        // Update the given URI.
         commit("updateNamespaceURI", { prefix: editRow, newURI: input });
       }
-      commit("clearTableEdit");
+      commit("clearTableEdit"); // Stop editing the table.
     }
   },
   getters: {
     /**
-     * Get a dictionary mapping the prefixes to their namespaces.
-     * `namespaces` cannot be referenced directly in the HTML.
-     * @returns {{schema, xsd, skos, tourism, rdfs, muto, ost, oslo, combust, regorg, dcterms, oh, tio, locn, prov, foaf, csvw, acco, "dbpedia-owl", adms, org, vcard, gr, ex, rdf, person, time}}
+     * Get an ordered dictionary mapping of the prefixes to their URIs.
+     * @returns {{}}
      */
     namespaces(state) {
       const ordered = {};
@@ -143,6 +151,24 @@ const configModule = {
           ordered[key] = state.namespaces[key];
         });
       return ordered;
+    },
+
+    /**
+     * Get the URI of the given prefix.
+     * @param state
+     * @returns {*}
+     */
+    prefixURI: state => args => {
+      return state.namespaces[args.prefix];
+    },
+
+    /**
+     * Get the prefix of the given URI.
+     * @param state
+     * @returns {*}
+     */
+    uriPrefix: state => args => {
+      return swapKeyValue(state.namespaces)[args.uri];
     }
   }
 };
