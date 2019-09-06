@@ -28,4 +28,4 @@ const namespaces = {
   "dbpedia-owl": "http://dbpedia.org/ontology/"
 };
 
-export { namespaces as default };
+// export { namespaces as default };

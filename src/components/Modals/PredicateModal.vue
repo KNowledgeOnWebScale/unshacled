@@ -93,7 +93,7 @@ import {
   urlToName
 } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
-import {ENTER, SCHEMA_URI} from "../../util/constants";
+import { ENTER, SCHEMA_URI } from "../../util/constants";
 import { XML_DATATYPES } from "../../util";
 import PredicateTable from "../FormElements/PredicateTable.vue";
 
@@ -170,7 +170,10 @@ export default {
         predicate: selected,
         input,
         inputBool: input === "true",
-        inputWithoutUrl: uriToPrefix(input),
+        inputWithoutUrl: uriToPrefix(
+          this.$store.state.mConfig.namespaces,
+          input
+        ),
         constraintType: s ? getConstraintValueType(selected) : ""
       };
     },
@@ -188,7 +191,7 @@ export default {
      * This method exists since `tableContents()` cannot be called directly from the HTML above.
      */
     table() {
-      return tableContents();
+      return tableContents(this.$store.state.mConfig.namespaces);
     },
 
     /**
@@ -391,7 +394,7 @@ export default {
      * @returns {*}
      */
     getName(key) {
-      return uriToPrefix(key);
+      return uriToPrefix(this.$store.state.mConfig.namespaces, key);
     },
 
     /**

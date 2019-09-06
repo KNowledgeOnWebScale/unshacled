@@ -1,6 +1,5 @@
-import namespaces from "../config/config";
 import { swapKeyValue } from "./index";
-import {CUSTOM_URI} from "../translation/terminology";
+import { CUSTOM_URI } from "../translation/terminology";
 
 /**
  * Takes the name out of an url if possible.
@@ -19,10 +18,11 @@ export function urlToName(url) {
 
 /**
  * Change the URI in the given string to the matching prefix.
+ * @param namespaces
  * @param string {string}
  * @returns {string}
  */
-export function uriToPrefix(string) {
+export function uriToPrefix(namespaces, string) {
   if (
     string.indexOf("_:") === 0 ||
     (string.indexOf(":") !== -1 && string.indexOf("://") === -1)
@@ -38,10 +38,11 @@ export function uriToPrefix(string) {
 /**
  * Change the prefix in the given string to the matching URI.
  * If there is no URI defined for the given prefix, return the string unchanged.
+ * @param namespaces
  * @param string {string}
  * @returns {string}
  */
-export function prefixToUri(string) {
+export function prefixToUri(namespaces, string) {
   const prefix = extractPrefix(string);
   if (namespaces[prefix])
     return string.replace(`${extractPrefix(string)}:`, namespaces[prefix]);

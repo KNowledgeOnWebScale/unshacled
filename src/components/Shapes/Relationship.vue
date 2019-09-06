@@ -121,7 +121,10 @@ export default {
         },
         text: {
           ...RELATIONSHIP_LABEL_TEXT_CONFIG,
-          text: uriToPrefix(this.$props.constraintID)
+          text: uriToPrefix(
+            this.$store.state.mConfig.namespaces,
+            this.$props.constraintID
+          )
         },
         rect: {
           ...RELATIONSHIP_LABEL_RECT_CONFIG,

@@ -98,7 +98,7 @@ export default {
       deleteNodeConfig: DELETE_BUTTON_CONFIG,
       idTextConfig: {
         ...LABEL_TEXT_CONFIG,
-        text: uriToPrefix(this.$props.id)
+        text: uriToPrefix(this.$store.state.mConfig.namespaces, this.$props.id)
       },
       addPredicateConfig: ADD_PREDICATE_CONFIG
     };
@@ -126,7 +126,11 @@ export default {
      */
     getLabelTextConfig() {
       const label = this.$store.getters.labelForId(this.id);
-      const text = label ? abbreviate(label) : abbreviate(uriToPrefix(this.id));
+      const text = label
+        ? abbreviate(label)
+        : abbreviate(
+            uriToPrefix(this.$store.state.mConfig.namespaces, this.id)
+          );
       return {
         ...LABEL_TEXT_CONFIG,
         y: label ? OFFSET : TEXT_OFFSET,

@@ -30,6 +30,7 @@
                 <sui-table-header-cell class="uri">
                   URI
                 </sui-table-header-cell>
+                <sui-table-header-cell class="delete"></sui-table-header-cell>
               </sui-table-row>
             </sui-table-header>
           </sui-table>
@@ -63,6 +64,10 @@
                       {{ uri }}
                     </div>
                   </sui-table-cell>
+
+                  <sui-table-cell class="delete" @click="deleteElement(prefix)">
+                    <sui-icon name="x icon"></sui-icon>
+                  </sui-table-cell>
                 </sui-table-row>
               </sui-table-body>
             </sui-table>
@@ -94,6 +99,9 @@ export default {
   mounted() {
     // Remove the input field from the top of the table.
     document.getElementById("namespaceTable").removeChild(this.$refs.form);
+    // Scroll to the top of the table.
+    const body = document.getElementById("table-body");
+    body.scrollTop = 0;
 
     // Stop editing when the modal is being closed.
     const self = this;
@@ -188,6 +196,15 @@ export default {
       // Remove the input field from the table.
       const cell = document.getElementById(editRow + editField);
       if (cell) cell.removeChild(this.$refs.form);
+    },
+
+    /**
+     * Delete the element with the given prefix from the table.
+     * @param prefix
+     */
+    deleteElement(prefix) {
+      console.log("deleteElement");
+      this.$store.commit("deletePrefix", { prefix });
     }
   }
 };
@@ -213,6 +230,10 @@ export default {
   width: 20%;
 }
 .uri {
-  width: 80%;
+  width: 75%;
+}
+.delete {
+  width: 5%;
+  cursor: pointer;
 }
 </style>

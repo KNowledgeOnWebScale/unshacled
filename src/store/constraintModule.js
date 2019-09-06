@@ -172,9 +172,14 @@ const constraintModule = {
       if (constraintID === TERM.path) {
         newValue = { "@id": input };
       } else if (valueType.includes(ValueTypes.ID)) {
-        newValue = { "@id": prefixToUri(input) };
+        newValue = {
+          "@id": prefixToUri(this.$store.state.mConfig.namespaces, input)
+        };
       } else {
-        newValue = { "@type": object, "@value": prefixToUri(input) };
+        newValue = {
+          "@type": object,
+          "@value": prefixToUri(this.$store.state.mConfig.namespaces, input)
+        };
       }
 
       // Check if this new value is a duplicate.

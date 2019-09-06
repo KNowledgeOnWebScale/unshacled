@@ -1,7 +1,6 @@
 // Vue
 import Vue from "vue";
 import Vuex from "vuex";
-import namespaces from "../config/config";
 
 // Util
 import { possiblePredicates, possibleObjects } from "../util/shacl/vocabulary";

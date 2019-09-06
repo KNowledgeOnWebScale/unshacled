@@ -6499,16 +6499,17 @@ export function customConstraintsByCategory() {
  *   type {string} the name of the category,
  *   description {string} the description of the constraint
  * }
+ * @param namespaces {{}} map of prefixes to URIs.
  * @returns {[]} list of constraint objects meant for visualization.
  */
-export function tableContents() {
+export function tableContents(namespaces) {
   const allConstraints = [].concat(...Object.values(constraintsByTypes));
   const contents = [];
   allConstraints.map(constraint => {
     const id = ShaclTranslator.toModelSimple(constraint);
     contents.push({
       id,
-      predicate: uriToPrefix(id),
+      predicate: uriToPrefix(namespaces, id),
       type: getConstraintCategory(id).replace(" Constraints", ""),
       description: json.filter(obj => obj["@id"] === constraint)[0][
         "http://www.w3.org/2000/01/rdf-schema#comment"

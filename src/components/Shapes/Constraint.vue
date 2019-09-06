@@ -88,7 +88,10 @@ export default {
         ...CONSTRAINT_TEXT_CONFIG,
         y: DELTA_Y_TEXT,
         fontStyle: "italic",
-        text: uriToPrefix(this.$props.constraintID)
+        text: uriToPrefix(
+          this.$store.state.mConfig.namespaces,
+          this.$props.constraintID
+        )
       },
       valueConfig: {
         ...CONSTRAINT_TEXT_CONFIG,
@@ -241,7 +244,8 @@ export default {
           const name = v[key] ? v[key] : v;
           // If the shape has a label, use it.
           const text =
-            this.$store.getters.labelForId(name) || uriToPrefix(name);
+            this.$store.getters.labelForId(name) ||
+            uriToPrefix(this.$store.state.mConfig.namespaces, name);
           // Abbreviate the label.
           output.push(abbreviate(text));
         }
@@ -327,7 +331,7 @@ export default {
      * @returns {{y: *, text: *}}
      */
     getValueConfig(value, index) {
-      const text = uriToPrefix(value);
+      const text = uriToPrefix(this.$store.state.mConfig.namespaces, value);
       const move = text.length - 2 > MAX_LENGTH ? -HEIGHT / 6 : 0;
       return {
         ...this.valueConfig,
