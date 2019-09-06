@@ -177,6 +177,8 @@ export default {
       // Check if the input is valid.
       if (!this.error()) {
         this.$store.dispatch("stopEditingNamespace", { input: this.input });
+      } else {
+        this.$store.commit("clearTableEdit");
       }
       // Remove the input field from the table.
       const cell = document.getElementById(editRow + editField);
