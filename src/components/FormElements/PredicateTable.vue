@@ -7,7 +7,10 @@
             <sui-table-header>
               <sui-table-row>
                 <sui-table-header-cell class="predicate">
-                  <div class="clickable" @click="setSorting(true, 'predicate')">
+                  <span
+                    class="clickable"
+                    @click="setSorting(true, 'predicate')"
+                  >
                     Predicate
                     <span v-if="$props.sorting.sortBy === 'predicate'">
                       <sui-icon
@@ -19,8 +22,12 @@
                         name="sort down"
                       ></sui-icon>
                     </span>
-                  </div>
+                    <span v-if="$props.sorting.sortBy !== 'predicate'">
+                      <sui-icon name="sort"></sui-icon>
+                    </span>
+                  </span>
                 </sui-table-header-cell>
+
                 <sui-table-header-cell class="description">
                   Description
                 </sui-table-header-cell>
@@ -36,6 +43,9 @@
                         v-if="!$props.sorting.ascending"
                         name="sort down"
                       ></sui-icon>
+                    </span>
+                    <span v-if="$props.sorting.sortBy !== 'type'">
+                      <sui-icon name="sort"></sui-icon>
                     </span>
                   </span>
                 </sui-table-header-cell>
