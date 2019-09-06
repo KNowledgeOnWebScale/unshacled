@@ -3,8 +3,13 @@
  * @param string
  * @returns {string}
  */
-import { MAX_LENGTH } from "./konvaConfigs";
+import { MAX_LENGTH } from "../config/konvaConfigs";
 
+/**
+ * Capitalize the first letter of the given string.
+ * @param string
+ * @returns {string}
+ */
 export function capitalizeFirstLetter(string) {
   return string[0].toUpperCase() + string.slice(1);
 }

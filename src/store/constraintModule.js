@@ -1,13 +1,13 @@
 import { clone } from "ramda";
 import Vue from "vue";
 import { TERM } from "../translation/terminology";
-import { extractUrl, urlToName } from "../util/urlParser";
+import { prefixToUri } from "../util/urlParser";
 import getValueType, {
   getValueTypeFromConstraint,
   ValueTypes
 } from "../util/enums/ValueType";
 import { IGNORED_PROPERTIES } from "../util/constants";
-import predicateModalModule from "./predicateModalModule";
+import predicateModalModule from "./modals/predicateModalModule";
 
 /**
  * This module contains everything to change the shape constraints.
@@ -50,12 +50,18 @@ const constraintModule = {
     /* ADD ========================================================================================================== */
 
     /**
-     * TODO
+     * Add a constraint with the given values to the given shape.
      * @param getters
      * @param commit
      * @param dispatch
      * @param rootState
      * @param args
+     *            shapeID {string} the IRI of the shape we want to add the predicate to.
+     *            predicate {string} the predicate we want to add.
+     *            valueType {string} the value type of this predicate.
+     *            input {string} the desired value of this constraint.
+     *            object {string} the type of the input.
+     *            language {string} the language tag of the input value.
      */
     addPredicate({ state, getters, commit, dispatch, rootState }, args) {
       const { shapeID, predicate, valueType, input, object, language } = args;
@@ -165,7 +171,6 @@ const constraintModule = {
       const iter = valueType.includes(ValueTypes.LIST)
         ? updated[0]["@list"]
         : updated;
-      const original = iter[i];
 
       // Create a new value object.
       let newValue;
@@ -173,11 +178,14 @@ const constraintModule = {
       if (constraintID === TERM.path) {
         newValue = { "@id": input };
       } else if (valueType.includes(ValueTypes.ID)) {
-        name = `${extractUrl(original["@id"])}${urlToName(input)}`;
-        newValue = { "@id": name };
+        newValue = {
+          "@id": prefixToUri(this.$store.state.mConfig.namespaces, input)
+        };
       } else {
-        name = `${extractUrl(original["@value"])}${urlToName(input)}`;
-        newValue = { "@type": object, "@value": name };
+        newValue = {
+          "@type": object,
+          "@value": prefixToUri(this.$store.state.mConfig.namespaces, input)
+        };
       }
 
       // Check if this new value is a duplicate.

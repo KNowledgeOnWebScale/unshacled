@@ -1,12 +1,11 @@
 import { TERM } from "../translation/terminology";
 
-export const EXAMPLE_URI = "http://example.org/ns#";
+export const ENTER = 13; // Enter key code.
+
 export const SHACL_URI = "http://www.w3.org/ns/shacl#";
 export const SCHEMA_URI = "http://schema.org/";
-export const XML_CHEMA_URI = "http://www.w3.org/2001/XMLSchema#";
 export const RDFS_URI = "http://www.w3.org/2000/01/rdf-schema#";
 export const LABEL = `${RDFS_URI}label`;
-export const RDF_URI = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 
 // Indicates which constraints should be visualized in a single entry.
 export const SINGLE_ENTRY = ["property"];

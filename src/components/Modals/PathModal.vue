@@ -30,9 +30,10 @@
 </template>
 
 <script>
-import { IRI_REGEX } from "../../util/constants";
+  import {ENTER, IRI_REGEX} from "../../util/constants";
 import { TERM } from "../../translation/terminology";
 import ValueType from "../../util/enums/ValueType";
+import { prefixToUri } from "../../util/urlParser";
 
 export default {
   name: "PathModal",
@@ -80,7 +81,7 @@ export default {
      * @param e key press event
      */
     handleKeyPress(e) {
-      if (e.keyCode === 13) this.confirm();
+      if (e.keyCode === ENTER) this.confirm();
     },
 
     /**
@@ -106,7 +107,7 @@ export default {
             predicate: p,
             object: this.$store.getters.objects(p)[0],
             valueType: ValueType(p),
-            input: this.path
+            input: prefixToUri(this.$store.state.mConfig.namespaces, this.path)
           });
         } else {
           // Create a new property shape.

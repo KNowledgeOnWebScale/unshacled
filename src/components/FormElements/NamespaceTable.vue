@@ -1,0 +1,220 @@
+<template>
+  <div id="namespaceTable">
+    <div ref="form" class="ui transparent form">
+      <sui-form-field :class="{ error: error() }">
+        <input
+          ref="inputField"
+          v-model="input"
+          :focus="$props.tableProperties.editRow !== ''"
+          @input="e => (input = e.target.value)"
+          @blur="stopEditing"
+          @keyup="handleKeyUp"
+        />
+      </sui-form-field>
+    </div>
+
+    <table class="table">
+      <tr>
+        <td>
+          <sui-table color="green" inverted>
+            <sui-table-header>
+              <sui-table-row>
+                <sui-table-header-cell class="four wide">
+                  <span class="unclickable">Prefix</span>
+                </sui-table-header-cell>
+                <sui-table-header-cell class="twelve wide unclickable">
+                  <span class="unclickable">URI</span>
+                </sui-table-header-cell>
+              </sui-table-row>
+            </sui-table-header>
+          </sui-table>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div id="table-body" class="table-body">
+            <sui-table>
+              <sui-table-body>
+                <sui-table-row
+                  v-for="(uri, prefix) of $store.getters.namespaces"
+                  :key="prefix"
+                >
+                  <sui-table-cell class="four wide">
+                    <div :id="prefix + 'prefix'"></div>
+                    <div
+                      v-if="!editingThis(prefix, 'prefix')"
+                      @click="startEditing(prefix, 'prefix', prefix)"
+                    >
+                      {{ prefix }}
+                    </div>
+                  </sui-table-cell>
+
+                  <sui-table-cell class="eleven wide">
+                    <div :id="prefix + 'uri'"></div>
+                    <div
+                      v-if="!editingThis(prefix, 'uri')"
+                      @click="startEditing(prefix, 'uri', uri)"
+                    >
+                      {{ uri }}
+                    </div>
+                  </sui-table-cell>
+
+                  <sui-table-cell
+                    class="one wide clickable"
+                    @click="deleteElement(prefix)"
+                  >
+                    <sui-icon name="x icon"></sui-icon>
+                  </sui-table-cell>
+                </sui-table-row>
+              </sui-table-body>
+            </sui-table>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</template>
+
+<script>
+import { ENTER } from "../../util/constants";
+
+export default {
+  name: "NamespaceTable",
+  props: {
+    tableProperties: {
+      type: Object,
+      required: true
+    }
+  },
+  data() {
+    return {
+      input: ""
+    };
+  },
+  mounted() {
+    // Remove the input field from the top of the table.
+    document.getElementById("namespaceTable").removeChild(this.$refs.form);
+    // Scroll to the top of the table.
+    const body = document.getElementById("table-body");
+    body.scrollTop = 0;
+
+    // Stop editing when the modal is being closed.
+    const self = this;
+    this.$store.watch(
+      () => self.$store.state.mConfig.mModal.show,
+      () => {
+        const { editRow, editField } = self.$props.tableProperties;
+        if (editRow !== "" && editField !== "") self.stopEditing();
+      }
+    );
+  },
+  methods: {
+    /**
+     * Stop editing when the enter key is pressed.
+     */
+    handleKeyUp(e) {
+      if (e.keyCode === ENTER) this.stopEditing();
+    },
+
+    /**
+     * Indicates that the entered value is invalid.
+     */
+    error() {
+      const { editRow, editField } = this.$props.tableProperties;
+
+      if (editField === "prefix") {
+        // Check if the input is valid.
+        if (!/^[a-zA-Z0-9]+$/i.test(this.input)) return true;
+
+        const newPrefix = this.$store.getters.prefixURI({ prefix: this.input });
+        const oldPrefix = this.$store.getters.prefixURI({ prefix: editRow });
+
+        // Check if the prefix is unique.
+        if (newPrefix) return newPrefix !== oldPrefix;
+      } else if (editField === "uri") {
+        // Check if the input is valid.
+        if (!"/#".includes(this.input.slice(-1))) return true;
+
+        // Check if the uri is unique.
+        const newPrefix = this.$store.getters.uriPrefix({ uri: this.input });
+        if (newPrefix) return newPrefix !== editRow;
+      }
+
+      return false; // Default: no errors.
+    },
+
+    /**
+     * Are we editing the given field in the given row?
+     * @returns {boolean}
+     */
+    editingThis(uri, field) {
+      return (
+        this.$props.tableProperties.editRow === uri &&
+        this.$props.tableProperties.editField === field
+      );
+    },
+
+    /**
+     * Start editing the given row.
+     * @param row {string} the prefix of the row we want to edit.
+     * @param field {string} the name of the field we want to edit.
+     * @param currentValue {string} the current value we want to edit.
+     */
+    startEditing(row, field, currentValue) {
+      this.$store.commit("startEditingNamespace", {
+        editRow: row,
+        editField: field
+      });
+      this.input = currentValue; // Set the initial value.
+      document.getElementById(row + field).appendChild(this.$refs.form); // Add the input field in the right place.
+      this.$refs.inputField.focus(); // Focus on the input field so the user can start typing immediately.
+    },
+
+    /**
+     * Stop editing the current row.
+     * Set the value of the given row and field to the entered data.
+     */
+    stopEditing() {
+      const { editRow, editField } = this.$props.tableProperties;
+      // Check if the input is valid.
+      if (!this.error()) {
+        this.$store.dispatch("stopEditingNamespace", { input: this.input });
+      } else {
+        this.$store.commit("clearTableEdit");
+      }
+      // Remove the input field from the table.
+      const cell = document.getElementById(editRow + editField);
+      if (cell && this.$refs.form) cell.removeChild(this.$refs.form);
+    },
+
+    /**
+     * Delete the element with the given prefix from the table.
+     * @param prefix
+     */
+    deleteElement(prefix) {
+      this.$store.commit("deletePrefix", { prefix });
+    }
+  }
+};
+</script>
+
+<style scoped>
+.table {
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+}
+.table-body {
+  height: 35vh;
+  min-height: 20vh;
+  max-height: 35vh;
+  overflow: auto;
+}
+
+.clickable {
+  cursor: pointer;
+}
+.unclickable {
+  cursor: default;
+}
+</style>

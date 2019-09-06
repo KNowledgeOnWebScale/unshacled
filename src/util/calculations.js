@@ -5,11 +5,7 @@
  * @param bottomRight
  * @param reference
  */
-export default function nearestPointOnPerimeter(
-  topLeft,
-  bottomRight,
-  reference
-) {
+export function nearestPointOnPerimeter(topLeft, bottomRight, reference) {
   // Reference: https://stackoverflow.com/questions/20453545/how-to-find-the-nearest-point-in-the-perimeter-of-a-rectangle-to-a-given-point
   const [l, r, t, b] = [topLeft.x, bottomRight.x, topLeft.y, bottomRight.y];
   const [x, y] = [clamp(reference.x, l, r), clamp(reference.y, t, b)];
@@ -33,4 +29,16 @@ export default function nearestPointOnPerimeter(
  */
 function clamp(a, lower, upper) {
   return Math.max(lower, Math.min(a, upper));
+}
+
+/**
+ * Calculate the distance between the two given points.
+ * @returns {number}
+ * @param x1
+ * @param y1
+ * @param x2
+ * @param y2
+ */
+export function distance(x1, y1, x2, y2) {
+  return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 }

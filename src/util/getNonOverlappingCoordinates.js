@@ -1,5 +1,5 @@
 import { values } from "ramda";
-import { WIDTH } from "./konvaConfigs";
+import { WIDTH } from "../config/konvaConfigs";
 
 /**
  * @param coordinates dictionary of object keys mapped to their top left coordinates.

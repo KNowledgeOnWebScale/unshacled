@@ -11,7 +11,12 @@
         <!-- Header -->
         <v-group @click="startEditing">
           <v-rect :config="shapeConfig"></v-rect>
-          <v-text ref="shapeLabel" :config="getLabelTextConfig()"></v-text>
+          <v-text
+            ref="shapeLabel"
+            :config="getLabelTextConfig()"
+            @mouseenter="setCursor('text')"
+            @mouseleave="setCursor('')"
+          ></v-text>
           <v-text ref="shapeURI" :config="getURITextConfig()"></v-text>
         </v-group>
 
@@ -29,11 +34,15 @@
           v-if="hover"
           :config="deleteNodeConfig"
           @click="deleteShape"
+          @mouseenter="setCursor('pointer')"
+          @mouseleave="setCursor('')"
         ></v-circle>
         <v-circle
           v-if="hover && !adding"
           :config="addPredicateConfig"
-          @mousedown="addPredicate"
+          @click="addPredicate"
+          @mouseenter="setCursor('pointer')"
+          @mouseleave="setCursor('')"
         ></v-circle>
       </v-group>
 
@@ -52,7 +61,7 @@
 
 <script>
 import Constraint from "./Constraint.vue";
-import { urlToName } from "../../util/urlParser";
+import { uriToPrefix } from "../../util/urlParser";
 import {
   DELETE_BUTTON_CONFIG,
   LABEL_TEXT_CONFIG,
@@ -67,8 +76,11 @@ import {
   MAX_LENGTH,
   TEXT_SIZE,
   WIDTH,
-  MARGIN
-} from "../../util/konvaConfigs";
+  MARGIN,
+  pointerCursor,
+  resetCursor,
+  textCursor
+} from "../../config/konvaConfigs";
 import { TERM } from "../../translation/terminology";
 import { abbreviate } from "../../util/strings";
 import { LABEL } from "../../util/constants";
@@ -98,7 +110,7 @@ export default {
       deleteNodeConfig: DELETE_BUTTON_CONFIG,
       idTextConfig: {
         ...LABEL_TEXT_CONFIG,
-        text: urlToName(this.$props.id)
+        text: uriToPrefix(this.$store.state.mConfig.namespaces, this.$props.id)
       },
       addPredicateConfig: ADD_PREDICATE_CONFIG
     };
@@ -126,7 +138,11 @@ export default {
      */
     getLabelTextConfig() {
       const label = this.$store.getters.labelForId(this.id);
-      const text = label ? abbreviate(label) : abbreviate(urlToName(this.id));
+      const text = label
+        ? abbreviate(label)
+        : abbreviate(
+            uriToPrefix(this.$store.state.mConfig.namespaces, this.id)
+          );
       return {
         ...LABEL_TEXT_CONFIG,
         y: label ? OFFSET : TEXT_OFFSET,
@@ -305,6 +321,16 @@ export default {
         ? "deleteNodeShape"
         : "deletePropertyShape";
       this.$store.dispatch(action, this.$props.id);
+    },
+
+    /**
+     * Set the cursor type according to the passed argument.
+     * @param type {string}
+     */
+    setCursor(type) {
+      if (type === "pointer") pointerCursor();
+      else if (type === "text") textCursor();
+      else resetCursor();
     }
   }
 };

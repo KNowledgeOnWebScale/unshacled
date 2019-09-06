@@ -79,7 +79,7 @@
 
 <script>
 import { SHACL_URI } from "../../util/constants";
-import { urlToName } from "../../util/urlParser";
+import { uriToPrefix } from "../../util/urlParser";
 import { groupBy } from "../../util";
 import { capitalizeFirstLetter } from "../../util/strings";
 
@@ -197,7 +197,10 @@ export default {
           const r = results[key];
           simple[key] = {};
           for (const constr of Object.keys(r)) {
-            const name = urlToName(r[constr]);
+            const name = uriToPrefix(
+              this.$store.state.mConfig.namespaces,
+              r[constr]
+            );
             if (name !== "(undefined)") simple[key][constr] = name;
           }
           simple[key].message = r.message;

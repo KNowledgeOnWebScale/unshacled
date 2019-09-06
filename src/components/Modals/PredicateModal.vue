@@ -10,13 +10,13 @@
           <input id="search" v-model="values.search" />
         </sui-form-field>
 
-        <scrollable-table
+        <predicate-table
           :contents="table()"
           :filter="values.search"
           :selected="$props.modalProperties.selected"
           :editing="$props.modalProperties.editing"
           :sorting="$store.state.mShape.mConstraint.mModal.sorting"
-        ></scrollable-table>
+        ></predicate-table>
 
         <br />
         <sui-form-field
@@ -85,16 +85,21 @@ import {
   getConstraintCategory,
   getConstraintValueType,
   tableContents
-} from "../../util/shaclConstraints";
-import { extractUrl, isUrl, urlToName } from "../../util/urlParser";
+} from "../../util/shacl/shaclConstraints";
+import {
+  extractUrl,
+  isUrl,
+  uriToPrefix,
+  urlToName
+} from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
-import { SCHEMA_URI } from "../../util/constants";
+import { ENTER, SCHEMA_URI } from "../../util/constants";
 import { XML_DATATYPES } from "../../util";
-import ScrollableTable from "../FormElements/ScrollableTable.vue";
+import PredicateTable from "../FormElements/PredicateTable.vue";
 
 export default {
   name: "PredicateModal",
-  components: { ScrollableTable },
+  components: { PredicateTable },
   props: {
     modalProperties: {
       required: true,
@@ -165,7 +170,10 @@ export default {
         predicate: selected,
         input,
         inputBool: input === "true",
-        inputWithoutUrl: urlToName(input),
+        inputWithoutUrl: uriToPrefix(
+          this.$store.state.mConfig.namespaces,
+          input
+        ),
         constraintType: s ? getConstraintValueType(selected) : ""
       };
     },
@@ -183,7 +191,7 @@ export default {
      * This method exists since `tableContents()` cannot be called directly from the HTML above.
      */
     table() {
-      return tableContents();
+      return tableContents(this.$store.state.mConfig.namespaces);
     },
 
     /**
@@ -290,7 +298,7 @@ export default {
      * @param e key press event
      */
     handleKeyPress(e) {
-      if (e.keyCode === 13) this.exit();
+      if (e.keyCode === ENTER) this.exit();
     },
 
     /* SHOW VALUE INPUT FIELD ======================================================================================= */
@@ -386,7 +394,7 @@ export default {
      * @returns {*}
      */
     getName(key) {
-      return urlToName(key);
+      return uriToPrefix(this.$store.state.mConfig.namespaces, key);
     },
 
     /**

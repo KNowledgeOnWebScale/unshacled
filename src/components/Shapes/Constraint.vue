@@ -8,6 +8,8 @@
         v-if="hoverKey && canBeDeleted()"
         :config="getConfigs().deleteConstraint"
         @click="deleteConstraint"
+        @mouseenter="setCursor('pointer')"
+        @mouseleave="setCursor('')"
       ></v-circle>
     </v-group>
 
@@ -17,12 +19,16 @@
       <div v-for="(value, index) of getConstraintValues()" :key="index">
         <v-text
           :config="getValueConfig(value, index)"
-          @click="editValue(index, value)"
+          @click="editValue(index)"
+          @mouseenter="setCursor('text')"
+          @mouseleave="setCursor('')"
         ></v-text>
         <v-circle
           v-if="hoverValues && !isListOfValues() && canBeDeleted()"
           :config="getDeleteValueConfig(index)"
           @click="deleteConstraintValue(index)"
+          @mouseenter="setCursor('pointer')"
+          @mouseleave="setCursor('')"
         ></v-circle>
       </div>
     </v-group>
@@ -39,9 +45,12 @@ import {
   DELTA_Y_TEXT,
   DELETE_BUTTON_CONFIG,
   DELTA_Y_DELETE,
-  MAX_LENGTH
-} from "../../util/konvaConfigs";
-import { urlToName } from "../../util/urlParser";
+  MAX_LENGTH,
+  pointerCursor,
+  textCursor,
+  resetCursor
+} from "../../config/konvaConfigs";
+import { uriToPrefix, urlToName } from "../../util/urlParser";
 import { SINGLE_ENTRY } from "../../util/constants";
 import ValueType, {
   getValueTypeFromConstraint,
@@ -88,7 +97,10 @@ export default {
         ...CONSTRAINT_TEXT_CONFIG,
         y: DELTA_Y_TEXT,
         fontStyle: "italic",
-        text: urlToName(this.$props.constraintID)
+        text: uriToPrefix(
+          this.$store.state.mConfig.namespaces,
+          this.$props.constraintID
+        )
       },
       valueConfig: {
         ...CONSTRAINT_TEXT_CONFIG,
@@ -240,7 +252,9 @@ export default {
           const key = vt.includes(ValueTypes.ID) ? "@id" : "@value";
           const name = v[key] ? v[key] : v;
           // If the shape has a label, use it.
-          const text = this.$store.getters.labelForId(name) || urlToName(name);
+          const text =
+            this.$store.getters.labelForId(name) ||
+            uriToPrefix(this.$store.state.mConfig.namespaces, name);
           // Abbreviate the label.
           output.push(abbreviate(text));
         }
@@ -287,7 +301,8 @@ export default {
     },
 
     /**
-     * TODO
+     * Get the configurations for the different visualization components.
+     * This is mainly to set the y values and heights of the different components.
      */
     getConfigs() {
       const y = this.getYValue();
@@ -325,11 +340,12 @@ export default {
      * @returns {{y: *, text: *}}
      */
     getValueConfig(value, index) {
-      const move = value.length - 2 > MAX_LENGTH ? -HEIGHT / 6 : 0;
+      const text = uriToPrefix(this.$store.state.mConfig.namespaces, value);
+      const move = text.length - 2 > MAX_LENGTH ? -HEIGHT / 6 : 0;
       return {
         ...this.valueConfig,
         y: this.valueConfig.y + this.getYValue() + index * HEIGHT + move,
-        text: this.$props.constraintID === TERM.path ? value : urlToName(value)
+        text
       };
     },
 
@@ -346,6 +362,16 @@ export default {
           (index + 1) * HEIGHT +
           this.getYValue()
       };
+    },
+
+    /**
+     * Set the cursor type according to the passed argument.
+     * @param type {string}
+     */
+    setCursor(type) {
+      if (type === "pointer") pointerCursor();
+      else if (type === "text") textCursor();
+      else resetCursor();
     }
   }
 };

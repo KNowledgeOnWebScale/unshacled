@@ -5,6 +5,7 @@ const XML_DATATYPES = {
   decimal: "http://www.w3.org/2001/XMLSchema#decimal",
   float: "http://www.w3.org/2001/XMLSchema#float",
   double: "http://www.w3.org/2001/XMLSchema#double",
+  integer: "http://www.w3.org/2001/XMLSchema#integer",
   duration: "http://www.w3.org/2001/XMLSchema#duration",
   dateTime: "http://www.w3.org/2001/XMLSchema#dateTime",
   time: "http://www.w3.org/2001/XMLSchema#time",

@@ -8,7 +8,7 @@
         <sui-form @submit.prevent="confirm">
           <sui-form-field inline>
             <label>Filename</label>
-            <input v-model="filename" @keyup="handleKeyPress" id="filename" />
+            <input id="filename" v-model="filename" @keyup="handleKeyPress" />
             .
             <select
               v-model="extension"
@@ -36,6 +36,8 @@
 </template>
 
 <script>
+import { ENTER } from "../../util/constants";
+
 export default {
   name: "ExportModal",
   data() {
@@ -62,7 +64,7 @@ export default {
      * @param e key press event
      */
     handleKeyPress(e) {
-      if (e.keyCode === 13) this.confirm();
+      if (e.keyCode === ENTER) this.confirm();
     },
 
     /**

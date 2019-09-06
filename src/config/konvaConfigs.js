@@ -12,7 +12,7 @@ export const MAX_LENGTH = 30;
 const X = 0;
 export const TEXT_SIZE = 12;
 const SMALL_TEXT_SIZE = TEXT_SIZE - 2;
-const DELETE_BUTTON_OFFSET = 240;
+const BUTTON_OFFSET = 240;
 
 /* SHAPES =========================================================================================================== */
 
@@ -102,17 +102,20 @@ export const DESCRIPTION_TEXT_CONFIG = {
 
 /* BUTTONS ========================================================================================================== */
 
+const BUTTON_CONFIG = {
+  x: BUTTON_OFFSET,
+  radius: 6
+};
+
 export const DELETE_BUTTON_CONFIG = {
-  x: DELETE_BUTTON_OFFSET,
+  ...BUTTON_CONFIG,
   y: OFFSET,
-  radius: 6,
   fill: "red"
 };
 
 export const ADD_PREDICATE_CONFIG = {
-  x: DELETE_BUTTON_OFFSET,
+  ...BUTTON_CONFIG,
   y: OFFSET + HEIGHT / 2,
-  radius: 6,
   fill: "green"
 };
 
@@ -135,3 +138,37 @@ export const RELATIONSHIP_LABEL_RECT_CONFIG = {
   fill: "white",
   height: TEXT_SIZE + MARGIN
 };
+
+/* CURSOR SETTINGS ================================================================================================== */
+
+/**
+ * Set the cursor style to pointer.
+ * @constructor
+ */
+export function pointerCursor() {
+  document.getElementById("app").style.cursor = "pointer";
+}
+
+/**
+ * Set the cursor style to pointer.
+ * @constructor
+ */
+export function moveCursor() {
+  document.getElementById("app").style.cursor = "move";
+}
+
+/**
+ * Set the cursor style to pointer.
+ * @constructor
+ */
+export function textCursor() {
+  document.getElementById("app").style.cursor = "text";
+}
+
+/**
+ * Set the cursor style to default.
+ * @constructor
+ */
+export function resetCursor() {
+  document.getElementById("app").style.cursor = "default";
+}

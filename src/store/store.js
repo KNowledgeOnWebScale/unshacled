@@ -3,7 +3,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 
 // Util
-import { possiblePredicates, possibleObjects } from "../util/vocabulary";
+import { possiblePredicates, possibleObjects } from "../util/shacl/vocabulary";
 import { ETF } from "../util/enums/extensionToFormat";
 
 // Translation
@@ -15,6 +15,7 @@ import { TERM } from "../translation/terminology";
 // Modules
 import shapeModule from "./shapeModule";
 import dataModule from "./dataModule";
+import configModule from "./configModule";
 import { exampleData, exampleShapes } from "../assets/example";
 
 Vue.use(Vuex);
@@ -33,7 +34,8 @@ export default new Vuex.Store({
   },
   modules: {
     mShape: shapeModule,
-    mData: dataModule
+    mData: dataModule,
+    mConfig: configModule
   },
   mutations: {
     /**
@@ -106,7 +108,7 @@ export default new Vuex.Store({
       ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
         self.commit("setModel", { model, getters }); // Set the shapes.
       });
-    }
+    },
   },
   getters: {
     /**
@@ -143,6 +145,6 @@ export default new Vuex.Store({
      */
     objects: () => predicate => {
       return possibleObjects(predicate);
-    }
+    },
   }
 });

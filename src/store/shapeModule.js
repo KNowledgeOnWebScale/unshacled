@@ -376,7 +376,10 @@ const shapeModule = {
     },
 
     /**
-     * TODO
+     * Get a list of relationships.
+     * Every relationship object has a reference to its destination and source shape,
+     *   the ID of the constraint it represents
+     *   and an object that indicates what it should do when the relationship arrow is clicked.
      * @param state
      * @param getters
      */
