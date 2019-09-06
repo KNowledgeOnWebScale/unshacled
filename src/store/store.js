@@ -16,8 +16,8 @@ import { TERM } from "../translation/terminology";
 // Modules
 import shapeModule from "./shapeModule";
 import dataModule from "./dataModule";
+import configModule from "./configModule";
 import { exampleData, exampleShapes } from "../assets/example";
-import { swapKeyValue } from "../util";
 
 Vue.use(Vuex);
 
@@ -31,17 +31,12 @@ export default new Vuex.Store({
       editing: false,
       shapeID: ""
     },
-    namespaceModal: {
-      show: false,
-      editRow: "",
-      editField: "",
-      input: ""
-    },
     exportType: ""
   },
   modules: {
     mShape: shapeModule,
-    mData: dataModule
+    mData: dataModule,
+    mConfig: configModule
   },
   mutations: {
     /**
@@ -51,61 +46,6 @@ export default new Vuex.Store({
      */
     setEditor(state, reference) {
       state.editor = reference;
-    },
-
-    /* NAMESPACE MODAL ============================================================================================== */
-
-    /**
-     * Toggle the visibility of the namespace modal.
-     * @param state
-     * @param bool {boolean} indicates if the modal should be shown.
-     */
-    toggleNamespaceModal(state, bool = true) {
-      event.preventDefault();
-      Vue.set(state.namespaceModal, "show", bool);
-    },
-
-    /**
-     * TODO
-     * @param state
-     * @param args
-     */
-    startEditingNamespace(state, args) {
-      const { editRow, editField } = args;
-      Vue.set(state.namespaceModal, "editRow", editRow);
-      Vue.set(state.namespaceModal, "editField", editField);
-    },
-
-    /**
-     * Clear the edit fields for the namespace modal.
-     * @param state
-     */
-    clearTableEdit(state) {
-      Vue.set(state.namespaceModal, "editRow", "");
-      Vue.set(state.namespaceModal, "editField", "");
-      Vue.set(state.namespaceModal, "input", "");
-    },
-
-    /**
-     * Update the given prefix in the namespaces config.
-     * @param state
-     * @param args
-     */
-    updateNamespacePrefix(state, args) {
-      const { prefix, uri } = args;
-      const oldPrefix = swapKeyValue(namespaces)[uri];
-      Vue.delete(namespaces, oldPrefix);
-      Vue.set(namespaces, prefix, uri);
-    },
-
-    /**
-     * Update the URI of the given prefix in the namespaces config.
-     * @param state
-     * @param args
-     */
-    updateNamespaceURI(state, args) {
-      const { prefix, uri } = args;
-      Vue.set(namespaces, prefix, uri);
     },
 
     /* MODALS ======================================================================================================= */
@@ -170,22 +110,6 @@ export default new Vuex.Store({
         self.commit("setModel", { model, getters }); // Set the shapes.
       });
     },
-
-    /**
-     * TODO
-     * @param state
-     * @param commit
-     * @param args
-     */
-    stopEditingNamespace({ state, commit }, args) {
-      const { input } = args;
-      const { editRow, editField } = state.namespaceModal;
-      const mutation =
-        editField === "prefix" ? "updateNamespacePrefix" : "updateNamespaceURI";
-      commit(mutation, { editRow, uri: input });
-      commit("clearTableEdit");
-      console.log(state.namespaceModal);
-    }
   },
   getters: {
     /**
@@ -222,6 +146,6 @@ export default new Vuex.Store({
      */
     objects: () => predicate => {
       return possibleObjects(predicate);
-    }
+    },
   }
 });

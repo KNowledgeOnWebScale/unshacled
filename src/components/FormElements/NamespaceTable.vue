@@ -2,9 +2,16 @@
   <div id="namespaceTable">
     <div ref="form" class="ui transparent form">
       <sui-form-field>
-        <input
+        <sui-input
           ref="inputField"
-          class="ui transparent input"
+          v-model="input"
+          :focus="$props.tableProperties.editRow !== ''"
+          :error="error()"
+          @input="
+            e => {
+              input = e;
+            }
+          "
           @blur="stopEditing"
           @keyup="handleKeyUp"
         />
@@ -30,29 +37,29 @@
       </tr>
       <tr>
         <td>
-          <div class="table-body">
+          <div id="table-body" class="table-body">
             <sui-table>
               <sui-table-body>
                 <sui-table-row
-                  v-for="(uri, prefix) of getNamespaces()"
+                  v-for="(uri, prefix) of $store.getters.namespaces"
                   :key="prefix"
                 >
-                  <sui-table-cell
-                    class="prefix"
-                    @click="startEditing(prefix, 'prefix', prefix)"
-                  >
+                  <sui-table-cell class="prefix">
                     <div :id="prefix + 'prefix'"></div>
-                    <div v-if="!editingThis(prefix, 'prefix')">
+                    <div
+                      v-if="!editingThis(prefix, 'prefix')"
+                      @click="startEditing(prefix, 'prefix', prefix)"
+                    >
                       {{ prefix }}
                     </div>
                   </sui-table-cell>
 
-                  <sui-table-cell
-                    class="uri"
-                    @click="startEditing(prefix, 'uri', uri)"
-                  >
+                  <sui-table-cell class="uri">
                     <div :id="prefix + 'uri'"></div>
-                    <div v-if="!editingThis(prefix, 'uri')">
+                    <div
+                      v-if="!editingThis(prefix, 'uri')"
+                      @click="startEditing(prefix, 'uri', uri)"
+                    >
                       {{ uri }}
                     </div>
                   </sui-table-cell>
@@ -69,6 +76,7 @@
 <script>
 import namespaces from "../../config/config";
 import { ENTER } from "../../util/constants";
+import { swapKeyValue } from "../../util";
 
 export default {
   name: "NamespaceTable",
@@ -86,22 +94,58 @@ export default {
   mounted() {
     // Remove the input field from the top of the table.
     document.getElementById("namespaceTable").removeChild(this.$refs.form);
+
+    // Stop editing when the modal is being closed.
+    const self = this;
+    this.$store.watch(
+      () => self.$store.state.mConfig.namespaceModal.show,
+      () => {
+        const { editRow, editField } = self.$props.tableProperties;
+        if (editRow !== "" && editField !== "") self.stopEditing();
+      }
+    );
   },
   methods: {
-    /**
-     * Get a dictionary mapping the prefixes to their namespaces.
-     * `namespaces` cannot be referenced directly in the HTML.
-     * @returns {{schema, xsd, skos, tourism, rdfs, muto, ost, oslo, combust, regorg, dcterms, oh, tio, locn, prov, foaf, csvw, acco, "dbpedia-owl", adms, org, vcard, gr, ex, rdf, person, time}}
-     */
-    getNamespaces() {
-      return namespaces;
-    },
-
     /**
      * Stop editing when the enter key is pressed.
      */
     handleKeyUp(e) {
       if (e.keyCode === ENTER) this.stopEditing();
+    },
+
+    /**
+     * Indicates that the entered value is invalid.
+     */
+    error() {
+      const { editRow, editField } = this.$props.tableProperties;
+
+      if (editField === "prefix") {
+        // Check if the input is valid.
+        if (/^[a-zA-Z0-9]+$/i.test(this.input)) return false;
+
+        // Check if the prefix is unique.
+        if (namespaces[this.input]) {
+          console.log(namespaces[this.input], "\n", namespaces[editRow]);
+          return namespaces[this.input] !== namespaces[editRow];
+        } else {
+          return false;
+        }
+      } else if (editField === "uri") {
+        // Check if the input is valid.
+        if (!"/#".includes(this.input.slice(-1))) return true;
+
+        // Check if the uri is unique.
+        const swap = swapKeyValue(namespaces);
+
+        if (swap[this.input]) {
+          console.log(swap[this.input], "\n", swap[namespaces[editRow]]);
+          return swap[this.input] !== swap[namespaces[editRow]];
+        } else {
+          return false;
+        }
+      }
+
+      return false;
     },
 
     /**
@@ -126,9 +170,8 @@ export default {
         editRow: row,
         editField: field
       });
-      this.$refs.inputField.value = currentValue;
+      this.input = currentValue;
       document.getElementById(row + field).appendChild(this.$refs.form);
-      this.$refs.inputField.focus();
     },
 
     /**
@@ -136,12 +179,15 @@ export default {
      * Set the value of the given row and field to the entered data.
      */
     stopEditing() {
+      console.log("stopEditing");
       const { editRow, editField } = this.$props.tableProperties;
-      this.input = this.$refs.inputField.value;
-      // TODO checks, input validation
-      console.log("stopEditing", this.input);
-      this.$store.dispatch("stopEditingNamespace", { input: this.input });
-      document.getElementById(editRow + editField).removeChild(this.$refs.form);
+      // Check if the input is valid.
+      if (!this.error()) {
+        this.$store.dispatch("stopEditingNamespace", { input: this.input });
+      }
+      // Remove the input field from the table.
+      const cell = document.getElementById(editRow + editField);
+      if (cell) cell.removeChild(this.$refs.form);
     }
   }
 };
@@ -160,6 +206,9 @@ export default {
   overflow: auto;
 }
 
+.fill {
+  width: 50%;
+}
 .prefix {
   width: 20%;
 }

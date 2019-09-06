@@ -1,9 +1,9 @@
 <template>
-  <sui-modal v-model="$store.state.namespaceModal.show">
+  <sui-modal v-model="$store.state.mConfig.namespaceModal.show">
     <sui-modal-header>Namespaces</sui-modal-header>
     <sui-modal-content>
       <namespace-table
-        :table-properties="$store.state.namespaceModal"
+        :table-properties="$store.state.mConfig.namespaceModal"
       ></namespace-table>
     </sui-modal-content>
     <sui-modal-actions>
