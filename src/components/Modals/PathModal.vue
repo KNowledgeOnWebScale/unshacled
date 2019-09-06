@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { IRI_REGEX } from "../../util/constants";
+  import {ENTER, IRI_REGEX} from "../../util/constants";
 import { TERM } from "../../translation/terminology";
 import ValueType from "../../util/enums/ValueType";
 import {prefixToUri} from "../../util/urlParser";
@@ -81,7 +81,7 @@ export default {
      * @param e key press event
      */
     handleKeyPress(e) {
-      if (e.keyCode === 13) this.confirm();
+      if (e.keyCode === ENTER) this.confirm();
     },
 
     /**

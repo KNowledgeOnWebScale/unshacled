@@ -1,5 +1,7 @@
 import { TERM } from "../translation/terminology";
 
+export const ENTER = 13; // Enter key code.
+
 export const SHACL_URI = "http://www.w3.org/ns/shacl#";
 export const SCHEMA_URI = "http://schema.org/";
 export const RDFS_URI = "http://www.w3.org/2000/01/rdf-schema#";

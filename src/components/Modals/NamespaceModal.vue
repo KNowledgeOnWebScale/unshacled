@@ -2,7 +2,9 @@
   <sui-modal v-model="$store.state.namespaceModal.show">
     <sui-modal-header>Namespaces</sui-modal-header>
     <sui-modal-content>
-      <namespace-table></namespace-table>
+      <namespace-table
+        :table-properties="$store.state.namespaceModal"
+      ></namespace-table>
     </sui-modal-content>
     <sui-modal-actions>
       <sui-button id="close" tab-index="0" @click="toggleModal">

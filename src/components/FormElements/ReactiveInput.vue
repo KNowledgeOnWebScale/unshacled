@@ -12,7 +12,8 @@
 </template>
 
 <script>
-const ENTER = 13;
+import {ENTER} from "../../util/constants";
+
 const MARGIN_TOP = 5;
 const MARGIN_LEFT = 20;
 

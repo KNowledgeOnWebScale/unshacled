@@ -93,7 +93,7 @@ import {
   urlToName
 } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
-import { SCHEMA_URI } from "../../util/constants";
+import {ENTER, SCHEMA_URI} from "../../util/constants";
 import { XML_DATATYPES } from "../../util";
 import PredicateTable from "../FormElements/PredicateTable.vue";
 
@@ -295,7 +295,7 @@ export default {
      * @param e key press event
      */
     handleKeyPress(e) {
-      if (e.keyCode === 13) this.exit();
+      if (e.keyCode === ENTER) this.exit();
     },
 
     /* SHOW VALUE INPUT FIELD ======================================================================================= */
