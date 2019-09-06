@@ -9,6 +9,8 @@
       v-if="hover"
       :config="getButtonConfig()"
       @click="click()"
+      @mouseenter="setCursor('pointer')"
+      @mouseleave="setCursor('')"
     ></v-circle>
   </v-group>
 </template>
@@ -21,7 +23,9 @@ import {
   RELATIONSHIP_ARROW_CONFIG,
   RELATIONSHIP_LABEL_RECT_CONFIG,
   RELATIONSHIP_LABEL_TEXT_CONFIG,
-  MARGIN
+  MARGIN,
+  pointerCursor,
+  resetCursor
 } from "../../config/konvaConfigs";
 import { nearestPointOnPerimeter, distance } from "../../util/calculations";
 import { uriToPrefix } from "../../util/urlParser";
@@ -169,6 +173,15 @@ export default {
     click() {
       this.hover = false;
       this.$store.dispatch("deleteConstraintValue", this.$props.onClickProps);
+    },
+
+    /**
+     * Set the cursor type according to the passed argument.
+     * @param type {string}
+     */
+    setCursor(type) {
+      if (type === "pointer") pointerCursor();
+      else resetCursor();
     }
   }
 };

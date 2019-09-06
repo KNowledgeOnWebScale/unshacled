@@ -6,7 +6,7 @@
           <sui-table color="green" inverted>
             <sui-table-header>
               <sui-table-row>
-                <sui-table-header-cell class="predicate">
+                <sui-table-header-cell class="two wide">
                   <span
                     class="clickable"
                     @click="setSorting(true, 'predicate')"
@@ -28,10 +28,10 @@
                   </span>
                 </sui-table-header-cell>
 
-                <sui-table-header-cell class="description">
-                  Description
+                <sui-table-header-cell class="five wide">
+                  <span class="unclickable">Description</span>
                 </sui-table-header-cell>
-                <sui-table-header-cell class="type">
+                <sui-table-header-cell class="two wide">
                   <span class="clickable" @click="setSorting(true, 'type')">
                     Type
                     <span v-if="$props.sorting.sortBy === 'type'">
@@ -67,13 +67,13 @@
                   :active="!editing && selected === object.id"
                   @click="selectConstraint(object.id)"
                 >
-                  <sui-table-cell class="predicate">
+                  <sui-table-cell class="three wide">
                     {{ object.predicate }}
                   </sui-table-cell>
-                  <sui-table-cell class="description">
+                  <sui-table-cell class="eight wide">
                     {{ object.description }}
                   </sui-table-cell>
-                  <sui-table-cell class="type">
+                  <sui-table-cell class="three wide">
                     {{ object.type.replace(" Constraints", "") }}
                   </sui-table-cell>
                 </sui-table-row>
@@ -282,13 +282,7 @@ function compareType(a, b) {
 .clickable {
   cursor: pointer;
 }
-.predicate {
-  width: 25%;
-}
-.description {
-  width: 55%;
-}
-.type {
-  width: 20%;
+.unclickable {
+  cursor: default;
 }
 </style>

@@ -8,6 +8,8 @@
         v-if="hoverKey && canBeDeleted()"
         :config="getConfigs().deleteConstraint"
         @click="deleteConstraint"
+        @mouseenter="setCursor('pointer')"
+        @mouseleave="setCursor('')"
       ></v-circle>
     </v-group>
 
@@ -18,11 +20,15 @@
         <v-text
           :config="getValueConfig(value, index)"
           @click="editValue(index)"
+          @mouseenter="setCursor('text')"
+          @mouseleave="setCursor('')"
         ></v-text>
         <v-circle
           v-if="hoverValues && !isListOfValues() && canBeDeleted()"
           :config="getDeleteValueConfig(index)"
           @click="deleteConstraintValue(index)"
+          @mouseenter="setCursor('pointer')"
+          @mouseleave="setCursor('')"
         ></v-circle>
       </div>
     </v-group>
@@ -39,7 +45,10 @@ import {
   DELTA_Y_TEXT,
   DELETE_BUTTON_CONFIG,
   DELTA_Y_DELETE,
-  MAX_LENGTH
+  MAX_LENGTH,
+  pointerCursor,
+  textCursor,
+  resetCursor
 } from "../../config/konvaConfigs";
 import { uriToPrefix, urlToName } from "../../util/urlParser";
 import { SINGLE_ENTRY } from "../../util/constants";
@@ -353,6 +362,16 @@ export default {
           (index + 1) * HEIGHT +
           this.getYValue()
       };
+    },
+
+    /**
+     * Set the cursor type according to the passed argument.
+     * @param type {string}
+     */
+    setCursor(type) {
+      if (type === "pointer") pointerCursor();
+      else if (type === "text") textCursor();
+      else resetCursor();
     }
   }
 };

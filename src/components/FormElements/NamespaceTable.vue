@@ -19,13 +19,12 @@
           <sui-table color="green" inverted>
             <sui-table-header>
               <sui-table-row>
-                <sui-table-header-cell class="prefix">
-                  Prefix
+                <sui-table-header-cell class="four wide">
+                  <span class="unclickable">Prefix</span>
                 </sui-table-header-cell>
-                <sui-table-header-cell class="uri">
-                  URI
+                <sui-table-header-cell class="twelve wide unclickable">
+                  <span class="unclickable">URI</span>
                 </sui-table-header-cell>
-                <sui-table-header-cell class="delete"></sui-table-header-cell>
               </sui-table-row>
             </sui-table-header>
           </sui-table>
@@ -40,7 +39,7 @@
                   v-for="(uri, prefix) of $store.getters.namespaces"
                   :key="prefix"
                 >
-                  <sui-table-cell class="prefix">
+                  <sui-table-cell class="four wide">
                     <div :id="prefix + 'prefix'"></div>
                     <div
                       v-if="!editingThis(prefix, 'prefix')"
@@ -50,7 +49,7 @@
                     </div>
                   </sui-table-cell>
 
-                  <sui-table-cell class="uri">
+                  <sui-table-cell class="eleven wide">
                     <div :id="prefix + 'uri'"></div>
                     <div
                       v-if="!editingThis(prefix, 'uri')"
@@ -60,7 +59,10 @@
                     </div>
                   </sui-table-cell>
 
-                  <sui-table-cell class="delete" @click="deleteElement(prefix)">
+                  <sui-table-cell
+                    class="one wide clickable"
+                    @click="deleteElement(prefix)"
+                  >
                     <sui-icon name="x icon"></sui-icon>
                   </sui-table-cell>
                 </sui-table-row>
@@ -209,14 +211,10 @@ export default {
   overflow: auto;
 }
 
-.prefix {
-  width: 20%;
-}
-.uri {
-  width: 75%;
-}
-.delete {
-  width: 5%;
+.clickable {
   cursor: pointer;
+}
+.unclickable {
+  cursor: default;
 }
 </style>

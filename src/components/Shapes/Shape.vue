@@ -11,7 +11,12 @@
         <!-- Header -->
         <v-group @click="startEditing">
           <v-rect :config="shapeConfig"></v-rect>
-          <v-text ref="shapeLabel" :config="getLabelTextConfig()"></v-text>
+          <v-text
+            ref="shapeLabel"
+            :config="getLabelTextConfig()"
+            @mouseenter="setCursor('text')"
+            @mouseleave="setCursor('')"
+          ></v-text>
           <v-text ref="shapeURI" :config="getURITextConfig()"></v-text>
         </v-group>
 
@@ -29,11 +34,15 @@
           v-if="hover"
           :config="deleteNodeConfig"
           @click="deleteShape"
+          @mouseenter="setCursor('pointer')"
+          @mouseleave="setCursor('')"
         ></v-circle>
         <v-circle
           v-if="hover && !adding"
           :config="addPredicateConfig"
-          @mousedown="addPredicate"
+          @click="addPredicate"
+          @mouseenter="setCursor('pointer')"
+          @mouseleave="setCursor('')"
         ></v-circle>
       </v-group>
 
@@ -67,7 +76,10 @@ import {
   MAX_LENGTH,
   TEXT_SIZE,
   WIDTH,
-  MARGIN
+  MARGIN,
+  pointerCursor,
+  resetCursor,
+  textCursor
 } from "../../config/konvaConfigs";
 import { TERM } from "../../translation/terminology";
 import { abbreviate } from "../../util/strings";
@@ -309,6 +321,16 @@ export default {
         ? "deleteNodeShape"
         : "deletePropertyShape";
       this.$store.dispatch(action, this.$props.id);
+    },
+
+    /**
+     * Set the cursor type according to the passed argument.
+     * @param type {string}
+     */
+    setCursor(type) {
+      if (type === "pointer") pointerCursor();
+      else if (type === "text") textCursor();
+      else resetCursor();
     }
   }
 };
