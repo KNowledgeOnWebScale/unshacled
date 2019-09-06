@@ -1,8 +1,8 @@
 import Vue from "vue";
 import constraintModule from "./constraintModule";
-import { getNonOverlappingCoordinates } from "../util";
+import {generateUUID, getNonOverlappingCoordinates} from "../util";
 import coordinateModule from "./coordinateModule";
-import { LABEL, SHACL_URI } from "../util/constants";
+import { IDENTIFIER, LABEL, SHACL_URI } from "../util/constants";
 import { TERM } from "../translation/terminology";
 import getValueType from "../util/enums/ValueType";
 import ShaclTranslator from "../translation/shaclTranslator";
@@ -180,32 +180,27 @@ const shapeModule = {
     /* ADD ========================================================================================================== */
 
     /**
-     * Add an empty node shape with the given id.
+     * Add an empty node shape.
      * @param store
-     * @param id
      */
-    addNodeShape({ commit, getters }, id) {
+    addNodeShape({ commit, getters }) {
       const object = {
-        "@id": id,
+        "@id": generateUUID(getters.baseURI),
         "@type": [TERM.NodeShape]
       };
-
       commit("addShape", { object, bottomYs: getters.allBottomYs });
     },
 
     /**
-     * Add a property shape with the given id.
+     * Add a new property shape.
      * @param store
      * @param args
      */
     addPropertyShape({ commit, getters }, args) {
-      const { id, path } = args;
-      // Only do so if there is no property shape with this ID yet.
-      if (!getters.shapeWithID(id)) {
-        const object = { "@id": id };
-        object[TERM.path] = [{ "@id": path }];
-        commit("addShape", { object, bottomYs: getters.allBottomYs });
-      }
+      const { path } = args;
+      const object = { "@id": generateUUID(getters.baseURI) };
+      object[TERM.path] = [{ "@id": path }];
+      commit("addShape", { object, bottomYs: getters.allBottomYs });
     },
 
     /* EDIT ========================================================================================================= */

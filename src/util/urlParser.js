@@ -1,5 +1,6 @@
 import { swapKeyValue } from "./index";
 import { CUSTOM_URI } from "../translation/terminology";
+import { IDENTIFIER } from "./constants";
 
 /**
  * Takes the name out of an url if possible.
@@ -55,10 +56,18 @@ export function prefixToUri(namespaces, string) {
  * @returns {string}
  */
 export function extractUrl(string) {
-  if (string.indexOf("#") !== -1)
-    return string.substring(0, string.indexOf("#") + 1);
-  if (string.indexOf("/") !== -1)
-    return string.substring(0, string.lastIndexOf("/") + 1);
+  if (string.indexOf("#") !== -1) {
+    const url = string.substring(0, string.indexOf("#") + 1);
+    const id = url.indexOf(IDENTIFIER);
+    if (id !== -1) return string.substring(0, id);
+    return url;
+  }
+  if (string.indexOf("/") !== -1) {
+    const url = string.substring(0, string.lastIndexOf("/") + 1);
+    const id = url.indexOf(IDENTIFIER);
+    if (id !== -1) return string.substring(0, id);
+    return url;
+  }
   return "";
 }
 

@@ -1,5 +1,6 @@
 import Vue from "vue";
 import { clone } from "ramda";
+import {IDENTIFIER} from "./constants";
 
 export { default as getNonOverlappingCoordinates } from "./getNonOverlappingCoordinates"; // prettier-ignore
 export { default as traverse } from "./traverse";
@@ -53,4 +54,13 @@ export function swapKeyValue(object) {
     output[object[key]] = key;
   });
   return output;
+}
+
+/**
+ * Generate an UUID using the current set base URI and the `uuid/v4` generator.
+ * @param baseURI
+ * @returns {string}
+ */
+export function generateUUID(baseURI) {
+  return `${baseURI}${IDENTIFIER}/${require("uuid/v4")()}`;
 }
