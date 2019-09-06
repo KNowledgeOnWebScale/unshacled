@@ -99,7 +99,7 @@ export default {
     // Stop editing when the modal is being closed.
     const self = this;
     this.$store.watch(
-      () => self.$store.state.mConfig.namespaceModal.show,
+      () => self.$store.state.mConfig.mModal.show,
       () => {
         const { editRow, editField } = self.$props.tableProperties;
         if (editRow !== "" && editField !== "") self.stopEditing();
@@ -173,7 +173,6 @@ export default {
      * Set the value of the given row and field to the entered data.
      */
     stopEditing() {
-      console.log("stopEditing");
       const { editRow, editField } = this.$props.tableProperties;
       // Check if the input is valid.
       if (!this.error()) {
@@ -189,7 +188,6 @@ export default {
      * @param prefix
      */
     deleteElement(prefix) {
-      console.log("deleteElement");
       this.$store.commit("deletePrefix", { prefix });
     }
   }

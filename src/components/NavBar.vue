@@ -40,7 +40,6 @@
           <sui-dropdown-item @click="toggleNamespaceModal">
             Namespaces...
           </sui-dropdown-item>
-
         </sui-dropdown-menu>
       </sui-dropdown>
       <sui-menu-item class="clickable" icon="add" @click="createNodeShape">

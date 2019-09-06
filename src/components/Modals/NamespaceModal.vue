@@ -1,26 +1,42 @@
 <template>
-  <sui-modal v-model="$store.state.mConfig.namespaceModal.show">
+  <sui-modal v-model="$store.state.mConfig.mModal.show">
     <sui-modal-header>Namespaces</sui-modal-header>
     <sui-modal-content>
       <namespace-table
-        :table-properties="$store.state.mConfig.namespaceModal"
+        :table-properties="$store.state.mConfig.mModal"
       ></namespace-table>
 
       <br />
 
       <sui-form @submit.prevent="addNamespace">
         <sui-form-fields>
-          <sui-form-field class="four wide field">
-            <sui-input placeholder="Prefix"></sui-input>
+          <sui-form-field
+            class="four wide field"
+            :class="{
+              error: prefix !== '' && !validPrefix()
+            }"
+          >
+            <input
+              id="prefixField"
+              placeholder="Prefix"
+              @input="e => (prefix = e.target.value)"
+            />
           </sui-form-field>
-          <sui-form-field class="eleven wide field">
-            <sui-input placeholder="URI"></sui-input>
+          <sui-form-field
+            class="eleven wide field"
+            :class="{ error: uri !== '' && !validURI() }"
+          >
+            <input
+              id="uriField"
+              placeholder="URI"
+              @input="e => (uri = e.target.value)"
+            />
           </sui-form-field>
           <sui-form-field class="one wide field">
             <sui-button
               color="green"
               icon="plus"
-              :disabled="!validNamespace()"
+              :disabled="!validPrefix() || !validURI()"
             ></sui-button>
           </sui-form-field>
         </sui-form-fields>
@@ -44,9 +60,11 @@ export default {
   components: {
     NamespaceTable
   },
-  state: {
-    prefix: "",
-    uri: ""
+  data() {
+    return {
+      prefix: "",
+      uri: ""
+    };
   },
   methods: {
     /**
@@ -57,25 +75,43 @@ export default {
     },
 
     /**
-     * Check if the entered prefix and URI are valid.
-     */
-    validNamespace() {
-      const { prefix, uri } = this;
-      if (
-        prefix === "" ||
-        uri === "" ||
-        !/^[a-zA-Z0-9]+$/i.test(prefix) ||
-        !IRI_REGEX.test(uri) ||
-        !"/#".includes(uri.slice(-1))
-      )
-        return false;
-    },
-
-    /**
      * Add the given prefix and URI to the list with namespaces.
      */
     addNamespace() {
-      this.$store.commit("addPrefix", { prefix: this.prefix, uri: this.uri });
+      const { prefix, uri } = this;
+      if (this.validURI() && this.validPrefix()) {
+        this.$store.dispatch("addNewPrefix", { prefix, uri });
+        // Clear the filled in values.
+        this.prefix = "";
+        this.uri = "";
+        document.getElementById("prefixField").value = "";
+        document.getElementById("uriField").value = "";
+      }
+    },
+
+    /**
+     * Check if the entered prefix is valid.
+     */
+    validPrefix() {
+      const { prefix } = this;
+      return (
+        prefix !== "" &&
+        /^[a-zA-Z0-9]+$/i.test(prefix) &&
+        !Object.keys(this.$store.getters.namespaces).includes(prefix)
+      );
+    },
+
+    /**
+     * Check if the entered URI is valid.
+     */
+    validURI() {
+      const { uri } = this;
+      return (
+        uri !== "" &&
+        IRI_REGEX.test(uri) &&
+        "/#".includes(uri.slice(-1)) &&
+        !Object.values(this.$store.getters.namespaces).includes(uri)
+      );
     }
   }
 };

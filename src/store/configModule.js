@@ -1,5 +1,6 @@
 import Vue from "vue";
 import { swapKeyValue } from "../util";
+import namespaceModalModule from "./modals/namespaceModalModule";
 
 const configModule = {
   state: {
@@ -31,12 +32,10 @@ const configModule = {
       oh: "http://semweb.mmlab.be/ns/oh#",
       combust: "http://combust.iminds.be/",
       "dbpedia-owl": "http://dbpedia.org/ontology/"
-    },
-    namespaceModal: {
-      show: false,
-      editRow: "",
-      editField: ""
     }
+  },
+  modules: {
+    mModal: namespaceModalModule
   },
   mutations: {
     /**
@@ -79,38 +78,6 @@ const configModule = {
     deletePrefix(state, args) {
       const { prefix } = args;
       Vue.delete(state.namespaces, prefix);
-    },
-
-    /* NAMESPACE MODAL ============================================================================================== */
-
-    /**
-     * Toggle the visibility of the namespace modal.
-     * @param state
-     * @param bool {boolean} indicates if the modal should be shown.
-     */
-    toggleNamespaceModal(state, bool = true) {
-      event.preventDefault();
-      Vue.set(state.namespaceModal, "show", bool);
-    },
-
-    /**
-     * Start editing the given row and field.
-     * @param state
-     * @param args
-     */
-    startEditingNamespace(state, args) {
-      const { editRow, editField } = args;
-      Vue.set(state.namespaceModal, "editRow", editRow);
-      Vue.set(state.namespaceModal, "editField", editField);
-    },
-
-    /**
-     * Clear the edit fields for the namespace modal.
-     * @param state
-     */
-    clearTableEdit(state) {
-      Vue.set(state.namespaceModal, "editRow", "");
-      Vue.set(state.namespaceModal, "editField", "");
     }
   },
   actions: {
@@ -123,7 +90,7 @@ const configModule = {
      */
     stopEditingNamespace({ state, commit }, args) {
       const { input } = args;
-      const { editRow, editField } = state.namespaceModal;
+      const { editRow, editField } = state.mModal;
       // Only execute the update if the value has actually changed.
       if (editField === "prefix" && editRow !== input) {
         // Update the given prefix.

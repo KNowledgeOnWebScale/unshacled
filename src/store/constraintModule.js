@@ -50,12 +50,18 @@ const constraintModule = {
     /* ADD ========================================================================================================== */
 
     /**
-     * TODO
+     * Add a constraint with the given values to the given shape.
      * @param getters
      * @param commit
      * @param dispatch
      * @param rootState
      * @param args
+     *            shapeID {string} the IRI of the shape we want to add the predicate to.
+     *            predicate {string} the predicate we want to add.
+     *            valueType {string} the value type of this predicate.
+     *            input {string} the desired value of this constraint.
+     *            object {string} the type of the input.
+     *            language {string} the language tag of the input value.
      */
     addPredicate({ state, getters, commit, dispatch, rootState }, args) {
       const { shapeID, predicate, valueType, input, object, language } = args;
