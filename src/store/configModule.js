@@ -45,10 +45,10 @@ const configModule = {
     /**
      * Update the given prefix in the namespaces config.
      * @param state
-     * @param args
+     * @param oldPrefix {string}
+     * @param newPrefix {string}
      */
-    updateNamespacePrefix(state, args) {
-      const { oldPrefix, newPrefix } = args;
+    updateNamespacePrefix(state, { oldPrefix, newPrefix }) {
       const uri = state.namespaces[oldPrefix];
       Vue.delete(state.namespaces, oldPrefix);
       Vue.set(state.namespaces, newPrefix, uri);
@@ -57,40 +57,39 @@ const configModule = {
     /**
      * Update the URI of the given prefix in the namespaces config.
      * @param state
-     * @param args
+     * @param prefix {string}
+     * @param newURI {string}
      */
-    updateNamespaceURI(state, args) {
-      const { prefix, newURI } = args;
+    updateNamespaceURI(state, { prefix, newURI }) {
       Vue.set(state.namespaces, prefix, newURI);
     },
 
     /**
      * Add the given prefix to the namespaces.
      * @param state
-     * @param args
+     * @param prefix {string}
+     * @param uri {string}
      */
-    addPrefix(state, args) {
-      const { prefix, uri } = args;
+    addPrefix(state, { prefix, uri }) {
       Vue.set(state.namespaces, prefix, uri);
     },
 
     /**
      * Delete the given prefix from the namespaces.
      * @param state
-     * @param args
+     * @param prefix {string}
      */
-    deletePrefix(state, args) {
-      const { prefix } = args;
+    deletePrefix(state, { prefix }) {
       Vue.delete(state.namespaces, prefix);
     },
 
     /**
      * Set the current base URI to the given URI (if given) or to the URI corresponding to the given prefix.
      * @param state
-     * @param args
+     * @param uri {string}
+     * @param prefix {string}
      */
-    setBaseUri(state, args) {
-      const { uri, prefix } = args;
+    setBaseUri(state, { uri, prefix }) {
       if (uri) Vue.set(state, "baseURI", uri);
       if (prefix) Vue.set(state, "baseURI", state.namespaces[prefix]);
     }
@@ -101,10 +100,9 @@ const configModule = {
      * Get the entered values and update the namespaces.
      * @param state
      * @param commit
-     * @param args
+     * @param input
      */
-    stopEditingNamespace({ state, commit }, args) {
-      const { input } = args;
+    stopEditingNamespace({ state, commit }, { input }) {
       const { editRow, editField } = state.mModal;
       // Only execute the update if the value has actually changed.
       if (editField === "prefix" && editRow !== input) {

@@ -71,11 +71,11 @@ export default new Vuex.Store({
     /**
      * Toggle the visibility of the path modal.
      * @param state
-     * @param args
+     * @param editing {boolean}
+     * @param shapeID {string}
      */
-    togglePathModal(state, args = {}) {
+    togglePathModal(state, { editing, shapeID }) {
       event.preventDefault();
-      const { editing, shapeID } = args;
       const { show } = state.pathModal;
       Vue.set(state.pathModal, "editing", editing || false);
       Vue.set(state.pathModal, "shapeID", shapeID || "");

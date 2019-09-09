@@ -1,8 +1,8 @@
 import Vue from "vue";
 import constraintModule from "./constraintModule";
-import {generateUUID, getNonOverlappingCoordinates} from "../util";
+import { generateUUID, getNonOverlappingCoordinates } from "../util";
 import coordinateModule from "./coordinateModule";
-import { IDENTIFIER, LABEL, SHACL_URI } from "../util/constants";
+import { LABEL, SHACL_URI } from "../util/constants";
 import { TERM } from "../translation/terminology";
 import getValueType from "../util/enums/ValueType";
 import ShaclTranslator from "../translation/shaclTranslator";
@@ -42,12 +42,10 @@ const shapeModule = {
     /**
      * Set the model to the given value. Parse to internal value if necessary.
      * @param state
-     * @param args
+     * @param model {object}
+     * @param getters {object}
      */
-    setModel(state, args) {
-      const { model } = args;
-      const { getters } = args;
-
+    setModel(state, { model, getters }) {
       // Parse the model if necessary.
       state.model = JSON.stringify(model).includes(SHACL_URI)
         ? ShaclTranslator.toModelSimple(model)
@@ -71,26 +69,25 @@ const shapeModule = {
     /**
      * Toggle the visibility of the node shape modal.
      * @param state
-     * @param args
+     * @param id {string}
+     * @param label {string}
+     * @param labelLang {string}
+     * @param description {string}
+     * @param descrLang {string}
      */
-    toggleEditShapeModal(state, args) {
+    toggleEditShapeModal(
+      state,
+      { id, label, labelLang, description, descrLang }
+    ) {
       event.preventDefault();
-      if (args) {
-        args.label = args.label ? args.label : "";
-        args.labelLang = args.labelLang ? args.labelLang : "en";
-        args.description = args.description ? args.description : "";
-        args.descrLang = args.descrLang ? args.descrLang : "en";
-      } else {
-        args = {
-          id: "",
-          label: "",
-          labelLang: "en",
-          description: "",
-          descrLang: "en"
-        };
-      }
-      args.show = !state.shapeModal.show;
-      Vue.set(state, "shapeModal", args);
+      Vue.set(state, "shapeModal", {
+        id: id || "",
+        label: label || "",
+        labelLang: labelLang || "en",
+        description: description || "",
+        descrLang: descrLang || "en",
+        show: !state.shapeModal.show
+      });
     },
 
     /* ADD ========================================================================================================== */
@@ -98,10 +95,10 @@ const shapeModule = {
     /**
      * Add the given shape to the state and set its coordinates to zero.
      * @param state
-     * @param args
+     * @param object {object}
+     * @param bottomYs {object}
      */
-    addShape(state, args) {
-      const { object, bottomYs } = args;
+    addShape(state, { object, bottomYs }) {
       state.model.push(object);
       const { x, y } = getNonOverlappingCoordinates({
         coordinates: state.mCoordinate.coordinates,
@@ -120,22 +117,20 @@ const shapeModule = {
     /**
      * Update the shape's id.
      * @param state
-     * @param args
-     *            index the index of the shape that should be updated.
-     *            newID the shape's new ID.
+     * @param index {number} the index of the shape that should be updated.
+     * @param newID {string} the shape's new ID.
      */
-    updateShapeID(state, args) {
-      const { index, newID } = args;
+    updateShapeID(state, { index, newID }) {
       Vue.set(state.model[index], "@id", newID);
     },
 
     /**
      * Update the value of the shape with the given ID to the given value.
      * @param state
-     * @param args
+     * @param shapeID {string}
+     * @param value {object}
      */
-    updateShape(state, args) {
-      const { shapeID, value } = args;
+    updateShape(state, { shapeID, value }) {
       Vue.set(state.model, shapeID, value);
     },
 
@@ -153,12 +148,10 @@ const shapeModule = {
     /**
      * Delete the property with the given ID from the given shape.
      * @param state
-     * @param args
-     *            shape the shape object from which the property should be removed.
-     *            propertyID the ID of the property that should be removed.
+     * @param shape  {object}the shape object from which the property should be removed.
+     * @param propertyID {string} the ID of the property that should be removed.
      */
-    deletePropertyFromShape(state, args) {
-      const { shape, propertyID } = args;
+    deletePropertyFromShape(state, { shape, propertyID }) {
       const properties = shape[TERM.property];
       let index = -1;
 
@@ -194,10 +187,9 @@ const shapeModule = {
     /**
      * Add a new property shape.
      * @param store
-     * @param args
+     * @param path {string} the new shape's path.
      */
-    addPropertyShape({ commit, getters }, args) {
-      const { path } = args;
+    addPropertyShape({ commit, getters }, { path }) {
       const object = { "@id": generateUUID(getters.baseURI) };
       object[TERM.path] = [{ "@id": path }];
       commit("addShape", { object, bottomYs: getters.allBottomYs });
@@ -209,10 +201,10 @@ const shapeModule = {
      * Edit the ID of a shape.
      * This will update the constraint values of every node shape that contains this shape.
      * @param store
-     * @param args
+     * @param oldID {string}
+     * @param newID {string}
      */
-    editShape({ state, getters, commit, dispatch }, args) {
-      const { oldID, newID } = args;
+    editShape({ state, getters, commit, dispatch }, { oldID, newID }) {
       // Check if the new ID is different from the old ID to avoid unexpected errors.
       if (oldID !== newID) {
         // Update the shape's locations.

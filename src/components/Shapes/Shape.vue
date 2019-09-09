@@ -304,11 +304,10 @@ export default {
     stopEditing(newValue) {
       // Check if the new value is valid and unique.
       if (newValue !== "" && !this.$store.getters.shapes[newValue]) {
-        const args = {
+        this.$store.dispatch("editShape", {
           oldID: this.$props.id,
           newID: newValue
-        };
-        this.$store.dispatch("editShape", args);
+        });
       }
     },
 

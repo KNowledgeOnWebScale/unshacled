@@ -154,7 +154,7 @@ const dataModule = {
      * @param filename {string} the name of the exported file.
      * @param extension {string} the extension of the exported file.
      */
-    exportFileWithName({ rootState, rootGetters }, { filename, extension }) {
+    exportFileWithName({ rootGetters }, { filename, extension }) {
       if (extension === "json") {
         downloadFile(
           filename,

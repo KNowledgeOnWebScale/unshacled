@@ -24,25 +24,21 @@ const constraintModule = {
     /**
      * Set the value of the constraint with the given ID to the given value.
      * @param state
-     * @param args
-     *            shape the shape object that has to be updated.
-     *            constraintID the ID of the constraint that should be updated.
-     *            value the new value of the given constraint.
+     * @param shape {object} the shape object that has to be updated.
+     * @param constraintID {string} the ID of the constraint that should be updated.
+     * @param value {object} the new value of the given constraint.
      */
-    setConstraintValue(state, args) {
-      const { shape, constraintID, value } = args;
+    setConstraintValue(state, { shape, constraintID, value }) {
       Vue.set(shape, constraintID, value);
     },
 
     /**
      * Delete the given constraint from the given shape object.
      * @param state
-     * @param args
-     *            shape the shape object that should be updated.
-     *            constraint the ID of the constraint that should be deleted.
+     * @param shape {object} the shape object that should be updated.
+     * @param constraint {string} the ID of the constraint that should be deleted.
      */
-    deleteConstraintFromShape(state, args) {
-      const { shape, constraintID } = args;
+    deleteConstraintFromShape(state, { shape, constraintID }) {
       Vue.delete(shape, constraintID);
     }
   },
@@ -51,20 +47,22 @@ const constraintModule = {
 
     /**
      * Add a constraint with the given values to the given shape.
+     * @param state
      * @param getters
      * @param commit
      * @param dispatch
      * @param rootState
-     * @param args
-     *            shapeID {string} the IRI of the shape we want to add the predicate to.
-     *            predicate {string} the predicate we want to add.
-     *            valueType {string} the value type of this predicate.
-     *            input {string} the desired value of this constraint.
-     *            object {string} the type of the input.
-     *            language {string} the language tag of the input value.
+     * @param shapeID {string} the IRI of the shape we want to add the predicate to.
+     * @param predicate {string} the predicate we want to add.
+     * @param  valueType {string} the value type of this predicate.
+     * @param input {string} the desired value of this constraint.
+     * @param object {string} the type of the input.
+     * @param language {string} the language tag of the input value.
      */
-    addPredicate({ state, getters, commit, dispatch, rootState }, args) {
-      const { shapeID, predicate, valueType, input, object, language } = args;
+    addPredicate(
+      { state, getters, commit, dispatch, rootState },
+      { shapeID, predicate, valueType, input, object, language }
+    ) {
       const shape = getters.shapeWithID(shapeID);
       const isID = valueType.includes(ValueTypes.ID);
       const isList = valueType.includes(ValueTypes.LIST);
@@ -133,11 +131,16 @@ const constraintModule = {
      * Prepare and toggle the predicate modal.
      * @param state
      * @param commit
-     * @param args
+     * @param shapeID {string} the ID of the shape we want to update.
+     * @param shapeType {string} the type of the shape we want to update.
+     * @param constraintID {string} the ID of the constraint we want to edit.
+     * @param index {number} the index of the constraint value we want to edit.
+     * @param value {string} the current value of the constraint value.
      */
-    startConstraintEdit({ state, commit }, args) {
-      const { shapeID, shapeType, constraintID, index, value } = args;
-
+    startConstraintEdit(
+      { state, commit },
+      { shapeID, shapeType, constraintID, index, value }
+    ) {
       state.constraintIndex = index;
       commit("togglePredicateModal", {
         shapeID,
@@ -153,17 +156,20 @@ const constraintModule = {
      * Get the values from the predicate model and execute the edit.
      * @param state
      * @param rootGetters
-     * @param args
+     * @param shapeID {string}
+     * @param constraintID {string}
+     * @param object {string}
+     * @param valueType {string}
+     * @param input {string}
      */
-    stopConstraintEdit({ state, rootGetters }, args) {
+    stopConstraintEdit(
+      { state, rootGetters },
+      { shapeID, predicate: constraintID, object, valueType, input }
+    ) {
       // Update the modal state.
       Vue.set(state.mModal, "show", false);
       Vue.set(state.mModal, "editing", false);
-
-      const { shapeID, predicate: constraintID, object, valueType } = args;
       const i = state.constraintIndex;
-
-      let { input } = args;
       if (typeof input === "boolean") input = input.toString();
 
       // Clone the original constraint and get the value we want to update.
@@ -216,14 +222,14 @@ const constraintModule = {
      * Update the constraint value of the given shape.
      * @param rootGetters
      * @param commit
-     * @param args
-     *            shapeID the ID of the shape.
-     *            constraintID the ID of the constraint we want to update.
-     *            value the new value of the given constraint.
+     * @param shapeID {string} the ID of the shape.
+     * @param constraintID {string} the ID of the constraint we want to update.
+     * @param newValue {object} the new value of the given constraint.
      */
-    updateConstraint({ rootGetters, commit }, args) {
-      const { shapeID, constraintID, newValue } = args;
-
+    updateConstraint(
+      { rootGetters, commit },
+      { shapeID, constraintID, newValue }
+    ) {
       commit("setConstraintValue", {
         shape: rootGetters.shapeWithID(shapeID),
         constraintID,
@@ -236,12 +242,13 @@ const constraintModule = {
     /**
      * Delete the given constraint from the given shape.
      * @param store
-     * @param args
-     *            shapeID the ID of the shape from which the constraint should be removed.
-     *            constraint the ID of the constraint that should be removed.
+     * @param shapeID {string} the ID of the shape from which the constraint should be removed.
+     * @param constraint {string} the ID of the constraint that should be removed.
      */
-    deleteConstraintFromShapeWithID({ getters, commit, rootState }, args) {
-      const { shapeID, constraintID } = args;
+    deleteConstraintFromShapeWithID(
+      { getters, commit, rootState },
+      { shapeID, constraintID }
+    ) {
       const shape = getters.shapeWithID(shapeID);
       commit(
         "deleteConstraintFromShape",
@@ -264,10 +271,14 @@ const constraintModule = {
      * @param getters
      * @param commit
      * @param rootState
-     * @param args
+     * @param shapeID {string} the ID of the shape we want to update.
+     * @param constraintID {string} the ID of the constraint we want to edit.
+     * @param valueIndex {number} the index of the constraint value we want to delete.
      */
-    deleteConstraintValueWithIndex({ getters, commit, rootState }, args) {
-      const { shapeID, constraintID, valueIndex } = args;
+    deleteConstraintValueWithIndex(
+      { getters, commit, rootState },
+      { shapeID, constraintID, valueIndex }
+    ) {
       const constraint = getters.shapeWithID(shapeID)[constraintID];
 
       // If the value is a list, then remove from that list instead of directly.
@@ -295,10 +306,14 @@ const constraintModule = {
      * @param getters
      * @param commit
      * @param rootState
-     * @param args
+     * @param shapeID {string}
+     * @param constraintID {string}
+     * @param value {string}
      */
-    deleteConstraintValue({ getters, commit, rootState }, args) {
-      const { shapeID, constraintID, value } = args;
+    deleteConstraintValue(
+      { getters, commit, rootState },
+      { shapeID, constraintID, value }
+    ) {
       const constraint = getters.shapeWithID(shapeID)[constraintID];
 
       // If the value is a list, then remove from that list instead of directly.

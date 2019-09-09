@@ -21,19 +21,23 @@ const predicateModalModule = {
     /**
      * Toggle the visibility of the predicate modal.
      * @param state
-     * @param args
+     * @param shapeID {string} the ID of the shape.
+     * @param shapeType {string} the type of the shape.
+     * @param editing {boolean} indicates if we are editing a predicate.
+     * @param onExit {string} the action that should be dispatched when the modal is confirmed.
+     * @param selected {string} the prefix of the predicate that is currently selected.
+     * @param input {string} the search term that is currently entered.
      */
-    togglePredicateModal(state, args) {
-      if (!args)
-        args = { shapeID: "", shapeType: "", onExit: "", editing: false };
-      const { shapeID, shapeType, editing, onExit, selected, input } = args;
-
+    togglePredicateModal(
+      state,
+      { shapeID, shapeType, editing, onExit, selected, input }
+    ) {
       Vue.set(state, "show", !state.show);
-      Vue.set(state, "shapeID", shapeID);
-      Vue.set(state, "shapeType", shapeType);
-      Vue.set(state, "editing", editing);
+      Vue.set(state, "shapeID", shapeID || "");
+      Vue.set(state, "shapeType", shapeType || "");
+      Vue.set(state, "editing", editing || false);
       Vue.set(state, "input", input || "");
-      Vue.set(state, "onExit", onExit);
+      Vue.set(state, "onExit", onExit || "");
       Vue.set(state, "selected", selected || "");
       Vue.set(state, "sorting", {
         sorted: true,
@@ -45,13 +49,11 @@ const predicateModalModule = {
     /**
      * Set the sorting of the table in the predicate modal.
      * @param state
-     * @param args
-     *            sorted {boolean}
-     *            sortBy {string}
-     *            ascending {boolean}
+     * @param sorted {boolean} indicates if the modal is sorted.
+     * @param sortBy {string} the column the modal is sorted on.
+     * @param ascending {boolean} indicates if the column is sorted ascending.
      */
-    sortPredicateModal(state, args) {
-      const { sorted, sortBy, ascending } = args;
+    sortPredicateModal(state, { sorted, sortBy, ascending }) {
       Vue.set(state.sorting, "sorted", sorted);
       Vue.set(state.sorting, "sortBy", sortBy);
       Vue.set(state.sorting, "ascending", ascending);
@@ -61,10 +63,9 @@ const predicateModalModule = {
      * Select the row with the given key (constraint ID).
      * If the row was already selected, then deselect it.
      * @param state
-     * @param args
+     * @param key {string} the key of the row that is selected.
      */
-    selectRow(state, args) {
-      const { key } = args;
+    selectRow(state, { key }) {
       const selected = state.selected === key ? "" : key;
       Vue.set(state, "selected", selected);
     },
