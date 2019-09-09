@@ -122,7 +122,7 @@ const constraintModule = {
       }
 
       // Toggle the predicate modal.
-      if (state.mModal.show) commit("togglePredicateModal", undefined);
+      if (state.mModal.show) commit("togglePredicateModal", {});
     },
 
     /* EDIT ========================================================================================================= */
