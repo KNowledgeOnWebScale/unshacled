@@ -20,10 +20,10 @@ const namespaceModalModule = {
     /**
      * Start editing the given row and field.
      * @param state
-     * @param args
+     * @param editRow {string} the prefix of the row we want to edit.
+     * @param editField {string} the field we want to edit; either 'prefix' or 'uri'
      */
-    startEditingNamespace(state, args) {
-      const { editRow, editField } = args;
+    startEditingNamespace(state, { editRow, editField }) {
       Vue.set(state, "editRow", editRow);
       Vue.set(state, "editField", editField);
     },
@@ -41,10 +41,10 @@ const namespaceModalModule = {
     /**
      * Add a new entry with the given prefix and URI.
      * @param commit
-     * @param args
+     * @param prefix {string}
+     * @param uri {string}
      */
-    addNewPrefix({ commit }, args) {
-      const { prefix, uri } = args;
+    addNewPrefix({ commit }, { prefix, uri }) {
       commit("addPrefix", { prefix, uri });
     }
   }
