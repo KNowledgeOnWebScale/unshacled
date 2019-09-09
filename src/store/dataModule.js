@@ -48,9 +48,13 @@ const dataModule = {
           ETF.ttl
         )
           .then(shapes => {
+            // if (state.dataFileExtension === "json")
+            // throw "JSON data files are not yet supported."; // FIXME
+            console.log(state.dataFile);
             if (state.dataFileExtension === "json")
-              throw "JSON data files are not yet supported."; // FIXME
-            // SerializerManager.serialize(state.dataFile, ETF.ttl).then(result => console.log(result)); // FIXME this errors
+              SerializerManager.serialize(state.dataFile, ETF.ttl).then(
+                result => console.log(result)
+              ); // FIXME this errors
 
             ValidatorManager.validate(state.dataFile, shapes, state.format)
               .then(report => {

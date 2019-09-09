@@ -197,11 +197,13 @@ export default {
           const r = results[key];
           simple[key] = {};
           for (const constr of Object.keys(r)) {
-            const name = uriToPrefix(
-              this.$store.state.mConfig.namespaces,
-              r[constr]
-            );
-            if (name !== "(undefined)") simple[key][constr] = name;
+            if (r[constr]) {
+              const name = uriToPrefix(
+                this.$store.state.mConfig.namespaces,
+                r[constr]
+              );
+              if (name !== "(undefined)") simple[key][constr] = name;
+            }
           }
           simple[key].message = r.message;
         }
