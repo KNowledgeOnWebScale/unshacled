@@ -162,7 +162,7 @@ export default {
       const modProps = this.$props.modalProperties;
 
       // Close the modal.
-      this.$store.commit("toggleEditShapeModal");
+      this.$store.commit("toggleEditShapeModal", {});
 
       // Update the shape ID.
       this.$store.dispatch("editShape", {
@@ -229,7 +229,7 @@ export default {
      * Cancel and close the modal.
      */
     cancel() {
-      this.$store.commit("toggleEditShapeModal");
+      this.$store.commit("toggleEditShapeModal", {});
     },
 
     /**
