@@ -36,6 +36,22 @@ const dataModule = {
     },
 
     /**
+     * Execute the validation using the given arguments.
+     * @param state
+     * @param data
+     * @param shapes
+     * @param format
+     */
+    validate(state, { data, shapes, format }) {
+      ValidatorManager.validate(data, shapes, format)
+        .then(report => {
+          state.validationReport = report;
+          state.showValidationReportModal = true;
+        })
+        .catch(e => console.error(`Error while validating: ${e}`));
+    },
+
+    /**
      * Parse the model to the expected format and validate the data file using these shapes.
      * If there is no data file loaded, this will print an error.
      * @param state
@@ -48,20 +64,26 @@ const dataModule = {
           ETF.ttl
         )
           .then(shapes => {
-            // if (state.dataFileExtension === "json")
-            // throw "JSON data files are not yet supported."; // FIXME
-            console.log(state.dataFile);
-            if (state.dataFileExtension === "json")
-              SerializerManager.serialize(state.dataFile, ETF.ttl).then(
-                result => console.log(result)
-              ); // FIXME this errors
-
-            ValidatorManager.validate(state.dataFile, shapes, state.format)
-              .then(report => {
-                state.validationReport = report;
-                state.showValidationReportModal = true;
-              })
-              .catch(e => console.error(`Error while validating: ${e}`));
+            if (state.dataFileExtension === "json") {
+              SerializerManager.serialize(
+                JSON.parse(state.dataFile),
+                ETF.ttl
+              ).then(data =>
+                ValidatorManager.validate(data, shapes, state.format)
+                  .then(report => {
+                    state.validationReport = report;
+                    state.showValidationReportModal = true;
+                  })
+                  .catch(e => console.error(`Error while validating: ${e}`))
+              );
+            } else {
+              ValidatorManager.validate(state.dataFile, shapes, state.format)
+                .then(report => {
+                  state.validationReport = report;
+                  state.showValidationReportModal = true;
+                })
+                .catch(e => console.error(`Error while validating: ${e}`));
+            }
           })
           .catch(e => console.error(`Error while serializing: ${e}`));
       } else {
