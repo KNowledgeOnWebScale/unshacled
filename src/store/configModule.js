@@ -100,9 +100,10 @@ const configModule = {
      * Get the entered values and update the namespaces.
      * @param state
      * @param commit
+     * @param getters
      * @param input
      */
-    stopEditingNamespace({ state, commit }, { input }) {
+    stopEditingNamespace({ state, commit, getters }, { input }) {
       const { editRow, editField } = state.mModal;
       // Only execute the update if the value has actually changed.
       if (editField === "prefix" && editRow !== input) {
@@ -113,6 +114,8 @@ const configModule = {
         });
       } else if (editField === "uri" && state.namespaces[editRow] !== input) {
         // Update the given URI.
+        if (editRow === getters.uriPrefix(state.baseURI))
+          commit("setBaseUri", { uri: input });
         commit("updateNamespaceURI", { prefix: editRow, newURI: input });
       }
       commit("clearTableEdit"); // Stop editing the table.
