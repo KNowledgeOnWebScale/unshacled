@@ -17,13 +17,10 @@ const coordinateModule = {
     /**
      * Update the coordinates and values of the given shapeID.
      * @param state
-     * @param args
-     *            oldID the shapeID's old ID.
-     *            newID the shapeID's new ID.
+     * @param oldID {string} the shapeID's old ID.
+     * @param newID {string} the shapeID's new ID.
      */
-    updateLocations(state, args) {
-      const { oldID, newID } = args;
-
+    updateLocations(state, { oldID, newID }) {
       // Update coordinates
       Vue.set(state.coordinates, newID, state.coordinates[oldID]);
       if (oldID !== newID) Vue.delete(state.coordinates, oldID);
@@ -46,10 +43,10 @@ const coordinateModule = {
     /**
      * Update the y values of the properties of the given shapeID.
      * @param state
-     * @param args
+     * @param shapeID {string}
+     * @param shapes {string}
      */
-    updateYValues(state, args) {
-      const { shapeID, shapes } = args;
+    updateYValues(state, { shapeID, shapes }) {
       // Update the y values of the properties.
       Vue.set(state.yValues, shapeID, {});
 
@@ -90,13 +87,11 @@ const coordinateModule = {
     /**
      * Update the coordinates of the given shapeID.
      * @param state
-     * @param args
-     *    shapeID: the ID of the shapeID whose location should be updated.
-     *    x: the new x coordinate.
-     *    y: the new y coordinate.
+     * @param shapeID {string} the ID of the shapeID whose location should be updated.
+     * @param x {number} the new x coordinate.
+     * @param y {number} the new y coordinate.
      */
-    updateCoordinates(state, args) {
-      const { shapeID, x, y } = args;
+    updateCoordinates(state, { shapeID, x, y }) {
       Vue.set(state.coordinates, shapeID, { x, y });
     },
 
