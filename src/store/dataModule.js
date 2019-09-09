@@ -150,11 +150,11 @@ const dataModule = {
      * Export the internal model to a file.
      * // FIXME the default is SHACL for now
      * @param rootState
-     * @param filename
+     * @param rootGetters
+     * @param filename {string} the name of the exported file.
+     * @param extension {string} the extension of the exported file.
      */
-    exportFileWithName({ rootState, rootGetters }, args) {
-      const { filename, extension } = args;
-      const type = ETF[extension];
+    exportFileWithName({ rootState, rootGetters }, { filename, extension }) {
       if (extension === "json") {
         downloadFile(
           filename,
@@ -162,9 +162,11 @@ const dataModule = {
         );
       } else {
         SerializerManager.serialize(
-          ShaclTranslator.toSHACLSimple(rootState.mShape.model),
-          type
-        ).then(e => downloadFile(filename, e));
+          ShaclTranslator.toSHACL(rootGetters.shapes),
+          ETF.ttl
+        ).then(e => {
+          downloadFile(filename, e);
+        });
       }
     }
   },
