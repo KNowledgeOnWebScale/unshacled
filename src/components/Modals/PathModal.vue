@@ -87,7 +87,7 @@ export default {
      * Cancel the modal.
      */
     cancel() {
-      this.$store.commit("togglePathModal");
+      this.$store.commit("togglePathModal", {});
       this.path = "";
     },
 
@@ -114,7 +114,7 @@ export default {
             path: this.path
           });
         }
-        this.$store.commit("togglePathModal");
+        this.$store.commit("togglePathModal", {});
         this.path = "";
       }
     },

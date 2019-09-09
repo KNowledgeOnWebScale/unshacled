@@ -142,7 +142,7 @@ export default {
       this.$store.dispatch("addNodeShape");
     },
     createPropertyShape() {
-      this.$store.commit("togglePathModal");
+      this.$store.commit("togglePathModal", {});
     },
 
     loadExample() {

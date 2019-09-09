@@ -91,7 +91,7 @@
 <script>
 import { XML_DATATYPES } from "../../util";
 import { TERM } from "../../translation/terminology";
-import {BLANK_REGEX, ENTER, IRI_REGEX, LABEL} from "../../util/constants";
+import { BLANK_REGEX, ENTER, IRI_REGEX, LABEL } from "../../util/constants";
 import getValueType from "../../util/enums/ValueType";
 import isoLangs from "../../util/enums/isoLangs";
 

@@ -4,11 +4,9 @@ import Vuex from "vuex";
 
 // Util
 import { possiblePredicates, possibleObjects } from "../util/shacl/vocabulary";
-import { ETF } from "../util/enums/extensionToFormat";
 
 // Translation
 import TranslatorManager from "../translation/translatorManager";
-import ParserManager from "../parsing/parserManager";
 import ShaclTranslator from "../translation/shaclTranslator";
 import { TERM } from "../translation/terminology";
 
@@ -16,7 +14,7 @@ import { TERM } from "../translation/terminology";
 import shapeModule from "./shapeModule";
 import dataModule from "./dataModule";
 import configModule from "./configModule";
-import { exampleData, exampleShapes } from "../assets/example";
+import { exampleData, exampleShapesJSON } from "../assets/example";
 
 Vue.use(Vuex);
 
@@ -105,10 +103,15 @@ export default new Vuex.Store({
         contents: exampleData,
         extension: "ttl"
       }); // Set the data.
-      ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
-        self.commit("setModel", { model, getters }); // Set the shapes.
-      });
-    },
+      self.commit("setModel", {
+        model: JSON.parse(exampleShapesJSON),
+        getters
+      }); // Set the shapes.
+      // FIXME
+      // ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
+      //   self.commit("setModel", { model, getters }); // Set the shapes.
+      // });
+    }
   },
   getters: {
     /**
@@ -145,6 +148,6 @@ export default new Vuex.Store({
      */
     objects: () => predicate => {
       return possibleObjects(predicate);
-    },
+    }
   }
 });

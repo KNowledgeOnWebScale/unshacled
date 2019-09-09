@@ -61,4 +61,185 @@ const exampleShapes =
   `        sh:maxInclusive 99999 ;` +
   `    ] .`;
 
-export { exampleData, exampleShapes };
+const exampleShapesJSON =
+  "[\n" +
+  "  {\n" +
+  '    "@id": "_:b0",\n' +
+  '    "http://www.w3.org/ns/shacl#path": [\n' +
+  "      {\n" +
+  '        "@id": "http://schema.org/givenName"\n' +
+  "      }\n" +
+  "    ],\n" +
+  '    "http://www.w3.org/ns/shacl#datatype": [\n' +
+  "      {\n" +
+  '        "@id": "http://www.w3.org/2001/XMLSchema#string"\n' +
+  "      }\n" +
+  "    ],\n" +
+  '    "http://www.w3.org/ns/shacl#name": [\n' +
+  "      {\n" +
+  '        "@value": "given name",\n' +
+  '        "@language": "en"\n' +
+  "      }\n" +
+  "    ]\n" +
+  "  },\n" +
+  "  {\n" +
+  '    "@id": "_:b1",\n' +
+  '    "http://www.w3.org/ns/shacl#path": [\n' +
+  "      {\n" +
+  '        "@id": "http://schema.org/birthDate"\n' +
+  "      }\n" +
+  "    ],\n" +
+  '    "http://www.w3.org/ns/shacl#lessThan": [\n' +
+  "      {\n" +
+  '        "@id": "http://schema.org/deathDate"\n' +
+  "      }\n" +
+  "    ],\n" +
+  '    "http://www.w3.org/ns/shacl#maxCount": [\n' +
+  "      {\n" +
+  '        "@value": "1",\n' +
+  '        "@type": "http://www.w3.org/2001/XMLSchema#integer"\n' +
+  "      }\n" +
+  "    ]\n" +
+  "  },\n" +
+  "  {\n" +
+  '    "@id": "_:b11",\n' +
+  '    "http://www.w3.org/ns/shacl#datatype": [\n' +
+  "      {\n" +
+  '        "@id": "http://www.w3.org/2001/XMLSchema#integer"\n' +
+  "      }\n" +
+  "    ]\n" +
+  "  },\n" +
+  "  {\n" +
+  '    "@id": "_:b2",\n' +
+  '    "http://www.w3.org/ns/shacl#path": [\n' +
+  "      {\n" +
+  '        "@id": "http://schema.org/gender"\n' +
+  "      }\n" +
+  "    ],\n" +
+  '    "http://www.w3.org/ns/shacl#in": [\n' +
+  "      {\n" +
+  '        "@list": [\n' +
+  "          {\n" +
+  '            "@value": "female"\n' +
+  "          },\n" +
+  "          {\n" +
+  '            "@value": "male"\n' +
+  "          }\n" +
+  "        ]\n" +
+  "      }\n" +
+  "    ]\n" +
+  "  },\n" +
+  "  {\n" +
+  '    "@id": "_:b5",\n' +
+  '    "http://www.w3.org/ns/shacl#path": [\n' +
+  "      {\n" +
+  '        "@id": "http://schema.org/address"\n' +
+  "      }\n" +
+  "    ],\n" +
+  '    "http://www.w3.org/ns/shacl#node": [\n' +
+  "      {\n" +
+  '        "@id": "http://schema.org/AddressShape"\n' +
+  "      }\n" +
+  "    ]\n" +
+  "  },\n" +
+  "  {\n" +
+  '    "@id": "_:b6",\n' +
+  '    "http://www.w3.org/ns/shacl#path": [\n' +
+  "      {\n" +
+  '        "@id": "http://schema.org/streetAddress"\n' +
+  "      }\n" +
+  "    ],\n" +
+  '    "http://www.w3.org/ns/shacl#datatype": [\n' +
+  "      {\n" +
+  '        "@id": "http://www.w3.org/2001/XMLSchema#string"\n' +
+  "      }\n" +
+  "    ]\n" +
+  "  },\n" +
+  "  {\n" +
+  '    "@id": "_:b7",\n' +
+  '    "http://www.w3.org/ns/shacl#path": [\n' +
+  "      {\n" +
+  '        "@id": "http://schema.org/postalCode"\n' +
+  "      }\n" +
+  "    ],\n" +
+  '    "http://www.w3.org/ns/shacl#or": [\n' +
+  "      {\n" +
+  '        "@list": [\n' +
+  "          {\n" +
+  '            "@id": "_:b9"\n' +
+  "          },\n" +
+  "          {\n" +
+  '            "@id": "_:b11"\n' +
+  "          }\n" +
+  "        ]\n" +
+  "      }\n" +
+  "    ],\n" +
+  '    "http://www.w3.org/ns/shacl#minInclusive": [\n' +
+  "      {\n" +
+  '        "@value": "10000",\n' +
+  '        "@type": "http://www.w3.org/2001/XMLSchema#integer"\n' +
+  "      }\n" +
+  "    ],\n" +
+  '    "http://www.w3.org/ns/shacl#maxInclusive": [\n' +
+  "      {\n" +
+  '        "@value": "99999",\n' +
+  '        "@type": "http://www.w3.org/2001/XMLSchema#integer"\n' +
+  "      }\n" +
+  "    ]\n" +
+  "  },\n" +
+  "  {\n" +
+  '    "@id": "_:b9",\n' +
+  '    "http://www.w3.org/ns/shacl#datatype": [\n' +
+  "      {\n" +
+  '        "@id": "http://www.w3.org/2001/XMLSchema#string"\n' +
+  "      }\n" +
+  "    ]\n" +
+  "  },\n" +
+  "  {\n" +
+  '    "@id": "http://schema.org/AddressShape",\n' +
+  '    "@type": [\n' +
+  '      "http://www.w3.org/ns/shacl#NodeShape"\n' +
+  "    ],\n" +
+  '    "http://www.w3.org/ns/shacl#closed": [\n' +
+  "      {\n" +
+  '        "@value": "true",\n' +
+  '        "@type": "http://www.w3.org/2001/XMLSchema#boolean"\n' +
+  "      }\n" +
+  "    ],\n" +
+  '    "http://www.w3.org/ns/shacl#property": [\n' +
+  "      {\n" +
+  '        "@id": "_:b6"\n' +
+  "      },\n" +
+  "      {\n" +
+  '        "@id": "_:b7"\n' +
+  "      }\n" +
+  "    ]\n" +
+  "  },\n" +
+  "  {\n" +
+  '    "@id": "http://schema.org/PersonShape",\n' +
+  '    "@type": [\n' +
+  '      "http://www.w3.org/ns/shacl#NodeShape"\n' +
+  "    ],\n" +
+  '    "http://www.w3.org/ns/shacl#targetClass": [\n' +
+  "      {\n" +
+  '        "@id": "http://schema.org/Person"\n' +
+  "      }\n" +
+  "    ],\n" +
+  '    "http://www.w3.org/ns/shacl#property": [\n' +
+  "      {\n" +
+  '        "@id": "_:b0"\n' +
+  "      },\n" +
+  "      {\n" +
+  '        "@id": "_:b1"\n' +
+  "      },\n" +
+  "      {\n" +
+  '        "@id": "_:b2"\n' +
+  "      },\n" +
+  "      {\n" +
+  '        "@id": "_:b5"\n' +
+  "      }\n" +
+  "    ]\n" +
+  "  }\n" +
+  "]";
+
+export { exampleData, exampleShapes, exampleShapesJSON };
