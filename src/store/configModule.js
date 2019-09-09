@@ -1,10 +1,12 @@
 import Vue from "vue";
 import { swapKeyValue } from "../util";
 import namespaceModalModule from "./modals/namespaceModalModule";
+import { DEFAULT_BASE_URI } from "../util/constants";
 
 const configModule = {
   state: {
     namespaces: {
+      usd: DEFAULT_BASE_URI,
       rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
       rdfs: "http://www.w3.org/2000/01/rdf-schema#",
       schema: "http://schema.org/",
@@ -32,7 +34,8 @@ const configModule = {
       oh: "http://semweb.mmlab.be/ns/oh#",
       combust: "http://combust.iminds.be/",
       "dbpedia-owl": "http://dbpedia.org/ontology/"
-    }
+    },
+    baseURI: DEFAULT_BASE_URI
   },
   modules: {
     mModal: namespaceModalModule
@@ -78,6 +81,17 @@ const configModule = {
     deletePrefix(state, args) {
       const { prefix } = args;
       Vue.delete(state.namespaces, prefix);
+    },
+
+    /**
+     * Set the current base URI to the given URI (if given) or to the URI corresponding to the given prefix.
+     * @param state
+     * @param args
+     */
+    setBaseUri(state, args) {
+      const { uri, prefix } = args;
+      if (uri) Vue.set(state, "baseURI", uri);
+      if (prefix) Vue.set(state, "baseURI", state.namespaces[prefix]);
     }
   },
   actions: {
@@ -125,8 +139,8 @@ const configModule = {
      * @param state
      * @returns {*}
      */
-    prefixURI: state => args => {
-      return state.namespaces[args.prefix];
+    prefixURI: state => prefix => {
+      return state.namespaces[prefix];
     },
 
     /**
@@ -134,8 +148,17 @@ const configModule = {
      * @param state
      * @returns {*}
      */
-    uriPrefix: state => args => {
-      return swapKeyValue(state.namespaces)[args.uri];
+    uriPrefix: state => uri => {
+      return swapKeyValue(state.namespaces)[uri];
+    },
+
+    /**
+     * Get the current base URI.
+     * @param state
+     * @returns {string}
+     */
+    baseURI: state => {
+      return state.baseURI;
     }
   }
 };

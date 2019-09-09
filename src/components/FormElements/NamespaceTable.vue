@@ -19,6 +19,9 @@
           <sui-table color="green" inverted>
             <sui-table-header>
               <sui-table-row>
+                <sui-table-header-cell class="one wide">
+                  <span class="unclickable">Base URI</span>
+                </sui-table-header-cell>
                 <sui-table-header-cell class="four wide">
                   <span class="unclickable">Prefix</span>
                 </sui-table-header-cell>
@@ -39,6 +42,15 @@
                   v-for="(uri, prefix) of $store.getters.namespaces"
                   :key="prefix"
                 >
+                  <sui-table-cell class="one wide">
+                    <sui-checkbox
+                      v-model="getSelected()[prefix]"
+                      class="clickable"
+                      radio
+                      @click="updateBaseUri(prefix)"
+                    ></sui-checkbox>
+                  </sui-table-cell>
+
                   <sui-table-cell class="four wide">
                     <div :id="prefix + 'prefix'"></div>
                     <div
@@ -59,11 +71,14 @@
                     </div>
                   </sui-table-cell>
 
-                  <sui-table-cell
-                    class="one wide clickable"
-                    @click="deleteElement(prefix)"
-                  >
-                    <sui-icon name="x icon"></sui-icon>
+                  <sui-table-cell class="one wide">
+                    <sui-icon
+                      v-if="!isBaseURI(prefix)"
+                      v-model="selected.prefix"
+                      class="clickable"
+                      name="x icon"
+                      @click="deleteElement(prefix)"
+                    ></sui-icon>
                   </sui-table-cell>
                 </sui-table-row>
               </sui-table-body>
@@ -77,6 +92,7 @@
 
 <script>
 import { ENTER } from "../../util/constants";
+import {extractPrefix} from "../../util/urlParser";
 
 export default {
   name: "NamespaceTable",
@@ -88,7 +104,8 @@ export default {
   },
   data() {
     return {
-      input: ""
+      input: "",
+      selected: {}
     };
   },
   mounted() {
@@ -126,8 +143,8 @@ export default {
         // Check if the input is valid.
         if (!/^[a-zA-Z0-9]+$/i.test(this.input)) return true;
 
-        const newPrefix = this.$store.getters.prefixURI({ prefix: this.input });
-        const oldPrefix = this.$store.getters.prefixURI({ prefix: editRow });
+        const newPrefix = this.$store.getters.prefixURI(this.input);
+        const oldPrefix = this.$store.getters.prefixURI(editRow);
 
         // Check if the prefix is unique.
         if (newPrefix) return newPrefix !== oldPrefix;
@@ -136,11 +153,18 @@ export default {
         if (!"/#".includes(this.input.slice(-1))) return true;
 
         // Check if the uri is unique.
-        const newPrefix = this.$store.getters.uriPrefix({ uri: this.input });
+        const newPrefix = this.$store.getters.uriPrefix(this.input);
         if (newPrefix) return newPrefix !== editRow;
       }
 
       return false; // Default: no errors.
+    },
+
+    /**
+     * Update the base URI to the URI corresponding to the given prefix.
+     */
+    updateBaseUri(prefix) {
+      this.$store.commit("setBaseUri", { prefix });
     },
 
     /**
@@ -177,10 +201,10 @@ export default {
     stopEditing() {
       const { editRow, editField } = this.$props.tableProperties;
       // Check if the input is valid.
-      if (!this.error()) {
-        this.$store.dispatch("stopEditingNamespace", { input: this.input });
-      } else {
+      if (this.error()) {
         this.$store.commit("clearTableEdit");
+      } else {
+        this.$store.dispatch("stopEditingNamespace", { input: this.input });
       }
       // Remove the input field from the table.
       const cell = document.getElementById(editRow + editField);
@@ -193,6 +217,29 @@ export default {
      */
     deleteElement(prefix) {
       this.$store.commit("deletePrefix", { prefix });
+    },
+
+    /**
+     * Check if the given prefix is the current base URI.
+     * @param prefix
+     * @returns {boolean}
+     */
+    isBaseURI(prefix) {
+      const { baseURI, prefixURI } = this.$store.getters;
+      return baseURI === prefixURI(prefix);
+    },
+
+    /**
+     * Get the available prefixes mapped to their checked-ness.
+     * @returns {{string: boolean}}
+     */
+    getSelected() {
+      const { baseURI, namespaces } = this.$store.getters;
+      const selected = {};
+      Object.keys(namespaces).map(prefix => {
+        selected[prefix] = namespaces[prefix] === baseURI;
+      });
+      return selected;
     }
   }
 };

@@ -127,7 +127,6 @@ export default {
   },
   data() {
     return {
-      uuid: require("uuid/v4"),
       shacl: languages.SHACL,
       shex: languages.SHEX
     };
@@ -140,7 +139,7 @@ export default {
       this.$store.commit("toggleNamespaceModal");
     },
     createNodeShape() {
-      this.$store.dispatch("addNodeShape", this.uuid());
+      this.$store.dispatch("addNodeShape");
     },
     createPropertyShape() {
       this.$store.commit("togglePathModal");

@@ -30,7 +30,7 @@
 </template>
 
 <script>
-  import {ENTER, IRI_REGEX} from "../../util/constants";
+import { ENTER, IRI_REGEX } from "../../util/constants";
 import { TERM } from "../../translation/terminology";
 import ValueType from "../../util/enums/ValueType";
 import { prefixToUri } from "../../util/urlParser";
@@ -49,7 +49,6 @@ export default {
   },
   data() {
     return {
-      uuid: require("uuid/v4"),
       path: ""
     };
   },
@@ -112,7 +111,6 @@ export default {
         } else {
           // Create a new property shape.
           this.$store.dispatch("addPropertyShape", {
-            id: this.uuid(),
             path: this.path
           });
         }
