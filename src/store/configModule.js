@@ -1,12 +1,13 @@
 import Vue from "vue";
 import { swapKeyValue } from "../util";
 import namespaceModalModule from "./modals/namespaceModalModule";
-import { DEFAULT_BASE_URI } from "../util/constants";
+import { DEFAULT_BASE_URI, SHACL_URI } from "../util/constants";
 
 const configModule = {
   state: {
     namespaces: {
       usd: DEFAULT_BASE_URI,
+      shacl: SHACL_URI,
       rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
       rdfs: "http://www.w3.org/2000/01/rdf-schema#",
       schema: "http://schema.org/",

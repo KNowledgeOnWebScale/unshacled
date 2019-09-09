@@ -29,7 +29,7 @@
             <p>The following shapes do not conform:</p>
             <ul>
               <li v-for="value of getGeneralReport().nodes" :key="value">
-                {{ value }}
+                {{ getPrefixedUri(value) }}
               </li>
             </ul>
             <p>More details can be found below.</p>
@@ -197,11 +197,13 @@ export default {
           const r = results[key];
           simple[key] = {};
           for (const constr of Object.keys(r)) {
-            const name = uriToPrefix(
-              this.$store.state.mConfig.namespaces,
-              r[constr]
-            );
-            if (name !== "(undefined)") simple[key][constr] = name;
+            if (r[constr]) {
+              const name = uriToPrefix(
+                this.$store.state.mConfig.namespaces,
+                r[constr]
+              );
+              if (name !== "(undefined)") simple[key][constr] = name;
+            }
           }
           simple[key].message = r.message;
         }
@@ -215,6 +217,15 @@ export default {
      */
     getResultsByNode() {
       return groupBy(this.getSimpleResults(), "node", true);
+    },
+
+    /**
+     * Change the URI in the given string to a prefix.
+     * @param string
+     * @returns {string}
+     */
+    getPrefixedUri(string) {
+      return uriToPrefix(this.$store.getters.namespaces, string);
     }
   }
 };

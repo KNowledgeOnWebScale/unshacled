@@ -2,6 +2,7 @@ import traverse from "../util/traverse";
 import dictionary from "./shaclDictionary";
 import { SHACL_URI } from "../util/constants";
 import { CUSTOM_URI } from "./terminology";
+import clone from "ramda/src/clone";
 /**
  *  ShaclTranslator class translates SHACL JSON-LD to an internal model and back
  */
@@ -53,16 +54,13 @@ export default class ShaclTranslator {
    * @returns {any|string} Translated document
    */
   static translate(document, dict) {
-    for (const property in document) {
-      if (Object.prototype.hasOwnProperty.call(document, property)) {
-        const translation = dict[property];
-        if (translation) {
-          document[translation] = document[property];
-          delete document[property];
-        }
-      }
+    const output = {};
+    for (const property of Object.keys(document)) {
+      const translation = dict[property];
+      output[translation || property] = clone(document[property]);
     }
-    traverse(document, (index, object) => {
+
+    traverse(output, (index, object) => {
       // Translate strings in an array
       if (Array.isArray(object)) {
         for (let i = 0; i < object.length; ++i) {
@@ -71,24 +69,22 @@ export default class ShaclTranslator {
         }
         return;
       }
-      for (const property in object) {
-        if (Object.prototype.hasOwnProperty.call(object, property)) {
-          // Translate property value (only if it isn't an array)
-          let translation = Array.isArray(object[property])
-            ? null
-            : dict[object[property]];
-          if (translation) {
-            object[property] = translation;
-          }
-          // Translate property name
-          translation = dict[property];
-          if (translation) {
-            object[translation] = object[property];
-            delete object[property];
-          }
+      for (const property of Object.keys(object)) {
+        // Translate property value (only if it isn't an array)
+        let translation = Array.isArray(object[property])
+          ? null
+          : dict[object[property]];
+        if (translation) {
+          object[property] = translation;
+        }
+        // Translate property name
+        translation = dict[property];
+        if (translation) {
+          object[translation] = object[property];
+          delete object[property];
         }
       }
     });
-    return document;
+    return output;
   }
 }
