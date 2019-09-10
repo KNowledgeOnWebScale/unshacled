@@ -40,6 +40,17 @@ const dataModule = {
     },
 
     /**
+     * TODO
+     * @param state
+     * @param text
+     */
+    setJsonData(state, { text }) {
+      Vue.set(state, "dataText", text);
+      Vue.set(state, "dataFileExtension", "json");
+      Vue.set(state, "dataFile", text);
+    },
+
+    /**
      * Execute the validation using the given arguments.
      * @param state
      * @param data
@@ -171,6 +182,20 @@ const dataModule = {
         ).then(e => {
           downloadFile(filename, e);
         });
+      }
+    },
+
+    /**
+     * TODO
+     * @param commit
+     * @param dataText
+     */
+    updateData({ commit }, { dataText }) {
+      try {
+        JSON.parse(dataText);
+        commit("setJsonData", { text: dataText });
+      } catch (e) {
+        console.err("Entered data is no valid JSON.");
       }
     }
   },

@@ -8,7 +8,7 @@
         <data-text-view :height="getHeight()"></data-text-view>
       </div>
       <multipane-resizer id="resizer" @drag="handleResize"></multipane-resizer>
-      <div id="editorContainer">
+      <div id="editorContainer" class="fill-height">
         <editor></editor>
       </div>
     </multipane>
@@ -64,13 +64,6 @@ window.onbeforeunload = function() {
   text-align: center;
   color: #2c3e50;
 }
-
-.text-panel {
-  width: 100%;
-  min-width: 250px;
-  max-width: 70vw;
-}
-
 #resizer {
   width: 3px;
   min-width: 3px;
@@ -82,5 +75,14 @@ window.onbeforeunload = function() {
 }
 #editorContainer {
   min-width: 100px;
+}
+
+.text-panel {
+  width: 30vw;
+  min-width: 250px;
+  max-width: 70vw;
+}
+.fill-height {
+  height: 100%;
 }
 </style>

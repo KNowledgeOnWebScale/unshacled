@@ -9,7 +9,7 @@ import { WIDTH } from "../config/konvaConfigs";
  * @returns {x: number, y: number} the coordinates for a newly added shapeID */
 export default ({ coordinates, bottomYs, heights }) => {
   const MARGIN = 16;
-  const { innerWidth } = window;
+  const stageWidth = document.getElementById("editorContainer").offsetWidth;
 
   // Get the top y value of the bottom row.
   const yBottomRow = Math.max(
@@ -32,7 +32,7 @@ export default ({ coordinates, bottomYs, heights }) => {
   );
 
   // If negative, add the shapeID to the right; if positive, a bit lower to the left.
-  const newLine = rightestX + 2 * (MARGIN + WIDTH) > innerWidth;
+  const newLine = rightestX + 2 * (MARGIN + WIDTH) > stageWidth;
 
   // Calculate x coordinate
   let x = MARGIN; // Default

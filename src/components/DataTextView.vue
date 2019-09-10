@@ -1,22 +1,44 @@
 <template>
-  <div v-if="dataText !== ''">
-    <sui-header id="header">Data</sui-header>
-    <sui-divider style="margin-bottom: 0;" />
-    <textarea
-      v-if="getTextualData()"
-      v-model="dataText"
-      :style="getStyle()"
-      @change="getTextualData()"
-    ></textarea>
-    <sui-segment basic v-if="!getTextualData()">
-      No data loaded.
+  <div class="fill-height">
+    <sui-segment basic style="padding-bottom: 0;">
+      <sui-grid :columns="3">
+        <sui-grid-column :width="4">
+          <sui-header id="header">Data</sui-header>
+        </sui-grid-column>
+        <sui-grid-column v-if="dataText !== ''" :width="12" text-align="right">
+          <sui-label v-if="invalidData()" basic color="red" pointing="right">
+            Invalid JSON
+          </sui-label>
+          <sui-button
+            :disabled="invalidData() || !dataHasChanged()"
+            color="green"
+            @click="updateData"
+          >
+            Update
+          </sui-button>
+          <sui-button
+            :disabled="!dataHasChanged()"
+            color="red"
+            @click="updateText"
+          >
+            Reset
+          </sui-button>
+        </sui-grid-column>
+      </sui-grid>
     </sui-segment>
+
+    <sui-divider style="margin-bottom: 0;" />
+
+    <div id="textContainer" class="fill-height">
+      <textarea v-if="dataText !== ''" v-model="dataText"></textarea>
+      <sui-segment v-if="dataText === ''" basic>
+        No data loaded.
+      </sui-segment>
+    </div>
   </div>
 </template>
 
 <script>
-import { MARGIN, MARGIN_TOP } from "../config/konvaConfigs";
-
 export default {
   name: "DataTextView",
   props: {
@@ -27,26 +49,34 @@ export default {
   },
   data() {
     return {
-      dataText: {
-        type: String,
-        required: true
-      }
+      dataText: ""
     };
   },
+  mounted() {
+    const self = this;
+    this.$store.watch(
+      () => self.$store.state.mData.dataText,
+      () => self.updateText()
+    );
+  },
   methods: {
-    getTextualData() {
+    updateText() {
       const { dataText } = this.$store.state.mData;
-      if (dataText.length > 0) {
-        this.dataText = dataText;
-        return dataText.replace(/\n/g, "<br />");
-      }
-      return undefined;
+      this.dataText = dataText || "";
     },
-    getStyle() {
-      return {
-        height: `${this.$props.height - MARGIN_TOP - 3 * MARGIN}px`,
-        width: "100%"
-      };
+    updateData() {
+      this.$store.dispatch("updateData", { dataText: this.dataText });
+    },
+    dataHasChanged() {
+      return this.dataText !== this.$store.state.mData.dataText;
+    },
+    invalidData() {
+      try {
+        JSON.parse(this.dataText);
+        return false;
+      } catch (e) {
+        return true; // Something went wrong while parsing.
+      }
     }
   }
 };
@@ -63,5 +93,10 @@ textarea {
   padding: 0 0 0 2vh;
   font-family: monospace;
   resize: none;
+  height: 100%;
+  width: 100%;
+}
+.fill-height {
+  height: 100%;
 }
 </style>
