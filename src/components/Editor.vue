@@ -69,12 +69,14 @@ export default {
      */
     handleResize() {
       if (this.$refs.stage) {
+        const editorContainer = document.getElementById("editorContainer");
+        const dataContainer = document.getElementById("dataTextView");
         const stage = this.$refs.stage.getNode();
+        const newWidth = window.innerWidth - dataContainer.offsetWidth;
+
         this.configKonva.height = window.innerHeight - this.marginTop;
-        this.configKonva.width = document.getElementById(
-          "editorContainer"
-        ).offsetWidth;
-        // this.configKonva.width = window.innerWidth;
+        editorContainer.style.width = newWidth.toString();
+        this.configKonva.width = newWidth;
         this.$nextTick(() => stage.draw()); // Resize on the next tick
       }
     },

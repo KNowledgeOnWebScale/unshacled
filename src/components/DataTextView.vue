@@ -1,15 +1,16 @@
 <template>
   <div v-if="dataText !== ''">
     <sui-header id="header">Data</sui-header>
+    <sui-divider style="margin-bottom: 0;" />
     <textarea
       v-if="getTextualData()"
       v-model="dataText"
       :style="getStyle()"
       @change="getTextualData()"
     ></textarea>
-    <div v-if="!getTextualData()">
+    <sui-segment basic v-if="!getTextualData()">
       No data loaded.
-    </div>
+    </sui-segment>
   </div>
 </template>
 
@@ -43,7 +44,7 @@ export default {
     },
     getStyle() {
       return {
-        height: `${this.$props.height - MARGIN_TOP - 2 * MARGIN}px`,
+        height: `${this.$props.height - MARGIN_TOP - 3 * MARGIN}px`,
         width: "100%"
       };
     }
@@ -54,11 +55,13 @@ export default {
 <style scoped>
 #header {
   margin: 1vh;
+  text-align: left;
 }
 textarea {
   border-color: white;
   border-width: 0;
   padding: 0 0 0 2vh;
   font-family: monospace;
+  resize: none;
 }
 </style>

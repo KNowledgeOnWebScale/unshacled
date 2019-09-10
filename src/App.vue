@@ -72,17 +72,15 @@ window.onbeforeunload = function() {
 }
 
 #resizer {
-  z-index: 1000;
   width: 3px;
   min-width: 3px;
   height: 100%;
   padding-bottom: 95vh;
   margin-left: -5px;
-  margin-right: 10px;
+  margin-right: 5px;
   background: black;
 }
 #editorContainer {
   min-width: 100px;
-  width: 100%;
 }
 </style>
