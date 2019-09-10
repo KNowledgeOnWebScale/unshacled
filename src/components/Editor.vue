@@ -5,6 +5,7 @@
     :config="configKonva"
     :draggable="true"
     @wheel="scroll"
+    @mouseover="handleResize"
   >
     <v-layer>
       <v-group
@@ -33,7 +34,7 @@
 <script>
 import Shape from "./Shapes/Shape.vue";
 import Relationship from "./Shapes/Relationship.vue";
-import { MARGIN_TOP } from "../config/konvaConfigs";
+import { MARGIN, MARGIN_TOP } from "../config/konvaConfigs";
 
 export default {
   name: "Editor",
@@ -42,7 +43,7 @@ export default {
   data() {
     return {
       previousPosition: undefined,
-      marginTop: MARGIN_TOP + 6, // Provide space for the NavBar
+      marginTop: MARGIN_TOP + MARGIN, // Provide space for the NavBar
       configKonva: {
         width: window.innerWidth,
         height: window.innerHeight - MARGIN_TOP
@@ -70,7 +71,10 @@ export default {
       if (this.$refs.stage) {
         const stage = this.$refs.stage.getNode();
         this.configKonva.height = window.innerHeight - this.marginTop;
-        this.configKonva.width = window.innerWidth;
+        this.configKonva.width = document.getElementById(
+          "editorContainer"
+        ).offsetWidth;
+        // this.configKonva.width = window.innerWidth;
         this.$nextTick(() => stage.draw()); // Resize on the next tick
       }
     },

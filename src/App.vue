@@ -2,6 +2,7 @@
   <div id="app">
     <portal-target name="semantic-ui-vue"></portal-target>
     <nav-bar></nav-bar>
+
     <multipane id="multipane" layout="vertical">
       <div id="dataTextView" class="text-panel">
         <data-text-view :height="getHeight()"></data-text-view>
@@ -39,14 +40,7 @@ export default {
     this.handleResize();
   },
   methods: {
-    handleResize() {
-      document.getElementById("resizer").style.paddingBottom = (
-        window.innerHeight - MARGIN_TOP
-      ).toString();
-      document.getElementById("resizer").style.height = (
-        window.innerHeight - MARGIN_TOP
-      ).toString();
-    },
+    handleResize() {},
     getHeight() {
       return window.innerHeight - MARGIN_TOP;
     }
@@ -72,16 +66,19 @@ window.onbeforeunload = function() {
 }
 
 .text-panel {
-  width: 100px;
-  min-width: 100px;
-  max-width: 50%;
+  width: 100%;
+  min-width: 250px;
+  max-width: 70vw;
 }
 
 #resizer {
-  width: 5px;
-  height: 30px;
-  padding-bottom: 200px;
-  margin-right: 20px;
+  z-index: 1000;
+  width: 3px;
+  min-width: 3px;
+  height: 100%;
+  padding-bottom: 95vh;
+  margin-left: -5px;
+  margin-right: 10px;
   background: black;
 }
 #editorContainer {

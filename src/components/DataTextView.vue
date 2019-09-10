@@ -1,9 +1,11 @@
 <template>
-  <div>
+  <div v-if="dataText !== ''">
+    <sui-header id="header">Data</sui-header>
     <textarea
       v-if="getTextualData()"
       v-model="dataText"
       :style="getStyle()"
+      @change="getTextualData()"
     ></textarea>
     <div v-if="!getTextualData()">
       No data loaded.
@@ -12,6 +14,8 @@
 </template>
 
 <script>
+import { MARGIN, MARGIN_TOP } from "../config/konvaConfigs";
+
 export default {
   name: "DataTextView",
   props: {
@@ -39,7 +43,7 @@ export default {
     },
     getStyle() {
       return {
-        height: `${this.$props.height - 6}px`,
+        height: `${this.$props.height - MARGIN_TOP - 2 * MARGIN}px`,
         width: "100%"
       };
     }
@@ -47,4 +51,14 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+#header {
+  margin: 1vh;
+}
+textarea {
+  border-color: white;
+  border-width: 0;
+  padding: 0 0 0 2vh;
+  font-family: monospace;
+}
+</style>
