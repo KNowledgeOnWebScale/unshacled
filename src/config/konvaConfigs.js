@@ -3,6 +3,7 @@
 export const WIDTH = 250;
 export const HEIGHT = 40;
 export const MARGIN = 5;
+export const MARGIN_TOP = 40;
 export const DELTA_Y_TEXT = 15;
 export const DELTA_Y_DELETE = 20;
 export const OFFSET = 10;

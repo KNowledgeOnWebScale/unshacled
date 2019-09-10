@@ -33,19 +33,19 @@
 <script>
 import Shape from "./Shapes/Shape.vue";
 import Relationship from "./Shapes/Relationship.vue";
+import { MARGIN_TOP } from "../config/konvaConfigs";
 
 export default {
   name: "Editor",
   components: { Relationship, Shape },
 
   data() {
-    const marginTop = 40;
     return {
       previousPosition: undefined,
-      marginTop, // Provide space for the NavBar
+      marginTop: MARGIN_TOP + 6, // Provide space for the NavBar
       configKonva: {
         width: window.innerWidth,
-        height: window.innerHeight - marginTop
+        height: window.innerHeight - MARGIN_TOP
       }
     };
   },

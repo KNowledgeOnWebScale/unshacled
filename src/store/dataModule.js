@@ -18,6 +18,7 @@ const dataModule = {
     dataFile: {},
     dataFileName: String,
     dataFileExtension: String,
+    dataText: "",
     validationReport: {},
     showValidationReportModal: false
   },
@@ -29,10 +30,13 @@ const dataModule = {
      * @param contents the contents of a read data file.
      * @param extension the extension of the data file.
      */
-    setDataFile(state, { name, contents, extension }) {
+    setData(state, { name, contents, extension }) {
       Vue.set(state, "dataFileName", name);
       Vue.set(state, "dataFile", contents);
       Vue.set(state, "dataFileExtension", extension);
+      ParserManager.parse(contents, ETF.ttl).then(data =>
+        Vue.set(state, "dataText", JSON.stringify(data, null, 2))
+      );
     },
 
     /**
@@ -102,7 +106,7 @@ const dataModule = {
       const reader = new FileReader();
       reader.readAsText(file);
       reader.onload = event =>
-        commit("setDataFile", {
+        commit("setData", {
           name: file.name,
           contents: event.target.result,
           extension: file.name.split(".").pop()

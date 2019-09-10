@@ -14,7 +14,9 @@ import { TERM } from "../translation/terminology";
 import shapeModule from "./shapeModule";
 import dataModule from "./dataModule";
 import configModule from "./configModule";
-import { exampleData, exampleShapesJSON } from "../assets/example";
+import {exampleData, exampleShapes, exampleShapesJSON} from "../assets/example";
+import ParserManager from "../parsing/parserManager";
+import {ETF} from "../util/enums/extensionToFormat";
 
 Vue.use(Vuex);
 
@@ -98,19 +100,14 @@ export default new Vuex.Store({
     loadExample({ getters }) {
       const self = this;
       this.commit("clear"); // Clear the existing data first.
-      this.commit("setDataFile", {
+      this.commit("setData", {
         name: "example.ttl",
         contents: exampleData,
         extension: "ttl"
       }); // Set the data.
-      self.commit("setModel", {
-        model: JSON.parse(exampleShapesJSON),
-        getters
-      }); // Set the shapes.
-      // FIXME
-      // ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
-      //   self.commit("setModel", { model, getters }); // Set the shapes.
-      // });
+      ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
+        self.commit("setModel", { model, getters }); // Set the shapes.
+      });
     }
   },
   getters: {
