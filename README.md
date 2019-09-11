@@ -57,7 +57,13 @@ For more information about the project structure, the internal model et cetera, 
 To ensure code style consistency we use [ESLint](https://eslint.org/) and [Prettier](https://prettier.io/) which are configured in `.eslintrc.js`.
 
 ### Testing
-Testing is done with [Jest.js](https://jestjs.io/) and [Vue Jest](https://github.com/vuejs/vue-jest). Unit tests are kept in the same directory as the classes they test and share the same filename but with extension e.g. `somefile.js` and `somefile.test.js`. All tests can be executed using the following command: `npm run test`
+Testing is done with [Jest.js](https://jestjs.io/) and [Vue Jest](https://github.com/vuejs/vue-jest). Unit tests are kept in the same directory as the classes they test and share the same filename but with extension e.g. `somefile.js` and `somefile.test.js`. All tests can be executed using the following command: 
+```
+npm run test
+```
 
 ### Documentation
-Make sure to document your code in [JSDoc style](https://jsdoc.app/). Documentation is generated using the command: `npm run docs`
+Make sure to document your code in [JSDoc style](https://jsdoc.app/). Documentation is generated using the command: 
+```
+npm run docs
+```
