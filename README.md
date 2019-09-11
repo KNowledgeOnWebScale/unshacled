@@ -68,5 +68,7 @@ Make sure to document your code in [JSDoc style](https://jsdoc.app/). Documentat
 npm run docs
 ```
 
-- `/* This documentation should appear in the HTML documentation. */`
-- `// This is just a comment and should not be added to the HTML documentation.`
+```
+/* This comment should appear in the HTML documentation. */
+// This is just a comment and should not be added to the HTML documentation.
+```
