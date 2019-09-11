@@ -143,8 +143,8 @@ export default {
         // Check if the input is valid.
         if (!/^[a-zA-Z0-9]+$/i.test(this.input)) return true;
 
-        const newPrefix = this.$store.getters.prefixURI(this.input);
-        const oldPrefix = this.$store.getters.prefixURI(editRow);
+        const newPrefix = this.$store.getters.prefixByURI(this.input);
+        const oldPrefix = this.$store.getters.prefixByURI(editRow);
 
         // Check if the prefix is unique.
         if (newPrefix) return newPrefix !== oldPrefix;
@@ -153,7 +153,7 @@ export default {
         if (!"/#".includes(this.input.slice(-1))) return true;
 
         // Check if the uri is unique.
-        const newPrefix = this.$store.getters.uriPrefix(this.input);
+        const newPrefix = this.$store.getters.uriByPrefix(this.input);
         if (newPrefix) return newPrefix !== editRow;
       }
 
@@ -228,8 +228,8 @@ export default {
      * @returns {boolean} `true` if the corresponding URI of the given prefix is the current base URI.
      */
     isBaseURI(prefix) {
-      const { baseURI, prefixURI } = this.$store.getters;
-      return baseURI === prefixURI(prefix);
+      const { baseURI, prefixByURI } = this.$store.getters;
+      return baseURI === prefixByURI(prefix);
     },
 
     /**

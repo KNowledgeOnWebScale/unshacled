@@ -146,7 +146,7 @@ export default {
      * @returns {{}} the configuration object for the label.
      */
     getLabelTextConfig() {
-      const label = this.$store.getters.labelForId(this.id);
+      const label = this.$store.getters.labelsForIds[this.id];
       const text = label
         ? abbreviate(label)
         : abbreviate(
@@ -165,7 +165,7 @@ export default {
      * @returns {{}} the configuration of the URI.
      */
     getURITextConfig() {
-      const label = this.$store.getters.labelForId(this.id);
+      const label = this.$store.getters.labelsForIds[this.id];
       const text = label ? abbreviate(this.id) : "";
       return { ...URI_TEXT_CONFIG, text };
     },

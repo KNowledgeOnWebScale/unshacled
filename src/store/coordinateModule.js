@@ -7,6 +7,10 @@ import { urlToName } from "../util/urlParser";
 import { HEIGHT } from "../config/konvaConfigs";
 import { IGNORED_PROPERTIES, SINGLE_ENTRY } from "../util/constants";
 
+/**
+ * This module contains everything regarding coordinates, locations and positioning.
+ * @type {{mutations: {updateYValues(*, {shapeID: string, shapes: string}): void, deleteShapeLocations(*, string): void, clearLocations(*): void, updateCoordinates(*, {shapeID: string, x: number, y: number}): void, updateLocations(*, {oldID: string, newID: string}): void}, state: {heights: {}, yValues: {}, coordinates: {}}, getters: {bottomYCoordinate: (function(*): function(*): *), allBottomYs: (function(*, *))}}}
+ */
 const coordinateModule = {
   state: {
     yValues: {},
@@ -21,19 +25,19 @@ const coordinateModule = {
      * @param newID {string} the shapeID's new ID.
      */
     updateLocations(state, { oldID, newID }) {
-      // Update coordinates
+      /* Update the coordinates of the shapes. */
       Vue.set(state.coordinates, newID, state.coordinates[oldID]);
       if (oldID !== newID) Vue.delete(state.coordinates, oldID);
 
-      // Update yValues
+      /* Update the y values of the shapes' components. */
       Vue.set(state.yValues, newID, state.yValues[oldID]);
       if (oldID !== newID) Vue.delete(state.yValues, oldID);
     },
 
     /**
-     * Delete the coordinates and y values of the shapeID with the given id.
+     * Delete the coordinates and y values of the shapeID with the given ID.
      * @param state
-     * @param id
+     * @param id {string} the ID of the shape from which we want to delete the location data.
      */
     deleteShapeLocations(state, id) {
       Vue.delete(state.coordinates, id);
@@ -43,20 +47,20 @@ const coordinateModule = {
     /**
      * Update the y values of the properties of the given shapeID.
      * @param state
-     * @param shapeID {string}
-     * @param shapes {string}
+     * @param shapeID {string} the ID of the shape we want to update the y values from.
+     * @param shapes {string} the list of shapes currently in the model.
      */
     updateYValues(state, { shapeID, shapes }) {
-      // Update the y values of the properties.
+      /* Update the y values of the properties. */
       Vue.set(state.yValues, shapeID, {});
 
-      // Get the shape with the given ID.
+      /* Get the shape with the given ID. */
       let shape;
       for (const item of shapes) {
         if (item["@id"] === shapeID) shape = item;
       }
 
-      // Get the IDs of all the constraints and the number of values for each constraint.
+      /* Get the IDs of all the constraints and the number of values for each constraint. */
       const constraints = {};
       for (const c in shape) {
         if (!IGNORED_PROPERTIES.includes(c)) {
@@ -72,15 +76,15 @@ const coordinateModule = {
         }
       }
 
-      // Calculate their y values.
+      /* Calculate their y values. */
       let i = 1;
       for (const con of Object.keys(constraints)) {
         Vue.set(state.yValues[shapeID], con, i * HEIGHT);
-        // Determine if every value has to be on a separate line.
+        /* Determine if every value has to be on a separate line. */
         i += SINGLE_ENTRY.includes(urlToName(con)) ? 2 : 1 + constraints[con];
       }
 
-      // Set the bottom coordinate.
+      /* Set the bottom coordinate. */
       Vue.set(state.heights, shapeID, i * HEIGHT);
     },
 
@@ -104,12 +108,11 @@ const coordinateModule = {
       state.yValues = {};
     }
   },
-  actions: {},
   getters: {
     /**
      * Get the absolute bottom y coordinate of the shapeID with the given ID.
      * @param state
-     * @returns {function(*): {x: *, y: *}}
+     * @returns {function} getter
      */
     bottomYCoordinate: state => shapeID => {
       return state.heights[shapeID] + state.coordinates[shapeID].y;

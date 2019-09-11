@@ -3,6 +3,11 @@ import { swapKeyValue } from "../util";
 import namespaceModalModule from "./modals/namespaceModalModule";
 import { DEFAULT_BASE_URI, SHACL_URI } from "../util/constants";
 
+/**
+ * This module contains everything related to the configuration of the application.
+ * For now, this is mainly the namespaces.
+ * @type {{mutations: {setBaseUri(*=, {uri: string, prefix: string}): void, updateNamespacePrefix(*, {oldPrefix: string, newPrefix: string}): void, updateNamespaceURI(*, {prefix: string, newURI: string}): void, deletePrefix(*, {prefix: string}): void, addPrefix(*, {prefix: string, uri: string}): void}, state: {baseURI: *, namespaces: {schema: string, usd: *, xsd: string, skos: string, tourism: string, rdfs: string, shacl: *, muto: string, ost: string, oslo: string, combust: string, regorg: string, dcterms: string, oh: string, tio: string, locn: string, prov: string, foaf: string, csvw: string, acco: string, "dbpedia-owl": string, adms: string, org: string, vcard: string, gr: string, ex: string, rdf: string, person: string, time: string}}, getters: {uriByPrefix: (function(*): function(*): *), baseURI: (function(*): *), prefixByURI: (function(*): function(*): *), namespaces(*): {}}, actions: {stopEditingNamespace({state: *, commit: *, getters: *}, {input: string}): void}, modules: {mModal: *}}}
+ */
 const configModule = {
   state: {
     namespaces: {
@@ -45,8 +50,8 @@ const configModule = {
     /**
      * Update the given prefix in the namespaces config.
      * @param state
-     * @param oldPrefix {string}
-     * @param newPrefix {string}
+     * @param oldPrefix {string} the original prefix.
+     * @param newPrefix {string} the new prefix we want to use for this namespace.
      */
     updateNamespacePrefix(state, { oldPrefix, newPrefix }) {
       const uri = state.namespaces[oldPrefix];
@@ -57,8 +62,8 @@ const configModule = {
     /**
      * Update the URI of the given prefix in the namespaces config.
      * @param state
-     * @param prefix {string}
-     * @param newURI {string}
+     * @param prefix {string} the prefix of the namespace we want to update.
+     * @param newURI {string} the new URI for this namespace.
      */
     updateNamespaceURI(state, { prefix, newURI }) {
       Vue.set(state.namespaces, prefix, newURI);
@@ -67,8 +72,8 @@ const configModule = {
     /**
      * Add the given prefix to the namespaces.
      * @param state
-     * @param prefix {string}
-     * @param uri {string}
+     * @param prefix {string} the prefix of the namespace we want to add.
+     * @param uri {string} the URI of the namespace we want to add.
      */
     addPrefix(state, { prefix, uri }) {
       Vue.set(state.namespaces, prefix, uri);
@@ -77,7 +82,7 @@ const configModule = {
     /**
      * Delete the given prefix from the namespaces.
      * @param state
-     * @param prefix {string}
+     * @param prefix {string} the prefix of the namespace we want to delete.
      */
     deletePrefix(state, { prefix }) {
       Vue.delete(state.namespaces, prefix);
@@ -86,8 +91,8 @@ const configModule = {
     /**
      * Set the current base URI to the given URI (if given) or to the URI corresponding to the given prefix.
      * @param state
-     * @param uri {string}
-     * @param prefix {string}
+     * @param uri {string} the URI of the namespace we want to set as base.
+     * @param prefix {string} the prefix of the namespace we want to set as base.
      */
     setBaseUri(state, { uri, prefix }) {
       if (uri) Vue.set(state, "baseURI", uri);
@@ -97,15 +102,15 @@ const configModule = {
   actions: {
     /**
      * Stop editing the namespaces.
-     * Get the entered values and update the namespaces.
+     * Get the entered value and update the namespaces.
      * @param state
      * @param commit
      * @param getters
-     * @param input
+     * @param input {string} the value entered by the user.
      */
     stopEditingNamespace({ state, commit, getters }, { input }) {
       const { editRow, editField } = state.mModal;
-      // Only execute the update if the value has actually changed.
+      /* Only execute the update if the value has actually changed. */
       if (editField === "prefix" && editRow !== input) {
         // Update the given prefix.
         commit("updateNamespacePrefix", {
@@ -114,17 +119,17 @@ const configModule = {
         });
       } else if (editField === "uri" && state.namespaces[editRow] !== input) {
         // Update the given URI.
-        if (editRow === getters.uriPrefix(state.baseURI))
+        if (editRow === getters.uriByPrefix(state.baseURI))
           commit("setBaseUri", { uri: input });
         commit("updateNamespaceURI", { prefix: editRow, newURI: input });
       }
-      commit("clearTableEdit"); // Stop editing the table.
+      commit("clearTableEdit"); /* Stop editing and clear the table. */
     }
   },
   getters: {
     /**
-     * Get an ordered dictionary mapping of the prefixes to their URIs.
-     * @returns {{}}
+     * Get the current namespaces.
+     * @returns {{}} an ordered dictionary mapping of the prefixes to their URIs.
      */
     namespaces(state) {
       const ordered = {};
@@ -138,26 +143,28 @@ const configModule = {
 
     /**
      * Get the URI of the given prefix.
+     * Prefix {string} the prefix of the namespace we want to get the URI from.
      * @param state
-     * @returns {*}
+     * @returns {function} getter
      */
-    prefixURI: state => prefix => {
+    prefixByURI: state => prefix => {
       return state.namespaces[prefix];
     },
 
     /**
      * Get the prefix of the given URI.
+     * URI {string} the URI of the namespace we want to get the prefix from.
      * @param state
-     * @returns {*}
+     * @returns {function} getter
      */
-    uriPrefix: state => uri => {
+    uriByPrefix: state => uri => {
       return swapKeyValue(state.namespaces)[uri];
     },
 
     /**
      * Get the current base URI.
      * @param state
-     * @returns {string}
+     * @returns {string} the current base URI.
      */
     baseURI: state => {
       return state.baseURI;

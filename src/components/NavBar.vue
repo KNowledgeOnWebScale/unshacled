@@ -188,7 +188,7 @@ export default {
     },
     /** Validate the data using the current model. */
     validate() {
-      this.$store.dispatch("validate");
+      this.$store.dispatch("validateWithCurrentModel");
     }
   }
 };

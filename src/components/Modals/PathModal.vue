@@ -104,9 +104,9 @@ export default {
           this.$store.dispatch("stopConstraintEdit", {
             shapeID,
             predicate: p,
-            object: this.$store.getters.objects(p)[0],
             valueType: ValueType(p),
-            input: prefixToUri(this.$store.state.mConfig.namespaces, this.path)
+            input: prefixToUri(this.$store.state.mConfig.namespaces, this.path),
+            inputType: this.$store.getters.objects(p)[0]
           });
         } else {
           /* Create a new property shape. */

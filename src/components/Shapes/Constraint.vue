@@ -270,7 +270,7 @@ export default {
           const name = v[key] ? v[key] : v;
           /* If the shape has a label, abbreviate and use it. */
           const text =
-            this.$store.getters.labelForId(name) ||
+            this.$store.getters.labelsForIds[name] ||
             uriToPrefix(this.$store.state.mConfig.namespaces, name);
           output.push(abbreviate(text));
         }

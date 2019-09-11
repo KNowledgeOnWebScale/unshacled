@@ -246,7 +246,7 @@ export default {
           valueType,
           shapeID: this.$props.modalProperties.shapeID,
           input: finalInput,
-          object: this.$store.getters.objects(predicate)[0]
+          inputType: this.$store.getters.objects(predicate)[0]
         });
         this.reset();
       }

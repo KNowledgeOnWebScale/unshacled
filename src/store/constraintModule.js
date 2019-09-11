@@ -11,7 +11,7 @@ import predicateModalModule from "./modals/predicateModalModule";
 
 /**
  * This module contains everything to change the shape constraints.
- * @type {{mutations: {}, state: {}, getters: {}, actions: {}}}
+ * @type {{mutations: {setConstraintValue(*, {shape: Object, constraintID: string, value: Object}): void, deleteConstraintFromShape(*, {shape: Object, constraintID?: *}): void}, state: {constraintIndex: number}, getters: {shapeConstraints: (function(*, *, *, *): Function), shapeProperties: (function(*, *, *): function(*): []), shapeIDConstraints: (function(*, *, *, *): function(*=))}, actions: {startConstraintEdit({state: *, commit: *}, {shapeID: string, shapeType: string, constraintID: string, index: number, value: string}): void, updateConstraint({rootGetters: *, commit: *}, {shapeID: string, constraintID: string, newValue: Object}): void, addPredicate({state: *, getters: *, commit: *, dispatch: *, rootState: *}, {shapeID: string, predicate: string, valueType: string, input: string, object: string, language: string}): void, deleteConstraintValueWithIndex({getters: *, commit: *, rootState: *}, {shapeID: string, constraintID: string, valueIndex: number}): void, stopConstraintEdit({state: *, rootGetters: *}, {shapeID: string, predicate: string, object: string, valueType: string, input: string}): void, deleteConstraintValue({getters: *, commit: *, rootState: *}, {shapeID: string, constraintID: string, value: string}): void, deleteConstraintFromShapeWithID({getters: *, commit: *, rootState: *}, {shapeID: string, constraintID: *}): void}, modules: {mModal: *}}}
  */
 const constraintModule = {
   state: {
@@ -54,14 +54,14 @@ const constraintModule = {
      * @param rootState
      * @param shapeID {string} the IRI of the shape we want to add the predicate to.
      * @param predicate {string} the predicate we want to add.
-     * @param  valueType {string} the value type of this predicate.
+     * @param valueType {string} the value type of this predicate.
      * @param input {string} the desired value of this constraint.
-     * @param object {string} the type of the input.
+     * @param inputType {string} the type of the input.
      * @param language {string} the language tag of the input value.
      */
     addPredicate(
       { state, getters, commit, dispatch, rootState },
-      { shapeID, predicate, valueType, input, object, language }
+      { shapeID, predicate, valueType, input, inputType, language }
     ) {
       const shape = getters.shapeWithID(shapeID);
       const isID = valueType.includes(ValueTypes.ID);
@@ -70,23 +70,23 @@ const constraintModule = {
 
       if (shape[predicate]) {
         const iter = isList ? shape[predicate][0]["@list"] : shape[predicate];
-        // Check if this new value is a duplicate.
+        /* Check if this new value is a duplicate. */
         const key = isID ? "@id" : "@value";
         for (const j in iter) {
           if (iter[j][key] === input) duplicate = true;
         }
       } else {
-        // Create an empty list to add to if necessary.
+        /* Create an empty list to add to if necessary. */
         shape[predicate] = [];
         if (isList) shape[predicate].push({ "@list": [] });
       }
 
-      // Don't add the value if it is a duplicate.
+      /* Don't add the value if it is a duplicate. */
       if (!duplicate) {
-        // Create the object we want to add.
+        /* Create the object we want to add. */
         const value = isID
           ? { "@id": input }
-          : { "@type": object, "@value": input };
+          : { "@type": inputType, "@value": input };
         if (language) {
           value["@language"] = language;
           Vue.delete(value, "@type");
@@ -94,26 +94,26 @@ const constraintModule = {
 
         // TODO take multiple languages into account
         if (valueType === "type") {
-          // Replace the value.
+          /* If there can only be one value, replace the existing value. */
           Vue.set(shape[predicate], 0, value);
         } else {
-          // Determine which list we want to add the predicate to.
+          /* Otherwise, determine which list we want to add the predicate to. */
           const list = isList ? shape[predicate][0]["@list"] : shape[predicate];
           list.push(value);
         }
 
-        // Add the predicate to the shape.
+        /* Add the predicate to the shape. */
         commit("updateShape", {
           shapeID,
           value: rootState.mShape.model[shapeID]
         });
 
-        // Add a property shape if needed.
+        /* Add a property shape if needed. */
         if (predicate === TERM.property) {
           dispatch("addPropertyShape", { id: input, path: "(undefined)" });
         }
 
-        // Update the y values.
+        /* Update the y values. */
         commit(
           "updateYValues",
           { shapeID, shapes: rootState.mShape.model },
@@ -121,7 +121,7 @@ const constraintModule = {
         );
       }
 
-      // Toggle the predicate modal.
+      /* Close the predicate modal if needed. */
       if (state.mModal.show) commit("togglePredicateModal", {});
     },
 
@@ -156,29 +156,29 @@ const constraintModule = {
      * Get the values from the predicate model and execute the edit.
      * @param state
      * @param rootGetters
-     * @param shapeID {string}
-     * @param constraintID {string}
-     * @param object {string}
+     * @param shapeID {string} the ID of the shape we are editing.
+     * @param constraintID {string} the ID of the constraint we are editing.
      * @param valueType {string}
      * @param input {string}
+     * @param inputType {string} the type of the input
      */
     stopConstraintEdit(
       { state, rootGetters },
-      { shapeID, predicate: constraintID, object, valueType, input }
+      { shapeID, predicate: constraintID, valueType, input, inputType }
     ) {
-      // Update the modal state.
+      /* Update the modal state. */
       Vue.set(state.mModal, "show", false);
       Vue.set(state.mModal, "editing", false);
       const i = state.constraintIndex;
       if (typeof input === "boolean") input = input.toString();
 
-      // Clone the original constraint and get the value we want to update.
+      /* Clone the original constraint and get the value we want to update. */
       const updated = clone(rootGetters.shapeWithID(shapeID)[constraintID]);
       const iter = valueType.includes(ValueTypes.LIST)
         ? updated[0]["@list"]
         : updated;
 
-      // Create a new value object.
+      /* Create a new value object. */
       let newValue;
       let name;
       if (constraintID === TERM.path) {
@@ -189,12 +189,12 @@ const constraintModule = {
         };
       } else {
         newValue = {
-          "@type": object,
+          "@type": inputType,
           "@value": prefixToUri(rootGetters.namespaces, input)
         };
       }
 
-      // Check if this new value is a duplicate.
+      /* Check if this new value is a duplicate. */
       let duplicate = false;
       const key = valueType.includes(ValueTypes.ID) ? "@id" : "@value";
       for (let j in iter) {
@@ -202,15 +202,16 @@ const constraintModule = {
         if (i !== j && iter[j][key] === name) duplicate = true;
       }
 
-      // Update this value in the original constraint object.
+      /* Update this value in the original constraint object. */
       // `iter` is a reference to the array we have to modify.
       if (duplicate) {
-        // Delete the duplicate.
+        /* Delete the duplicate if there is one. */
         iter.splice(i, 1);
       } else {
         iter[i] = newValue;
       }
 
+      /* Dispatch the action to update the constraint with the updated value. */
       this.dispatch("updateConstraint", {
         shapeID,
         constraintID,
@@ -256,7 +257,7 @@ const constraintModule = {
         { root: true }
       );
 
-      // Update the y values
+      /* Update the y values. */
       commit(
         "updateYValues",
         { shapeID, shapes: rootState.mShape.model },
@@ -281,13 +282,13 @@ const constraintModule = {
     ) {
       const constraint = getters.shapeWithID(shapeID)[constraintID];
 
-      // If the value is a list, then remove from that list instead of directly.
+      /* If the value is a list, then remove from that list instead of directly from the constraint. */
       const iter = getValueType(constraintID).includes(ValueTypes.LIST)
         ? constraint[0]["@list"]
         : constraint;
       iter.splice(valueIndex, 1);
 
-      // Delete the constraint from the shape if there are no values left.
+      /* Delete the constraint from the shape if there are no values left. */
       if (iter.length === 0) {
         this.dispatch("deleteConstraintFromShapeWithID", {
           shapeID,
@@ -295,7 +296,7 @@ const constraintModule = {
         });
       }
 
-      // Update the y values
+      /* Update the y values. */
       commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
     },
 
@@ -306,9 +307,9 @@ const constraintModule = {
      * @param getters
      * @param commit
      * @param rootState
-     * @param shapeID {string}
-     * @param constraintID {string}
-     * @param value {string}
+     * @param shapeID {string} the ID of the shape we want to edit.
+     * @param constraintID {string} the ID of the constraint we want to edit.
+     * @param value {string} the constraint value we want to delete.
      */
     deleteConstraintValue(
       { getters, commit, rootState },
@@ -316,21 +317,21 @@ const constraintModule = {
     ) {
       const constraint = getters.shapeWithID(shapeID)[constraintID];
 
-      // If the value is a list, then remove from that list instead of directly.
+      /* If the value is a list, then remove from that list instead of directly. */
       const iter = getValueType(constraintID).includes(ValueTypes.LIST)
         ? constraint[0]["@list"]
         : constraint;
 
-      // Check every value of the list.
+      /* Check every value of the list. */
       for (const i in iter) {
         const val = iter[i];
         if (val["@id"] === value || val["@value"] === value || val === value) {
-          // Delete this value from the list if it is the value we want to remove.
+          /* Delete this value from the list if it is the value we want to remove. */
           iter.splice(i, 1);
         }
       }
 
-      // Delete the constraint from the shape if there are no values left.
+      /* Delete the constraint from the shape if there are no values left. */
       if (iter.length === 0) {
         this.dispatch("deleteConstraintFromShapeWithID", {
           shapeID,
@@ -338,35 +339,30 @@ const constraintModule = {
         });
       }
 
-      // Update the y values
+      /* Update the y values. */
       commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
     }
   },
   getters: {
     /**
      * Get a list of property ID's for the shape with the given ID.
+     * ShapeID {string} the ID of the shape whose properties we want to get.
      * @param state
      * @param getters
-     * @param rootState
-     * @returns {function(*): Array}
+     * @param rootGetters
+     * @returns {function}
      */
-    shapeProperties: (state, getters, rootState) => shapeID => {
-      let shape;
-      for (const s of rootState.mShape.model) {
-        if (s["@id"] === shapeID) {
-          shape = s;
-        }
-      }
-
+    shapeProperties: (state, getters, rootGetters) => shapeID => {
+      const shape = rootGetters.shapeWithID(shapeID);
       const propertyObjects = shape[TERM.property];
       const properties = [];
 
       if (propertyObjects) {
-        // Get the references to property shapes
+        /* Get the references to property shapes. */
         for (const p of propertyObjects) {
           properties.push(p["@id"]);
         }
-        // Get the other properties
+        /* Get the other properties. */
         const ignored = ["@id", "@type", TERM.property, TERM.targetNode];
         for (const p in shape) {
           if (!ignored.includes(p)) properties.push(p[0]["@id"]);
@@ -377,11 +373,12 @@ const constraintModule = {
 
     /**
      * Get a map of the constraints of the shape with the given ID.
+     * ShapeID {string} the ID of the shape whose constraints we want to get.
      * @param _state
      * @param _getters
      * @param _rootState
      * @param rootGetters
-     * @returns {Function}
+     * @returns {function}
      */
     shapeConstraints: (
       _state,
@@ -394,14 +391,12 @@ const constraintModule = {
 
       if (shape) {
         for (const prop in shape) {
-          // Only handle the constraints that are not ignored
+          /* Only handle the constraints that are not ignored. */
           if (!IGNORED_PROPERTIES.includes(prop)) {
             if (shape[prop].length > 1) {
-              // Get the ID of every element in the list
+              /* Get the ID of every element in the list. */
               const properties = [];
-              for (const p of shape[prop]) {
-                properties.push(p["@id"]);
-              }
+              Object.values(shape[prop]).map(p => properties.push(p["@id"]));
               constraints[prop] = properties;
             } else {
               constraints[prop] = shape[prop];
@@ -417,11 +412,12 @@ const constraintModule = {
     /**
      * Get the constraints that have existing shape IDs as values.
      * This will return a dictionary that maps every constraint IDs to a list of shape IDs.
-     * @returns {Function}
+     * ShapeID {string} the ID of the shape whose ID constraints we want to get.
      * @param _state
      * @param getters
      * @param _rootState
      * @param rootGetters
+     * @returns {function}
      */
     shapeIDConstraints: (
       _state,
@@ -430,9 +426,8 @@ const constraintModule = {
       rootGetters
     ) => shapeID => {
       const output = {};
-      const { shapeIDs } = rootGetters;
 
-      // Check every constraint of the given shape.
+      /* Check every constraint of the given shape. */
       const constraints = getters.shapeConstraints(shapeID);
       for (const c of Object.keys(constraints)) {
         const vt = getValueType(c)
@@ -447,13 +442,13 @@ const constraintModule = {
               ? constraints[c][0]["@list"]
               : constraints[c];
 
-          // Check every constraint value.
+          /* Check every constraint value. */
           for (const value of iter) {
             const id = value["@id"] ? value["@id"] : value;
-            // Check if the value is an existing shape ID.
-            if (shapeIDs.includes(id)) values.push(id);
+            /* Check if the value is an existing shape ID. */
+            if (rootGetters.shapeIDs.includes(id)) values.push(id);
           }
-          // Only push the constraints that do have some values.
+          /* Only push the constraints that do have some values. */
           if (values.length > 0) output[c] = values;
         }
       }

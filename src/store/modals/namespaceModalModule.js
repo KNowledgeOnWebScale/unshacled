@@ -41,8 +41,8 @@ const namespaceModalModule = {
     /**
      * Add a new entry with the given prefix and URI.
      * @param commit
-     * @param prefix {string}
-     * @param uri {string}
+     * @param prefix {string} the prefix of the new entry.
+     * @param uri {string} the URI of the new entry.
      */
     addNewPrefix({ commit }, { prefix, uri }) {
       commit("addPrefix", { prefix, uri });
