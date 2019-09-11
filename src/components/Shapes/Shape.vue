@@ -38,7 +38,7 @@
           @mouseleave="setCursor('')"
         ></v-circle>
         <v-circle
-          v-if="hover && !adding"
+          v-if="hover"
           :config="addPredicateConfig"
           @click="addPredicate"
           @mouseenter="setCursor('pointer')"
@@ -98,12 +98,19 @@ export default {
       required: true
     }
   },
+  /**
+   * Hover {boolean} indicates if the user is hovering over this shape.
+   * TitleHover {boolean} indicates if the user is hovering over the title of this shape.
+   * ShapeConfig {object} configuration object for the rectangle of the shape.
+   * DeleteNodeConfig {object} configuration of the delete button.
+   * IDTextConfig {object} configuration of the ID text.
+   * AddPredicateConfig {object} configuration of the "add predicate"-button
+   * @returns {{hover: boolean, titleHover: boolean, shapeConfig: object, deleteNodeConfig: object, idTextConfig: object, addPredicateConfig: object}}}
+   */
   data() {
     return {
       hover: false,
       titleHover: false,
-      editing: false,
-      adding: false,
       shapeConfig: this.$props.nodeShape
         ? NODE_SHAPE_CONFIG
         : PROPERTY_SHAPE_CONFIG,
@@ -118,12 +125,13 @@ export default {
   mounted() {
     const self = this;
     const { id } = this.$props;
-    // Move the shape to the defined coordinate.
+    /* Move the shape to the defined coordinate. */
     this.$refs.posRef
       .getNode()
       .setPosition(this.$store.state.mShape.mCoordinate.coordinates[id]);
     this.updatePosition();
 
+    /* Update the constraints when the store state changes. */
     this.$store.watch(
       () => self.$store.getters.shapeConstraints(self.$props.id),
       () => {
@@ -134,7 +142,9 @@ export default {
   },
   methods: {
     /**
-     * @returns {{}} the configuration of the main text
+     * Create the label text configuration object.
+     * Abbreviate the text if needed and change the namespace URL to the prefix if possible.
+     * @returns {{}} the configuration object for the label.
      */
     getLabelTextConfig() {
       const label = this.$store.getters.labelForId(this.id);
@@ -151,7 +161,9 @@ export default {
     },
 
     /**
-     * @returns {{}} the configuration of the URI
+     * Create the URI text configuration object.
+     * Abbreviate the URI if needed.
+     * @returns {{}} the configuration of the URI.
      */
     getURITextConfig() {
       const label = this.$store.getters.labelForId(this.id);
@@ -160,6 +172,7 @@ export default {
     },
 
     /**
+     * Check if this shape has a description.
      * @returns {boolean} value that indicates if this shape has a description.
      */
     hasDescription() {
@@ -175,10 +188,11 @@ export default {
     },
 
     /**
-     * Get the configuration for the visualization of the description.
+     * Get the configuration objects for the visualization of the description.
+     * @returns {{rect: object, title: object, text: object}}
      */
     getDescriptionConfig() {
-      // Check if the shape has a description.
+      /* Check if the shape has a description first. */
       if (this.hasDescription()) {
         const text = this.$store.getters.shapeWithID(this.id)[
           TERM.description
@@ -215,7 +229,7 @@ export default {
         };
       }
 
-      // If the shape does not have a description, do not return any configuration.
+      /* If the shape does not have a description, no configurations are needed. */
       return {
         rect: {},
         title: {},
@@ -225,7 +239,7 @@ export default {
 
     /**
      * Get an object containing all the constraints.
-     * @returns an object mapping every constraint name to a (list of) values.
+     * @returns {{}} an object mapping every constraint name to a (list of) values.
      */
     getConstraints() {
       return this.$store.getters.shapeConstraints(this.$props.id);
@@ -235,11 +249,14 @@ export default {
      * Takes the coordinates from this node shape and calls store to update them.
      */
     updatePosition() {
+      /* Determine the current position. */
       const pos = this.$refs.posRef.getNode().position();
+      /* Update the y values of the components relative to this shape. */
       this.$store.commit("updateYValues", {
         shapeID: this.$props.id,
         shapes: this.$store.state.mShape.model
       });
+      /* Update the coordinates of this shape. */
       this.$store.commit("updateCoordinates", {
         shapeID: this.$props.id,
         x: pos.x,
@@ -261,12 +278,12 @@ export default {
     },
 
     /**
-     * Call the ReactiveInput component to start editing using the given text node.
+     * Toggle the shape modal to start editing this shape's properties.
      */
     startEditing() {
       const shape = this.$store.getters.shapeWithID(this.id);
 
-      // Get the label and its language.
+      /* Get the label and its language. */
       const labelConstraint = shape[TERM.name]
         ? shape[TERM.name]
         : shape[LABEL]
@@ -277,7 +294,7 @@ export default {
         ? labelConstraint[0]["@language"]
         : "en";
 
-      // Get the description and its language.
+      /* Get the description and its language. */
       const description = shape[TERM.description]
         ? shape[TERM.description][0]["@value"]
         : "";
@@ -285,11 +302,11 @@ export default {
         ? shape[TERM.description][0]["@language"]
         : "en";
 
-      // Toggle the modal.
+      /* Toggle the modal. */
       this.$store.commit("toggleEditShapeModal", {
         id: this.id,
         label,
-        labelLang: labelLang || "en",
+        labelLang,
         description,
         descrLang,
         nodeShape: this.nodeShape
@@ -297,25 +314,9 @@ export default {
     },
 
     /**
-     * Stop editing.
-     * Check if the filled in value is valid and unique.
-     * Call the store to edit the node shape if possible.
-     */
-    stopEditing(newValue) {
-      // Check if the new value is valid and unique.
-      if (newValue !== "" && !this.$store.getters.shapes[newValue]) {
-        this.$store.dispatch("editShape", {
-          oldID: this.$props.id,
-          newID: newValue
-        });
-      }
-    },
-
-    /**
-     * Delete this node shape.
+     * Delete this shape.
      */
     deleteShape() {
-      if (this.$refs.reactiveInput) this.$refs.reactiveInput.stopEditing();
       const action = this.$props.nodeShape
         ? "deleteNodeShape"
         : "deletePropertyShape";
@@ -324,7 +325,7 @@ export default {
 
     /**
      * Set the cursor type according to the passed argument.
-     * @param type {string}
+     * @param type {string} "pointer" || "text" || *: the type of cursor we want to use.
      */
     setCursor(type) {
       if (type === "pointer") pointerCursor();

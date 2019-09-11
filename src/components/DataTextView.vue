@@ -47,12 +47,17 @@ export default {
       required: true
     }
   },
+  /**
+   * DataText {string} the current (possibly edited) data in JSON text format.
+   * @returns {{dataText: string}}
+   */
   data() {
     return {
       dataText: ""
     };
   },
   mounted() {
+    /* Update the shown text whenever the store state is updated. */
     const self = this;
     this.$store.watch(
       () => self.$store.state.mData.dataText,
@@ -60,16 +65,31 @@ export default {
     );
   },
   methods: {
+    /**
+     * Update the shown text depending on the store state.
+     */
     updateText() {
       const { dataText } = this.$store.state.mData;
       this.dataText = dataText || "";
     },
+    /**
+     * Update the data in the store using the data in the text field.
+     */
     updateData() {
       this.$store.dispatch("updateData", { dataText: this.dataText });
     },
+    /**
+     * Check if the data in the text field has changed in comparison to the data in the store.
+     * @returns {boolean} indicates if the data has changed.
+     */
     dataHasChanged() {
       return this.dataText !== this.$store.state.mData.dataText;
     },
+    /**
+     * Check if the data is invalid.
+     * This will try to parse the data in the text field and return `true` if this is invalid JSON.
+     * @returns {boolean} indicates if the data is invalid.
+     */
     invalidData() {
       try {
         JSON.parse(this.dataText);

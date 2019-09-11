@@ -34,16 +34,18 @@
 <script>
 import Shape from "./Shapes/Shape.vue";
 import Relationship from "./Shapes/Relationship.vue";
-import { MARGIN, MARGIN_TOP } from "../config/konvaConfigs";
+import { MARGIN_TOP } from "../config/konvaConfigs";
 
 export default {
   name: "Editor",
   components: { Relationship, Shape },
 
+  /**
+   * ConfigKonva {{width: number, height: number}} the configuration for the Konva stage.
+   * @returns {{configConva: object}}}
+   */
   data() {
     return {
-      previousPosition: undefined,
-      marginTop: MARGIN_TOP + MARGIN, // Provide space for the NavBar
       configKonva: {
         width: window.innerWidth,
         height: window.innerHeight - MARGIN_TOP
@@ -52,39 +54,44 @@ export default {
   },
 
   mounted() {
+    /* Save a reference to the stage when it's loaded. */
     this.$store.commit("setEditor", this.$refs.stage.getNode());
-    window.addEventListener("resize", this.handleResize); // React to window resizing.
+    /* React to window resizing. */
+    window.addEventListener("resize", this.handleResize);
     this.handleResize();
   },
 
   updated() {
-    // Put the arrows on the bottom layer.
+    /* Put the arrows on the bottom layer. */
     const layer = this.$refs.relationships;
     if (layer && layer.getNode) layer.getNode.zIndex(0);
   },
 
   methods: {
     /**
-     * Resize the canvas on resizing of the window.
+     * Resize the canvas on resizing of the window or when the div has resized.
+     * Redraw the canvas on the next tick.
      */
     handleResize() {
       if (this.$refs.stage) {
         const editorContainer = document.getElementById("editorContainer");
         const dataContainer = document.getElementById("dataTextView");
+        const navbar = document.getElementById("navbar");
+
         const stage = this.$refs.stage.getNode();
         const newWidth = window.innerWidth - dataContainer.offsetWidth;
 
-        this.configKonva.height = window.innerHeight - this.marginTop;
         editorContainer.style.width = newWidth.toString();
+        this.configKonva.height = window.innerHeight - navbar.offsetHeight;
         this.configKonva.width = newWidth;
-        this.$nextTick(() => stage.draw()); // Resize on the next tick
+        this.$nextTick(() => stage.draw());
       }
     },
 
     /**
      * Scale the canvas depending on the pointer position when scrolling.
      * This will zoom in on scrolling up and zoom out on scrolling down.
-     * @param e scoll event
+     * @param e {*} scoll event
      */
     scroll(e) {
       const stage = this.$refs.stage.getNode();
@@ -92,15 +99,18 @@ export default {
       const oldScale = stage.scaleX();
       e.evt.preventDefault();
 
+      /* Determine where the mouse points to. */
       const mousePointTo = {
         x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
         y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale
       };
 
+      /* Determine the new scale of the stage. */
       const newScale =
         e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-      stage.scale({ x: newScale, y: newScale });
+      stage.scale({ x: newScale, y: newScale }); /* Rescale the stage. */
 
+      /* Determine the new position of the stage. */
       const newPos = {
         x:
           -(mousePointTo.x - stage.getPointerPosition().x / newScale) *
@@ -108,8 +118,9 @@ export default {
         y:
           -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale
       };
-      stage.position(newPos);
-      stage.batchDraw();
+
+      stage.position(newPos); /* Reposition the stage. */
+      stage.batchDraw(); /* Redraw the stage. */
     }
   }
 };
