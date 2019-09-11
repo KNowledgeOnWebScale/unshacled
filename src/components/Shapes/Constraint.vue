@@ -38,13 +38,12 @@
 <script>
 import {
   HEIGHT,
-  CONSTRAINT_SEPARATION_LINE,
   WIDTH,
   CONSTRAINT_CONFIG,
   CONSTRAINT_TEXT_CONFIG,
-  DELTA_Y_TEXT,
+  CONSTRAINT_SEPARATION_LINE,
   DELETE_BUTTON_CONFIG,
-  DELTA_Y_DELETE,
+  TEXT_OFFSET,
   MAX_LENGTH,
   pointerCursor,
   textCursor,
@@ -107,7 +106,7 @@ export default {
       },
       keyConfig: {
         ...CONSTRAINT_TEXT_CONFIG,
-        y: DELTA_Y_TEXT,
+        y: TEXT_OFFSET,
         fontStyle: "italic",
         text: uriToPrefix(
           this.$store.state.mConfig.namespaces,
@@ -116,11 +115,11 @@ export default {
       },
       valueConfig: {
         ...CONSTRAINT_TEXT_CONFIG,
-        y: DELTA_Y_TEXT + HEIGHT
+        y: TEXT_OFFSET + HEIGHT
       },
       deleteConstraintConfig: {
         ...DELETE_BUTTON_CONFIG,
-        y: DELTA_Y_DELETE
+        y: HEIGHT / 2
       }
     };
   },

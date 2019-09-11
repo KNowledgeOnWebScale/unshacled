@@ -72,11 +72,10 @@ import {
   TEXT_OFFSET,
   OFFSET,
   DESCRIPTION_RECT_CONFIG,
+  DESCRIPTION_TITLE_CONFIG,
   DESCRIPTION_TEXT_CONFIG,
   MAX_LENGTH,
   TEXT_SIZE,
-  WIDTH,
-  MARGIN,
   pointerCursor,
   resetCursor,
   textCursor
@@ -199,31 +198,17 @@ export default {
         ][0]["@value"];
 
         // Constants for the configuration.
-        const x = WIDTH + MARGIN;
-        const textX = x + 2 * MARGIN;
-        const offset = TEXT_OFFSET / 2;
         let lines = Math.ceil(text.length / MAX_LENGTH);
         if (lines < 2) lines = 2;
 
         return {
           rect: {
             ...DESCRIPTION_RECT_CONFIG,
-            x,
-            height: lines * TEXT_SIZE + TEXT_OFFSET,
-            width: WIDTH + 4 * MARGIN
+            height: lines * TEXT_SIZE + TEXT_OFFSET
           },
-          title: {
-            ...DESCRIPTION_TEXT_CONFIG,
-            text: "Description",
-            fontStyle: "bold",
-            x: textX,
-            y: offset
-          },
+          title: DESCRIPTION_TITLE_CONFIG,
           text: {
             ...DESCRIPTION_TEXT_CONFIG,
-            x: textX,
-            y: offset + TEXT_OFFSET,
-            width: WIDTH,
             text
           }
         };
