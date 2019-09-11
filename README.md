@@ -10,11 +10,13 @@ Visual editor for shape constraint languages.
 At the time of writing this editor supports SHACL, future support for ShEx is envisioned. This editor makes abstraction of specific constraint languages and exposes concepts in a simple visual interface.
 
 ### Functionalities
-- [x] Import SHACL files
-- [x] Add, remove and edit shapes
-- [x] Add, remove and edit properties
-- [x] Add, remove and edit constraints
-- [x] Export SHACL files
+- [x] Drag and drop to rearrange the visualized shapes
+- [x] Add, remove and edit shapes, constraints and relationships
+- [x] View and edit namespaces and prefixes
+- [x] Import SHACL files in JSON and Turtle
+- [x] Export SHACL files in JSON and Turtle
+- [x] Import data files in JSON and Turtle
+- [x] View and edit data files in JSON format
 - [x] Validate data files
 
 ### Concepts
