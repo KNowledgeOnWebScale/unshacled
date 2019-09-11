@@ -1,13 +1,10 @@
 # [UnSHACLed](https://osoc19.github.io/unshacled/)
 Visual editor for shape constraint languages.
 ## Contents
-[Overview](#Overview)
-
-[Setup](#Setup)
-
-[Concepts](#Concepts)
-
-[Contribute](#Contribute)
+1. [Overview](#Overview)
+2. [Setup](#Setup)
+3. [Concepts](#Concepts)
+4. [Contribute](#Contribute)
 
 ## Overview
 At the time of writing this editor supports SHACL, future support for ShEx is envisioned. This editor makes abstraction of specific constraint languages and exposes concepts in a simple visual interface.
@@ -24,14 +21,25 @@ At the time of writing this editor supports SHACL, future support for ShEx is en
 An [internal model](#Model) is used to represent shapes which can be edited in the browser. Using existing shape files requires these to be imported and [translated to this model](#Translation) before use. Editing is done in a [visual editor](#Interface).
 
 ## Setup
-### Install dependencies
+To start the application, run the following commands:
+1. Install dependencies
 ```
 npm install
 ```
-
-### Compile and hot-reload for development
+2. Compile and hot-reload for development
 ```
 npm run serve
+```
+
+The documentation can be generated in `/docs` using the following command:
+```
+npm run docs
+```
+
+### Useful while developing: testing and linting
+```
+npm run test // Run tests
+npm run lint // Check and fix code style
 ```
 
 ### Compile and minify for production
@@ -40,51 +48,85 @@ Execute this command, then move the contents of `/dist` into the `gh-pages` bran
 npm run build
 ```
 
-### Generate documentation in `/docs`
-```
-npm run docs
-```
-
-### Run tests
-```
-npm run test
-```
-
-### Check and fix code style
-```
-npm run lint
-```
-
-
 ## Concepts
 ### Model
 The internal model used is based on SHACL in JSON-LD format. An example:
 ```json
 [
   {
-    "@id": "AddressShape",
+    "@id": "_:b1",
     "https://2019.summerofcode.be/unshacled#path": [
       {
-        "@id": "http://example.org/ns#address"
+        "@id": "http://schema.org/birthDate"
       }
     ],
-    "https://2019.summerofcode.be/unshacled#class": [
+    "https://2019.summerofcode.be/unshacled#lessThan": [
       {
-        "@id": "http://example.org/ns#PostalAddress"
+        "@id": "http://schema.org/deathDate"
+      }
+    ],
+    "https://2019.summerofcode.be/unshacled#maxCount": [
+      {
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ]
   },
   {
-    "@id": "http://example.org/ns#ClassExampleShape",
-    "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
-    "https://2019.summerofcode.be/unshacled#property": [
+    "@id": "_:b2",
+    "https://2019.summerofcode.be/unshacled#path": [
       {
-        "@id": "AddressShape"
+        "@id": "http://schema.org/gender"
       }
     ],
-    "https://2019.summerofcode.be/unshacled#targetNode": [
+    "https://2019.summerofcode.be/unshacled#in": [
       {
-        "@id": "http://example.org/ns#Bob"
+        "@list": [
+          {
+            "@value": "female"
+          },
+          {
+            "@value": "male"
+          }
+        ]
+      },
+    "https://2019.summerofcode.be/unshacled#name": [
+      {
+        "@value": "gender",
+        "@language": "en
+      }
+    ]
+  },
+  {
+    "@id": "_:b6",
+    "https://2019.summerofcode.be/unshacled#path": [
+      {
+        "@id": "http://schema.org/streetAddress"
+      }
+    ],
+    "https://2019.summerofcode.be/unshacled#datatype": [
+      {
+        "@id": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    ]
+  },
+  {
+    "@id": "http://schema.org/AddressShape",
+    "@type": [
+      "https://2019.summerofcode.be/unshacled#NodeShape"
+    ],
+    "https://2019.summerofcode.be/unshacled#closed": [
+      {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    ],
+    "https://2019.summerofcode.be/unshacled#property": [
+      {
+        "@id": "_:b6"
+      },
+      {
+        "@id": "_:b7"
       }
     ]
   }
