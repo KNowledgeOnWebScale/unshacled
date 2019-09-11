@@ -54,79 +54,29 @@ The internal model used is based on SHACL in JSON-LD format. An example:
 ```json
 [
   {
-    "@id": "_:b1",
+    "@id": "AddressShape",
     "https://2019.summerofcode.be/unshacled#path": [
       {
-        "@id": "http://schema.org/birthDate"
+        "@id": "http://example.org/ns#address"
       }
     ],
-    "https://2019.summerofcode.be/unshacled#lessThan": [
+    "https://2019.summerofcode.be/unshacled#class": [
       {
-        "@id": "http://schema.org/deathDate"
-      }
-    ],
-    "https://2019.summerofcode.be/unshacled#maxCount": [
-      {
-        "@value": "1",
-        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+        "@id": "http://example.org/ns#PostalAddress"
       }
     ]
   },
   {
-    "@id": "_:b2",
-    "https://2019.summerofcode.be/unshacled#path": [
-      {
-        "@id": "http://schema.org/gender"
-      }
-    ],
-    "https://2019.summerofcode.be/unshacled#in": [
-      {
-        "@list": [
-          {
-            "@value": "female"
-          },
-          {
-            "@value": "male"
-          }
-        ]
-      },
-    "https://2019.summerofcode.be/unshacled#name": [
-      {
-        "@value": "gender",
-        "@language": "en
-      }
-    ]
-  },
-  {
-    "@id": "_:b6",
-    "https://2019.summerofcode.be/unshacled#path": [
-      {
-        "@id": "http://schema.org/streetAddress"
-      }
-    ],
-    "https://2019.summerofcode.be/unshacled#datatype": [
-      {
-        "@id": "http://www.w3.org/2001/XMLSchema#string"
-      }
-    ]
-  },
-  {
-    "@id": "http://schema.org/AddressShape",
-    "@type": [
-      "https://2019.summerofcode.be/unshacled#NodeShape"
-    ],
-    "https://2019.summerofcode.be/unshacled#closed": [
-      {
-        "@value": "true",
-        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
-      }
-    ],
+    "@id": "http://example.org/ns#ClassExampleShape",
+    "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
     "https://2019.summerofcode.be/unshacled#property": [
       {
-        "@id": "_:b6"
-      },
+        "@id": "AddressShape"
+      }
+    ],
+    "https://2019.summerofcode.be/unshacled#targetNode": [
       {
-        "@id": "_:b7"
+        "@id": "http://example.org/ns#Bob"
       }
     ]
   }
