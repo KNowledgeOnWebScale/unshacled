@@ -185,12 +185,12 @@ const constraintModule = {
         newValue = { "@id": input };
       } else if (valueType.includes(ValueTypes.ID)) {
         newValue = {
-          "@id": prefixToUri(this.$store.state.mConfig.namespaces, input)
+          "@id": prefixToUri(rootGetters.namespaces, input)
         };
       } else {
         newValue = {
           "@type": object,
-          "@value": prefixToUri(this.$store.state.mConfig.namespaces, input)
+          "@value": prefixToUri(rootGetters.namespaces, input)
         };
       }
 

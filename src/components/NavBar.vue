@@ -75,6 +75,11 @@
         <sui-menu-item class="clickable" icon="user"></sui-menu-item>
       </sui-menu-menu>
       -->
+      <sui-menu-menu position="right">
+        <a href="https://github.com/oSoc19/unshacled/" target="_blank">
+          <sui-menu-item class="clickable" icon="github"></sui-menu-item>
+        </a>
+      </sui-menu-menu>
     </sui-menu>
 
     <clear-modal></clear-modal>
@@ -142,7 +147,7 @@ export default {
       this.$store.dispatch("addNodeShape");
     },
     createPropertyShape() {
-      this.$store.commit("togglePathModal");
+      this.$store.commit("togglePathModal", {});
     },
 
     loadExample() {

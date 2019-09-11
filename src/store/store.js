@@ -4,11 +4,9 @@ import Vuex from "vuex";
 
 // Util
 import { possiblePredicates, possibleObjects } from "../util/shacl/vocabulary";
-import { ETF } from "../util/enums/extensionToFormat";
 
 // Translation
 import TranslatorManager from "../translation/translatorManager";
-import ParserManager from "../parsing/parserManager";
 import ShaclTranslator from "../translation/shaclTranslator";
 import { TERM } from "../translation/terminology";
 
@@ -16,7 +14,9 @@ import { TERM } from "../translation/terminology";
 import shapeModule from "./shapeModule";
 import dataModule from "./dataModule";
 import configModule from "./configModule";
-import { exampleData, exampleShapes } from "../assets/example";
+import {exampleData, exampleShapes, exampleShapesJSON} from "../assets/example";
+import ParserManager from "../parsing/parserManager";
+import {ETF} from "../util/enums/extensionToFormat";
 
 Vue.use(Vuex);
 
@@ -100,7 +100,7 @@ export default new Vuex.Store({
     loadExample({ getters }) {
       const self = this;
       this.commit("clear"); // Clear the existing data first.
-      this.commit("setDataFile", {
+      this.commit("setData", {
         name: "example.ttl",
         contents: exampleData,
         extension: "ttl"
@@ -108,7 +108,7 @@ export default new Vuex.Store({
       ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
         self.commit("setModel", { model, getters }); // Set the shapes.
       });
-    },
+    }
   },
   getters: {
     /**
@@ -145,6 +145,6 @@ export default new Vuex.Store({
      */
     objects: () => predicate => {
       return possibleObjects(predicate);
-    },
+    }
   }
 });

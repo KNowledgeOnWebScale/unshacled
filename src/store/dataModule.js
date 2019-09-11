@@ -18,6 +18,7 @@ const dataModule = {
     dataFile: {},
     dataFileName: String,
     dataFileExtension: String,
+    dataText: "",
     validationReport: {},
     showValidationReportModal: false
   },
@@ -29,10 +30,24 @@ const dataModule = {
      * @param contents the contents of a read data file.
      * @param extension the extension of the data file.
      */
-    setDataFile(state, { name, contents, extension }) {
+    setData(state, { name, contents, extension }) {
       Vue.set(state, "dataFileName", name);
       Vue.set(state, "dataFile", contents);
       Vue.set(state, "dataFileExtension", extension);
+      ParserManager.parse(contents, ETF.ttl).then(data =>
+        Vue.set(state, "dataText", JSON.stringify(data, null, 2))
+      );
+    },
+
+    /**
+     * TODO
+     * @param state
+     * @param text
+     */
+    setJsonData(state, { text }) {
+      Vue.set(state, "dataText", text);
+      Vue.set(state, "dataFileExtension", "json");
+      Vue.set(state, "dataFile", text);
     },
 
     /**
@@ -102,7 +117,7 @@ const dataModule = {
       const reader = new FileReader();
       reader.readAsText(file);
       reader.onload = event =>
-        commit("setDataFile", {
+        commit("setData", {
           name: file.name,
           contents: event.target.result,
           extension: file.name.split(".").pop()
@@ -167,6 +182,20 @@ const dataModule = {
         ).then(e => {
           downloadFile(filename, e);
         });
+      }
+    },
+
+    /**
+     * TODO
+     * @param commit
+     * @param dataText
+     */
+    updateData({ commit }, { dataText }) {
+      try {
+        JSON.parse(dataText);
+        commit("setJsonData", { text: dataText });
+      } catch (e) {
+        console.err("Entered data is no valid JSON.");
       }
     }
   },
