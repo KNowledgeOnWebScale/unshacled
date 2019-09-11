@@ -92,7 +92,6 @@
 
 <script>
 import { ENTER } from "../../util/constants";
-import {extractPrefix} from "../../util/urlParser";
 
 export default {
   name: "NamespaceTable",
@@ -109,13 +108,13 @@ export default {
     };
   },
   mounted() {
-    // Remove the input field from the top of the table.
+    /* Remove the input field from the top of the table. */
     document.getElementById("namespaceTable").removeChild(this.$refs.form);
-    // Scroll to the top of the table.
+    /* Scroll to the top of the table. */
     const body = document.getElementById("table-body");
     body.scrollTop = 0;
 
-    // Stop editing when the modal is being closed.
+    /* Stop editing when the modal is being closed. */
     const self = this;
     this.$store.watch(
       () => self.$store.state.mConfig.mModal.show,
@@ -135,6 +134,7 @@ export default {
 
     /**
      * Indicates that the entered value is invalid.
+     * A value is valid if the input is valid and unique.
      */
     error() {
       const { editRow, editField } = this.$props.tableProperties;
@@ -169,7 +169,7 @@ export default {
 
     /**
      * Are we editing the given field in the given row?
-     * @returns {boolean}
+     * @returns {boolean} `true` if we are currently editing the given field in the given row.
      */
     editingThis(uri, field) {
       return (
@@ -189,9 +189,12 @@ export default {
         editRow: row,
         editField: field
       });
-      this.input = currentValue; // Set the initial value.
-      document.getElementById(row + field).appendChild(this.$refs.form); // Add the input field in the right place.
-      this.$refs.inputField.focus(); // Focus on the input field so the user can start typing immediately.
+      /* Set the initial value. */
+      this.input = currentValue;
+      /* Add the input field in the right place. */
+      document.getElementById(row + field).appendChild(this.$refs.form);
+      /* Focus on the input field so the user can start typing immediately. */
+      this.$refs.inputField.focus();
     },
 
     /**
@@ -200,20 +203,20 @@ export default {
      */
     stopEditing() {
       const { editRow, editField } = this.$props.tableProperties;
-      // Check if the input is valid.
+      /* Check if the input is valid. */
       if (this.error()) {
         this.$store.commit("clearTableEdit");
       } else {
         this.$store.dispatch("stopEditingNamespace", { input: this.input });
       }
-      // Remove the input field from the table.
+      /* Remove the input field from the table. */
       const cell = document.getElementById(editRow + editField);
       if (cell && this.$refs.form) cell.removeChild(this.$refs.form);
     },
 
     /**
      * Delete the element with the given prefix from the table.
-     * @param prefix
+     * @param prefix {string} the prefix we want to remove.
      */
     deleteElement(prefix) {
       this.$store.commit("deletePrefix", { prefix });
@@ -221,8 +224,8 @@ export default {
 
     /**
      * Check if the given prefix is the current base URI.
-     * @param prefix
-     * @returns {boolean}
+     * @param prefix {string} the prefix of the namespace we want to check.
+     * @returns {boolean} `true` if the corresponding URI of the given prefix is the current base URI.
      */
     isBaseURI(prefix) {
       const { baseURI, prefixURI } = this.$store.getters;
@@ -230,8 +233,8 @@ export default {
     },
 
     /**
-     * Get the available prefixes mapped to their checked-ness.
-     * @returns {{string: boolean}}
+     * Get the available prefixes mapped to their checked value.
+     * @returns {{string: boolean}} map of prefixes to a boolean value which indicates if their radio checkbox is checked.
      */
     getSelected() {
       const { baseURI, namespaces } = this.$store.getters;

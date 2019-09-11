@@ -85,7 +85,7 @@
     </table>
 
     <sui-segment v-if="editing && clicked" emphasis="secondary">
-      <!-- TODO allow predicate editing -->
+      <!-- TODO allow predicate editing? -->
       <div>
         You cannot change the predicate while editing.
       </div>
@@ -146,12 +146,12 @@ export default {
   methods: {
     /**
      * Set the sorting to the given values.
-     * @param sorted
-     * @param sortBy
+     * @param sorted {boolean} indicates if the table is sorted.
+     * @param sortBy {string} the column that is used to sort the table.
      */
     setSorting(sorted, sortBy) {
       const p = this.$props.sorting;
-      // Invert the order if the sorting criterium stays the same, otherwise sort ascendingly.
+      /* Invert the order if the sorting criterium stays the same, otherwise sort ascendingly. */
       const ascending = p.sortBy === sortBy ? !p.ascending : true;
       this.$store.commit("sortPredicateModal", {
         sorted,
@@ -166,25 +166,26 @@ export default {
      * If no search term is entered, show everything.
      * Otherwise, check for each row if the search term occurs in the predicate or type.
      * The selected predicate will always be shown.
-     * @returns {[]} List of constraint objects: {id, predicate, description, type}
+     * @returns {[]} list of constraint objects: {id, predicate, description, type}
      */
     filterContents() {
       const { contents, selected } = this.$props;
-      if (this.editing) {
-        return contents.filter(obj => obj.id === selected);
-      }
+      if (this.editing) return contents.filter(obj => obj.id === selected);
       if (this.filter === "") {
-        // No filter. Show every entry.
+        /* If there is no filter, show every entry. */
         return Object.values(contents);
       }
-      // Otherwise, filter the table contents.
+      /* Otherwise, filter the table contents. */
       const filtered = [];
       for (const obj of contents) {
         const type = obj["type"].replace(" Constraints", "");
+        /* Always show the selected predicate. */
+        /* Check if the search term matches the type. */
+        /* Check if the search term matches the predicate. */
         if (
-          obj.id === selected || // Always show the selected predicate.
-          this.matches(type) || // Check if the search term matches the type.
-          this.matches(obj.predicate) // Check if the search term matches the predicate.
+          obj.id === selected ||
+          this.matches(type) ||
+          this.matches(obj.predicate)
         )
           filtered.push(obj);
       }
@@ -194,6 +195,8 @@ export default {
     /**
      * Check if the given string matches the current filter.
      * Make the string and filter lowercase and remove the whitespace and non-alphanumeric characters first.
+     * @param string {string} the string that we want to check.
+     * @returns {boolean} value which indicates if the given string matches the current filter.
      */
     matches(string) {
       const matchString = string.toLowerCase().replace(/[^0-9a-z]/gi, "");
@@ -206,36 +209,35 @@ export default {
      * `sorted` {boolean} indicates if the list should be sorted.
      * `sortBy` {string} indicates which field the list should be sorted with.
      * `ascending` {boolean} indicates if the list should be sorted ascendingly.
-     * @param list
-     * @returns {*}
+     * @param list {[]}
+     * @returns {[]} the sorted list
      */
     sortList(list) {
       const { sorted, sortBy, ascending } = this.$props.sorting;
       if (sorted) {
-        // Sort the list.
+        /* Sort the given list using the current requirements. */
         sortBy === "predicate"
           ? list.sort(comparePredicates)
           : sortBy === "type"
           ? list.sort(compareType)
           : null;
 
-        // Reverse the list if needed.
+        /* Reverse the list if needed. */
         if (!ascending) list.reverse();
       }
       return list;
     },
 
     /**
-     * Select the constraint with the given key.
-     * This will activate the row.
-     * Only allow selecting if the user is not editing the constraint.
+     * Select the constraint with the given key. This will activate the clicked row.
+     * Only allow selecting if the user is not editing the constraint. Otherwise, show a message.
      * @param key
      */
     selectConstraint(key) {
-      if (!this.editing) {
-        this.$store.commit("selectRow", { key });
-      } else {
+      if (this.editing) {
         this.clicked = true;
+      } else {
+        this.$store.commit("selectRow", { key });
       }
     }
   }
@@ -243,8 +245,8 @@ export default {
 
 /**
  * Compare the given objects by predicate.
- * @param a
- * @param b
+ * @param a {{}} the first object that should be compared.
+ * @param b {{}} the second object that should be compared.
  * @returns {number}
  */
 function comparePredicates(a, b) {
@@ -255,8 +257,8 @@ function comparePredicates(a, b) {
 
 /**
  * Compare the given objects by type.
- * @param a
- * @param b
+ * @param a the first object that should be compared.
+ * @param b the second object that should be compared.
  * @returns {number}
  */
 function compareType(a, b) {

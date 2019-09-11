@@ -26,9 +26,9 @@ const dataModule = {
     /**
      * Set the data file to the given contents.
      * @param state
-     * @param name
-     * @param contents the contents of a read data file.
-     * @param extension the extension of the data file.
+     * @param name {string} the name of the data file.
+     * @param contents {string} the contents of a read data file.
+     * @param extension {string} the extension of the data file.
      */
     setData(state, { name, contents, extension }) {
       Vue.set(state, "dataFileName", name);
@@ -40,9 +40,9 @@ const dataModule = {
     },
 
     /**
-     * TODO
+     * Set the given JSON data as the current data file.
      * @param state
-     * @param text
+     * @param text {string} the data in JSON format.
      */
     setJsonData(state, { text }) {
       Vue.set(state, "dataText", text);
@@ -73,6 +73,7 @@ const dataModule = {
      * @param model
      */
     validateWithModel(state, model) {
+      console.log(JSON.stringify(model, null, 2));
       if (state.dataFile.length > 0) {
         SerializerManager.serialize(
           ShaclTranslator.toSHACLSimple(model),
