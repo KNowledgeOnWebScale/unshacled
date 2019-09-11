@@ -176,13 +176,15 @@ const dataModule = {
           filename,
           JSON.stringify(rootGetters.internalModelToJson, null, 2)
         );
-      } else {
+      } else if (extension === "ttl") {
         SerializerManager.serialize(
           ShaclTranslator.toSHACL(rootGetters.shapes),
           ETF.ttl
         ).then(e => {
           downloadFile(filename, e);
         });
+      } else {
+        console.err(`Extension ${extension} not supported.`);
       }
     },
 

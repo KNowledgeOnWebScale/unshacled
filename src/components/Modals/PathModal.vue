@@ -53,7 +53,7 @@ export default {
     };
   },
   mounted() {
-    // Update the path value if the modal is called to edit.
+    /* Update the path value if the modal is called to edit. */
     const self = this;
     this.$store.watch(
       () => self.$store.state.pathModal.editing,
@@ -65,7 +65,7 @@ export default {
       }
     );
 
-    // Focus the input field when the modal is called.
+    /* Focus the input field when the modal is called. */
     this.$store.watch(
       () => self.$store.state.pathModal.show,
       () => {
@@ -77,14 +77,14 @@ export default {
   methods: {
     /**
      * Confirm on enter press.
-     * @param e key press event
+     * @param e {*} key press event
      */
     handleKeyPress(e) {
       if (e.keyCode === ENTER) this.confirm();
     },
 
     /**
-     * Cancel the modal.
+     * Cancel the modal and clear the entered value.
      */
     cancel() {
       this.$store.commit("togglePathModal", {});
@@ -92,13 +92,13 @@ export default {
     },
 
     /**
-     * Check if the entered value is valid and confirm the modal if so.
-     * Otherwise, show an error message.
+     * Confirm the modal if the entered value is valid.
      */
     confirm() {
+      /* Check if the entered value is valid. */
       if (!this.error()) {
         if (this.$props.editing) {
-          // Edit the path.
+          /* Edit the path if the user is editing a shape. */
           const { shapeID } = this.$props;
           const p = TERM.path;
           this.$store.dispatch("stopConstraintEdit", {
@@ -109,11 +109,12 @@ export default {
             input: prefixToUri(this.$store.state.mConfig.namespaces, this.path)
           });
         } else {
-          // Create a new property shape.
+          /* Create a new property shape. */
           this.$store.dispatch("addPropertyShape", {
             path: this.path
           });
         }
+        /* Close and clear the modal. */
         this.$store.commit("togglePathModal", {});
         this.path = "";
       }

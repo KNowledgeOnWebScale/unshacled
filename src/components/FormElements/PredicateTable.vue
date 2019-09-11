@@ -129,6 +129,10 @@ export default {
       }
     }
   },
+  /**
+   * Clicked {boolean} indicates if the row is clicked when the user is editing.
+   * @returns {{clicked: boolean}}
+   */
   data() {
     return {
       clicked: false

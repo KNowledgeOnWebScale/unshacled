@@ -48,7 +48,7 @@ export default {
     };
   },
   mounted() {
-    // Focus the input field when the modal is called.
+    /* Focus the input field when the modal is called. */
     const self = this;
     this.$store.watch(
       () => self.$store.state.showExportModal,
@@ -70,7 +70,6 @@ export default {
     /**
      * Check if the entered filename is valid.
      * If so, export the file and close the modal.
-     * Otherwise, show an error message.
      */
     confirm() {
       const output = `${this.filename}.${this.extension}`;
@@ -83,6 +82,9 @@ export default {
       }
     },
 
+    /**
+     * Cancel and close the modal without saving any changes.
+     */
     cancel() {
       this.closeExportModal();
     },
@@ -99,11 +101,11 @@ export default {
     /**
      * Check if the filename is valid.
      * Toggle the error message if needed.
-     * @param filename
-     * @returns {*} boolean, indicates if the filename is valid.
+     * @param filename {string} the filename we want to check.
+     * @returns {boolean|*} boolean, indicates if the filename is valid.
      */
     checkFilename(filename) {
-      const bool = filename.match(/^[\w,\s-]+\.[A-Za-z]+/);
+      const bool = filename.match(/^[\w,\s-]+\.[A-Za-z0-9]+/);
       this.error = !bool;
       return bool;
     }

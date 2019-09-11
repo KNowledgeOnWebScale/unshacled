@@ -103,6 +103,14 @@ export default {
       type: Object
     }
   },
+  /**
+   * ID {string} the IRI of the shape.
+   * Label {string} the label/name of the shape.
+   * LabelLang {string} the language tag of the label.
+   * Description {string} the description of the shape.
+   * DescLang {string} the language tag of the description.
+   * @returns {{values: {labelLang: string, descrLang: string, description: string, id: string, label: string}}}
+   */
   data() {
     return {
       values: {
@@ -128,7 +136,7 @@ export default {
       () => self.updateValues()
     );
 
-    // Focus the id input field when the modal is called.
+    /* Focus the id input field when the modal is called. */
     this.$store.watch(
       () => self.$store.state.mShape.shapeModal.show,
       () => {
@@ -140,13 +148,14 @@ export default {
   methods: {
     /**
      * Get a list of language tags.
+     * @returns {[]}
      */
     getLanguageTags() {
       return Object.keys(isoLangs).sort();
     },
 
     /**
-     * Confirm on enter press.
+     * Confirm when the user presses the enter key.
      * @param e key press event
      */
     handleKeyPress(e) {
@@ -161,52 +170,47 @@ export default {
       const { id, label, labelLang, description, descrLang } = this.values;
       const modProps = this.$props.modalProperties;
 
-      // Close the modal.
+      /* Close the modal. */
       this.$store.commit("toggleEditShapeModal", {});
 
-      // Update the shape ID.
+      /* Update the shape ID. */
       this.$store.dispatch("editShape", {
         oldID: modProps.id,
         newID: id
       });
-      // Update the shape label/name and description.
+      /* Update the shape label (in case of a node shape) or name (in case of a property shape). */
       this.handleConstraint(
         modProps.nodeShape ? LABEL : TERM.name,
         label,
         labelLang
       );
+      /* Update the shape description. */
       this.handleConstraint(TERM.description, description, descrLang);
     },
 
     /**
      * Handle the update of the given constraint.
-     * @param constraintID the key of the constraint.
-     * @param value the value of the constraint.
-     * @param language the language tag for this value.
+     * @param constraintID {string} the key of the constraint.
+     * @param value {string} the value of the constraint.
+     * @param language {string} the language tag for this value.
      */
     handleConstraint(constraintID, value, language) {
       const shapeID = this.values.id;
 
-      // Check if the user has filled in a value.
+      /* Check if the user has filled in a value. */
       if (value && value !== "") {
         const shape = this.$store.getters.shapeWithID(shapeID);
 
-        // Update or add the value accordingly.
+        /* Update or add the value accordingly. */
         if (shape[constraintID]) {
-          // Update the value of the existing constraint.
+          /* Update the value of the existing constraint if the shape already has this predicate. */
           this.$store.dispatch("updateConstraint", {
             shapeID,
             constraintID,
-            newValue: [
-              {
-                // "@type": XML_DATATYPES.string,
-                "@value": value,
-                "@language": language
-              }
-            ]
+            newValue: [{ "@value": value, "@language": language }]
           });
         } else {
-          // Add the predicate to the shape.
+          /* Add the predicate to the shape if needed. */
           this.$store.dispatch("addPredicate", {
             shapeID,
             predicate: constraintID,
@@ -217,7 +221,7 @@ export default {
           });
         }
       } else {
-        // Delete the value.
+        /* Delete the value if the user has not filled in anything. */
         this.$store.dispatch("deleteConstraintFromShapeWithID", {
           shapeID,
           constraintID
@@ -234,6 +238,7 @@ export default {
 
     /**
      * Update the data values using the properties.
+     * This method is called whenever `this.$props.modalProperties` changes.
      */
     updateValues() {
       const {
@@ -247,7 +252,8 @@ export default {
     },
 
     /**
-     * @returns {boolean} value to indicate the validity of the entered date.
+     * Checks if the entered values are valid.
+     * @returns {boolean} value to indicate if the entered value is valid.
      */
     error() {
       return !(
@@ -256,12 +262,13 @@ export default {
     },
 
     /**
+     * Checks if the entered ID is unique.
      * @returns {boolean} value to indicate if the entered id is unique.
      */
     unique() {
       return (
-        this.values.id === this.$props.modalProperties.id ||
-        !Object.keys(this.$store.getters.shapes).includes(this.values.id)
+        this.values.id === this.$props.modalProperties.id || // The ID hasn't changed.
+        !Object.keys(this.$store.getters.shapes).includes(this.values.id) // The changed ID is unique.
       );
     }
   }

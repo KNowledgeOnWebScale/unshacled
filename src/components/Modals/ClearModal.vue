@@ -29,7 +29,7 @@
 export default {
   name: "ClearModal",
   mounted() {
-    // Focus the clear button when the modal is called.
+    /* Focus the clear button when the modal is called. */
     const self = this;
     this.$store.watch(
       () => self.$store.state.showClearModal,
@@ -40,13 +40,22 @@ export default {
     );
   },
   methods: {
+    /**
+     * Confirm the modal. This will clear the editor and close the modal.
+     */
     confirm() {
       this.$store.commit("clear");
       this.toggleClearModal();
     },
+    /**
+     * Cancel the modal and close it without confirmation.
+     */
     cancel() {
       this.toggleClearModal();
     },
+    /**
+     * Close the modal.
+     */
     toggleClearModal() {
       this.$store.commit("toggleClearModal");
     }

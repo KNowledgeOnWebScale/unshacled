@@ -12,25 +12,15 @@
         <sui-form-fields>
           <sui-form-field
             class="four wide field"
-            :class="{
-              error: prefix !== '' && !validPrefix()
-            }"
+            :class="{ error: prefix !== '' && !validPrefix() }"
           >
-            <input
-              id="prefixField"
-              placeholder="Prefix"
-              @input="e => (prefix = e.target.value)"
-            />
+            <input id="prefixField" v-model="prefix" placeholder="Prefix" />
           </sui-form-field>
           <sui-form-field
             class="eleven wide field"
             :class="{ error: uri !== '' && !validURI() }"
           >
-            <input
-              id="uriField"
-              placeholder="URI"
-              @input="e => (uri = e.target.value)"
-            />
+            <input id="uriField" v-model="uri" placeholder="URI" />
           </sui-form-field>
           <sui-form-field class="one wide field">
             <sui-button
@@ -60,6 +50,11 @@ export default {
   components: {
     NamespaceTable
   },
+  /**
+   * Prefix {string} the prefix that is currently filled in.
+   * URI {string} the uri that is currently filled in.
+   * @returns {{prefix: string, uri: string}}
+   */
   data() {
     return {
       prefix: "",
@@ -68,29 +63,30 @@ export default {
   },
   methods: {
     /**
-     * Close the modal.
+     * Close the modal and clear the entered values.
      */
     closeModal() {
       this.$store.commit("toggleNamespaceModal", false);
+      this.prefix = "";
+      this.uri = "";
     },
 
     /**
      * Add the given prefix and URI to the list with namespaces.
+     * Clear the entered values.
      */
     addNamespace() {
       const { prefix, uri } = this;
       if (this.validURI() && this.validPrefix()) {
         this.$store.dispatch("addNewPrefix", { prefix, uri });
-        // Clear the filled in values.
         this.prefix = "";
         this.uri = "";
-        document.getElementById("prefixField").value = "";
-        document.getElementById("uriField").value = "";
       }
     },
 
     /**
      * Check if the entered prefix is valid.
+     * @returns {boolean}
      */
     validPrefix() {
       const { prefix } = this;
@@ -103,6 +99,7 @@ export default {
 
     /**
      * Check if the entered URI is valid.
+     * @returns {boolean}
      */
     validURI() {
       const { uri } = this;
