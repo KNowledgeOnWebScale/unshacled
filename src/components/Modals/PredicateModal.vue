@@ -89,6 +89,7 @@ import {
 import {
   extractUrl,
   isUrl,
+  prefixToUri,
   uriToPrefix,
   urlToName
 } from "../../util/urlParser";
@@ -233,9 +234,15 @@ export default {
         // Set the input to the value of the checkbox, as a string.
         finalInput = inputBool.toString();
       } else if (this.showString() || this.showPaths() || this.showOther()) {
-        // Add the base URL back to the input.
-        const url = extractUrl(input);
-        finalInput = `${url}${urlToName(inputWithoutUrl)}`;
+        finalInput = prefixToUri(
+          this.$store.getters.namespaces,
+          inputWithoutUrl
+        );
+        // Check if the input is an URL or has a prefix.
+        if (!isUrl(finalInput)) {
+          // If not, add the original URL.
+          finalInput = `${extractUrl(input)}${urlToName(inputWithoutUrl)}`;
+        }
       }
       if (this.values.constraintType.includes("integer") && input === "")
         finalInput = "0";

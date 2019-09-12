@@ -349,11 +349,10 @@ const constraintModule = {
      * ShapeID {string} the ID of the shape whose properties we want to get.
      * @param state
      * @param getters
-     * @param rootGetters
      * @returns {function}
      */
-    shapeProperties: (state, getters, rootGetters) => shapeID => {
-      const shape = rootGetters.shapeWithID(shapeID);
+    shapeProperties: (state, getters) => shapeID => {
+      const shape = getters.shapeWithID(shapeID);
       const propertyObjects = shape[TERM.property];
       const properties = [];
 
