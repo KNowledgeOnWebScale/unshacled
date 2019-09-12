@@ -1,7 +1,7 @@
 import ShaclTranslator from "./shaclTranslator";
 import language from "../util/enums/languages";
 /**
- *  TranslatorManager assigns translation tasks to the correct translator
+ * The TranslatorManager assigns translation tasks to the correct translator.
  */
 export default class TranslatorManager {
   /**

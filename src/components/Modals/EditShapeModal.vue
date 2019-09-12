@@ -30,7 +30,7 @@
             </sui-label>
           </sui-form-field>
           <sui-form-fields class="two">
-            <sui-form-field class="fourteen wide">
+            <sui-form-field class="twelve wide">
               <label for="label">
                 <!-- Node shape has a label, property shape has a name. -->
                 {{ this.$props.modalProperties.nodeShape ? "Label" : "Name" }}
@@ -41,37 +41,45 @@
                 @keyup="handleKeyPress"
               />
             </sui-form-field>
-            <sui-form-field class="two wide">
+            <sui-form-field class="four wide">
               <label for="labelLang">Language</label>
               <select
                 id="labelLang"
                 v-model="values.labelLang"
                 class="ui fluid dropdown"
               >
-                <option v-for="language of getLanguageTags()" :key="language">
-                  {{ language }}
+                <option
+                  v-for="language of getLanguageTags()"
+                  :key="language"
+                  :value="language"
+                >
+                  {{ getLanguages()[language].name }}
                 </option>
               </select>
             </sui-form-field>
           </sui-form-fields>
 
           <sui-form-fields class="two">
-            <sui-form-field class="fourteen wide">
+            <sui-form-field class="twelve wide">
               <label for="description">Description</label>
               <input
                 id="description"
                 v-model="values.description"
                 @keyup="handleKeyPress"
             /></sui-form-field>
-            <sui-form-field class="two wide">
+            <sui-form-field class="four wide">
               <label for="descrLang">Language</label>
               <select
                 id="descrLang"
                 v-model="values.descrLang"
                 class="ui fluid dropdown"
               >
-                <option v-for="language of getLanguageTags()" :key="language">
-                  {{ language }}
+                <option
+                  v-for="language of getLanguageTags()"
+                  :key="language"
+                  :value="language"
+                >
+                  {{ getLanguages()[language].name }}
                 </option>
               </select>
             </sui-form-field>
@@ -93,7 +101,7 @@ import { XML_DATATYPES } from "../../util";
 import { TERM } from "../../translation/terminology";
 import { BLANK_REGEX, ENTER, IRI_REGEX, LABEL } from "../../util/constants";
 import getValueType from "../../util/enums/ValueType";
-import isoLangs from "../../util/enums/isoLangs";
+import isoLangs, {isoLangsByName} from "../../util/enums/isoLangs";
 
 export default {
   name: "EditShapeModal",
@@ -151,7 +159,11 @@ export default {
      * @returns {[]}
      */
     getLanguageTags() {
-      return Object.keys(isoLangs).sort();
+      const sortedLangs = Object.keys(isoLangsByName()).sort();
+      return sortedLangs.map(lang => isoLangsByName()[lang]);
+    },
+    getLanguages() {
+      return isoLangs;
     },
 
     /**

@@ -1,5 +1,5 @@
+/** This dictionary maps every internal term to the SHACL equivalent and vice versa. */
 const dictionary = {
-
   SHACL: {
     "https://2019.summerofcode.be/unshacled#AbstractResult":
       "http://www.w3.org/ns/shacl#AbstractResult",
