@@ -1,5 +1,9 @@
 import Vue from "vue";
 
+/**
+ * This module contains all the state data related to the namespace modal.
+ * @type {{mutations: {toggleNamespaceModal(*=, boolean=): void, clearTableEdit(*=): void, startEditingNamespace(*=, {editRow: string, editField: string}): void}, state: {editField: string, editRow: string, show: boolean}, actions: {addNewPrefix({commit: *}, {prefix: string, uri: string}): void}}}
+ */
 const namespaceModalModule = {
   state: {
     show: false,
@@ -37,6 +41,7 @@ const namespaceModalModule = {
       Vue.set(state, "editField", "");
     }
   },
+
   actions: {
     /**
      * Add a new entry with the given prefix and URI.

@@ -101,7 +101,7 @@ import { XML_DATATYPES } from "../../util";
 import { TERM } from "../../translation/terminology";
 import { BLANK_REGEX, ENTER, IRI_REGEX, LABEL } from "../../util/constants";
 import getValueType from "../../util/enums/ValueType";
-import isoLangs, {isoLangsByName} from "../../util/enums/isoLangs";
+import isoLangs, { isoLangsByName } from "../../util/enums/isoLangs";
 
 export default {
   name: "EditShapeModal",
