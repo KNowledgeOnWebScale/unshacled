@@ -44,10 +44,12 @@
                 >
                   <sui-table-cell class="one wide">
                     <sui-checkbox
-                      v-model="getSelected()[prefix]"
+                      :id="prefix"
+                      v-model="currentBaseURI"
+                      :value="getURI(prefix)"
                       class="clickable"
                       radio
-                      @click="updateBaseUri(prefix)"
+                      @mouseup="updateBaseUri(prefix)"
                     ></sui-checkbox>
                   </sui-table-cell>
 
@@ -74,7 +76,6 @@
                   <sui-table-cell class="one wide">
                     <sui-icon
                       v-if="!isBaseURI(prefix)"
-                      v-model="selected.prefix"
                       class="clickable"
                       name="x icon"
                       @click="deleteElement(prefix)"
@@ -104,7 +105,7 @@ export default {
   data() {
     return {
       input: "",
-      selected: {}
+      currentBaseURI: ""
     };
   },
   mounted() {
@@ -121,6 +122,14 @@ export default {
       () => {
         const { editRow, editField } = self.$props.tableProperties;
         if (editRow !== "" && editField !== "") self.stopEditing();
+      }
+    );
+
+    /* Set the value of the current base URI to match the store state. */
+    this.$store.watch(
+      () => self.$store.getters.baseURI,
+      () => {
+        this.currentBaseURI = self.$store.getters.baseURI;
       }
     );
   },
@@ -165,7 +174,12 @@ export default {
      * Update the base URI to the URI corresponding to the given prefix.
      */
     updateBaseUri(prefix) {
-      this.$store.commit("setBaseUri", { prefix });
+      const uri = this.$store.getters.namespaces[prefix];
+      const { baseURI } = this.$store.state.mConfig;
+      if (uri === baseURI) {
+        document.getElementById(prefix).childNodes[0].checked = false;
+      }
+      this.$store.commit("setBaseUri", { uri: uri === baseURI ? "" : uri });
     },
 
     /**
@@ -234,16 +248,13 @@ export default {
     },
 
     /**
-     * Get the available prefixes mapped to their checked value.
-     * @returns {{string: boolean}} map of prefixes to a boolean value which indicates if their radio checkbox is checked.
+     * Get the full URI for the given prefix.
+     * @param {string} prefix the prefix we want to get the URI from.
+     * @returns {string} the URI associated to the given prefix.
      */
-    getSelected() {
-      const { baseURI, namespaces } = this.$store.getters;
-      const selected = {};
-      Object.keys(namespaces).map(prefix => {
-        selected[prefix] = namespaces[prefix] === baseURI;
-      });
-      return selected;
+    getURI(prefix) {
+      const { namespaces } = this.$store.getters;
+      return namespaces[prefix];
     }
   }
 };

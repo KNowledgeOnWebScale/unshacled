@@ -90,13 +90,18 @@ const configModule = {
 
     /**
      * Set the current base URI to the given URI (if given) or to the URI corresponding to the given prefix.
+     * If the current base URI is identical to the given URI, then clear the base URI.
      * @param state
      * @param {string} uri the URI of the namespace we want to set as base.
      * @param {string} prefix the prefix of the namespace we want to set as base.
      */
     setBaseUri(state, { uri, prefix }) {
-      if (uri) Vue.set(state, "baseURI", uri);
-      if (prefix) Vue.set(state, "baseURI", state.namespaces[prefix]);
+      if (uri === "") {
+        Vue.set(state, "baseURI", "");
+      } else {
+        if (prefix) uri = state.namespaces[prefix];
+        Vue.set(state, "baseURI", uri);
+      }
     }
   },
   actions: {
