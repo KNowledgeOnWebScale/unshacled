@@ -156,19 +156,24 @@ export default {
   methods: {
     /**
      * Get a list of language tags.
-     * @returns {[]}
+     * @returns {[string]}
      */
     getLanguageTags() {
       const sortedLangs = Object.keys(isoLangsByName()).sort();
       return sortedLangs.map(lang => isoLangsByName()[lang]);
     },
+    /**
+     * Get the language tags mapped to their language object.
+     * `isoLangs` cannot be called directly from HTML.
+     * @returns {object} map of language tags to language object.
+     */
     getLanguages() {
       return isoLangs;
     },
 
     /**
      * Confirm when the user presses the enter key.
-     * @param e key press event
+     * @param e {*} key press event
      */
     handleKeyPress(e) {
       if (e.keyCode === ENTER && !this.error()) this.confirm();

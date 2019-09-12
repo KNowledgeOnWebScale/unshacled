@@ -6521,8 +6521,8 @@ export function tableContents(namespaces) {
 
 /**
  * Get the constraint category of the constraint with the given ID.
- * @param constraintID
- * @returns {string}
+ * @param constraintID {string} the ID of the constraint we want to get the category from.
+ * @returns {string} the category of the given constraint.
  */
 export function getConstraintCategory(constraintID) {
   constraintID = ShaclTranslator.toSHACLSimple(constraintID);
@@ -6533,15 +6533,15 @@ export function getConstraintCategory(constraintID) {
 
 /**
  * Get the value type of the constraint with the given ID.
- * @param constraint
+ * @param constraintID {string} the ID of the constraint whose value type we want to determine.
  * @returns {string} possible values:
  *                    Class, Datatype,  NodeKind, List
  *                    Property, PropertyShape, NodeShape, Shape
  *                    integer, string, boolean
  */
-export function getConstraintValueType(constraint) {
+export function getConstraintValueType(constraintID) {
   const object = json.filter(
-    c => c["@id"] === ShaclTranslator.toSHACLSimple(constraint)
+    c => c["@id"] === ShaclTranslator.toSHACLSimple(constraintID)
   )[0];
   const range = object["http://www.w3.org/2000/01/rdf-schema#range"];
   return range ? ShaclTranslator.toModelSimple(range[0]["@id"]) : "";

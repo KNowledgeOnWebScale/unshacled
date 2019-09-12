@@ -1,6 +1,10 @@
 import { TERM } from "../../translation/terminology";
 import { LABEL } from "../constants";
 
+/**
+ * The different types of values.
+ * @type {{ID: string, VALUE: string, ID_LIST: string, LIST: string, VALUE_LIST: string}}
+ */
 export const ValueTypes = {
   ID: "id",
   VALUE: "type",
@@ -50,21 +54,21 @@ const valueLists = new Set([TERM.ignoredProperties, TERM.languageIn, TERM.in]);
 const idLists = new Set([TERM.and, TERM.or, TERM.xone]);
 
 /**
- * Get the value type of the given url.
- * @param url
+ * Get the value type of the given predicate.
+ * @param predicate {string} the predicate we want to determine the type of.
  * @returns {string} either "id", "type", or "valueList" or "idList"
  */
-export default function getValueType(url) {
-  if (ids.has(url)) return ValueTypes.ID;
-  if (values.has(url)) return ValueTypes.VALUE;
-  if (valueLists.has(url)) return ValueTypes.VALUE_LIST;
-  if (idLists.has(url)) return ValueTypes.ID_LIST;
+export default function getValueType(predicate) {
+  if (ids.has(predicate)) return ValueTypes.ID;
+  if (values.has(predicate)) return ValueTypes.VALUE;
+  if (valueLists.has(predicate)) return ValueTypes.VALUE_LIST;
+  if (idLists.has(predicate)) return ValueTypes.ID_LIST;
 }
 
 /**
- * Determine the value type of the given constraint.
- * @param constraint
- * @returns {string|null}
+ * Determine the value type of the given constraint object.
+ * @param constraint {object} constraint object with values.
+ * @returns {string|null} the value type of this constraint.
  */
 export function getValueTypeFromConstraint(constraint) {
   if (constraint.length > 0) {

@@ -1,5 +1,5 @@
 <template>
-  <div class="fill-height">
+  <div style="height: 96%;">
     <sui-segment basic style="padding-bottom: 0;">
       <sui-grid :columns="3">
         <sui-grid-column :width="4">
@@ -29,7 +29,7 @@
 
     <sui-divider style="margin-bottom: 0;" />
 
-    <div id="textContainer" class="fill-height">
+    <div id="textContainer" style="height: 95%">
       <textarea v-if="dataText !== ''" v-model="dataText"></textarea>
       <sui-segment v-if="dataText === ''" basic>
         No data loaded.
@@ -115,8 +115,5 @@ textarea {
   resize: none;
   height: 100%;
   width: 100%;
-}
-.fill-height {
-  height: 100%;
 }
 </style>

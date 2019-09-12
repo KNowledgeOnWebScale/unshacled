@@ -1,9 +1,9 @@
 /**
  * Return the nearest point to the given reference on the perimeter of the rectangle
  * defined by the given top left and bottom right coordiantes.
- * @param topLeft
- * @param bottomRight
- * @param reference
+ * @param topLeft {{x: number, y: number}} the top left coordinate of the rectangle.
+ * @param bottomRight {{x: number, y: number}} the bottom right coordinate of the rectangle.
+ * @param reference {{x: number, y: number}} the reference point.
  */
 export function nearestPointOnPerimeter(topLeft, bottomRight, reference) {
   // Reference: https://stackoverflow.com/questions/20453545/how-to-find-the-nearest-point-in-the-perimeter-of-a-rectangle-to-a-given-point
@@ -22,10 +22,10 @@ export function nearestPointOnPerimeter(topLeft, bottomRight, reference) {
 
 /**
  * If the given number is outside of the given boundaries, then return the respecitve boundary.
- * @param a the reference number
- * @param lower the lower boundary
- * @param upper the upper boundary
- * @returns {number}
+ * @param a {number} the reference number.
+ * @param lower {number} the lower boundary.
+ * @param upper {number} the upper boundary.
+ * @returns {number} a if a is between the given boundaries, otherwise one of the boundaries.
  */
 function clamp(a, lower, upper) {
   return Math.max(lower, Math.min(a, upper));
@@ -33,11 +33,11 @@ function clamp(a, lower, upper) {
 
 /**
  * Calculate the distance between the two given points.
- * @returns {number}
- * @param x1
- * @param y1
- * @param x2
- * @param y2
+ * @param x1 {number} the x coordinate of the first point.
+ * @param y1 {number} the y coordinate of the first point.
+ * @param x2 {number} the x coordinate of the second point.
+ * @param y2 {number} the y coordinate of the second point.
+ * @returns {number} the distance between the given points.
  */
 export function distance(x1, y1, x2, y2) {
   return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));

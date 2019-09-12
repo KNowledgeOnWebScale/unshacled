@@ -1,6 +1,6 @@
 import Vue from "vue";
 import { clone } from "ramda";
-import {IDENTIFIER} from "./constants";
+import { IDENTIFIER } from "./constants";
 
 export { default as getNonOverlappingCoordinates } from "./getNonOverlappingCoordinates"; // prettier-ignore
 export { default as traverse } from "./traverse";
