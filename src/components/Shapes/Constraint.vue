@@ -38,13 +38,12 @@
 <script>
 import {
   HEIGHT,
-  CONSTRAINT_SEPARATION_LINE,
   WIDTH,
   CONSTRAINT_CONFIG,
   CONSTRAINT_TEXT_CONFIG,
-  DELTA_Y_TEXT,
+  CONSTRAINT_SEPARATION_LINE,
   DELETE_BUTTON_CONFIG,
-  DELTA_Y_DELETE,
+  TEXT_OFFSET,
   MAX_LENGTH,
   pointerCursor,
   textCursor,
@@ -80,6 +79,18 @@ export default {
       default: "black"
     }
   },
+  /**
+   * HoverKey {boolean} indicates if the mouse is hovering over the key of the constraint.
+   * HoverValues {boolean} indicates if the mouse is hovering over the values of the constraint.
+   *
+   * LineConfig {} the configuration of the line that seperates the key and the value.
+   * RectangleConfig {} the configuration of the rectangle.
+   * KeyConfig {} the configuration of the key text field.
+   * ValueConfig {} the configuration of the value text field.
+   * DeleteConstraintConfig {} the configuration of the delete button.
+   *
+   * @returns {{hoverKey: boolean, hoverValues: boolean, lineConfig: {}, rectangleConfig: {}, keyConfig: {}, valueConfig: {}, deleteConstraintConfig: {}}}
+   */
   data() {
     return {
       hoverKey: false,
@@ -95,7 +106,7 @@ export default {
       },
       keyConfig: {
         ...CONSTRAINT_TEXT_CONFIG,
-        y: DELTA_Y_TEXT,
+        y: TEXT_OFFSET,
         fontStyle: "italic",
         text: uriToPrefix(
           this.$store.state.mConfig.namespaces,
@@ -104,11 +115,11 @@ export default {
       },
       valueConfig: {
         ...CONSTRAINT_TEXT_CONFIG,
-        y: DELTA_Y_TEXT + HEIGHT
+        y: TEXT_OFFSET + HEIGHT
       },
       deleteConstraintConfig: {
         ...DELETE_BUTTON_CONFIG,
-        y: DELTA_Y_DELETE
+        y: HEIGHT / 2
       }
     };
   },
@@ -116,6 +127,7 @@ export default {
     /* EDIT/DELETE  ================================================================================================= */
 
     /**
+     * Check if this constraint can be removed.
      * @returns {boolean} value that indicates if this constraint can be removed from the shape.
      */
     canBeDeleted() {
@@ -124,7 +136,9 @@ export default {
 
     /**
      * Start editing the value of the given constraint.
-     * NOTE: We don't want to edit properties this way; they will be edited using the visual relationships.
+     * NOTE: We don't want to edit every constraint this way.
+     *       Some constraint can be edited using the visual relationships.
+     * @param {number} index the index of the value in the constraint object.
      */
     editValue(index) {
       const { constraintID } = this.$props;
@@ -134,6 +148,7 @@ export default {
         ? ValueType(constraintID)
         : getValueTypeFromConstraint(values);
 
+      // Determine the list we have to iterate over.
       let iter = values;
       if (
         vt.includes(ValueTypes.LIST) &&
@@ -142,15 +157,18 @@ export default {
       ) {
         iter = values[0]["@list"];
       }
+      // Determine the key we have to check.
       const key = vt.includes(ValueTypes.ID) ? "@id" : "@value";
       const value = iter[index][key];
 
       if (constraintID === TERM.path) {
+        /* The path of a property shape is handled differently. */
         this.$store.commit("togglePathModal", {
           shapeID: this.$props.shapeID,
           editing: true
         });
       } else if (!this.isListOfValues()) {
+        /* Lists of values cannot be edited. */
         this.$store.dispatch("startConstraintEdit", {
           shapeID: this.$props.shapeID,
           shapeType: this.$props.nodeShape ? "NodeShape" : "PropertyShape",
@@ -177,7 +195,7 @@ export default {
 
     /**
      * Delete the constraint value at the given index,
-     * @param index
+     * @param {number} index the index of the value in the constraint.
      */
     deleteConstraintValue(index) {
       this.$store.dispatch("deleteConstraintValueWithIndex", {
@@ -194,9 +212,8 @@ export default {
     /* HELPERS ====================================================================================================== */
 
     /**
-     * Returns boolean value which indicates if the current constraint value should be visualized
-     * as a list of values in a single entry.
-     * @returns {boolean}
+     * Checks if the current constraint value should be visualized as a list of values in a single entry.
+     * @returns {boolean} value which indicates if the constraint value should be visualized as a list of values.
      */
     isListOfValues() {
       const { shapeID, constraintID } = this.$props;
@@ -209,8 +226,8 @@ export default {
     },
 
     /**
-     * Get all the constraint values of this predicate.
-     * @returns {[]} a list of values.
+     * Get all the constraint values of this predicate, used to visualize the constraint.
+     * @returns {[string]} a list of all the constraint values as strings.
      */
     getConstraintValues() {
       const { shapeID, constraintID } = this.$props;
@@ -218,18 +235,18 @@ export default {
       const output = [];
 
       if (constraints && constraints[constraintID]) {
-        // Show the full path.
         if (constraintID === TERM.path) {
+          /* Show the full path. */
           return [constraints[constraintID][0]["@id"]];
         }
 
-        // Get the constraint's value type.
+        /* Get the constraint's value type. */
         const values = constraints[constraintID];
         const vt = ValueType(constraintID)
           ? ValueType(constraintID)
           : getValueTypeFromConstraint(constraints[constraintID]);
 
-        // Properties should be listed in a single entry.
+        /* Specified constraint values should be listed in a single entry. */
         let iter;
         if (this.isListOfValues()) {
           iter =
@@ -240,7 +257,7 @@ export default {
           iter = values;
         }
 
-        // Other constraints should be visualized as an array of their value representations.
+        /* Other constraints should be visualized as an array of their value representations. */
         if (
           vt.includes(ValueTypes.LIST) &&
           values.length === 1 &&
@@ -251,16 +268,15 @@ export default {
         for (const v of iter) {
           const key = vt.includes(ValueTypes.ID) ? "@id" : "@value";
           const name = v[key] ? v[key] : v;
-          // If the shape has a label, use it.
+          /* If the shape has a label, abbreviate and use it. */
           const text =
-            this.$store.getters.labelForId(name) ||
+            this.$store.getters.labelsForIds[name] ||
             uriToPrefix(this.$store.state.mConfig.namespaces, name);
-          // Abbreviate the label.
           output.push(abbreviate(text));
         }
         if (this.isListOfValues()) {
           const joined = output.join(", ");
-          // Abbreviate the label of every element depending on the number of elements in the list.
+          /* Abbreviate the label of every element depending on the number of elements in the list. */
           if (joined.length > MAX_LENGTH - 8) {
             return [
               output
@@ -275,14 +291,15 @@ export default {
     },
 
     /**
-     * Get the number of constraint values.
-     * @returns {number}
+     * Get the number of constraint values in this constraint.
+     * This is used to determine the size of the rectangle.
+     * @returns {number} the number of constraint values.
      */
     getNumConstraintValues() {
       const { shapeID, constraintID } = this.$props;
       const cvs = this.$store.getters.shapeWithID(shapeID)[constraintID];
       return SINGLE_ENTRY.includes(urlToName(constraintID))
-        ? 1 // For `property`, these will be listed as a single value.
+        ? 1 /* For certain constraints, the values will be listed as a single value. */
         : cvs.length > 0 && cvs[0]["@list"]
         ? cvs[0]["@list"].length // Get the number of elements if it's a list.
         : cvs.length;
@@ -291,8 +308,8 @@ export default {
     /* CONFIGURATIONS =============================================================================================== */
 
     /**
-     * Return the y value of this constraint.
-     * @returns {*}
+     * Get the y value of this constraint.
+     * @returns {number} the y value of this constraint.
      */
     getYValue() {
       return this.$store.state.mShape.mCoordinate.yValues[this.$props.shapeID][
@@ -302,9 +319,11 @@ export default {
 
     /**
      * Get the configurations for the different visualization components.
-     * This is mainly to set the y values and heights of the different components.
+     * This is mainly to dynamically set the y values and heights of the different components.
+     * @returns {{lineConfig: object, rectangleConfig: object, keyConfig: object, valueConfig: object, deleteConstraint: object}}
      */
     getConfigs() {
+      /* Determine the current y value. */
       const y = this.getYValue();
       const points = [...this.lineConfig.points];
       points[1] += y;
@@ -335,12 +354,13 @@ export default {
     /**
      * Get the configuration for a constraint value.
      * This will set the y coordinate and the text using the given value and index.
-     * @param value text that should be visualized in this constraint component.
-     * @param index the index of the constraint value.
-     * @returns {{y: *, text: *}}
+     * @param {string} value text that should be visualized in this constraint component.
+     * @param {number} index the index of the constraint value.
+     * @returns {{y: number, text: string}}
      */
     getValueConfig(value, index) {
       const text = uriToPrefix(this.$store.state.mConfig.namespaces, value);
+      // Determine if the value has to move up to free up space for the label/name.
       const move = text.length - 2 > MAX_LENGTH ? -HEIGHT / 6 : 0;
       return {
         ...this.valueConfig,
@@ -350,9 +370,9 @@ export default {
     },
 
     /**
-     * Delete the configuration of the delete button for the constraint value at the given index.
-     * @param index the index of the constraint value.
-     * @returns {{y: *}}
+     * Get the configuration of the delete button for the constraint value at the given index.
+     * @param {number} index the index of the constraint value.
+     * @returns {object} the configuration object with an updated y value.
      */
     getDeleteValueConfig(index) {
       return {
@@ -366,7 +386,7 @@ export default {
 
     /**
      * Set the cursor type according to the passed argument.
-     * @param type {string}
+     * @param {string} type the type of pointer we want to use: "pointer" || "text"
      */
     setCursor(type) {
       if (type === "pointer") pointerCursor();

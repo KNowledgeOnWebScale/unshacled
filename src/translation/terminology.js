@@ -1,5 +1,6 @@
 export const CUSTOM_URI = "https://2019.summerofcode.be/unshacled#";
 
+/** This dictionary maps every term to its corresponding internal model URI. */
 export const TERM = {
   AbstractResult: `${CUSTOM_URI}AbstractResult`,
   AndConstraintComponent: `${CUSTOM_URI}AndConstraintComponent`,

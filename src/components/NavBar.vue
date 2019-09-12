@@ -1,6 +1,6 @@
 <template>
   <div>
-    <sui-menu ref="navbar" attached="top" inverted>
+    <sui-menu id="navbar" ref="navbar" attached="top" inverted>
       <sui-dropdown item icon="file alternate" simple>
         <sui-dropdown-menu>
           <sui-dropdown-item @click="$refs.importShapes.click()">
@@ -130,6 +130,11 @@ export default {
     ValidationReportModal,
     PredicateModal
   },
+  /**
+   * Get the string representations of the given languages.
+   * Used because the values from `languages` cannot be referenced directly from the HTML.
+   * @returns {{shacl: *, shex: *}}
+   */
   data() {
     return {
       shacl: languages.SHACL,
@@ -137,39 +142,53 @@ export default {
     };
   },
   methods: {
+    /** Toggle the visibility of the clear modal. */
     toggleClearModal() {
       this.$store.commit("toggleClearModal");
     },
+    /** Toggle the visibility of the namespace modal. */
     toggleNamespaceModal() {
       this.$store.commit("toggleNamespaceModal");
     },
+
+    /** Create a new node shape. */
     createNodeShape() {
       this.$store.dispatch("addNodeShape");
     },
+    /** Toggle the visibility of the path modal to add a new property. */
     createPropertyShape() {
       this.$store.commit("togglePathModal", {});
     },
 
+    /** Load the example. */
     loadExample() {
       this.$store.dispatch("loadExample");
     },
 
+    /** Read the entered text file and upload it as the new model. */
     readTextFile() {
       const file = document.getElementById("file").files[0];
       this.$store.dispatch("uploadSchemaFile", file);
     },
+    /** Toggle the export modal using the given file type. */
     exportFile(type) {
       this.$store.commit("toggleExportModal", type);
     },
+    /** Read the entered data file and upload it as the new data. */
     uploadDataFile() {
       const file = document.getElementById("dataFile").files[0];
       this.$store.dispatch("uploadDataFile", file);
     },
+    /**
+     * Check if there is a data file loaded.
+     * @returns {boolean} `true` if there is at least one data file loaded.
+     */
     dataFileUploaded() {
       return this.$store.state.mData.dataFile.length > 0;
     },
+    /** Validate the data using the current model. */
     validate() {
-      this.$store.dispatch("validate");
+      this.$store.dispatch("validateWithCurrentModel");
     }
   }
 };

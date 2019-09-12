@@ -10,7 +10,7 @@ const namespaceModalModule = {
     /**
      * Toggle the visibility of the namespace modal.
      * @param state
-     * @param bool {boolean} indicates if the modal should be shown.
+     * @param {boolean} bool indicates if the modal should be shown.
      */
     toggleNamespaceModal(state, bool = true) {
       event.preventDefault();
@@ -20,8 +20,8 @@ const namespaceModalModule = {
     /**
      * Start editing the given row and field.
      * @param state
-     * @param editRow {string} the prefix of the row we want to edit.
-     * @param editField {string} the field we want to edit; either 'prefix' or 'uri'
+     * @param {string} editRow the prefix of the row we want to edit.
+     * @param {string} editField the field we want to edit; either 'prefix' or 'uri'
      */
     startEditingNamespace(state, { editRow, editField }) {
       Vue.set(state, "editRow", editRow);
@@ -41,8 +41,8 @@ const namespaceModalModule = {
     /**
      * Add a new entry with the given prefix and URI.
      * @param commit
-     * @param prefix {string}
-     * @param uri {string}
+     * @param {string} prefix the prefix of the new entry.
+     * @param {string} uri the URI of the new entry.
      */
     addNewPrefix({ commit }, { prefix, uri }) {
       commit("addPrefix", { prefix, uri });

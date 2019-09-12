@@ -2,14 +2,14 @@ import ShaclValidator from "./shaclValidator";
 import languages from "../util/enums/languages";
 
 /**
- *  ValidatorManager assigns validation tasks to the correct translator
+ * The ValidatorManager assigns validation tasks to the correct validator.
  */
 export default class ValidatorManager {
   /**
    * TODO support multiple formats (ttl, n3, ...)
-   * @param data Data in turtle
-   * @param shapes Constraint shapes in turtle
-   * @param language Constraint language e.g. SHACL
+   * @param data {object} data in Turtle.
+   * @param shapes {object} constraint shapes in Turtle.
+   * @param language {string} constraint language, e.g. SHACL.
    * @returns {Promise<any>}
    */
   static validate(data, shapes, language) {

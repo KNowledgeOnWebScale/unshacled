@@ -7,8 +7,8 @@ import XMLSerializer from "./xmlSerializer";
 export default class SerializerManager {
   /**
    * Takes a JSON-LD document and a desired format type, returns the document in given format type.
-   * @param doc RDF document in JSON-LD
-   * @param type Format type e.g. "text/turtle"
+   * @param {string} doc RDF document in JSON-LD
+   * @param {string} type Format type e.g. "text/turtle"
    * @returns {Promise<Object>} Promise which resolves to RDF in given format type
    */
   static serialize(doc, type) {

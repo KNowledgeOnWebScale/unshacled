@@ -89,6 +89,7 @@ import {
 import {
   extractUrl,
   isUrl,
+  prefixToUri,
   uriToPrefix,
   urlToName
 } from "../../util/urlParser";
@@ -106,10 +107,20 @@ export default {
       type: Object
     }
   },
+  /**
+   * Category {string} the category of the selected predicate.
+   * Predicate {string} the selected predicate.
+   * Input {string} the current input value.
+   * InputBool {boolean} the current input value as a boolean, if applicable.
+   * Object {string}
+   * ConstraintType {string} the constraint type of the selected predicate.
+   * Search {string} the currently entered search/filter value.
+   * Error {boolean} indicates if the current input is invalid.
+   * @returns {{values: {predicate: string, input: string, constraintType: string, inputBool: boolean, search: string, category: string, object: string}, error: boolean}}
+   */
   data() {
     return {
       values: {
-        urls: {},
         category: "",
         predicate: "",
         input: "",
@@ -146,7 +157,7 @@ export default {
       }
     );
 
-    // Focus the input field when the modal is called.
+    /* Focus the input field when the modal is called. */
     this.$store.watch(
       () => self.$store.state.mShape.mConstraint.mModal.show,
       () => {
@@ -160,6 +171,7 @@ export default {
   methods: {
     /**
      * Get the values passed on by the parent.
+     * This method is called when `this.$props.modalProperties` is updated.
      */
     updateValues() {
       const { selected, input } = this.$props.modalProperties;
@@ -179,16 +191,17 @@ export default {
     },
 
     /**
-     * Toggle the visibility of the modal.
+     * Toggle the visibility of the modal and reset its values.
      */
     toggleModal() {
       this.$store.commit("togglePredicateModal", {});
-      this.reset(); // Reset modal values
+      this.reset();
     },
 
     /**
      * Returns the contents of the table.
      * This method exists since `tableContents()` cannot be called directly from the HTML above.
+     * @returns {[]} list of constraint objects meant for visualization.
      */
     table() {
       return tableContents(this.$store.state.mConfig.namespaces);
@@ -196,7 +209,7 @@ export default {
 
     /**
      * Execute the changes.
-     * Close the modal.
+     * Close and reset the modal.
      */
     exit() {
       const {
@@ -210,7 +223,7 @@ export default {
       const valueType = ValueType(predicate);
       this.error = valueType === undefined;
 
-      // Add the `schema` url to the path input if necessary.
+      /* Add the `schema` url to the path input if necessary. */
       if (category.includes("Property Pair")) {
         if (!isUrl(input)) {
           finalInput = `${SCHEMA_URI}${input}`;
@@ -221,9 +234,15 @@ export default {
         // Set the input to the value of the checkbox, as a string.
         finalInput = inputBool.toString();
       } else if (this.showString() || this.showPaths() || this.showOther()) {
-        // Add the base URL back to the input.
-        const url = extractUrl(input);
-        finalInput = `${url}${urlToName(inputWithoutUrl)}`;
+        finalInput = prefixToUri(
+          this.$store.getters.namespaces,
+          inputWithoutUrl
+        );
+        // Check if the input is an URL or has a prefix.
+        if (!isUrl(finalInput)) {
+          // If not, add the original URL.
+          finalInput = `${extractUrl(input)}${urlToName(inputWithoutUrl)}`;
+        }
       }
       if (this.values.constraintType.includes("integer") && input === "")
         finalInput = "0";
@@ -234,18 +253,17 @@ export default {
           valueType,
           shapeID: this.$props.modalProperties.shapeID,
           input: finalInput,
-          object: this.$store.getters.objects(predicate)[0]
+          inputType: this.$store.getters.objects(predicate)[0]
         });
         this.reset();
       }
     },
 
     /**
-     * Reset the data from the modal.
+     * Reset the data from the modal and deselect the selected row.
      */
     reset() {
       this.values = {
-        urls: {},
         category: "",
         predicate: "",
         input: "",
@@ -254,14 +272,15 @@ export default {
         search: ""
       };
       this.error = false;
-      // Deselect the selected row.
       this.$store.commit("selectRow", { key: "" });
     },
 
     /* INPUT FIELD HELPERS ========================================================================================== */
 
     /**
-     * Get the wanted model.
+     * Get the wanted input model.
+     * This determines which input field will be shown.
+     * @returns {string} "inputBool" || "inputWithoutUrl" || "input
      */
     getModel() {
       return this.showCheckbox()
@@ -273,6 +292,8 @@ export default {
 
     /**
      * Get the wanted input type.
+     * This determines the type of the input field.
+     * @returns {string} "checkbox" || "number" || "text"
      */
     getType() {
       return this.showCheckbox()
@@ -283,7 +304,8 @@ export default {
     },
 
     /**
-     * Get the wanted data list.
+     * Get the wanted data list that should be used for the input field.
+     * @returns {string} "pathList" || "shapeList" || ""
      */
     getDataList() {
       return this.showPaths()
@@ -294,8 +316,8 @@ export default {
     },
 
     /**
-     * Confirm on enter press.
-     * @param e key press event
+     * Confirm the modal when the user presses the enter key.
+     * @param {any} e key press event
      */
     handleKeyPress(e) {
       if (e.keyCode === ENTER) this.exit();
@@ -342,7 +364,7 @@ export default {
 
     /**
      * Get the possible options for the datalist object.
-     * @returns {*}
+     * @returns {[]} a (possibly empty) list of shape objects.
      */
     getShapeOptions() {
       const ct = this.values.constraintType.toLocaleLowerCase();
@@ -355,25 +377,28 @@ export default {
 
     /**
      * Get the ID of the given option.
-     * @param key
-     * @returns {*}
+     * This method exists since calling `shape["@id"]` directly in the HTML causes errors.
+     * @param {shape} shape a shape object.
+     * @returns {string} the ID Of the given shape object.
      */
-    getOptionID(key) {
-      return key["@id"];
+    getOptionID(shape) {
+      return shape["@id"];
     },
 
     /**
      * Get the different options for choosing an existing path.
      * The path of the current shape is not an option.
-     * @returns {[]}
+     * @returns {[string]} list of possible paths.
      */
     getPathOptions() {
       const { propertyShapes } = this.$store.getters;
       const pShape = propertyShapes[this.$props.modalProperties.shapeID];
 
+      // Only property shapes have a path.
       let thisPath;
       if (pShape) thisPath = pShape[TERM.path];
 
+      /* Populate the list of paths. */
       const paths = [];
       for (const ps in propertyShapes) {
         const path = propertyShapes[ps][TERM.path];
@@ -388,19 +413,19 @@ export default {
     },
 
     /**
-     * Get the name of the path from the given url.
+     * Get the name of the path from the given URI.
      * Used in the HTML since `urlToName` cannot be used directly.
-     * @param key
-     * @returns {*}
+     * @param {string} uri the URI we want to extract the name from.
+     * @returns {string} the URI with the namespace replaced by the prefix.
      */
-    getName(key) {
-      return uriToPrefix(this.$store.state.mConfig.namespaces, key);
+    getName(uri) {
+      return uriToPrefix(this.$store.state.mConfig.namespaces, uri);
     },
 
     /**
      * Get the possible XML datatypes.
      * Used in the HTML since `XML_DATATYPES` cannot be used directly.
-     * @returns {*[]}
+     * @returns {[string]} a list of possible datatype URIs.
      */
     getDataTypes() {
       return Object.values(XML_DATATYPES);

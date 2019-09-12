@@ -21,12 +21,12 @@ const predicateModalModule = {
     /**
      * Toggle the visibility of the predicate modal.
      * @param state
-     * @param shapeID {string} the ID of the shape.
-     * @param shapeType {string} the type of the shape.
-     * @param editing {boolean} indicates if we are editing a predicate.
-     * @param onExit {string} the action that should be dispatched when the modal is confirmed.
-     * @param selected {string} the prefix of the predicate that is currently selected.
-     * @param input {string} the search term that is currently entered.
+     * @param {string} shapeID the ID of the shape.
+     * @param {string} shapeType the type of the shape.
+     * @param {boolean} editing indicates if we are editing a predicate.
+     * @param {string} onExit the action that should be dispatched when the modal is confirmed.
+     * @param {string} selected the prefix of the predicate that is currently selected.
+     * @param {string} input the search term that is currently entered.
      */
     togglePredicateModal(
       state,
@@ -49,9 +49,9 @@ const predicateModalModule = {
     /**
      * Set the sorting of the table in the predicate modal.
      * @param state
-     * @param sorted {boolean} indicates if the modal is sorted.
-     * @param sortBy {string} the column the modal is sorted on.
-     * @param ascending {boolean} indicates if the column is sorted ascending.
+     * @param {boolean} sorted indicates if the modal is sorted.
+     * @param {string} sortBy the column the modal is sorted on.
+     * @param {boolean} ascending indicates if the column is sorted ascending.
      */
     sortPredicateModal(state, { sorted, sortBy, ascending }) {
       Vue.set(state.sorting, "sorted", sorted);
@@ -63,7 +63,7 @@ const predicateModalModule = {
      * Select the row with the given key (constraint ID).
      * If the row was already selected, then deselect it.
      * @param state
-     * @param key {string} the key of the row that is selected.
+     * @param {string} key the key of the row that is selected.
      */
     selectRow(state, { key }) {
       const selected = state.selected === key ? "" : key;

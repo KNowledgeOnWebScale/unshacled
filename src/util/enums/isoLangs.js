@@ -734,4 +734,16 @@ const isoLangs = {
   }
 };
 
+/**
+ * Get the isoLangs mapped from their name to their language tags.
+ * @returns {object} map of languages to language tags.
+ */
+export function isoLangsByName() {
+  const output = {};
+  Object.keys(isoLangs).map(key => {
+    output[isoLangs[key].name] = key;
+  });
+  return output;
+}
+
 export { isoLangs as default };

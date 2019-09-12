@@ -1,8 +1,9 @@
 /**
- * Helper function to traverse over an object and apply a function
- * @param o Object to be traversed
- * @param func Function that is applied recursively to every property of the object
- * @param args Arguments passed on to the function NOTE: first two arguments are always the index and property
+ * Helper function to traverse over an object and apply a function.
+ * @param {object} o object to be traversed.
+ * @param {function} func function that is applied recursively to every property of the object.
+ * @param {object} args arguments passed on to the function.
+ *        NOTE: first two arguments are always the index and property.
  */
 export default function traverse(o, func, ...args) {
   for (const i in o) {

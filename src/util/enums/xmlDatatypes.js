@@ -1,4 +1,6 @@
-// List of possible XML datatypes.
+/**
+ * List of possible XML datatypes.
+ */
 const XML_DATATYPES = {
   string: "http://www.w3.org/2001/XMLSchema#string",
   boolean: "http://www.w3.org/2001/XMLSchema#boolean",

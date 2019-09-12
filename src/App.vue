@@ -7,7 +7,7 @@
       <div id="dataTextView" class="text-panel">
         <data-text-view :height="getHeight()"></data-text-view>
       </div>
-      <multipane-resizer id="resizer" @drag="handleResize"></multipane-resizer>
+      <multipane-resizer id="resizer"></multipane-resizer>
       <div id="editorContainer" class="fill-height">
         <editor></editor>
       </div>
@@ -35,25 +35,21 @@ export default {
     MultipaneResizer,
     DataTextView
   },
-  mounted() {
-    window.addEventListener("resize", this.handleResize); // React to window resizing.
-    this.handleResize();
-  },
   methods: {
-    handleResize() {},
+    /**
+     * Determine the available height for the data text view.
+     * @returns {number} the available height.
+     */
     getHeight() {
       return window.innerHeight - MARGIN_TOP;
     }
   }
 };
 
-/*
-TODO enable this again
+/* Require approval before closing the page. */
 window.onbeforeunload = function() {
   return "Are you sure you want to quit without saving? Any unsaved progress will be lost.";
 };
-)/
- */
 </script>
 
 <style lang="scss">

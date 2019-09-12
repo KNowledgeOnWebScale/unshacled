@@ -10,8 +10,8 @@ const { quad } = DataFactory;
 export default class N3Serializer {
   /**
    *
-   * @param json JSON-LD representation
-   * @param type Format to serialize to (Turtle, Trig, N-Triples, N-Quads, and Notation3 (N3))
+   * @param {string} json JSON-LD representation
+   * @param {string} type Format to serialize to (Turtle, Trig, N-Triples, N-Quads, and Notation3 (N3))
    * @returns {Promise<any>}
    */
   static serialize(json, type) {

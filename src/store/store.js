@@ -14,9 +14,9 @@ import { TERM } from "../translation/terminology";
 import shapeModule from "./shapeModule";
 import dataModule from "./dataModule";
 import configModule from "./configModule";
-import {exampleData, exampleShapes, exampleShapesJSON} from "../assets/example";
+import { exampleData, exampleShapes } from "../assets/example";
 import ParserManager from "../parsing/parserManager";
-import {ETF} from "../util/enums/extensionToFormat";
+import { ETF } from "../util/enums/extensionToFormat";
 
 Vue.use(Vuex);
 
@@ -41,23 +41,13 @@ export default new Vuex.Store({
     /**
      * Save a reference to the editor.
      * @param state
-     * @param reference
+     * @param {object} editor the editor object.
      */
-    setEditor(state, reference) {
-      state.editor = reference;
+    setEditor(state, editor) {
+      Vue.set(state, "editor", editor);
     },
 
     /* MODALS ======================================================================================================= */
-
-    /**
-     * Show the validation report modal.
-     * @param state
-     */
-    toggleValidationReport(state) {
-      event.preventDefault();
-      state.mData.showValidationReportModal = !state.mData
-        .showValidationReportModal;
-    },
 
     /**
      * Toggle the visibility of the clear modal.
@@ -65,14 +55,14 @@ export default new Vuex.Store({
      */
     toggleClearModal(state) {
       event.preventDefault();
-      state.showClearModal = !state.showClearModal;
+      Vue.set(state, "showClearModal", !state.showClearModal);
     },
 
     /**
      * Toggle the visibility of the path modal.
      * @param state
-     * @param editing {boolean}
-     * @param shapeID {string}
+     * @param {boolean} editing indicates if we are editing the path; default: false.
+     * @param {string} shapeID the ID of the shape whose path we are editing; default: "".
      */
     togglePathModal(state, { editing, shapeID }) {
       event.preventDefault();
@@ -85,12 +75,12 @@ export default new Vuex.Store({
     /**
      * Toggle the visibility of the export modal.
      * @param state
-     * @param type
+     * @param {string} type the type of file we want to export.
      */
     toggleExportModal(state, type) {
-      this.state.exportType = type;
       event.preventDefault();
-      state.showExportModal = !state.showExportModal;
+      Vue.set(state, "exportType", type);
+      Vue.set(state, "showExportModal", !state.showExportModal);
     }
   },
   actions: {
@@ -99,31 +89,34 @@ export default new Vuex.Store({
      */
     loadExample({ getters }) {
       const self = this;
-      this.commit("clear"); // Clear the existing data first.
+      /* Clear the existing data first. */
+      this.commit("clear");
+      /* Set the new data. */
       this.commit("setData", {
         name: "example.ttl",
         contents: exampleData,
         extension: "ttl"
-      }); // Set the data.
+      });
+      /* Set the new model. */
       ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
-        self.commit("setModel", { model, getters }); // Set the shapes.
+        self.commit("setModel", { model, getters });
       });
     }
   },
   getters: {
     /**
-     * Returns the Json Internal model.
+     * Returns the internal model in SHACL, JSON format.
      * @param state
-     * @returns {*}
+     * @returns {any} SHACL model in JSON
      */
     internalModelToJson: state => {
       return ShaclTranslator.toSHACLSimple(state.mShape.model);
     },
 
     /**
-     * Returns the internal model in ttl format.
+     * Returns the internal model in SHACL, Turtle format.
      * @param state
-     * @returns {any}
+     * @returns {any} SHACL model, Turtle
      */
     internalModelToTurtle: state => {
       return TranslatorManager.translateToLanguage(
@@ -134,7 +127,8 @@ export default new Vuex.Store({
 
     /**
      * Get the possible predicates for the given value type.
-     * @returns {function(*): string[]}
+     * Type {string} the given value type.
+     * @returns {function} getter
      */
     predicates: () => type => {
       return possiblePredicates(TERM[type]);
@@ -142,6 +136,8 @@ export default new Vuex.Store({
 
     /**
      * Get the possible object for the currently set predicate.
+     * Predicate {string} the currently set predicate.
+     * @returns {function} getter
      */
     objects: () => predicate => {
       return possibleObjects(predicate);

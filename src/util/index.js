@@ -1,6 +1,6 @@
 import Vue from "vue";
 import { clone } from "ramda";
-import {IDENTIFIER} from "./constants";
+import { IDENTIFIER } from "./constants";
 
 export { default as getNonOverlappingCoordinates } from "./getNonOverlappingCoordinates"; // prettier-ignore
 export { default as traverse } from "./traverse";
@@ -8,8 +8,8 @@ export { default as XML_DATATYPES } from "./enums/xmlDatatypes";
 
 /**
  * Prompt to download a file with the given filename and contents.
- * @param filename
- * @param contents
+ * @param {string} filename the name of the file we want to download.
+ * @param {string} contents the contents of the file.
  */
 export function downloadFile(filename, contents) {
   const element = document.createElement("a");
@@ -46,7 +46,7 @@ export function groupBy(dictionary, key, deleteKey = false) {
 }
 
 /**
- * Swap the keys and values form `namespaces`.
+ * Swap the keys and values from `namespaces`.
  */
 export function swapKeyValue(object) {
   const output = {};
@@ -62,5 +62,9 @@ export function swapKeyValue(object) {
  * @returns {string}
  */
 export function generateUUID(baseURI) {
-  return `${baseURI}${IDENTIFIER}/${require("uuid/v4")()}`;
+  if (baseURI === "") {
+    return `${IDENTIFIER}/${require("uuid/v4")()}`;
+  } else {
+    return `${baseURI}${require("uuid/v4")()}`;
+  }
 }

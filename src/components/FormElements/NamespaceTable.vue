@@ -44,10 +44,12 @@
                 >
                   <sui-table-cell class="one wide">
                     <sui-checkbox
-                      v-model="getSelected()[prefix]"
+                      :id="prefix"
+                      v-model="currentBaseURI"
+                      :value="getURI(prefix)"
                       class="clickable"
                       radio
-                      @click="updateBaseUri(prefix)"
+                      @mouseup="updateBaseUri(prefix)"
                     ></sui-checkbox>
                   </sui-table-cell>
 
@@ -74,7 +76,6 @@
                   <sui-table-cell class="one wide">
                     <sui-icon
                       v-if="!isBaseURI(prefix)"
-                      v-model="selected.prefix"
                       class="clickable"
                       name="x icon"
                       @click="deleteElement(prefix)"
@@ -92,7 +93,6 @@
 
 <script>
 import { ENTER } from "../../util/constants";
-import {extractPrefix} from "../../util/urlParser";
 
 export default {
   name: "NamespaceTable",
@@ -105,17 +105,17 @@ export default {
   data() {
     return {
       input: "",
-      selected: {}
+      currentBaseURI: ""
     };
   },
   mounted() {
-    // Remove the input field from the top of the table.
+    /* Remove the input field from the top of the table. */
     document.getElementById("namespaceTable").removeChild(this.$refs.form);
-    // Scroll to the top of the table.
+    /* Scroll to the top of the table. */
     const body = document.getElementById("table-body");
     body.scrollTop = 0;
 
-    // Stop editing when the modal is being closed.
+    /* Stop editing when the modal is being closed. */
     const self = this;
     this.$store.watch(
       () => self.$store.state.mConfig.mModal.show,
@@ -124,10 +124,19 @@ export default {
         if (editRow !== "" && editField !== "") self.stopEditing();
       }
     );
+
+    /* Set the value of the current base URI to match the store state. */
+    this.$store.watch(
+      () => self.$store.getters.baseURI,
+      () => {
+        this.currentBaseURI = self.$store.getters.baseURI;
+      }
+    );
   },
   methods: {
     /**
      * Stop editing when the enter key is pressed.
+     * @param {any} e key press event.
      */
     handleKeyUp(e) {
       if (e.keyCode === ENTER) this.stopEditing();
@@ -135,6 +144,7 @@ export default {
 
     /**
      * Indicates that the entered value is invalid.
+     * A value is valid if the input is valid and unique.
      */
     error() {
       const { editRow, editField } = this.$props.tableProperties;
@@ -143,8 +153,8 @@ export default {
         // Check if the input is valid.
         if (!/^[a-zA-Z0-9]+$/i.test(this.input)) return true;
 
-        const newPrefix = this.$store.getters.prefixURI(this.input);
-        const oldPrefix = this.$store.getters.prefixURI(editRow);
+        const newPrefix = this.$store.getters.prefixByURI(this.input);
+        const oldPrefix = this.$store.getters.prefixByURI(editRow);
 
         // Check if the prefix is unique.
         if (newPrefix) return newPrefix !== oldPrefix;
@@ -153,7 +163,7 @@ export default {
         if (!"/#".includes(this.input.slice(-1))) return true;
 
         // Check if the uri is unique.
-        const newPrefix = this.$store.getters.uriPrefix(this.input);
+        const newPrefix = this.$store.getters.uriByPrefix(this.input);
         if (newPrefix) return newPrefix !== editRow;
       }
 
@@ -164,12 +174,17 @@ export default {
      * Update the base URI to the URI corresponding to the given prefix.
      */
     updateBaseUri(prefix) {
-      this.$store.commit("setBaseUri", { prefix });
+      const uri = this.$store.getters.namespaces[prefix];
+      const { baseURI } = this.$store.state.mConfig;
+      if (uri === baseURI) {
+        document.getElementById(prefix).childNodes[0].checked = false;
+      }
+      this.$store.commit("setBaseUri", { uri: uri === baseURI ? "" : uri });
     },
 
     /**
      * Are we editing the given field in the given row?
-     * @returns {boolean}
+     * @returns {boolean} `true` if we are currently editing the given field in the given row.
      */
     editingThis(uri, field) {
       return (
@@ -180,18 +195,21 @@ export default {
 
     /**
      * Start editing the given row.
-     * @param row {string} the prefix of the row we want to edit.
-     * @param field {string} the name of the field we want to edit.
-     * @param currentValue {string} the current value we want to edit.
+     * @param {string} row the prefix of the row we want to edit.
+     * @param {string} field the name of the field we want to edit.
+     * @param {string} currentValue the current value we want to edit.
      */
     startEditing(row, field, currentValue) {
       this.$store.commit("startEditingNamespace", {
         editRow: row,
         editField: field
       });
-      this.input = currentValue; // Set the initial value.
-      document.getElementById(row + field).appendChild(this.$refs.form); // Add the input field in the right place.
-      this.$refs.inputField.focus(); // Focus on the input field so the user can start typing immediately.
+      /* Set the initial value. */
+      this.input = currentValue;
+      /* Add the input field in the right place. */
+      document.getElementById(row + field).appendChild(this.$refs.form);
+      /* Focus on the input field so the user can start typing immediately. */
+      this.$refs.inputField.focus();
     },
 
     /**
@@ -200,20 +218,20 @@ export default {
      */
     stopEditing() {
       const { editRow, editField } = this.$props.tableProperties;
-      // Check if the input is valid.
+      /* Check if the input is valid. */
       if (this.error()) {
         this.$store.commit("clearTableEdit");
       } else {
         this.$store.dispatch("stopEditingNamespace", { input: this.input });
       }
-      // Remove the input field from the table.
+      /* Remove the input field from the table. */
       const cell = document.getElementById(editRow + editField);
       if (cell && this.$refs.form) cell.removeChild(this.$refs.form);
     },
 
     /**
      * Delete the element with the given prefix from the table.
-     * @param prefix
+     * @param {string} prefix the prefix we want to remove.
      */
     deleteElement(prefix) {
       this.$store.commit("deletePrefix", { prefix });
@@ -221,25 +239,22 @@ export default {
 
     /**
      * Check if the given prefix is the current base URI.
-     * @param prefix
-     * @returns {boolean}
+     * @param {string} prefix the prefix of the namespace we want to check.
+     * @returns {boolean} `true` if the corresponding URI of the given prefix is the current base URI.
      */
     isBaseURI(prefix) {
-      const { baseURI, prefixURI } = this.$store.getters;
-      return baseURI === prefixURI(prefix);
+      const { baseURI, prefixByURI } = this.$store.getters;
+      return baseURI === prefixByURI(prefix);
     },
 
     /**
-     * Get the available prefixes mapped to their checked-ness.
-     * @returns {{string: boolean}}
+     * Get the full URI for the given prefix.
+     * @param {string} prefix the prefix we want to get the URI from.
+     * @returns {string} the URI associated to the given prefix.
      */
-    getSelected() {
-      const { baseURI, namespaces } = this.$store.getters;
-      const selected = {};
-      Object.keys(namespaces).map(prefix => {
-        selected[prefix] = namespaces[prefix] === baseURI;
-      });
-      return selected;
+    getURI(prefix) {
+      const { namespaces } = this.$store.getters;
+      return namespaces[prefix];
     }
   }
 };
