@@ -91,7 +91,7 @@ export default {
     /**
      * Scale the canvas depending on the pointer position when scrolling.
      * This will zoom in on scrolling up and zoom out on scrolling down.
-     * @param e {*} scoll event
+     * @param {any} e scoll event
      */
     scroll(e) {
       const stage = this.$refs.stage.getNode();

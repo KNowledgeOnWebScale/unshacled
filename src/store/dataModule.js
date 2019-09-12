@@ -38,9 +38,9 @@ const dataModule = {
     /**
      * Set the data file to the given contents.
      * @param state
-     * @param name {string} the name of the data file.
-     * @param contents {string} the contents of a read data file.
-     * @param extension {string} the extension of the data file.
+     * @param {string} name the name of the data file.
+     * @param {string} contents the contents of a read data file.
+     * @param {string} extension the extension of the data file.
      */
     setData(state, { name, contents, extension }) {
       Vue.set(state, "dataFileName", name);
@@ -55,7 +55,7 @@ const dataModule = {
     /**
      * Set the given JSON data as the current data file.
      * @param state
-     * @param text {string} the data in JSON format.
+     * @param {string} text the data in JSON format.
      */
     setJsonData(state, { text }) {
       Vue.set(state, "dataText", text);
@@ -67,7 +67,7 @@ const dataModule = {
      * Parse the model to the expected format and validate the data file using these shapes.
      * If there is no data file loaded, this will print an error.
      * @param state
-     * @param model {object} the current model.
+     * @param {object} model the current model.
      */
     validateWithModel(state, model) {
       /**
@@ -78,9 +78,9 @@ const dataModule = {
        * Does not work if placed outside `validateWithModel` due to the way the mutations work.
        *
        * @param state
-       * @param data {object} the data objects in Turtle.
-       * @param shapes {object} the shape objects in SHACL.
-       * @param format {string} the format of the data.
+       * @param {object} data the data objects in Turtle.
+       * @param {object} shapes the shape objects in SHACL.
+       * @param {string} format the format of the data.
        */
       const validateData = function(state, data, shapes, format) {
         ValidatorManager.validate(data, shapes, format)
@@ -122,7 +122,7 @@ const dataModule = {
      * Recieves a datafile and takes its content to the state
      * @param state
      * @param commit
-     * @param file {*} file containing data to check on.
+     * @param {any} file file containing data to check on.
      * */
     uploadDataFile({ commit }, file) {
       const reader = new FileReader();
@@ -138,8 +138,8 @@ const dataModule = {
     /**
      * Takes a file and reads the extension.
      * Depending on the used format, it will use the correct parser to turn it into an internal model.
-     * @param _
-     * @param file The uploaded file
+     * @param {any} _
+     * @param {any} file the uploaded file
      * */
     uploadSchemaFile(_, file) {
       const reader = new FileReader();
@@ -159,7 +159,7 @@ const dataModule = {
      * Set the model to the given one.
      * @param commit
      * @param getters
-     * @param model {array} the shapes we want to use as a model now.
+     * @param {array} model the shapes we want to use as a model now.
      */
     updateModel({ commit, rootGetters }, model) {
       commit("setModel", { model, getters: rootGetters }, { root: true });
@@ -178,8 +178,8 @@ const dataModule = {
      * // FIXME the default is SHACL for now
      * @param rootState
      * @param rootGetters
-     * @param filename {string} the name of the exported file.
-     * @param extension {string} the extension of the exported file.
+     * @param {string} filename the name of the exported file.
+     * @param {string} extension the extension of the exported file.
      */
     exportFileWithName({ rootGetters }, { filename, extension }) {
       if (extension === "json") {
@@ -205,7 +205,7 @@ const dataModule = {
      * Update the data file to the given data text.
      * If the given text is not valid JSON, this wil print an error.
      * @param commit
-     * @param dataText {string} the text we want to use as data.
+     * @param {string} dataText the text we want to use as data.
      */
     updateData({ commit }, { dataText }) {
       try {

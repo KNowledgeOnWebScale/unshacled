@@ -6,8 +6,8 @@ import XMLParser from "./xmlParser";
 export default class ParserManager {
   /**
    * Takes a RDF document and its format type, returns the document as JSON-LD.
-   * @param doc RDF document
-   * @param type Format type e.g. text/turtle
+   * @param {string} doc RDF document
+   * @param {string} type Format type e.g. text/turtle
    * @returns {Promise<Object>} Promise which resolves to JSON-LD Object
    */
   static parse(doc, type) {

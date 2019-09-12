@@ -143,7 +143,7 @@ export default {
     /**
      * Create the label text configuration object.
      * Abbreviate the text if needed and change the namespace URL to the prefix if possible.
-     * @returns {{}} the configuration object for the label.
+     * @returns {object} the configuration object for the label.
      */
     getLabelTextConfig() {
       const label = this.$store.getters.labelsForIds[this.id];
@@ -162,7 +162,7 @@ export default {
     /**
      * Create the URI text configuration object.
      * Abbreviate the URI if needed.
-     * @returns {{}} the configuration of the URI.
+     * @returns {object} the configuration of the URI.
      */
     getURITextConfig() {
       const label = this.$store.getters.labelsForIds[this.id];
@@ -224,7 +224,7 @@ export default {
 
     /**
      * Get an object containing all the constraints.
-     * @returns {{}} an object mapping every constraint name to a (list of) values.
+     * @returns {object} an object mapping every constraint name to a (list of) values.
      */
     getConstraints() {
       return this.$store.getters.shapeConstraints(this.$props.id);
@@ -310,7 +310,7 @@ export default {
 
     /**
      * Set the cursor type according to the passed argument.
-     * @param type {string} "pointer" || "text" || *: the type of cursor we want to use.
+     * @param {string} type "pointer" || "text" || *: the type of cursor we want to use.
      */
     setCursor(type) {
       if (type === "pointer") pointerCursor();

@@ -65,9 +65,9 @@ Dictionary = SHACLTranslator.toModel(Dictionary);
 
 /**
  * Returns first object with a matching `@id` from document.
- * @param doc {[object]} array with objects that have an `@id`.
- * @param id {string} the given URI we want to match.
- * @returns {*} the first object that matches.
+ * @param {[object]} doc array with objects that have an `@id`.
+ * @param {string} id the given URI we want to match.
+ * @returns {any} the first object that matches.
  */
 function findObjectWithId(doc, id) {
   return doc.filter(object => object["@id"] === id)[0];
@@ -75,8 +75,8 @@ function findObjectWithId(doc, id) {
 
 /**
  * Returns array with all objects that have a certain type.
- * @param doc {[object]} array with objects.
- * @param type {string} the type we want to match.
+ * @param {[object]} doc array with objects.
+ * @param {string} type the type we want to match.
  * @returns {[object]} all objects that have the given type.
  */
 function findObjectsWithType(doc, type) {
@@ -85,8 +85,8 @@ function findObjectsWithType(doc, type) {
 
 /**
  * Uses rdfs:domain to find predicates that have a specified subject.
- * @param doc {[object]} array with objects.
- * @param subject {string} the subject we want to match.
+ * @param {[object]} doc array with objects.
+ * @param {string} subject the subject we want to match.
  * @returns {[object]} all objects that match the given subject.
  */
 function findPredicatesWithSubject(doc, subject) {
@@ -99,7 +99,7 @@ function findPredicatesWithSubject(doc, subject) {
 /**
  * Returns object with all distinct types such as rdfs:class and shacl:ConstraintComponent
  * NOTE: The term for each type is used as key so duplicate terms WILL override eachother
- * @param doc {[object]} array with objects.
+ * @param {[object]} doc array with objects.
  * @returns {object} an object with the distinct types.
  */
 function listDistinctTypes(doc) {
@@ -116,7 +116,7 @@ function listDistinctTypes(doc) {
 
 /**
  * Removes duplicate entries from array of strings.
- * @param array {[string]} an array of strings.
+ * @param {[string]} array an array of strings.
  * @returns {[string]} the input array with duplicates removed.
  */
 function removeDuplicates(array) {
@@ -131,7 +131,7 @@ function removeDuplicates(array) {
 
 /**
  * Checks whether URI is of a class.
- * @param uri {string} the URI we want to check.
+ * @param {string} uri the URI we want to check.
  * @returns {boolean} true if class.
  */
 export function isClass(uri) {
@@ -144,7 +144,7 @@ export function isClass(uri) {
 
 /**
  * Checks whether the URI is of a predicate.
- * @param uri {string} the URI we want to check.
+ * @param {string} uri the URI we want to check.
  * @returns {boolean} true if predicate
  */
 export function isPredicate(uri) {
@@ -153,7 +153,7 @@ export function isPredicate(uri) {
 
 /**
  * Check whether the URI is known in the dictionary.
- * @param uri {string} the URI we want to check.
+ * @param {string} uri the URI we want to check.
  * @returns {boolean} true if the URI is found in the dictionary.
  */
 export function isInDictionary(uri) {
@@ -162,7 +162,7 @@ export function isInDictionary(uri) {
 
 /**
  * Returns array of possible entries for a list with the given predicate.
- * @param predicate {string} the predicate we want to check.
+ * @param {string} predicate the predicate we want to check.
  * @returns {[Object]} an array with possible values for the list.
  */
 export function listValues(predicate) {
@@ -198,7 +198,7 @@ export function listValues(predicate) {
 
 /**
  * Returns URI's of all possible predicates for given subject.
- * @param subject {string} the subject we want to get the predicates of.
+ * @param {string} subject the subject we want to get the predicates of.
  * @returns {[string]} array of URIs of all the predicates for the given subject.
  */
 export function possiblePredicates(subject) {
@@ -207,7 +207,7 @@ export function possiblePredicates(subject) {
 
 /**
  * Returns URI's of all possible objects for given predicate.
- * @param predicate {string} the predicate we want to get the objects of.
+ * @param {string} predicate the predicate we want to get the objects of.
  * @returns {[string]} array of URIs of all the objects for the given predicate.
  */
 export function possibleObjects(predicate) {

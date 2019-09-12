@@ -21,8 +21,8 @@ const coordinateModule = {
     /**
      * Update the coordinates and values of the given shapeID.
      * @param state
-     * @param oldID {string} the shapeID's old ID.
-     * @param newID {string} the shapeID's new ID.
+     * @param {string} oldID the shapeID's old ID.
+     * @param {string} newID the shapeID's new ID.
      */
     updateLocations(state, { oldID, newID }) {
       /* Update the coordinates of the shapes. */
@@ -37,7 +37,7 @@ const coordinateModule = {
     /**
      * Delete the coordinates and y values of the shapeID with the given ID.
      * @param state
-     * @param id {string} the ID of the shape from which we want to delete the location data.
+     * @param {string} id the ID of the shape from which we want to delete the location data.
      */
     deleteShapeLocations(state, id) {
       Vue.delete(state.coordinates, id);
@@ -47,8 +47,8 @@ const coordinateModule = {
     /**
      * Update the y values of the properties of the given shapeID.
      * @param state
-     * @param shapeID {string} the ID of the shape we want to update the y values from.
-     * @param shapes {string} the list of shapes currently in the model.
+     * @param {string} shapeID the ID of the shape we want to update the y values from.
+     * @param {string} shapes the list of shapes currently in the model.
      */
     updateYValues(state, { shapeID, shapes }) {
       /* Update the y values of the properties. */
@@ -91,9 +91,9 @@ const coordinateModule = {
     /**
      * Update the coordinates of the given shapeID.
      * @param state
-     * @param shapeID {string} the ID of the shapeID whose location should be updated.
-     * @param x {number} the new x coordinate.
-     * @param y {number} the new y coordinate.
+     * @param s{string} hapeID the ID of the shapeID whose location should be updated.
+     * @param {number} x the new x coordinate.
+     * @param {number} y the new y coordinate.
      */
     updateCoordinates(state, { shapeID, x, y }) {
       Vue.set(state.coordinates, shapeID, { x, y });

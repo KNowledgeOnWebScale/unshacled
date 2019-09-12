@@ -1,7 +1,7 @@
 import Vue from "vue";
 import { swapKeyValue } from "../util";
 import namespaceModalModule from "./modals/namespaceModalModule";
-import { DEFAULT_BASE_URI, SHACL_URI } from "../util/constants";
+import {DEFAULT_BASE_URI, IDENTIFIER, SHACL_URI} from "../util/constants";
 
 /**
  * This module contains everything related to the configuration of the application.
@@ -11,7 +11,7 @@ import { DEFAULT_BASE_URI, SHACL_URI } from "../util/constants";
 const configModule = {
   state: {
     namespaces: {
-      usd: DEFAULT_BASE_URI,
+      usd: `${DEFAULT_BASE_URI}${IDENTIFIER}/`,
       shacl: SHACL_URI,
       rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
       rdfs: "http://www.w3.org/2000/01/rdf-schema#",
@@ -41,7 +41,7 @@ const configModule = {
       combust: "http://combust.iminds.be/",
       "dbpedia-owl": "http://dbpedia.org/ontology/"
     },
-    baseURI: DEFAULT_BASE_URI
+    baseURI: `${DEFAULT_BASE_URI}${IDENTIFIER}/`
   },
   modules: {
     mModal: namespaceModalModule
@@ -50,8 +50,8 @@ const configModule = {
     /**
      * Update the given prefix in the namespaces config.
      * @param state
-     * @param oldPrefix {string} the original prefix.
-     * @param newPrefix {string} the new prefix we want to use for this namespace.
+     * @param {string} oldPrefix the original prefix.
+     * @param {string} newPrefix the new prefix we want to use for this namespace.
      */
     updateNamespacePrefix(state, { oldPrefix, newPrefix }) {
       const uri = state.namespaces[oldPrefix];
@@ -62,8 +62,8 @@ const configModule = {
     /**
      * Update the URI of the given prefix in the namespaces config.
      * @param state
-     * @param prefix {string} the prefix of the namespace we want to update.
-     * @param newURI {string} the new URI for this namespace.
+     * @param {string} prefix the prefix of the namespace we want to update.
+     * @param {string} newURI the new URI for this namespace.
      */
     updateNamespaceURI(state, { prefix, newURI }) {
       Vue.set(state.namespaces, prefix, newURI);
@@ -72,8 +72,8 @@ const configModule = {
     /**
      * Add the given prefix to the namespaces.
      * @param state
-     * @param prefix {string} the prefix of the namespace we want to add.
-     * @param uri {string} the URI of the namespace we want to add.
+     * @param {string} prefix the prefix of the namespace we want to add.
+     * @param {string} uri the URI of the namespace we want to add.
      */
     addPrefix(state, { prefix, uri }) {
       Vue.set(state.namespaces, prefix, uri);
@@ -82,7 +82,7 @@ const configModule = {
     /**
      * Delete the given prefix from the namespaces.
      * @param state
-     * @param prefix {string} the prefix of the namespace we want to delete.
+     * @param {string} prefix the prefix of the namespace we want to delete.
      */
     deletePrefix(state, { prefix }) {
       Vue.delete(state.namespaces, prefix);
@@ -91,8 +91,8 @@ const configModule = {
     /**
      * Set the current base URI to the given URI (if given) or to the URI corresponding to the given prefix.
      * @param state
-     * @param uri {string} the URI of the namespace we want to set as base.
-     * @param prefix {string} the prefix of the namespace we want to set as base.
+     * @param {string} uri the URI of the namespace we want to set as base.
+     * @param {string} prefix the prefix of the namespace we want to set as base.
      */
     setBaseUri(state, { uri, prefix }) {
       if (uri) Vue.set(state, "baseURI", uri);
@@ -106,7 +106,7 @@ const configModule = {
      * @param state
      * @param commit
      * @param getters
-     * @param input {string} the value entered by the user.
+     * @param {string} input the value entered by the user.
      */
     stopEditingNamespace({ state, commit, getters }, { input }) {
       const { editRow, editField } = state.mModal;
@@ -129,7 +129,7 @@ const configModule = {
   getters: {
     /**
      * Get the current namespaces.
-     * @returns {{}} an ordered dictionary mapping of the prefixes to their URIs.
+     * @returns {object} an ordered dictionary mapping of the prefixes to their URIs.
      */
     namespaces(state) {
       const ordered = {};

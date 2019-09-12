@@ -124,7 +124,7 @@ export default {
     /**
      * Capitalize the first letter of the given string.
      * Used because `capitalizeFirstLetter` cannot be called directly from the HTML.
-     * @param string {string} the string we want to edit.
+     * @param {string} string the string we want to edit.
      * @returns {string} the given string with its first letter capitalized.
      */
     cfl(string) {
@@ -134,7 +134,7 @@ export default {
     /**
      * Get the general report of the validation report as an object.
      * This object is used to populate the validation modal.
-     * @returns {{}} a report object.
+     * @returns {object} a report object.
      */
     getGeneralReport() {
       const { validationNode } = this.$props.report;
@@ -165,7 +165,7 @@ export default {
     /**
      * Get the validation results as a dictionary.
      * This object is used to populate the validation modal.
-     * @returns {{}} a dictionary of the shape IDs to their validation results.
+     * @returns {object} a dictionary of the shape IDs to their validation results.
      */
     getValidationResults() {
       const { graph } = this.$props.report;
@@ -194,7 +194,7 @@ export default {
     /**
      * Get the validation results as a dictionary without URIs.
      * This object is used to populate the validation modal.
-     * @returns {{}}
+     * @returns {object}
      */
     getSimpleResults() {
       const results = this.getValidationResults();
@@ -221,7 +221,7 @@ export default {
 
     /**
      * Get the validation results grouped by node.
-     * @returns {{}} the validation result object grouped using the "node" key.
+     * @returns {object} the validation result object grouped using the "node" key.
      */
     getResultsByNode() {
       return groupBy(this.getSimpleResults(), "node", true);
@@ -229,7 +229,7 @@ export default {
 
     /**
      * Change the URI in the given string to a prefix.
-     * @param string {string} the string we want to change.
+     * @param {string} string the string we want to change.
      * @returns {string} the given string with the namespace replaced by the corresponding prefix.
      */
     getPrefixedUri(string) {

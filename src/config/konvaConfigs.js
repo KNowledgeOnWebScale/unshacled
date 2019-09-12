@@ -16,7 +16,7 @@ const BUTTON_OFFSET = 240;
 
 /**
  * Configuration for a shape rectangle.
- * @type {{strokeWidth: number, x: *, width: *, y: number, height: *}}
+ * @type {{strokeWidth: number, width: number, y: number, height: number}}
  */
 export const SHAPE_CONFIG = {
   y: 0,
@@ -27,7 +27,7 @@ export const SHAPE_CONFIG = {
 
 /**
  * Configuration for a node shape rectangle.
- * @type {{strokeWidth: number, x: *, width: *, y: number, fill: string, stroke: string, height: *}}
+ * @type {{strokeWidth: number, width: number, y: number, fill: string, stroke: string, height: number}}
  */
 export const NODE_SHAPE_CONFIG = {
   ...SHAPE_CONFIG,
@@ -37,7 +37,7 @@ export const NODE_SHAPE_CONFIG = {
 
 /**
  * Configuration for a property shape rectangle.
- * @type {{strokeWidth: number, x: *, width: *, y: number, fill: string, stroke: string, height: *}}
+ * @type {{strokeWidth: number, x: number, width: number, y: number, fill: string, stroke: string, height: number}}
  */
 export const PROPERTY_SHAPE_CONFIG = {
   ...SHAPE_CONFIG,
@@ -47,7 +47,7 @@ export const PROPERTY_SHAPE_CONFIG = {
 
 /**
  * Configuration for a description rectangle.
- * @type {{strokeWidth: number, width: *, fill: string, stroke: string}}
+ * @type {{strokeWidth: number, width: number, fill: string, stroke: string}}
  */
 export const DESCRIPTION_RECT_CONFIG = {
   x: WIDTH + MARGIN,
@@ -61,7 +61,7 @@ export const DESCRIPTION_RECT_CONFIG = {
 
 /**
  * Configuration for the constraint seperation line.
- * @type {{dash: [*, *], stroke: string, points: [number, *, *, *], strokewidth: number}}
+ * @type {{dash: [number, number], stroke: string, points: [number, number, number, number], strokewidth: number}}
  */
 export const CONSTRAINT_SEPARATION_LINE = {
   points: [0, HEIGHT, WIDTH, HEIGHT], // x y values
@@ -72,7 +72,7 @@ export const CONSTRAINT_SEPARATION_LINE = {
 
 /**
  * Configuration for the constraint rectangle.
- * @type {{strokeWidth: number, width: *, fill: string, stroke: string, height: number}}
+ * @type {{strokeWidth: number, width: number, fill: string, stroke: string, height: number}}
  */
 export const CONSTRAINT_CONFIG = {
   height: 2 * HEIGHT,
@@ -86,7 +86,7 @@ export const CONSTRAINT_CONFIG = {
 
 /**
  * General text configuration.
- * @type {{width: *, fontSize: *, text: string, align: string}}
+ * @type {{width: number, fontSize: number, text: string, align: string}}
  */
 const TEXT_CONFIG = {
   align: "center",
@@ -97,7 +97,7 @@ const TEXT_CONFIG = {
 
 /**
  * Configuration for a shape's label text.
- * @type {{width: *, y: *, text: string, align: string, fontStyle: string}}
+ * @type {{width: number, y: number, text: string, align: string, fontStyle: string}}
  */
 export const LABEL_TEXT_CONFIG = {
   ...TEXT_CONFIG,
@@ -107,7 +107,7 @@ export const LABEL_TEXT_CONFIG = {
 
 /**
  * Configuration for a shape's URI text.
- * @type {{width: *, y: number, fontSize: *, text: string, align: string, fontStyle: string}}
+ * @type {{width: number, y: number, fontSize: number, text: string, align: string, fontStyle: string}}
  */
 export const URI_TEXT_CONFIG = {
   ...TEXT_CONFIG,
@@ -118,7 +118,7 @@ export const URI_TEXT_CONFIG = {
 
 /**
  * Configuration for a shape's constraint text.
- * @type {{width: *, fontSize: *, text: string, align: string}}
+ * @type {{width: number, fontSize: number, text: string, align: string}}
  */
 export const CONSTRAINT_TEXT_CONFIG = {
   ...TEXT_CONFIG
@@ -126,7 +126,7 @@ export const CONSTRAINT_TEXT_CONFIG = {
 
 /**
  * Configuration for a shape's description title.
- * @type {{width: *, x: *, y: number, fontSize: *, text: string, align: string, fontStyle: string}}
+ * @type {{width: number, x: number, y: number, fontSize: number, text: string, align: string, fontStyle: string}}
  */
 export const DESCRIPTION_TITLE_CONFIG = {
   ...TEXT_CONFIG,
@@ -139,7 +139,7 @@ export const DESCRIPTION_TITLE_CONFIG = {
 
 /**
  * Configuration for a shape's description text.
- * @type {{width: *, x: *, y: *, fontSize: *, text: string, align: string}}
+ * @type {{width: number, x: number, y: number, fontSize: number, text: string, align: string}}
  */
 export const DESCRIPTION_TEXT_CONFIG = {
   ...TEXT_CONFIG,
@@ -152,7 +152,7 @@ export const DESCRIPTION_TEXT_CONFIG = {
 
 /**
  * Default button configuration.
- * @type {{x: *, radius: number}}
+ * @type {{x: number, radius: number}}
  */
 const BUTTON_CONFIG = {
   x: BUTTON_OFFSET,
@@ -161,7 +161,7 @@ const BUTTON_CONFIG = {
 
 /**
  * Configuration for delete buttons.
- * @type {{x: *, y: *, radius: number, fill: string}}
+ * @type {{x: number, y: number, radius: number, fill: string}}
  */
 export const DELETE_BUTTON_CONFIG = {
   ...BUTTON_CONFIG,
@@ -171,7 +171,7 @@ export const DELETE_BUTTON_CONFIG = {
 
 /**
  * Configuration for "add predicate"-buttons.
- * @type {{x: *, y: number, radius: number, fill: string}}
+ * @type {{x: number, y: number, radius: number, fill: string}}
  */
 export const ADD_PREDICATE_CONFIG = {
   ...BUTTON_CONFIG,
@@ -195,7 +195,7 @@ export const RELATIONSHIP_ARROW_CONFIG = {
 
 /**
  * Configuration for the label text on relationship arrows.
- * @type {{fontSize: *, align: string}}
+ * @type {{fontSize: number, align: string}}
  */
 export const RELATIONSHIP_LABEL_TEXT_CONFIG = {
   fontSize: TEXT_SIZE,

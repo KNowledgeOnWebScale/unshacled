@@ -150,8 +150,8 @@ export default {
   methods: {
     /**
      * Set the sorting to the given values.
-     * @param sorted {boolean} indicates if the table is sorted.
-     * @param sortBy {string} the column that is used to sort the table.
+     * @param {boolean} sorted indicates if the table is sorted.
+     * @param {string} sortBy the column that is used to sort the table.
      */
     setSorting(sorted, sortBy) {
       const p = this.$props.sorting;
@@ -199,7 +199,7 @@ export default {
     /**
      * Check if the given string matches the current filter.
      * Make the string and filter lowercase and remove the whitespace and non-alphanumeric characters first.
-     * @param string {string} the string that we want to check.
+     * @param {string} string the string that we want to check.
      * @returns {boolean} value which indicates if the given string matches the current filter.
      */
     matches(string) {
@@ -213,7 +213,7 @@ export default {
      * `sorted` {boolean} indicates if the list should be sorted.
      * `sortBy` {string} indicates which field the list should be sorted with.
      * `ascending` {boolean} indicates if the list should be sorted ascendingly.
-     * @param list {[]}
+     * @param {[]} list
      * @returns {[]} the sorted list
      */
     sortList(list) {
@@ -235,7 +235,7 @@ export default {
     /**
      * Select the constraint with the given key. This will activate the clicked row.
      * Only allow selecting if the user is not editing the constraint. Otherwise, show a message.
-     * @param key
+     * @param {string} key the key of the row we want to select.
      */
     selectConstraint(key) {
       if (this.editing) {
@@ -249,8 +249,8 @@ export default {
 
 /**
  * Compare the given objects by predicate.
- * @param a {{}} the first object that should be compared.
- * @param b {{}} the second object that should be compared.
+ * @param {object} a the first object that should be compared.
+ * @param {object} b the second object that should be compared.
  * @returns {number}
  */
 function comparePredicates(a, b) {
@@ -261,8 +261,8 @@ function comparePredicates(a, b) {
 
 /**
  * Compare the given objects by type.
- * @param a the first object that should be compared.
- * @param b the second object that should be compared.
+ * @param {object} a the first object that should be compared.
+ * @param {object} b the second object that should be compared.
  * @returns {number}
  */
 function compareType(a, b) {

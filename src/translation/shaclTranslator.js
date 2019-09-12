@@ -9,7 +9,7 @@ import clone from "ramda/src/clone";
 export default class ShaclTranslator {
   /**
    * Replaces all SHACL URI's with model URI's.
-   * @param shacl SHACL in JSON-LD
+   * @param {any} shacl  SHACL in JSON-LD
    * @returns {any} Translated document
    */
   static toModel(shacl) {
@@ -18,7 +18,7 @@ export default class ShaclTranslator {
 
   /**
    * Replaces all SHACL URI's with model URI's.
-   * @param shacl SHACL in JSON-LD
+   * @param {any} shacl SHACL in JSON-LD
    * @returns {any|string} Translated document
    */
   static toModelSimple(shacl) {
@@ -29,7 +29,7 @@ export default class ShaclTranslator {
 
   /**
    * Replaces all model URI's with SHACL URI's.
-   * @param model Model in JSON-LD
+   * @param {any} model Model in JSON-LD
    * @returns {any|string} Translated document
    */
   static toSHACL(model) {
@@ -38,7 +38,7 @@ export default class ShaclTranslator {
 
   /**
    * Replaces all model URI's with SHACL URI's.
-   * @param model Model in JSON-LD
+   * @param {any} model Model in JSON-LD
    * @returns {any|string} Translated document
    */
   static toSHACLSimple(model) {
@@ -49,8 +49,8 @@ export default class ShaclTranslator {
 
   /**
    * Translates by replacing URI's found in dictionary.
-   * @param document Document in JSON-LD
-   * @param dict Dictionary which contains URI's to be translated
+   * @param {any} document Document in JSON-LD
+   * @param {any} dict Dictionary which contains URI's to be translated
    * @returns {any|string} Translated document
    */
   static translate(document, dict) {

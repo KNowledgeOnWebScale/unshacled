@@ -127,6 +127,7 @@ export default {
   methods: {
     /**
      * Stop editing when the enter key is pressed.
+     * @param {any} e key press event.
      */
     handleKeyUp(e) {
       if (e.keyCode === ENTER) this.stopEditing();
@@ -180,9 +181,9 @@ export default {
 
     /**
      * Start editing the given row.
-     * @param row {string} the prefix of the row we want to edit.
-     * @param field {string} the name of the field we want to edit.
-     * @param currentValue {string} the current value we want to edit.
+     * @param {string} row the prefix of the row we want to edit.
+     * @param {string} field the name of the field we want to edit.
+     * @param {string} currentValue the current value we want to edit.
      */
     startEditing(row, field, currentValue) {
       this.$store.commit("startEditingNamespace", {
@@ -216,7 +217,7 @@ export default {
 
     /**
      * Delete the element with the given prefix from the table.
-     * @param prefix {string} the prefix we want to remove.
+     * @param {string} prefix the prefix we want to remove.
      */
     deleteElement(prefix) {
       this.$store.commit("deletePrefix", { prefix });
@@ -224,7 +225,7 @@ export default {
 
     /**
      * Check if the given prefix is the current base URI.
-     * @param prefix {string} the prefix of the namespace we want to check.
+     * @param {string} prefix the prefix of the namespace we want to check.
      * @returns {boolean} `true` if the corresponding URI of the given prefix is the current base URI.
      */
     isBaseURI(prefix) {

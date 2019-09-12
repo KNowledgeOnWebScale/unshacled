@@ -55,9 +55,9 @@ function simplifyParameter(obj) {
 
 /**
  * Group the given dictionary of objects by the given key.
- * @param xs
- * @param key
- * @returns {*}
+ * @param {object} xs
+ * @param {string} key
+ * @returns {any}
  */
 function groupBy(xs, key) {
   return xs.reduce((rv, x) => {
@@ -6499,7 +6499,7 @@ export function customConstraintsByCategory() {
  *   type {string} the name of the category,
  *   description {string} the description of the constraint
  * }
- * @param namespaces {{}} map of prefixes to URIs.
+ * @param {object} namespaces map of prefixes to URIs.
  * @returns {[]} list of constraint objects meant for visualization.
  */
 export function tableContents(namespaces) {
@@ -6521,7 +6521,7 @@ export function tableContents(namespaces) {
 
 /**
  * Get the constraint category of the constraint with the given ID.
- * @param constraintID {string} the ID of the constraint we want to get the category from.
+ * @param {string} constraintID the ID of the constraint we want to get the category from.
  * @returns {string} the category of the given constraint.
  */
 export function getConstraintCategory(constraintID) {
@@ -6533,11 +6533,11 @@ export function getConstraintCategory(constraintID) {
 
 /**
  * Get the value type of the constraint with the given ID.
- * @param constraintID {string} the ID of the constraint whose value type we want to determine.
+ * @param {string} constraintID the ID of the constraint whose value type we want to determine.
  * @returns {string} possible values:
- *                    Class, Datatype,  NodeKind, List
- *                    Property, PropertyShape, NodeShape, Shape
- *                    integer, string, boolean
+ *                    Class, Datatype,  NodeKind, List;
+ *                    Property, PropertyShape, NodeShape, Shape;
+ *                    integer, string, boolean.
  */
 export function getConstraintValueType(constraintID) {
   const object = json.filter(

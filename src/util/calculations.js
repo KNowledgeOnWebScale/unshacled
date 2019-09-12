@@ -1,9 +1,10 @@
 /**
  * Return the nearest point to the given reference on the perimeter of the rectangle
  * defined by the given top left and bottom right coordiantes.
- * @param topLeft {{x: number, y: number}} the top left coordinate of the rectangle.
- * @param bottomRight {{x: number, y: number}} the bottom right coordinate of the rectangle.
- * @param reference {{x: number, y: number}} the reference point.
+ * @param {{x: number, y: number}} topLeft the top left coordinate of the rectangle.
+ * @param {{x: number, y: number}} bottomRight the bottom right coordinate of the rectangle.
+ * @param {{x: number, y: number}} reference the reference point.
+ * @returns {{x: number, y: number}} the nearest point to the reference point on the perimeter of the given rectangle.
  */
 export function nearestPointOnPerimeter(topLeft, bottomRight, reference) {
   // Reference: https://stackoverflow.com/questions/20453545/how-to-find-the-nearest-point-in-the-perimeter-of-a-rectangle-to-a-given-point
@@ -22,9 +23,9 @@ export function nearestPointOnPerimeter(topLeft, bottomRight, reference) {
 
 /**
  * If the given number is outside of the given boundaries, then return the respecitve boundary.
- * @param a {number} the reference number.
- * @param lower {number} the lower boundary.
- * @param upper {number} the upper boundary.
+ * @param {number} a the reference number.
+ * @param {number} lower the lower boundary.
+ * @param {number} upper the upper boundary.
  * @returns {number} a if a is between the given boundaries, otherwise one of the boundaries.
  */
 function clamp(a, lower, upper) {

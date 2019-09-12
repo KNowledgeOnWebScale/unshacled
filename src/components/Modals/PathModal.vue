@@ -77,7 +77,7 @@ export default {
   methods: {
     /**
      * Confirm on enter press.
-     * @param e {*} key press event
+     * @param {any} e key press event
      */
     handleKeyPress(e) {
       if (e.keyCode === ENTER) this.confirm();

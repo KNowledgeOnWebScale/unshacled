@@ -41,7 +41,7 @@ export default new Vuex.Store({
     /**
      * Save a reference to the editor.
      * @param state
-     * @param editor {object} the editor object.
+     * @param {object} editor the editor object.
      */
     setEditor(state, editor) {
       Vue.set(state, "editor", editor);
@@ -61,8 +61,8 @@ export default new Vuex.Store({
     /**
      * Toggle the visibility of the path modal.
      * @param state
-     * @param editing {boolean} indicates if we are editing the path; default: false.
-     * @param shapeID {string} the ID of the shape whose path we are editing; default: "".
+     * @param {boolean} editing indicates if we are editing the path; default: false.
+     * @param {string} shapeID the ID of the shape whose path we are editing; default: "".
      */
     togglePathModal(state, { editing, shapeID }) {
       event.preventDefault();
@@ -75,12 +75,12 @@ export default new Vuex.Store({
     /**
      * Toggle the visibility of the export modal.
      * @param state
-     * @param type {string} the type of file we want to export.
+     * @param {string} type the type of file we want to export.
      */
     toggleExportModal(state, type) {
       event.preventDefault();
       Vue.set(state, "exportType", type);
-      Vue.set(state, "showClearModal", !state.showExportModal);
+      Vue.set(state, "showExportModal", !state.showExportModal);
     }
   },
   actions: {
@@ -107,7 +107,7 @@ export default new Vuex.Store({
     /**
      * Returns the internal model in SHACL, JSON format.
      * @param state
-     * @returns {*} SHACL model in JSON
+     * @returns {any} SHACL model in JSON
      */
     internalModelToJson: state => {
       return ShaclTranslator.toSHACLSimple(state.mShape.model);
@@ -116,7 +116,7 @@ export default new Vuex.Store({
     /**
      * Returns the internal model in SHACL, Turtle format.
      * @param state
-     * @returns {*} SHACL model, Turtle
+     * @returns {any} SHACL model, Turtle
      */
     internalModelToTurtle: state => {
       return TranslatorManager.translateToLanguage(

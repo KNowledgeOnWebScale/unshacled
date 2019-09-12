@@ -173,7 +173,7 @@ export default {
 
     /**
      * Confirm when the user presses the enter key.
-     * @param e {*} key press event
+     * @param {any} e key press event
      */
     handleKeyPress(e) {
       if (e.keyCode === ENTER && !this.error()) this.confirm();
@@ -207,9 +207,9 @@ export default {
 
     /**
      * Handle the update of the given constraint.
-     * @param constraintID {string} the key of the constraint.
-     * @param value {string} the value of the constraint.
-     * @param language {string} the language tag for this value.
+     * @param {string} constraintID the key of the constraint.
+     * @param {string} value the value of the constraint.
+     * @param {string} language the language tag for this value.
      */
     handleConstraint(constraintID, value, language) {
       const shapeID = this.values.id;

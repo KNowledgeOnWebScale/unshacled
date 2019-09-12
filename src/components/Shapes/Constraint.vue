@@ -138,7 +138,7 @@ export default {
      * Start editing the value of the given constraint.
      * NOTE: We don't want to edit every constraint this way.
      *       Some constraint can be edited using the visual relationships.
-     * @param index {number} the index of the value in the constraint object.
+     * @param {number} index the index of the value in the constraint object.
      */
     editValue(index) {
       const { constraintID } = this.$props;
@@ -195,7 +195,7 @@ export default {
 
     /**
      * Delete the constraint value at the given index,
-     * @param index {number} the index of the value in the constraint.
+     * @param {number} index the index of the value in the constraint.
      */
     deleteConstraintValue(index) {
       this.$store.dispatch("deleteConstraintValueWithIndex", {
@@ -354,8 +354,8 @@ export default {
     /**
      * Get the configuration for a constraint value.
      * This will set the y coordinate and the text using the given value and index.
-     * @param value {string} text that should be visualized in this constraint component.
-     * @param index {number} the index of the constraint value.
+     * @param {string} value text that should be visualized in this constraint component.
+     * @param {number} index the index of the constraint value.
      * @returns {{y: number, text: string}}
      */
     getValueConfig(value, index) {
@@ -371,8 +371,8 @@ export default {
 
     /**
      * Get the configuration of the delete button for the constraint value at the given index.
-     * @param index {number} the index of the constraint value.
-     * @returns {{}} the configuration object with an updated y value.
+     * @param {number} index the index of the constraint value.
+     * @returns {object} the configuration object with an updated y value.
      */
     getDeleteValueConfig(index) {
       return {
@@ -386,7 +386,7 @@ export default {
 
     /**
      * Set the cursor type according to the passed argument.
-     * @param type {string} the type of pointer we want to use: "pointer" || "text"
+     * @param {string} type the type of pointer we want to use: "pointer" || "text"
      */
     setCursor(type) {
       if (type === "pointer") pointerCursor();

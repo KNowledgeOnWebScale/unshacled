@@ -55,7 +55,7 @@ const idLists = new Set([TERM.and, TERM.or, TERM.xone]);
 
 /**
  * Get the value type of the given predicate.
- * @param predicate {string} the predicate we want to determine the type of.
+ * @param {string} predicate the predicate we want to determine the type of.
  * @returns {string} either "id", "type", or "valueList" or "idList"
  */
 export default function getValueType(predicate) {
@@ -67,7 +67,7 @@ export default function getValueType(predicate) {
 
 /**
  * Determine the value type of the given constraint object.
- * @param constraint {object} constraint object with values.
+ * @param {object} constraint constraint object with values.
  * @returns {string|null} the value type of this constraint.
  */
 export function getValueTypeFromConstraint(constraint) {

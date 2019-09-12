@@ -146,7 +146,7 @@ export default {
     /**
      * Get the configuration for the label rectangle.
      * This one is not included in `getConfigs` because it relies on the previously drawn line.
-     * @returns {*} a configuration object.
+     * @returns {any} a configuration object.
      */
     getLabelRectConfig() {
       const configs = this.getConfigs();
@@ -162,7 +162,7 @@ export default {
     /**
      * Get the button configuration.
      * This one is not included in `getConfigs` because it relies on the previously drawn line.
-     * @returns {*} a configuration object.
+     * @returns {any} a configuration object.
      */
     getButtonConfig() {
       const arrow = this.$refs.arrow.getNode();
@@ -188,7 +188,7 @@ export default {
 
     /**
      * Set the cursor type according to the passed argument.
-     * @param type {string} the type of cursor we want to use.
+     * @param {string} type the type of cursor we want to use.
      */
     setCursor(type) {
       if (type === "pointer") pointerCursor();

@@ -310,7 +310,7 @@ export default {
 
     /**
      * Confirm the modal when the user presses the enter key.
-     * @param e {*} key press event
+     * @param {any} e key press event
      */
     handleKeyPress(e) {
       if (e.keyCode === ENTER) this.exit();
@@ -371,7 +371,7 @@ export default {
     /**
      * Get the ID of the given option.
      * This method exists since calling `shape["@id"]` directly in the HTML causes errors.
-     * @param shape {{}} a shape object.
+     * @param {shape} shape a shape object.
      * @returns {string} the ID Of the given shape object.
      */
     getOptionID(shape) {
@@ -408,7 +408,7 @@ export default {
     /**
      * Get the name of the path from the given URI.
      * Used in the HTML since `urlToName` cannot be used directly.
-     * @param uri {string} the URI we want to extract the name from.
+     * @param {string} uri the URI we want to extract the name from.
      * @returns {string} the URI with the namespace replaced by the prefix.
      */
     getName(uri) {

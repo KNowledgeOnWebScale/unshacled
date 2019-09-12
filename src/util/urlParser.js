@@ -4,7 +4,7 @@ import { CUSTOM_URI } from "../translation/terminology";
 /**
  * Takes the name out of an URL if possible.
  * If the given argument is not a real URL, just return the argument.
- * @param url {string} the string we want to remove the URL from.
+ * @param {string} url the string we want to remove the URL from.
  * @returns {string} if possible, the name extracted from the given URL.
  */
 export function urlToName(url) {
@@ -18,8 +18,8 @@ export function urlToName(url) {
 
 /**
  * Change the URI in the given string to the matching prefix.
- * @param namespaces {object} the current set namespaces.
- * @param string {string} the string we want to change.
+ * @param {object} namespaces the current set namespaces.
+ * @param {string} string the string we want to change.
  * @returns {string} the input string with the URI replaced by a prefix.
  */
 export function uriToPrefix(namespaces, string) {
@@ -33,8 +33,8 @@ export function uriToPrefix(namespaces, string) {
 /**
  * Change the prefix in the given string to the matching URI.
  * If there is no URI defined for the given prefix, return the string unchanged.
- * @param namespaces {object} the current set namespaces.
- * @param string {string} the string we want to change.
+ * @param {object} namespaces the current set namespaces.
+ * @param {string} string the string we want to change.
  * @returns {string} the input string with the prefix replaced by the URI.
  */
 export function prefixToUri(namespaces, string) {
@@ -49,7 +49,7 @@ export function prefixToUri(namespaces, string) {
 
 /**
  * Get the URL from a string.
- * @param string {string} the string we want to extract the URL from.
+ * @param {string} string the string we want to extract the URL from.
  * @returns {string} the URL from the given string.
  */
 export function extractUrl(string) {
@@ -64,8 +64,8 @@ export function extractUrl(string) {
 
 /**
  * Get the prefix from a string.
- * @param namespaces {object} the current set namespaces.
- * @param string {string} the string we want to extract the prefix from.
+ * @param {object} namespaces the current set namespaces.
+ * @param {string} string the string we want to extract the prefix from.
  * @returns {string} the prefix from the given string.
  */
 export function extractPrefix(namespaces, string) {
@@ -78,7 +78,7 @@ export function extractPrefix(namespaces, string) {
 
 /**
  * Check if the given string is an URL.
- * @param string {string} the string we want to check.
+ * @param {string} string the string we want to check.
  * @returns {boolean} `true` if the given string is an URL.
  */
 export function isUrl(string) {

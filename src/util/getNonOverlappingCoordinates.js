@@ -3,9 +3,9 @@ import { WIDTH } from "../config/konvaConfigs";
 
 /**
  * Determine the top left coordinate for a new shape so that it does not overlap with the existing shapes in the stage.
- * @param coordinates {object} dictionary of object keys mapped to their top left coordinates.
- * @param bottomYs {object} dictionary of object keys mapped to their absolute bottom y coordinate.
- * @param heights {object} dictionary of object keys mapped to height.
+ * @param {object} coordinates dictionary of object keys mapped to their top left coordinates.
+ * @param {object} bottomYs dictionary of object keys mapped to their absolute bottom y coordinate.
+ * @param {object} heights dictionary of object keys mapped to height.
  * @returns {{x: number, y: number}} the coordinates for a newly added shapeID
  */
 export default ({ coordinates, bottomYs, heights }) => {

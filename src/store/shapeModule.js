@@ -42,8 +42,8 @@ const shapeModule = {
     /**
      * Set the model to the given value.
      * @param state
-     * @param model {object} the model we want to set.
-     * @param getters {object} the store's getters.
+     * @param {object} model the model we want to set.
+     * @param {object} getters the store's getters.
      */
     setModel(state, { model, getters }) {
       /* Parse the model if necessary. */
@@ -69,11 +69,11 @@ const shapeModule = {
     /**
      * Toggle the visibility of the node shape modal.
      * @param state
-     * @param id {string} the ID of the shape we want to edit.
-     * @param label {string} the current label/name of the shape.
-     * @param labelLang {string} the language of the label/name.
-     * @param description {string} the current description of the shape.
-     * @param descrLang {string} the language of the description.
+     * @param {string} id the ID of the shape we want to edit.
+     * @param {string} label the current label/name of the shape.
+     * @param {string} labelLang the language of the label/name.
+     * @param {string} description the current description of the shape.
+     * @param {string} descrLang the language of the description.
      */
     toggleEditShapeModal(
       state,
@@ -95,8 +95,8 @@ const shapeModule = {
     /**
      * Add the given shape to the state and set its coordinates to zero.
      * @param state
-     * @param shape {object} the shape we want to add.
-     * @param bottomYs {object} all the current shape's bottom y coordinates.
+     * @param {object} shape the shape we want to add.
+     * @param {object} bottomYs all the current shape's bottom y coordinates.
      */
     addShape(state, { shape, bottomYs }) {
       state.model.push(shape);
@@ -119,8 +119,8 @@ const shapeModule = {
     /**
      * Update the shape's id.
      * @param state
-     * @param index {number} the index of the shape that should be updated.
-     * @param newID {string} the shape's new ID.
+     * @param {number} index the index of the shape that should be updated.
+     * @param {string} newID the shape's new ID.
      */
     updateShapeID(state, { index, newID }) {
       Vue.set(state.model[index], "@id", newID);
@@ -129,8 +129,8 @@ const shapeModule = {
     /**
      * Update the value of the shape with the given ID to the given value.
      * @param state
-     * @param shapeID {string} the ID of the shape we want to update.
-     * @param value {object} the new shape value.
+     * @param {string} shapeID the ID of the shape we want to update.
+     * @param {object} value the new shape value.
      */
     updateShape(state, { shapeID, value }) {
       Vue.set(state.model, shapeID, value);
@@ -141,7 +141,7 @@ const shapeModule = {
     /**
      * Delete the shape at the given index.
      * @param state
-     * @param index {number} the index of the shape we want to delete.
+     * @param {number} index the index of the shape we want to delete.
      */
     deleteShapeAtIndex(state, index) {
       Vue.delete(state.model, index);
@@ -150,8 +150,8 @@ const shapeModule = {
     /**
      * Delete the property with the given ID from the given shape.
      * @param state
-     * @param shape {object} the shape object from which the property should be removed.
-     * @param propertyID {string} the ID of the property that should be removed.
+     * @param {object} shape the shape object from which the property should be removed.
+     * @param {string} propertyID the ID of the property that should be removed.
      */
     deletePropertyFromShape(state, { shape, propertyID }) {
       const properties = shape[TERM.property];
@@ -191,7 +191,7 @@ const shapeModule = {
     /**
      * Add a new property shape with a generated UUID and a given path.
      * @param store
-     * @param path {string} the new shape's path.
+     * @param {string} path the new shape's path.
      */
     addPropertyShape({ commit, getters }, { path }) {
       const shape = { "@id": generateUUID(getters.baseURI) };
@@ -205,8 +205,8 @@ const shapeModule = {
      * Edit the ID of a shape.
      * This will update the constraint values of every node shape that contains this shape.
      * @param store
-     * @param oldID {string}
-     * @param newID {string}
+     * @param {string} oldID the original ID of the shape we want to edit.
+     * @param {string} newID the new ID for this shape.
      */
     editShape({ state, getters, commit, dispatch }, { oldID, newID }) {
       /* Check if the new ID is different from the old ID to avoid unexpected errors. */
@@ -268,7 +268,7 @@ const shapeModule = {
     /**
      * Delete the node shape with the given ID.
      * @param store
-     * @param id {string} the ID of the node shape that we want to delete.
+     * @param {string} id the ID of the node shape that we want to delete.
      */
     deleteNodeShape({ getters, commit }, id) {
       commit("deleteShapeAtIndex", getters.indexWithID(id));
@@ -278,7 +278,7 @@ const shapeModule = {
     /**
      * Delete the property shape with the given id.
      * @param store
-     * @param id {string} the ID of the property shape we want to delete.
+     * @param {string} id the ID of the property shape we want to delete.
      */
     deletePropertyShape({ state, getters, commit }, id) {
       /* Check every nodeShape if it contains the given property. */

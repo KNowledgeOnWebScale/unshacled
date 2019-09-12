@@ -4,7 +4,7 @@ import language from "./enums/languages";
 /**
  * Currently not used.
  * @param input
- * @returns {*}
+ * @returns {any}
  */
 export default function getConstraints(input) {
   switch (input) {

@@ -61,7 +61,7 @@ export default {
   methods: {
     /**
      * Confirm on enter press.
-     * @param e key press event
+     * @param {any} e key press event
      */
     handleKeyPress(e) {
       if (e.keyCode === ENTER) this.confirm();
@@ -101,7 +101,7 @@ export default {
     /**
      * Check if the filename is valid.
      * Toggle the error message if needed.
-     * @param filename {string} the filename we want to check.
+     * @param {string} filename the filename we want to check.
      * @returns {boolean|*} boolean, indicates if the filename is valid.
      */
     checkFilename(filename) {
