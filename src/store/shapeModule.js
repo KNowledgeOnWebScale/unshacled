@@ -14,7 +14,6 @@ import ShaclTranslator from "../translation/shaclTranslator";
 const shapeModule = {
   state: {
     model: [],
-    idToLabel: {},
     shapeModal: {
       show: false,
       id: "",
@@ -25,10 +24,12 @@ const shapeModule = {
       nodeShape: false
     }
   },
+
   modules: {
     mConstraint: constraintModule,
     mCoordinate: coordinateModule
   },
+
   mutations: {
     /**
      * Clear all shapes and properties from the current state.
@@ -117,7 +118,7 @@ const shapeModule = {
     /* EDIT ========================================================================================================= */
 
     /**
-     * Update the shape's id.
+     * Update the shape's ID.
      * @param state
      * @param {number} index the index of the shape that should be updated.
      * @param {string} newID the shape's new ID.
@@ -173,6 +174,7 @@ const shapeModule = {
       }
     }
   },
+
   actions: {
     /* ADD ========================================================================================================== */
 
@@ -292,6 +294,7 @@ const shapeModule = {
       commit("deleteShapeLocations", id);
     }
   },
+
   getters: {
     /**
      * Get a map of the shapes' IDs to their labels.

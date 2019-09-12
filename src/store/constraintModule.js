@@ -20,6 +20,7 @@ const constraintModule = {
   modules: {
     mModal: predicateModalModule
   },
+
   mutations: {
     /**
      * Set the value of the constraint with the given ID to the given value.
@@ -42,6 +43,7 @@ const constraintModule = {
       Vue.delete(shape, constraintID);
     }
   },
+
   actions: {
     /* ADD ========================================================================================================== */
 
@@ -343,6 +345,7 @@ const constraintModule = {
       commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
     }
   },
+
   getters: {
     /**
      * Get a list of property ID's for the shape with the given ID.

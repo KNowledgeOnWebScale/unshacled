@@ -17,6 +17,7 @@ const coordinateModule = {
     coordinates: {},
     heights: {}
   },
+
   mutations: {
     /**
      * Update the coordinates and values of the given shapeID.
@@ -108,6 +109,7 @@ const coordinateModule = {
       state.yValues = {};
     }
   },
+
   getters: {
     /**
      * Get the absolute bottom y coordinate of the shapeID with the given ID.

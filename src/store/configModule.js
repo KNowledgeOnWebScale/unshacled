@@ -1,7 +1,7 @@
 import Vue from "vue";
 import { swapKeyValue } from "../util";
 import namespaceModalModule from "./modals/namespaceModalModule";
-import {DEFAULT_BASE_URI, IDENTIFIER, SHACL_URI} from "../util/constants";
+import { DEFAULT_BASE_URI, IDENTIFIER, SHACL_URI } from "../util/constants";
 
 /**
  * This module contains everything related to the configuration of the application.
@@ -46,6 +46,7 @@ const configModule = {
   modules: {
     mModal: namespaceModalModule
   },
+
   mutations: {
     /**
      * Update the given prefix in the namespaces config.
@@ -104,6 +105,7 @@ const configModule = {
       }
     }
   },
+
   actions: {
     /**
      * Stop editing the namespaces.
@@ -131,6 +133,7 @@ const configModule = {
       commit("clearTableEdit"); /* Stop editing and clear the table. */
     }
   },
+
   getters: {
     /**
      * Get the current namespaces.

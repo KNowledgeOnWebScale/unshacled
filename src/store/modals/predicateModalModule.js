@@ -1,11 +1,14 @@
 import Vue from "vue";
 
+/**
+ * This module contains all the state data related to the predicate modal.
+ * @type {{mutations: {selectRow(*=, {key: string}): void, togglePredicateModal(*=, {shapeID: string, shapeType: string, editing: boolean, onExit: string, selected: string, input: string}): void, resetPredicateModal(*=): void, sortPredicateModal(*, {sorted: boolean, sortBy: string, ascending: boolean}): void}, state: {shapeType: string, input: string, shapeID: string, onExit: *, sorting: {sorted: boolean, sortBy: string, ascending: boolean}, show: boolean, selected: string, object: string, editing: boolean}}}
+ */
 const predicateModalModule = {
   state: {
     show: false,
     shapeID: "",
     shapeType: "",
-    urls: {},
     input: "",
     object: "",
     editing: false,
@@ -17,6 +20,7 @@ const predicateModalModule = {
       ascending: true
     }
   },
+
   mutations: {
     /**
      * Toggle the visibility of the predicate modal.
@@ -51,7 +55,7 @@ const predicateModalModule = {
      * @param state
      * @param {boolean} sorted indicates if the modal is sorted.
      * @param {string} sortBy the column the modal is sorted on.
-     * @param {boolean} ascending indicates if the column is sorted ascending.
+     * @param {boolean} ascending indicates if the column is sorted alphabetically.
      */
     sortPredicateModal(state, { sorted, sortBy, ascending }) {
       Vue.set(state.sorting, "sorted", sorted);
@@ -82,15 +86,13 @@ const predicateModalModule = {
       Vue.set(state, "object", "");
       Vue.set(state, "editing", false);
       Vue.set(state, "onExit", undefined);
-      Vue.set(state, "urls", {});
       Vue.set(state, "sorting", {
         sorted: true,
         sortBy: "predicate",
         ascending: true
       });
     }
-  },
-  actions: {}
+  }
 };
 
 export { predicateModalModule as default };

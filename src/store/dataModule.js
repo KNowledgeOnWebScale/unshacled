@@ -21,6 +21,7 @@ const dataModule = {
     validationReport: {},
     showValidationReportModal: false
   },
+
   mutations: {
     /**
      * Show the validation report modal.
@@ -117,9 +118,10 @@ const dataModule = {
       }
     }
   },
+
   actions: {
     /**
-     * Recieves a datafile and takes its content to the state
+     * Receives a datafile and takes its content to the state.
      * @param state
      * @param commit
      * @param {any} file file containing data to check on.
@@ -217,6 +219,7 @@ const dataModule = {
       }
     }
   },
+
   getters: {
     /**
      * Get the validation report.

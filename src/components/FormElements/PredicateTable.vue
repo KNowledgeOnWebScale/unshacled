@@ -124,7 +124,7 @@ export default {
         return {
           sorted: true, // Is the table sorted?
           sortBy: "predicate", // What field is the table sorted with?
-          ascending: true // Is the table sorted ascending?
+          ascending: true // Is the table sorted alphabetically?
         };
       }
     }
@@ -155,7 +155,7 @@ export default {
      */
     setSorting(sorted, sortBy) {
       const p = this.$props.sorting;
-      /* Invert the order if the sorting criterium stays the same, otherwise sort ascendingly. */
+      /* Invert the order if the sorting criterium stays the same, otherwise sort alphabetically. */
       const ascending = p.sortBy === sortBy ? !p.ascending : true;
       this.$store.commit("sortPredicateModal", {
         sorted,
@@ -212,7 +212,7 @@ export default {
      * Sort the given list using the sorting properties.
      * `sorted` {boolean} indicates if the list should be sorted.
      * `sortBy` {string} indicates which field the list should be sorted with.
-     * `ascending` {boolean} indicates if the list should be sorted ascendingly.
+     * `ascending` {boolean} indicates if the list should be sorted alphabetically.
      * @param {[]} list
      * @returns {[]} the sorted list
      */
