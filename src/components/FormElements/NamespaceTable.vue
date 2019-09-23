@@ -90,6 +90,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 import { ENTER } from "../../util/constants";
 
 export default {
@@ -187,7 +188,6 @@ export default {
 
       if (uri === baseURI) {
         // Uncheck the prefix if it was previously checked.
-        this.checked[prefix] = false;
         target.checked = false;
       } else {
         target.checked = true;
@@ -240,6 +240,9 @@ export default {
       if (this.error()) {
         this.$store.commit("clearTableEdit");
       } else {
+        /* Update the internal checked value. */
+        this.checked[this.input] = this.checked[editRow];
+        Vue.delete(this.checked, editRow);
         this.$store.dispatch("stopEditingNamespace", { input: this.input });
       }
       /* Remove the input field from the table. */

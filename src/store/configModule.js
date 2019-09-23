@@ -117,6 +117,7 @@ const configModule = {
      */
     stopEditingNamespace({ state, commit, getters }, { input }) {
       const { editRow, editField } = state.mModal;
+      console.log(editRow, input);
       /* Only execute the update if the value has actually changed. */
       if (editField === "prefix" && editRow !== input) {
         // Update the given prefix.
@@ -126,8 +127,8 @@ const configModule = {
         });
       } else if (editField === "uri" && state.namespaces[editRow] !== input) {
         // Update the given URI.
-        if (editRow === getters.uriByPrefix(state.baseURI))
-          commit("setBaseUri", { uri: input });
+        console.log(editRow, getters.uriByPrefix(state.baseURI));
+        if (editRow === getters.uriByPrefix(state.baseURI)) commit("setBaseUri", { uri: input });
         commit("updateNamespaceURI", { prefix: editRow, newURI: input });
       }
       commit("clearTableEdit"); /* Stop editing and clear the table. */
