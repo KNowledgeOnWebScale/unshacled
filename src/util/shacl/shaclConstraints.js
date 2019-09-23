@@ -903,7 +903,8 @@ const json = [
     ],
     "https://www.w3.org/ns/shacl#parameter": [
       {
-        "@id": "https://www.w3.org/ns/shacl#DatatypeConstraintComponent-datatype"
+        "@id":
+          "https://www.w3.org/ns/shacl#DatatypeConstraintComponent-datatype"
       }
     ],
     "https://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -954,7 +955,8 @@ const json = [
     ],
     "https://www.w3.org/ns/shacl#parameter": [
       {
-        "@id": "https://www.w3.org/ns/shacl#DisjointConstraintComponent-disjoint"
+        "@id":
+          "https://www.w3.org/ns/shacl#DisjointConstraintComponent-disjoint"
       }
     ],
     "https://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1115,7 +1117,8 @@ const json = [
     ],
     "https://www.w3.org/ns/shacl#parameter": [
       {
-        "@id": "https://www.w3.org/ns/shacl#HasValueConstraintComponent-hasValue"
+        "@id":
+          "https://www.w3.org/ns/shacl#HasValueConstraintComponent-hasValue"
       }
     ],
     "https://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1583,7 +1586,8 @@ const json = [
     ],
     "https://www.w3.org/ns/shacl#parameter": [
       {
-        "@id": "https://www.w3.org/ns/shacl#LessThanConstraintComponent-lessThan"
+        "@id":
+          "https://www.w3.org/ns/shacl#LessThanConstraintComponent-lessThan"
       }
     ],
     "https://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1698,7 +1702,8 @@ const json = [
     ],
     "https://www.w3.org/ns/shacl#parameter": [
       {
-        "@id": "https://www.w3.org/ns/shacl#MaxCountConstraintComponent-maxCount"
+        "@id":
+          "https://www.w3.org/ns/shacl#MaxCountConstraintComponent-maxCount"
       }
     ],
     "https://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1907,7 +1912,8 @@ const json = [
     ],
     "https://www.w3.org/ns/shacl#parameter": [
       {
-        "@id": "https://www.w3.org/ns/shacl#MinCountConstraintComponent-minCount"
+        "@id":
+          "https://www.w3.org/ns/shacl#MinCountConstraintComponent-minCount"
       }
     ],
     "https://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -2184,7 +2190,8 @@ const json = [
     ],
     "https://www.w3.org/ns/shacl#parameter": [
       {
-        "@id": "https://www.w3.org/ns/shacl#NodeKindConstraintComponent-nodeKind"
+        "@id":
+          "https://www.w3.org/ns/shacl#NodeKindConstraintComponent-nodeKind"
       }
     ],
     "https://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -2498,7 +2505,8 @@ const json = [
     ],
     "https://www.w3.org/ns/shacl#parameter": [
       {
-        "@id": "https://www.w3.org/ns/shacl#PropertyConstraintComponent-property"
+        "@id":
+          "https://www.w3.org/ns/shacl#PropertyConstraintComponent-property"
       }
     ],
     "https://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
