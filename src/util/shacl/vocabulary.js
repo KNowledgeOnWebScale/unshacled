@@ -4,22 +4,22 @@ import SHACLTranslator from "../../translation/shaclTranslator";
 
 /** Dictionary with distinct Types
  {
-  Ontology: 'http://www.w3.org/2002/07/owl#Ontology',
-  Class: 'http://www.w3.org/2000/01/rdf-schema#Class',
-  ConstraintComponent: 'http://www.w3.org/ns/shacl#ConstraintComponent',
-  Parameter: 'http://www.w3.org/ns/shacl#Parameter',
-  NodeKind: 'http://www.w3.org/ns/shacl#NodeKind',
-  Severity: 'http://www.w3.org/ns/shacl#Severity',
-  Property: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property',
-  Resource: 'http://www.w3.org/2000/01/rdf-schema#Resource'
+  Ontology: 'https://www.w3.org/2002/07/owl#Ontology',
+  Class: 'https://www.w3.org/2000/01/rdf-schema#Class',
+  ConstraintComponent: 'https://www.w3.org/ns/shacl#ConstraintComponent',
+  Parameter: 'https://www.w3.org/ns/shacl#Parameter',
+  NodeKind: 'https://www.w3.org/ns/shacl#NodeKind',
+  Severity: 'https://www.w3.org/ns/shacl#Severity',
+  Property: 'https://www.w3.org/1999/02/22-rdf-syntax-ns#Property',
+  Resource: 'https://www.w3.org/2000/01/rdf-schema#Resource'
 }
  */
 const Types = listDistinctTypes(shacl);
 
 /** Gathering information from SHACL.js */
-const Shape = "http://www.w3.org/ns/shacl#Shape";
-const NodeShape = "http://www.w3.org/ns/shacl#NodeShape";
-const PropertyShape = "http://www.w3.org/ns/shacl#PropertyShape";
+const Shape = "https://www.w3.org/ns/shacl#Shape";
+const NodeShape = "https://www.w3.org/ns/shacl#NodeShape";
+const PropertyShape = "https://www.w3.org/ns/shacl#PropertyShape";
 
 /* Add all concepts to the dictionary. */
 let Dictionary = {};
@@ -39,7 +39,7 @@ Dictionary[PropertyShape].push(...PropertyShapeFields);
 
 /* Add constraints of shapes and remove double entries */
 const Constraints = findObjectsWithType(shacl, Types.Parameter).map(
-  obj => obj["http://www.w3.org/ns/shacl#path"][0]["@id"]
+  obj => obj["https://www.w3.org/ns/shacl#path"][0]["@id"]
 );
 
 // FIXME Not every constraint is applicable to a NodeShape or a PropertyShape
@@ -51,10 +51,10 @@ Dictionary[PropertyShape] = removeDuplicates(Dictionary[PropertyShape]);
 /* Add possible values for predicates. */
 Dictionary[PropertyShape].forEach(predicate => {
   const range = findObjectWithId(shacl, predicate)[
-    "http://www.w3.org/2000/01/rdf-schema#range"
+    "https://www.w3.org/2000/01/rdf-schema#range"
   ];
   Dictionary[predicate].push(
-    range ? range[0]["@id"] : "http://www.w3.org/2000/01/rdf-schema#Resource"
+    range ? range[0]["@id"] : "https://www.w3.org/2000/01/rdf-schema#Resource"
   );
 });
 
@@ -91,7 +91,7 @@ function findObjectsWithType(doc, type) {
  */
 function findPredicatesWithSubject(doc, subject) {
   return doc.filter(obj => {
-    const domain = obj["http://www.w3.org/2000/01/rdf-schema#domain"];
+    const domain = obj["https://www.w3.org/2000/01/rdf-schema#domain"];
     return domain && domain[0]["@id"] === subject;
   });
 }

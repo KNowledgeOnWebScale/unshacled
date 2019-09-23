@@ -311,31 +311,31 @@ const EXAMPLES = {
         "@id": "_:b8",
         "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#password"
+            "@id": "https://example.org/ns#password"
           }
         ],
-        "http://www.w3.org/ns/shacl#maxLength": [
+        "https://www.w3.org/ns/shacl#maxLength": [
           {
             "@value": "10",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#MaxLengthExampleShape",
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "@id": "https://example.org/ns#MaxLengthExampleShape",
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#MinLengthExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#MinLengthExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b8"
           }
@@ -345,37 +345,37 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b9",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#bCode"
+            "@id": "https://example.org/ns#bCode"
           }
         ],
-        "http://www.w3.org/ns/shacl#pattern": [
+        "https://www.w3.org/ns/shacl#pattern": [
           {
             "@value": "^B"
           }
         ],
-        "http://www.w3.org/ns/shacl#flags": [
+        "https://www.w3.org/ns/shacl#flags": [
           {
             "@value": "i"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#PatternExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "@id": "https://example.org/ns#PatternExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           },
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Carol"
+            "@id": "https://example.org/ns#Carol"
           }
         ],
-        "http://www.w3.org/ns/shacl#property": [
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b9"
           }
@@ -385,12 +385,12 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b10",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#prefLabel"
+            "@id": "https://example.org/ns#prefLabel"
           }
         ],
-        "http://www.w3.org/ns/shacl#languageIn": [
+        "https://www.w3.org/ns/shacl#languageIn": [
           {
             "@list": [
               {
@@ -404,19 +404,19 @@ const EXAMPLES = {
         ]
       },
       {
-        "@id": "http://example.org/ns#NewZealandLanguagesShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#NewZealandLanguagesShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b10"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#Mountain"
+            "@id": "https://example.org/ns#Mountain"
           },
           {
-            "@id": "http://example.org/ns#Berg"
+            "@id": "https://example.org/ns#Berg"
           }
         ]
       }
@@ -424,32 +424,32 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b13",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#label"
+            "@id": "https://example.org/ns#label"
           }
         ],
-        "http://www.w3.org/ns/shacl#uniqueLang": [
+        "https://www.w3.org/ns/shacl#uniqueLang": [
           {
             "@value": "true",
-            "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+            "@type": "https://www.w3.org/2001/XMLSchema#boolean"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#UniqueLangExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#UniqueLangExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b13"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -457,31 +457,31 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b14",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#firstName"
+            "@id": "https://example.org/ns#firstName"
           }
         ],
-        "http://www.w3.org/ns/shacl#equals": [
+        "https://www.w3.org/ns/shacl#equals": [
           {
-            "@id": "http://example.org/ns#givenName"
+            "@id": "https://example.org/ns#givenName"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#EqualExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#EqualExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b14"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           },
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           }
         ]
       }
@@ -489,31 +489,31 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b15",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#prefLabel"
+            "@id": "https://example.org/ns#prefLabel"
           }
         ],
-        "http://www.w3.org/ns/shacl#disjoint": [
+        "https://www.w3.org/ns/shacl#disjoint": [
           {
-            "@id": "http://example.org/ns#altLabel"
+            "@id": "https://example.org/ns#altLabel"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#DisjointExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#DisjointExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b15"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#USA"
+            "@id": "https://example.org/ns#USA"
           },
           {
-            "@id": "http://example.org/ns#Germany"
+            "@id": "https://example.org/ns#Germany"
           }
         ]
       }
@@ -521,31 +521,31 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b16",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#startDate"
+            "@id": "https://example.org/ns#startDate"
           }
         ],
-        "http://www.w3.org/ns/shacl#lessThan": [
+        "https://www.w3.org/ns/shacl#lessThan": [
           {
-            "@id": "http://example.org/ns#endDate"
+            "@id": "https://example.org/ns#endDate"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#LessThanExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#LessThanExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b16"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#Event1"
+            "@id": "https://example.org/ns#Event1"
           },
           {
-            "@id": "http://example.org/ns#Event2"
+            "@id": "https://example.org/ns#Event2"
           }
         ]
       }
@@ -553,31 +553,31 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b17",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#startDate"
+            "@id": "https://example.org/ns#startDate"
           }
         ],
-        "http://www.w3.org/ns/shacl#lessThanOrEquals": [
+        "https://www.w3.org/ns/shacl#lessThanOrEquals": [
           {
-            "@id": "http://example.org/ns#endDate"
+            "@id": "https://example.org/ns#endDate"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#LessThanOrEqualsExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#LessThanOrEqualsExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b17"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#Event1"
+            "@id": "https://example.org/ns#Event1"
           },
           {
-            "@id": "http://example.org/ns#Event2"
+            "@id": "https://example.org/ns#Event2"
           }
         ]
       }
@@ -585,30 +585,30 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b18",
-        "@type": ["http://www.w3.org/ns/shacl#PropertyShape"],
-        "http://www.w3.org/ns/shacl#path": [
+        "@type": ["https://www.w3.org/ns/shacl#PropertyShape"],
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#property"
+            "@id": "https://example.org/ns#property"
           }
         ],
-        "http://www.w3.org/ns/shacl#minCount": [
+        "https://www.w3.org/ns/shacl#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#NotExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#not": [
+        "@id": "https://example.org/ns#NotExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#not": [
           {
             "@id": "_:b18"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#InvalidInstance1"
+            "@id": "https://example.org/ns#InvalidInstance1"
           }
         ]
       }
@@ -616,40 +616,40 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b19",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#property"
+            "@id": "https://example.org/ns#property"
           }
         ],
-        "http://www.w3.org/ns/shacl#minCount": [
+        "https://www.w3.org/ns/shacl#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
         "@id": "_:b22",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#property"
+            "@id": "https://example.org/ns#property"
           }
         ],
-        "http://www.w3.org/ns/shacl#maxCount": [
+        "https://www.w3.org/ns/shacl#maxCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#ExampleAndShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#and": [
+        "@id": "https://example.org/ns#ExampleAndShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#and": [
           {
             "@list": [
               {
-                "@id": "http://example.org/ns#SuperShape"
+                "@id": "https://example.org/ns#SuperShape"
               },
               {
                 "@id": "_:b22"
@@ -657,16 +657,16 @@ const EXAMPLES = {
             ]
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#ValidInstance"
+            "@id": "https://example.org/ns#ValidInstance"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#SuperShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#SuperShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b19"
           }
@@ -676,36 +676,36 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b24",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#firstName"
+            "@id": "https://example.org/ns#firstName"
           }
         ],
-        "http://www.w3.org/ns/shacl#minCount": [
+        "https://www.w3.org/ns/shacl#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
         "@id": "_:b26",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#givenName"
+            "@id": "https://example.org/ns#givenName"
           }
         ],
-        "http://www.w3.org/ns/shacl#minCount": [
+        "https://www.w3.org/ns/shacl#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#OrConstraintExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#or": [
+        "@id": "https://example.org/ns#OrConstraintExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#or": [
           {
             "@list": [
               {
@@ -717,9 +717,9 @@ const EXAMPLES = {
             ]
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -727,7 +727,7 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b28",
-        "http://www.w3.org/ns/shacl#property": [
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b29"
           }
@@ -735,21 +735,21 @@ const EXAMPLES = {
       },
       {
         "@id": "_:b29",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#fullName"
+            "@id": "https://example.org/ns#fullName"
           }
         ],
-        "http://www.w3.org/ns/shacl#minCount": [
+        "https://www.w3.org/ns/shacl#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
         "@id": "_:b31",
-        "http://www.w3.org/ns/shacl#property": [
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b32"
           },
@@ -760,36 +760,36 @@ const EXAMPLES = {
       },
       {
         "@id": "_:b32",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#firstName"
+            "@id": "https://example.org/ns#firstName"
           }
         ],
-        "http://www.w3.org/ns/shacl#minCount": [
+        "https://www.w3.org/ns/shacl#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
         "@id": "_:b33",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#lastName"
+            "@id": "https://example.org/ns#lastName"
           }
         ],
-        "http://www.w3.org/ns/shacl#minCount": [
+        "https://www.w3.org/ns/shacl#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#XoneConstraintExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#xone": [
+        "@id": "https://example.org/ns#XoneConstraintExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#xone": [
           {
             "@list": [
               {
@@ -801,9 +801,9 @@ const EXAMPLES = {
             ]
           }
         ],
-        "http://www.w3.org/ns/shacl#targetClass": [
+        "https://www.w3.org/ns/shacl#targetClass": [
           {
-            "@id": "http://example.org/ns#Person"
+            "@id": "https://example.org/ns#Person"
           }
         ]
       }
@@ -811,62 +811,62 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b34",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#postalCode"
+            "@id": "https://example.org/ns#postalCode"
           }
         ],
-        "http://www.w3.org/ns/shacl#datatype": [
+        "https://www.w3.org/ns/shacl#datatype": [
           {
-            "@id": "http://www.w3.org/2001/XMLSchema#string"
+            "@id": "https://www.w3.org/2001/XMLSchema#string"
           }
         ],
-        "http://www.w3.org/ns/shacl#maxCount": [
+        "https://www.w3.org/ns/shacl#maxCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
         "@id": "_:b35",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#address"
+            "@id": "https://example.org/ns#address"
           }
         ],
-        "http://www.w3.org/ns/shacl#minCount": [
+        "https://www.w3.org/ns/shacl#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ],
-        "http://www.w3.org/ns/shacl#node": [
+        "https://www.w3.org/ns/shacl#node": [
           {
-            "@id": "http://example.org/ns#AddressShape"
+            "@id": "https://example.org/ns#AddressShape"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#AddressShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#AddressShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b34"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#PersonShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#PersonShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b35"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetClass": [
+        "https://www.w3.org/ns/shacl#targetClass": [
           {
-            "@id": "http://example.org/ns#Person"
+            "@id": "https://example.org/ns#Person"
           }
         ]
       }
@@ -878,17 +878,17 @@ const EXAMPLES = {
         "@id": "_:b0",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#address"
+            "@id": "https://example.org/ns#address"
           }
         ],
         "https://2019.summerofcode.be/unshacled#class": [
           {
-            "@id": "http://example.org/ns#PostalAddress"
+            "@id": "https://example.org/ns#PostalAddress"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#ClassExampleShape",
+        "@id": "https://example.org/ns#ClassExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -897,13 +897,13 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           },
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Carol"
+            "@id": "https://example.org/ns#Carol"
           }
         ]
       }
@@ -913,17 +913,17 @@ const EXAMPLES = {
         "@id": "_:b1",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#age"
+            "@id": "https://example.org/ns#age"
           }
         ],
         "https://2019.summerofcode.be/unshacled#datatype": [
           {
-            "@id": "http://www.w3.org/2001/XMLSchema#integer"
+            "@id": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#DatatypeExampleShape",
+        "@id": "https://example.org/ns#DatatypeExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -932,20 +932,20 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           },
           {
-            "@id": "http://example.org/ns#Carol"
+            "@id": "https://example.org/ns#Carol"
           }
         ]
       }
     ],
     [
       {
-        "@id": "http://example.org/ns#NodeKindExampleShape",
+        "@id": "https://example.org/ns#NodeKindExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#nodeKind": [
           {
@@ -954,32 +954,32 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetObjectsOf": [
           {
-            "@id": "http://example.org/ns#knows"
+            "@id": "https://example.org/ns#knows"
           }
         ]
       }
     ],
     [
       {
-        "@id": "http://example.org/ns#MinCountExampleShape",
+        "@id": "https://example.org/ns#MinCountExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#PropertyShape"],
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#name"
+            "@id": "https://example.org/ns#name"
           }
         ],
         "https://2019.summerofcode.be/unshacled#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -989,18 +989,18 @@ const EXAMPLES = {
         "@id": "_:b2",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#birthDate"
+            "@id": "https://example.org/ns#birthDate"
           }
         ],
         "https://2019.summerofcode.be/unshacled#maxCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#MaxCountExampleShape",
+        "@id": "https://example.org/ns#MaxCountExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -1009,7 +1009,7 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -1019,18 +1019,18 @@ const EXAMPLES = {
         "@id": "_:b3",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#hasKeys"
+            "@id": "https://example.org/ns#hasKeys"
           }
         ],
         "https://2019.summerofcode.be/unshacled#minExclusive": [
           {
             "@value": "2",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#MinExclusiveExampleShape",
+        "@id": "https://example.org/ns#MinExclusiveExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -1039,10 +1039,10 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -1052,18 +1052,18 @@ const EXAMPLES = {
         "@id": "_:b4",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#hasKeys"
+            "@id": "https://example.org/ns#hasKeys"
           }
         ],
         "https://2019.summerofcode.be/unshacled#minInclusive": [
           {
             "@value": "2",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#MinInclusiveExampleShape",
+        "@id": "https://example.org/ns#MinInclusiveExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -1072,10 +1072,10 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -1085,18 +1085,18 @@ const EXAMPLES = {
         "@id": "_:b5",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#hasKeys"
+            "@id": "https://example.org/ns#hasKeys"
           }
         ],
         "https://2019.summerofcode.be/unshacled#maxExclusive": [
           {
             "@value": "2",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#MaxExclusiveExampleShape",
+        "@id": "https://example.org/ns#MaxExclusiveExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -1105,10 +1105,10 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -1118,18 +1118,18 @@ const EXAMPLES = {
         "@id": "_:b6",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#hasKeys"
+            "@id": "https://example.org/ns#hasKeys"
           }
         ],
         "https://2019.summerofcode.be/unshacled#maxInclusive": [
           {
             "@value": "2",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#MaxInclusiveExampleShape",
+        "@id": "https://example.org/ns#MaxInclusiveExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -1138,10 +1138,10 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -1151,18 +1151,18 @@ const EXAMPLES = {
         "@id": "_:b7",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#password"
+            "@id": "https://example.org/ns#password"
           }
         ],
         "https://2019.summerofcode.be/unshacled#minLength": [
           {
             "@value": "8",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#MinLengthExampleShape",
+        "@id": "https://example.org/ns#MinLengthExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -1171,10 +1171,10 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -1184,29 +1184,29 @@ const EXAMPLES = {
         "@id": "_:b8",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#password"
+            "@id": "https://example.org/ns#password"
           }
         ],
         "https://2019.summerofcode.be/unshacled#maxLength": [
           {
             "@value": "10",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#MaxLengthExampleShape",
+        "@id": "https://example.org/ns#MaxLengthExampleShape",
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#MinLengthExampleShape",
+        "@id": "https://example.org/ns#MinLengthExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -1220,7 +1220,7 @@ const EXAMPLES = {
         "@id": "_:b9",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#bCode"
+            "@id": "https://example.org/ns#bCode"
           }
         ],
         "https://2019.summerofcode.be/unshacled#pattern": [
@@ -1235,17 +1235,17 @@ const EXAMPLES = {
         ]
       },
       {
-        "@id": "http://example.org/ns#PatternExampleShape",
+        "@id": "https://example.org/ns#PatternExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           },
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Carol"
+            "@id": "https://example.org/ns#Carol"
           }
         ],
         "https://2019.summerofcode.be/unshacled#property": [
@@ -1260,7 +1260,7 @@ const EXAMPLES = {
         "@id": "_:b10",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#prefLabel"
+            "@id": "https://example.org/ns#prefLabel"
           }
         ],
         "https://2019.summerofcode.be/unshacled#languageIn": [
@@ -1277,7 +1277,7 @@ const EXAMPLES = {
         ]
       },
       {
-        "@id": "http://example.org/ns#NewZealandLanguagesShape",
+        "@id": "https://example.org/ns#NewZealandLanguagesShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -1286,10 +1286,10 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#Mountain"
+            "@id": "https://example.org/ns#Mountain"
           },
           {
-            "@id": "http://example.org/ns#Berg"
+            "@id": "https://example.org/ns#Berg"
           }
         ]
       }
@@ -1299,18 +1299,18 @@ const EXAMPLES = {
         "@id": "_:b13",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#label"
+            "@id": "https://example.org/ns#label"
           }
         ],
         "https://2019.summerofcode.be/unshacled#uniqueLang": [
           {
             "@value": "true",
-            "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+            "@type": "https://www.w3.org/2001/XMLSchema#boolean"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#UniqueLangExampleShape",
+        "@id": "https://example.org/ns#UniqueLangExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -1319,10 +1319,10 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -1332,17 +1332,17 @@ const EXAMPLES = {
         "@id": "_:b14",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#firstName"
+            "@id": "https://example.org/ns#firstName"
           }
         ],
         "https://2019.summerofcode.be/unshacled#equals": [
           {
-            "@id": "http://example.org/ns#givenName"
+            "@id": "https://example.org/ns#givenName"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#EqualExampleShape",
+        "@id": "https://example.org/ns#EqualExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -1351,10 +1351,10 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           },
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           }
         ]
       }
@@ -1364,17 +1364,17 @@ const EXAMPLES = {
         "@id": "_:b15",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#prefLabel"
+            "@id": "https://example.org/ns#prefLabel"
           }
         ],
         "https://2019.summerofcode.be/unshacled#disjoint": [
           {
-            "@id": "http://example.org/ns#altLabel"
+            "@id": "https://example.org/ns#altLabel"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#DisjointExampleShape",
+        "@id": "https://example.org/ns#DisjointExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -1383,10 +1383,10 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#USA"
+            "@id": "https://example.org/ns#USA"
           },
           {
-            "@id": "http://example.org/ns#Germany"
+            "@id": "https://example.org/ns#Germany"
           }
         ]
       }
@@ -1396,17 +1396,17 @@ const EXAMPLES = {
         "@id": "_:b16",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#startDate"
+            "@id": "https://example.org/ns#startDate"
           }
         ],
         "https://2019.summerofcode.be/unshacled#lessThan": [
           {
-            "@id": "http://example.org/ns#endDate"
+            "@id": "https://example.org/ns#endDate"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#LessThanExampleShape",
+        "@id": "https://example.org/ns#LessThanExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -1415,10 +1415,10 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#Event1"
+            "@id": "https://example.org/ns#Event1"
           },
           {
-            "@id": "http://example.org/ns#Event2"
+            "@id": "https://example.org/ns#Event2"
           }
         ]
       }
@@ -1428,17 +1428,17 @@ const EXAMPLES = {
         "@id": "_:b17",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#startDate"
+            "@id": "https://example.org/ns#startDate"
           }
         ],
         "https://2019.summerofcode.be/unshacled#lessThanOrEquals": [
           {
-            "@id": "http://example.org/ns#endDate"
+            "@id": "https://example.org/ns#endDate"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#LessThanOrEqualsExampleShape",
+        "@id": "https://example.org/ns#LessThanOrEqualsExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -1447,10 +1447,10 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#Event1"
+            "@id": "https://example.org/ns#Event1"
           },
           {
-            "@id": "http://example.org/ns#Event2"
+            "@id": "https://example.org/ns#Event2"
           }
         ]
       }
@@ -1461,18 +1461,18 @@ const EXAMPLES = {
         "@type": ["https://2019.summerofcode.be/unshacled#PropertyShape"],
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#property"
+            "@id": "https://example.org/ns#property"
           }
         ],
         "https://2019.summerofcode.be/unshacled#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#NotExampleShape",
+        "@id": "https://example.org/ns#NotExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#not": [
           {
@@ -1481,7 +1481,7 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#InvalidInstance1"
+            "@id": "https://example.org/ns#InvalidInstance1"
           }
         ]
       }
@@ -1491,13 +1491,13 @@ const EXAMPLES = {
         "@id": "_:b19",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#property"
+            "@id": "https://example.org/ns#property"
           }
         ],
         "https://2019.summerofcode.be/unshacled#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
@@ -1505,24 +1505,24 @@ const EXAMPLES = {
         "@id": "_:b22",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#property"
+            "@id": "https://example.org/ns#property"
           }
         ],
         "https://2019.summerofcode.be/unshacled#maxCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#ExampleAndShape",
+        "@id": "https://example.org/ns#ExampleAndShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#and": [
           {
             "@list": [
               {
-                "@id": "http://example.org/ns#SuperShape"
+                "@id": "https://example.org/ns#SuperShape"
               },
               {
                 "@id": "_:b22"
@@ -1532,12 +1532,12 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#ValidInstance"
+            "@id": "https://example.org/ns#ValidInstance"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#SuperShape",
+        "@id": "https://example.org/ns#SuperShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -1551,13 +1551,13 @@ const EXAMPLES = {
         "@id": "_:b24",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#firstName"
+            "@id": "https://example.org/ns#firstName"
           }
         ],
         "https://2019.summerofcode.be/unshacled#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
@@ -1565,18 +1565,18 @@ const EXAMPLES = {
         "@id": "_:b26",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#givenName"
+            "@id": "https://example.org/ns#givenName"
           }
         ],
         "https://2019.summerofcode.be/unshacled#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#OrConstraintExampleShape",
+        "@id": "https://example.org/ns#OrConstraintExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#or": [
           {
@@ -1592,7 +1592,7 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetNode": [
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -1610,13 +1610,13 @@ const EXAMPLES = {
         "@id": "_:b29",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#fullName"
+            "@id": "https://example.org/ns#fullName"
           }
         ],
         "https://2019.summerofcode.be/unshacled#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
@@ -1635,13 +1635,13 @@ const EXAMPLES = {
         "@id": "_:b32",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#firstName"
+            "@id": "https://example.org/ns#firstName"
           }
         ],
         "https://2019.summerofcode.be/unshacled#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
@@ -1649,18 +1649,18 @@ const EXAMPLES = {
         "@id": "_:b33",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#lastName"
+            "@id": "https://example.org/ns#lastName"
           }
         ],
         "https://2019.summerofcode.be/unshacled#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#XoneConstraintExampleShape",
+        "@id": "https://example.org/ns#XoneConstraintExampleShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#xone": [
           {
@@ -1676,7 +1676,7 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetClass": [
           {
-            "@id": "http://example.org/ns#Person"
+            "@id": "https://example.org/ns#Person"
           }
         ]
       }
@@ -1686,18 +1686,18 @@ const EXAMPLES = {
         "@id": "_:b34",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#postalCode"
+            "@id": "https://example.org/ns#postalCode"
           }
         ],
         "https://2019.summerofcode.be/unshacled#datatype": [
           {
-            "@id": "http://www.w3.org/2001/XMLSchema#string"
+            "@id": "https://www.w3.org/2001/XMLSchema#string"
           }
         ],
         "https://2019.summerofcode.be/unshacled#maxCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
@@ -1705,23 +1705,23 @@ const EXAMPLES = {
         "@id": "_:b35",
         "https://2019.summerofcode.be/unshacled#path": [
           {
-            "@id": "http://example.org/ns#address"
+            "@id": "https://example.org/ns#address"
           }
         ],
         "https://2019.summerofcode.be/unshacled#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ],
         "https://2019.summerofcode.be/unshacled#node": [
           {
-            "@id": "http://example.org/ns#AddressShape"
+            "@id": "https://example.org/ns#AddressShape"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#AddressShape",
+        "@id": "https://example.org/ns#AddressShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -1730,7 +1730,7 @@ const EXAMPLES = {
         ]
       },
       {
-        "@id": "http://example.org/ns#PersonShape",
+        "@id": "https://example.org/ns#PersonShape",
         "@type": ["https://2019.summerofcode.be/unshacled#NodeShape"],
         "https://2019.summerofcode.be/unshacled#property": [
           {
@@ -1739,7 +1739,7 @@ const EXAMPLES = {
         ],
         "https://2019.summerofcode.be/unshacled#targetClass": [
           {
-            "@id": "http://example.org/ns#Person"
+            "@id": "https://example.org/ns#Person"
           }
         ]
       }

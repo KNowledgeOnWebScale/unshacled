@@ -2,890 +2,890 @@
 const dictionary = {
   SHACL: {
     "https://2019.summerofcode.be/unshacled#AbstractResult":
-      "http://www.w3.org/ns/shacl#AbstractResult",
+      "https://www.w3.org/ns/shacl#AbstractResult",
     "https://2019.summerofcode.be/unshacled#AndConstraintComponent":
-      "http://www.w3.org/ns/shacl#AndConstraintComponent",
+      "https://www.w3.org/ns/shacl#AndConstraintComponent",
     "https://2019.summerofcode.be/unshacled#AndConstraintComponent-and":
-      "http://www.w3.org/ns/shacl#AndConstraintComponent-and",
+      "https://www.w3.org/ns/shacl#AndConstraintComponent-and",
     "https://2019.summerofcode.be/unshacled#BlankNode":
-      "http://www.w3.org/ns/shacl#BlankNode",
+      "https://www.w3.org/ns/shacl#BlankNode",
     "https://2019.summerofcode.be/unshacled#BlankNodeOrIRI":
-      "http://www.w3.org/ns/shacl#BlankNodeOrIRI",
+      "https://www.w3.org/ns/shacl#BlankNodeOrIRI",
     "https://2019.summerofcode.be/unshacled#BlankNodeOrLiteral":
-      "http://www.w3.org/ns/shacl#BlankNodeOrLiteral",
+      "https://www.w3.org/ns/shacl#BlankNodeOrLiteral",
     "https://2019.summerofcode.be/unshacled#ClassConstraintComponent":
-      "http://www.w3.org/ns/shacl#ClassConstraintComponent",
+      "https://www.w3.org/ns/shacl#ClassConstraintComponent",
     "https://2019.summerofcode.be/unshacled#ClassConstraintComponent-class":
-      "http://www.w3.org/ns/shacl#ClassConstraintComponent-class",
+      "https://www.w3.org/ns/shacl#ClassConstraintComponent-class",
     "https://2019.summerofcode.be/unshacled#ClosedConstraintComponent":
-      "http://www.w3.org/ns/shacl#ClosedConstraintComponent",
+      "https://www.w3.org/ns/shacl#ClosedConstraintComponent",
     "https://2019.summerofcode.be/unshacled#ClosedConstraintComponent-closed":
-      "http://www.w3.org/ns/shacl#ClosedConstraintComponent-closed",
+      "https://www.w3.org/ns/shacl#ClosedConstraintComponent-closed",
     "https://2019.summerofcode.be/unshacled#ClosedConstraintComponent-ignoredProperties":
-      "http://www.w3.org/ns/shacl#ClosedConstraintComponent-ignoredProperties",
+      "https://www.w3.org/ns/shacl#ClosedConstraintComponent-ignoredProperties",
     "https://2019.summerofcode.be/unshacled#ConstraintComponent":
-      "http://www.w3.org/ns/shacl#ConstraintComponent",
+      "https://www.w3.org/ns/shacl#ConstraintComponent",
     "https://2019.summerofcode.be/unshacled#DatatypeConstraintComponent":
-      "http://www.w3.org/ns/shacl#DatatypeConstraintComponent",
+      "https://www.w3.org/ns/shacl#DatatypeConstraintComponent",
     "https://2019.summerofcode.be/unshacled#DatatypeConstraintComponent-datatype":
-      "http://www.w3.org/ns/shacl#DatatypeConstraintComponent-datatype",
+      "https://www.w3.org/ns/shacl#DatatypeConstraintComponent-datatype",
     "https://2019.summerofcode.be/unshacled#DisjointConstraintComponent":
-      "http://www.w3.org/ns/shacl#DisjointConstraintComponent",
+      "https://www.w3.org/ns/shacl#DisjointConstraintComponent",
     "https://2019.summerofcode.be/unshacled#DisjointConstraintComponent-disjoint":
-      "http://www.w3.org/ns/shacl#DisjointConstraintComponent-disjoint",
+      "https://www.w3.org/ns/shacl#DisjointConstraintComponent-disjoint",
     "https://2019.summerofcode.be/unshacled#EqualsConstraintComponent":
-      "http://www.w3.org/ns/shacl#EqualsConstraintComponent",
+      "https://www.w3.org/ns/shacl#EqualsConstraintComponent",
     "https://2019.summerofcode.be/unshacled#EqualsConstraintComponent-equals":
-      "http://www.w3.org/ns/shacl#EqualsConstraintComponent-equals",
+      "https://www.w3.org/ns/shacl#EqualsConstraintComponent-equals",
     "https://2019.summerofcode.be/unshacled#ExpressionConstraintComponent":
-      "http://www.w3.org/ns/shacl#ExpressionConstraintComponent",
+      "https://www.w3.org/ns/shacl#ExpressionConstraintComponent",
     "https://2019.summerofcode.be/unshacled#ExpressionConstraintComponent-expression":
-      "http://www.w3.org/ns/shacl#ExpressionConstraintComponent-expression",
+      "https://www.w3.org/ns/shacl#ExpressionConstraintComponent-expression",
     "https://2019.summerofcode.be/unshacled#Function":
-      "http://www.w3.org/ns/shacl#Function",
+      "https://www.w3.org/ns/shacl#Function",
     "https://2019.summerofcode.be/unshacled#HasValueConstraintComponent":
-      "http://www.w3.org/ns/shacl#HasValueConstraintComponent",
+      "https://www.w3.org/ns/shacl#HasValueConstraintComponent",
     "https://2019.summerofcode.be/unshacled#HasValueConstraintComponent-hasValue":
-      "http://www.w3.org/ns/shacl#HasValueConstraintComponent-hasValue",
+      "https://www.w3.org/ns/shacl#HasValueConstraintComponent-hasValue",
     "https://2019.summerofcode.be/unshacled#IRI":
-      "http://www.w3.org/ns/shacl#IRI",
+      "https://www.w3.org/ns/shacl#IRI",
     "https://2019.summerofcode.be/unshacled#IRIOrLiteral":
-      "http://www.w3.org/ns/shacl#IRIOrLiteral",
+      "https://www.w3.org/ns/shacl#IRIOrLiteral",
     "https://2019.summerofcode.be/unshacled#InConstraintComponent":
-      "http://www.w3.org/ns/shacl#InConstraintComponent",
+      "https://www.w3.org/ns/shacl#InConstraintComponent",
     "https://2019.summerofcode.be/unshacled#InConstraintComponent-in":
-      "http://www.w3.org/ns/shacl#InConstraintComponent-in",
+      "https://www.w3.org/ns/shacl#InConstraintComponent-in",
     "https://2019.summerofcode.be/unshacled#Info":
-      "http://www.w3.org/ns/shacl#Info",
+      "https://www.w3.org/ns/shacl#Info",
     "https://2019.summerofcode.be/unshacled#JSConstraint":
-      "http://www.w3.org/ns/shacl#JSConstraint",
+      "https://www.w3.org/ns/shacl#JSConstraint",
     "https://2019.summerofcode.be/unshacled#JSConstraint-js":
-      "http://www.w3.org/ns/shacl#JSConstraint-js",
+      "https://www.w3.org/ns/shacl#JSConstraint-js",
     "https://2019.summerofcode.be/unshacled#JSConstraintComponent":
-      "http://www.w3.org/ns/shacl#JSConstraintComponent",
+      "https://www.w3.org/ns/shacl#JSConstraintComponent",
     "https://2019.summerofcode.be/unshacled#JSExecutable":
-      "http://www.w3.org/ns/shacl#JSExecutable",
+      "https://www.w3.org/ns/shacl#JSExecutable",
     "https://2019.summerofcode.be/unshacled#JSFunction":
-      "http://www.w3.org/ns/shacl#JSFunction",
+      "https://www.w3.org/ns/shacl#JSFunction",
     "https://2019.summerofcode.be/unshacled#JSLibrary":
-      "http://www.w3.org/ns/shacl#JSLibrary",
+      "https://www.w3.org/ns/shacl#JSLibrary",
     "https://2019.summerofcode.be/unshacled#JSRule":
-      "http://www.w3.org/ns/shacl#JSRule",
+      "https://www.w3.org/ns/shacl#JSRule",
     "https://2019.summerofcode.be/unshacled#JSTarget":
-      "http://www.w3.org/ns/shacl#JSTarget",
+      "https://www.w3.org/ns/shacl#JSTarget",
     "https://2019.summerofcode.be/unshacled#JSTargetType":
-      "http://www.w3.org/ns/shacl#JSTargetType",
+      "https://www.w3.org/ns/shacl#JSTargetType",
     "https://2019.summerofcode.be/unshacled#JSValidator":
-      "http://www.w3.org/ns/shacl#JSValidator",
+      "https://www.w3.org/ns/shacl#JSValidator",
     "https://2019.summerofcode.be/unshacled#LanguageInConstraintComponent":
-      "http://www.w3.org/ns/shacl#LanguageInConstraintComponent",
+      "https://www.w3.org/ns/shacl#LanguageInConstraintComponent",
     "https://2019.summerofcode.be/unshacled#LanguageInConstraintComponent-languageIn":
-      "http://www.w3.org/ns/shacl#LanguageInConstraintComponent-languageIn",
+      "https://www.w3.org/ns/shacl#LanguageInConstraintComponent-languageIn",
     "https://2019.summerofcode.be/unshacled#LessThanConstraintComponent":
-      "http://www.w3.org/ns/shacl#LessThanConstraintComponent",
+      "https://www.w3.org/ns/shacl#LessThanConstraintComponent",
     "https://2019.summerofcode.be/unshacled#LessThanConstraintComponent-lessThan":
-      "http://www.w3.org/ns/shacl#LessThanConstraintComponent-lessThan",
+      "https://www.w3.org/ns/shacl#LessThanConstraintComponent-lessThan",
     "https://2019.summerofcode.be/unshacled#LessThanOrEqualsConstraintComponent":
-      "http://www.w3.org/ns/shacl#LessThanOrEqualsConstraintComponent",
+      "https://www.w3.org/ns/shacl#LessThanOrEqualsConstraintComponent",
     "https://2019.summerofcode.be/unshacled#LessThanOrEqualsConstraintComponent-lessThanOrEquals":
-      "http://www.w3.org/ns/shacl#LessThanOrEqualsConstraintComponent-lessThanOrEquals",
+      "https://www.w3.org/ns/shacl#LessThanOrEqualsConstraintComponent-lessThanOrEquals",
     "https://2019.summerofcode.be/unshacled#Literal":
-      "http://www.w3.org/ns/shacl#Literal",
+      "https://www.w3.org/ns/shacl#Literal",
     "https://2019.summerofcode.be/unshacled#MaxCountConstraintComponent":
-      "http://www.w3.org/ns/shacl#MaxCountConstraintComponent",
+      "https://www.w3.org/ns/shacl#MaxCountConstraintComponent",
     "https://2019.summerofcode.be/unshacled#MaxCountConstraintComponent-maxCount":
-      "http://www.w3.org/ns/shacl#MaxCountConstraintComponent-maxCount",
+      "https://www.w3.org/ns/shacl#MaxCountConstraintComponent-maxCount",
     "https://2019.summerofcode.be/unshacled#MaxExclusiveConstraintComponent":
-      "http://www.w3.org/ns/shacl#MaxExclusiveConstraintComponent",
+      "https://www.w3.org/ns/shacl#MaxExclusiveConstraintComponent",
     "https://2019.summerofcode.be/unshacled#MaxExclusiveConstraintComponent-maxExclusive":
-      "http://www.w3.org/ns/shacl#MaxExclusiveConstraintComponent-maxExclusive",
+      "https://www.w3.org/ns/shacl#MaxExclusiveConstraintComponent-maxExclusive",
     "https://2019.summerofcode.be/unshacled#MaxInclusiveConstraintComponent":
-      "http://www.w3.org/ns/shacl#MaxInclusiveConstraintComponent",
+      "https://www.w3.org/ns/shacl#MaxInclusiveConstraintComponent",
     "https://2019.summerofcode.be/unshacled#MaxInclusiveConstraintComponent-maxInclusive":
-      "http://www.w3.org/ns/shacl#MaxInclusiveConstraintComponent-maxInclusive",
+      "https://www.w3.org/ns/shacl#MaxInclusiveConstraintComponent-maxInclusive",
     "https://2019.summerofcode.be/unshacled#MaxLengthConstraintComponent":
-      "http://www.w3.org/ns/shacl#MaxLengthConstraintComponent",
+      "https://www.w3.org/ns/shacl#MaxLengthConstraintComponent",
     "https://2019.summerofcode.be/unshacled#MaxLengthConstraintComponent-maxLength":
-      "http://www.w3.org/ns/shacl#MaxLengthConstraintComponent-maxLength",
+      "https://www.w3.org/ns/shacl#MaxLengthConstraintComponent-maxLength",
     "https://2019.summerofcode.be/unshacled#MinCountConstraintComponent":
-      "http://www.w3.org/ns/shacl#MinCountConstraintComponent",
+      "https://www.w3.org/ns/shacl#MinCountConstraintComponent",
     "https://2019.summerofcode.be/unshacled#MinCountConstraintComponent-minCount":
-      "http://www.w3.org/ns/shacl#MinCountConstraintComponent-minCount",
+      "https://www.w3.org/ns/shacl#MinCountConstraintComponent-minCount",
     "https://2019.summerofcode.be/unshacled#MinExclusiveConstraintComponent":
-      "http://www.w3.org/ns/shacl#MinExclusiveConstraintComponent",
+      "https://www.w3.org/ns/shacl#MinExclusiveConstraintComponent",
     "https://2019.summerofcode.be/unshacled#MinExclusiveConstraintComponent-minExclusive":
-      "http://www.w3.org/ns/shacl#MinExclusiveConstraintComponent-minExclusive",
+      "https://www.w3.org/ns/shacl#MinExclusiveConstraintComponent-minExclusive",
     "https://2019.summerofcode.be/unshacled#MinInclusiveConstraintComponent":
-      "http://www.w3.org/ns/shacl#MinInclusiveConstraintComponent",
+      "https://www.w3.org/ns/shacl#MinInclusiveConstraintComponent",
     "https://2019.summerofcode.be/unshacled#MinInclusiveConstraintComponent-minInclusive":
-      "http://www.w3.org/ns/shacl#MinInclusiveConstraintComponent-minInclusive",
+      "https://www.w3.org/ns/shacl#MinInclusiveConstraintComponent-minInclusive",
     "https://2019.summerofcode.be/unshacled#MinLengthConstraintComponent":
-      "http://www.w3.org/ns/shacl#MinLengthConstraintComponent",
+      "https://www.w3.org/ns/shacl#MinLengthConstraintComponent",
     "https://2019.summerofcode.be/unshacled#MinLengthConstraintComponent-minLength":
-      "http://www.w3.org/ns/shacl#MinLengthConstraintComponent-minLength",
+      "https://www.w3.org/ns/shacl#MinLengthConstraintComponent-minLength",
     "https://2019.summerofcode.be/unshacled#NodeConstraintComponent":
-      "http://www.w3.org/ns/shacl#NodeConstraintComponent",
+      "https://www.w3.org/ns/shacl#NodeConstraintComponent",
     "https://2019.summerofcode.be/unshacled#NodeConstraintComponent-node":
-      "http://www.w3.org/ns/shacl#NodeConstraintComponent-node",
+      "https://www.w3.org/ns/shacl#NodeConstraintComponent-node",
     "https://2019.summerofcode.be/unshacled#NodeKind":
-      "http://www.w3.org/ns/shacl#NodeKind",
+      "https://www.w3.org/ns/shacl#NodeKind",
     "https://2019.summerofcode.be/unshacled#NodeKindConstraintComponent":
-      "http://www.w3.org/ns/shacl#NodeKindConstraintComponent",
+      "https://www.w3.org/ns/shacl#NodeKindConstraintComponent",
     "https://2019.summerofcode.be/unshacled#NodeKindConstraintComponent-nodeKind":
-      "http://www.w3.org/ns/shacl#NodeKindConstraintComponent-nodeKind",
+      "https://www.w3.org/ns/shacl#NodeKindConstraintComponent-nodeKind",
     "https://2019.summerofcode.be/unshacled#NodeShape":
-      "http://www.w3.org/ns/shacl#NodeShape",
+      "https://www.w3.org/ns/shacl#NodeShape",
     "https://2019.summerofcode.be/unshacled#NotConstraintComponent":
-      "http://www.w3.org/ns/shacl#NotConstraintComponent",
+      "https://www.w3.org/ns/shacl#NotConstraintComponent",
     "https://2019.summerofcode.be/unshacled#NotConstraintComponent-not":
-      "http://www.w3.org/ns/shacl#NotConstraintComponent-not",
+      "https://www.w3.org/ns/shacl#NotConstraintComponent-not",
     "https://2019.summerofcode.be/unshacled#OrConstraintComponent":
-      "http://www.w3.org/ns/shacl#OrConstraintComponent",
+      "https://www.w3.org/ns/shacl#OrConstraintComponent",
     "https://2019.summerofcode.be/unshacled#OrConstraintComponent-or":
-      "http://www.w3.org/ns/shacl#OrConstraintComponent-or",
+      "https://www.w3.org/ns/shacl#OrConstraintComponent-or",
     "https://2019.summerofcode.be/unshacled#Parameter":
-      "http://www.w3.org/ns/shacl#Parameter",
+      "https://www.w3.org/ns/shacl#Parameter",
     "https://2019.summerofcode.be/unshacled#Parameterizable":
-      "http://www.w3.org/ns/shacl#Parameterizable",
+      "https://www.w3.org/ns/shacl#Parameterizable",
     "https://2019.summerofcode.be/unshacled#PatternConstraintComponent":
-      "http://www.w3.org/ns/shacl#PatternConstraintComponent",
+      "https://www.w3.org/ns/shacl#PatternConstraintComponent",
     "https://2019.summerofcode.be/unshacled#PatternConstraintComponent-flags":
-      "http://www.w3.org/ns/shacl#PatternConstraintComponent-flags",
+      "https://www.w3.org/ns/shacl#PatternConstraintComponent-flags",
     "https://2019.summerofcode.be/unshacled#PatternConstraintComponent-pattern":
-      "http://www.w3.org/ns/shacl#PatternConstraintComponent-pattern",
+      "https://www.w3.org/ns/shacl#PatternConstraintComponent-pattern",
     "https://2019.summerofcode.be/unshacled#PrefixDeclaration":
-      "http://www.w3.org/ns/shacl#PrefixDeclaration",
+      "https://www.w3.org/ns/shacl#PrefixDeclaration",
     "https://2019.summerofcode.be/unshacled#PropertyConstraintComponent":
-      "http://www.w3.org/ns/shacl#PropertyConstraintComponent",
+      "https://www.w3.org/ns/shacl#PropertyConstraintComponent",
     "https://2019.summerofcode.be/unshacled#PropertyConstraintComponent-property":
-      "http://www.w3.org/ns/shacl#PropertyConstraintComponent-property",
+      "https://www.w3.org/ns/shacl#PropertyConstraintComponent-property",
     "https://2019.summerofcode.be/unshacled#PropertyGroup":
-      "http://www.w3.org/ns/shacl#PropertyGroup",
+      "https://www.w3.org/ns/shacl#PropertyGroup",
     "https://2019.summerofcode.be/unshacled#PropertyShape":
-      "http://www.w3.org/ns/shacl#PropertyShape",
+      "https://www.w3.org/ns/shacl#PropertyShape",
     "https://2019.summerofcode.be/unshacled#QualifiedMaxCountConstraintComponent":
-      "http://www.w3.org/ns/shacl#QualifiedMaxCountConstraintComponent",
+      "https://www.w3.org/ns/shacl#QualifiedMaxCountConstraintComponent",
     "https://2019.summerofcode.be/unshacled#QualifiedMaxCountConstraintComponent-qualifiedMaxCount":
-      "http://www.w3.org/ns/shacl#QualifiedMaxCountConstraintComponent-qualifiedMaxCount",
+      "https://www.w3.org/ns/shacl#QualifiedMaxCountConstraintComponent-qualifiedMaxCount",
     "https://2019.summerofcode.be/unshacled#QualifiedMaxCountConstraintComponent-qualifiedValueShape":
-      "http://www.w3.org/ns/shacl#QualifiedMaxCountConstraintComponent-qualifiedValueShape",
+      "https://www.w3.org/ns/shacl#QualifiedMaxCountConstraintComponent-qualifiedValueShape",
     "https://2019.summerofcode.be/unshacled#QualifiedMaxCountConstraintComponent-qualifiedValueShapesDisjoint":
-      "http://www.w3.org/ns/shacl#QualifiedMaxCountConstraintComponent-qualifiedValueShapesDisjoint",
+      "https://www.w3.org/ns/shacl#QualifiedMaxCountConstraintComponent-qualifiedValueShapesDisjoint",
     "https://2019.summerofcode.be/unshacled#QualifiedMinCountConstraintComponent":
-      "http://www.w3.org/ns/shacl#QualifiedMinCountConstraintComponent",
+      "https://www.w3.org/ns/shacl#QualifiedMinCountConstraintComponent",
     "https://2019.summerofcode.be/unshacled#QualifiedMinCountConstraintComponent-qualifiedMinCount":
-      "http://www.w3.org/ns/shacl#QualifiedMinCountConstraintComponent-qualifiedMinCount",
+      "https://www.w3.org/ns/shacl#QualifiedMinCountConstraintComponent-qualifiedMinCount",
     "https://2019.summerofcode.be/unshacled#QualifiedMinCountConstraintComponent-qualifiedValueShape":
-      "http://www.w3.org/ns/shacl#QualifiedMinCountConstraintComponent-qualifiedValueShape",
+      "https://www.w3.org/ns/shacl#QualifiedMinCountConstraintComponent-qualifiedValueShape",
     "https://2019.summerofcode.be/unshacled#QualifiedMinCountConstraintComponent-qualifiedValueShapesDisjoint":
-      "http://www.w3.org/ns/shacl#QualifiedMinCountConstraintComponent-qualifiedValueShapesDisjoint",
+      "https://www.w3.org/ns/shacl#QualifiedMinCountConstraintComponent-qualifiedValueShapesDisjoint",
     "https://2019.summerofcode.be/unshacled#ResultAnnotation":
-      "http://www.w3.org/ns/shacl#ResultAnnotation",
+      "https://www.w3.org/ns/shacl#ResultAnnotation",
     "https://2019.summerofcode.be/unshacled#Rule":
-      "http://www.w3.org/ns/shacl#Rule",
+      "https://www.w3.org/ns/shacl#Rule",
     "https://2019.summerofcode.be/unshacled#SPARQLAskExecutable":
-      "http://www.w3.org/ns/shacl#SPARQLAskExecutable",
+      "https://www.w3.org/ns/shacl#SPARQLAskExecutable",
     "https://2019.summerofcode.be/unshacled#SPARQLAskValidator":
-      "http://www.w3.org/ns/shacl#SPARQLAskValidator",
+      "https://www.w3.org/ns/shacl#SPARQLAskValidator",
     "https://2019.summerofcode.be/unshacled#SPARQLConstraint":
-      "http://www.w3.org/ns/shacl#SPARQLConstraint",
+      "https://www.w3.org/ns/shacl#SPARQLConstraint",
     "https://2019.summerofcode.be/unshacled#SPARQLConstraintComponent":
-      "http://www.w3.org/ns/shacl#SPARQLConstraintComponent",
+      "https://www.w3.org/ns/shacl#SPARQLConstraintComponent",
     "https://2019.summerofcode.be/unshacled#SPARQLConstraintComponent-sparql":
-      "http://www.w3.org/ns/shacl#SPARQLConstraintComponent-sparql",
+      "https://www.w3.org/ns/shacl#SPARQLConstraintComponent-sparql",
     "https://2019.summerofcode.be/unshacled#SPARQLConstructExecutable":
-      "http://www.w3.org/ns/shacl#SPARQLConstructExecutable",
+      "https://www.w3.org/ns/shacl#SPARQLConstructExecutable",
     "https://2019.summerofcode.be/unshacled#SPARQLExecutable":
-      "http://www.w3.org/ns/shacl#SPARQLExecutable",
+      "https://www.w3.org/ns/shacl#SPARQLExecutable",
     "https://2019.summerofcode.be/unshacled#SPARQLFunction":
-      "http://www.w3.org/ns/shacl#SPARQLFunction",
+      "https://www.w3.org/ns/shacl#SPARQLFunction",
     "https://2019.summerofcode.be/unshacled#SPARQLRule":
-      "http://www.w3.org/ns/shacl#SPARQLRule",
+      "https://www.w3.org/ns/shacl#SPARQLRule",
     "https://2019.summerofcode.be/unshacled#SPARQLSelectExecutable":
-      "http://www.w3.org/ns/shacl#SPARQLSelectExecutable",
+      "https://www.w3.org/ns/shacl#SPARQLSelectExecutable",
     "https://2019.summerofcode.be/unshacled#SPARQLSelectValidator":
-      "http://www.w3.org/ns/shacl#SPARQLSelectValidator",
+      "https://www.w3.org/ns/shacl#SPARQLSelectValidator",
     "https://2019.summerofcode.be/unshacled#SPARQLTarget":
-      "http://www.w3.org/ns/shacl#SPARQLTarget",
+      "https://www.w3.org/ns/shacl#SPARQLTarget",
     "https://2019.summerofcode.be/unshacled#SPARQLTargetType":
-      "http://www.w3.org/ns/shacl#SPARQLTargetType",
+      "https://www.w3.org/ns/shacl#SPARQLTargetType",
     "https://2019.summerofcode.be/unshacled#SPARQLUpdateExecutable":
-      "http://www.w3.org/ns/shacl#SPARQLUpdateExecutable",
+      "https://www.w3.org/ns/shacl#SPARQLUpdateExecutable",
     "https://2019.summerofcode.be/unshacled#Severity":
-      "http://www.w3.org/ns/shacl#Severity",
+      "https://www.w3.org/ns/shacl#Severity",
     "https://2019.summerofcode.be/unshacled#Shape":
-      "http://www.w3.org/ns/shacl#Shape",
+      "https://www.w3.org/ns/shacl#Shape",
     "https://2019.summerofcode.be/unshacled#Target":
-      "http://www.w3.org/ns/shacl#Target",
+      "https://www.w3.org/ns/shacl#Target",
     "https://2019.summerofcode.be/unshacled#TargetType":
-      "http://www.w3.org/ns/shacl#TargetType",
+      "https://www.w3.org/ns/shacl#TargetType",
     "https://2019.summerofcode.be/unshacled#TripleRule":
-      "http://www.w3.org/ns/shacl#TripleRule",
+      "https://www.w3.org/ns/shacl#TripleRule",
     "https://2019.summerofcode.be/unshacled#UniqueLangConstraintComponent":
-      "http://www.w3.org/ns/shacl#UniqueLangConstraintComponent",
+      "https://www.w3.org/ns/shacl#UniqueLangConstraintComponent",
     "https://2019.summerofcode.be/unshacled#UniqueLangConstraintComponent-uniqueLang":
-      "http://www.w3.org/ns/shacl#UniqueLangConstraintComponent-uniqueLang",
+      "https://www.w3.org/ns/shacl#UniqueLangConstraintComponent-uniqueLang",
     "https://2019.summerofcode.be/unshacled#ValidationReport":
-      "http://www.w3.org/ns/shacl#ValidationReport",
+      "https://www.w3.org/ns/shacl#ValidationReport",
     "https://2019.summerofcode.be/unshacled#ValidationResult":
-      "http://www.w3.org/ns/shacl#ValidationResult",
+      "https://www.w3.org/ns/shacl#ValidationResult",
     "https://2019.summerofcode.be/unshacled#Validator":
-      "http://www.w3.org/ns/shacl#Validator",
+      "https://www.w3.org/ns/shacl#Validator",
     "https://2019.summerofcode.be/unshacled#Violation":
-      "http://www.w3.org/ns/shacl#Violation",
+      "https://www.w3.org/ns/shacl#Violation",
     "https://2019.summerofcode.be/unshacled#Warning":
-      "http://www.w3.org/ns/shacl#Warning",
+      "https://www.w3.org/ns/shacl#Warning",
     "https://2019.summerofcode.be/unshacled#XoneConstraintComponent":
-      "http://www.w3.org/ns/shacl#XoneConstraintComponent",
+      "https://www.w3.org/ns/shacl#XoneConstraintComponent",
     "https://2019.summerofcode.be/unshacled#XoneConstraintComponent-xone":
-      "http://www.w3.org/ns/shacl#XoneConstraintComponent-xone",
+      "https://www.w3.org/ns/shacl#XoneConstraintComponent-xone",
     "https://2019.summerofcode.be/unshacled#alternativePath":
-      "http://www.w3.org/ns/shacl#alternativePath",
+      "https://www.w3.org/ns/shacl#alternativePath",
     "https://2019.summerofcode.be/unshacled#and":
-      "http://www.w3.org/ns/shacl#and",
+      "https://www.w3.org/ns/shacl#and",
     "https://2019.summerofcode.be/unshacled#annotationProperty":
-      "http://www.w3.org/ns/shacl#annotationProperty",
+      "https://www.w3.org/ns/shacl#annotationProperty",
     "https://2019.summerofcode.be/unshacled#annotationValue":
-      "http://www.w3.org/ns/shacl#annotationValue",
+      "https://www.w3.org/ns/shacl#annotationValue",
     "https://2019.summerofcode.be/unshacled#annotationVarName":
-      "http://www.w3.org/ns/shacl#annotationVarName",
+      "https://www.w3.org/ns/shacl#annotationVarName",
     "https://2019.summerofcode.be/unshacled#ask":
-      "http://www.w3.org/ns/shacl#ask",
+      "https://www.w3.org/ns/shacl#ask",
     "https://2019.summerofcode.be/unshacled#class":
-      "http://www.w3.org/ns/shacl#class",
+      "https://www.w3.org/ns/shacl#class",
     "https://2019.summerofcode.be/unshacled#closed":
-      "http://www.w3.org/ns/shacl#closed",
+      "https://www.w3.org/ns/shacl#closed",
     "https://2019.summerofcode.be/unshacled#condition":
-      "http://www.w3.org/ns/shacl#condition",
+      "https://www.w3.org/ns/shacl#condition",
     "https://2019.summerofcode.be/unshacled#conforms":
-      "http://www.w3.org/ns/shacl#conforms",
+      "https://www.w3.org/ns/shacl#conforms",
     "https://2019.summerofcode.be/unshacled#construct":
-      "http://www.w3.org/ns/shacl#construct",
+      "https://www.w3.org/ns/shacl#construct",
     "https://2019.summerofcode.be/unshacled#datatype":
-      "http://www.w3.org/ns/shacl#datatype",
+      "https://www.w3.org/ns/shacl#datatype",
     "https://2019.summerofcode.be/unshacled#deactivated":
-      "http://www.w3.org/ns/shacl#deactivated",
+      "https://www.w3.org/ns/shacl#deactivated",
     "https://2019.summerofcode.be/unshacled#declare":
-      "http://www.w3.org/ns/shacl#declare",
+      "https://www.w3.org/ns/shacl#declare",
     "https://2019.summerofcode.be/unshacled#defaultValue":
-      "http://www.w3.org/ns/shacl#defaultValue",
+      "https://www.w3.org/ns/shacl#defaultValue",
     "https://2019.summerofcode.be/unshacled#description":
-      "http://www.w3.org/ns/shacl#description",
+      "https://www.w3.org/ns/shacl#description",
     "https://2019.summerofcode.be/unshacled#detail":
-      "http://www.w3.org/ns/shacl#detail",
+      "https://www.w3.org/ns/shacl#detail",
     "https://2019.summerofcode.be/unshacled#disjoint":
-      "http://www.w3.org/ns/shacl#disjoint",
+      "https://www.w3.org/ns/shacl#disjoint",
     "https://2019.summerofcode.be/unshacled#entailment":
-      "http://www.w3.org/ns/shacl#entailment",
+      "https://www.w3.org/ns/shacl#entailment",
     "https://2019.summerofcode.be/unshacled#equals":
-      "http://www.w3.org/ns/shacl#equals",
+      "https://www.w3.org/ns/shacl#equals",
     "https://2019.summerofcode.be/unshacled#expression":
-      "http://www.w3.org/ns/shacl#expression",
+      "https://www.w3.org/ns/shacl#expression",
     "https://2019.summerofcode.be/unshacled#filterShape":
-      "http://www.w3.org/ns/shacl#filterShape",
+      "https://www.w3.org/ns/shacl#filterShape",
     "https://2019.summerofcode.be/unshacled#flags":
-      "http://www.w3.org/ns/shacl#flags",
+      "https://www.w3.org/ns/shacl#flags",
     "https://2019.summerofcode.be/unshacled#focusNode":
-      "http://www.w3.org/ns/shacl#focusNode",
+      "https://www.w3.org/ns/shacl#focusNode",
     "https://2019.summerofcode.be/unshacled#group":
-      "http://www.w3.org/ns/shacl#group",
+      "https://www.w3.org/ns/shacl#group",
     "https://2019.summerofcode.be/unshacled#hasValue":
-      "http://www.w3.org/ns/shacl#hasValue",
+      "https://www.w3.org/ns/shacl#hasValue",
     "https://2019.summerofcode.be/unshacled#ignoredProperties":
-      "http://www.w3.org/ns/shacl#ignoredProperties",
+      "https://www.w3.org/ns/shacl#ignoredProperties",
     "https://2019.summerofcode.be/unshacled#in":
-      "http://www.w3.org/ns/shacl#in",
+      "https://www.w3.org/ns/shacl#in",
     "https://2019.summerofcode.be/unshacled#intersection":
-      "http://www.w3.org/ns/shacl#intersection",
+      "https://www.w3.org/ns/shacl#intersection",
     "https://2019.summerofcode.be/unshacled#inversePath":
-      "http://www.w3.org/ns/shacl#inversePath",
+      "https://www.w3.org/ns/shacl#inversePath",
     "https://2019.summerofcode.be/unshacled#js":
-      "http://www.w3.org/ns/shacl#js",
+      "https://www.w3.org/ns/shacl#js",
     "https://2019.summerofcode.be/unshacled#jsFunctionName":
-      "http://www.w3.org/ns/shacl#jsFunctionName",
+      "https://www.w3.org/ns/shacl#jsFunctionName",
     "https://2019.summerofcode.be/unshacled#jsLibrary":
-      "http://www.w3.org/ns/shacl#jsLibrary",
+      "https://www.w3.org/ns/shacl#jsLibrary",
     "https://2019.summerofcode.be/unshacled#jsLibraryURL":
-      "http://www.w3.org/ns/shacl#jsLibraryURL",
+      "https://www.w3.org/ns/shacl#jsLibraryURL",
     "https://2019.summerofcode.be/unshacled#labelTemplate":
-      "http://www.w3.org/ns/shacl#labelTemplate",
+      "https://www.w3.org/ns/shacl#labelTemplate",
     "https://2019.summerofcode.be/unshacled#languageIn":
-      "http://www.w3.org/ns/shacl#languageIn",
+      "https://www.w3.org/ns/shacl#languageIn",
     "https://2019.summerofcode.be/unshacled#lessThan":
-      "http://www.w3.org/ns/shacl#lessThan",
+      "https://www.w3.org/ns/shacl#lessThan",
     "https://2019.summerofcode.be/unshacled#lessThanOrEquals":
-      "http://www.w3.org/ns/shacl#lessThanOrEquals",
+      "https://www.w3.org/ns/shacl#lessThanOrEquals",
     "https://2019.summerofcode.be/unshacled#maxCount":
-      "http://www.w3.org/ns/shacl#maxCount",
+      "https://www.w3.org/ns/shacl#maxCount",
     "https://2019.summerofcode.be/unshacled#maxExclusive":
-      "http://www.w3.org/ns/shacl#maxExclusive",
+      "https://www.w3.org/ns/shacl#maxExclusive",
     "https://2019.summerofcode.be/unshacled#maxInclusive":
-      "http://www.w3.org/ns/shacl#maxInclusive",
+      "https://www.w3.org/ns/shacl#maxInclusive",
     "https://2019.summerofcode.be/unshacled#maxLength":
-      "http://www.w3.org/ns/shacl#maxLength",
+      "https://www.w3.org/ns/shacl#maxLength",
     "https://2019.summerofcode.be/unshacled#message":
-      "http://www.w3.org/ns/shacl#message",
+      "https://www.w3.org/ns/shacl#message",
     "https://2019.summerofcode.be/unshacled#minCount":
-      "http://www.w3.org/ns/shacl#minCount",
+      "https://www.w3.org/ns/shacl#minCount",
     "https://2019.summerofcode.be/unshacled#minExclusive":
-      "http://www.w3.org/ns/shacl#minExclusive",
+      "https://www.w3.org/ns/shacl#minExclusive",
     "https://2019.summerofcode.be/unshacled#minInclusive":
-      "http://www.w3.org/ns/shacl#minInclusive",
+      "https://www.w3.org/ns/shacl#minInclusive",
     "https://2019.summerofcode.be/unshacled#minLength":
-      "http://www.w3.org/ns/shacl#minLength",
+      "https://www.w3.org/ns/shacl#minLength",
     "https://2019.summerofcode.be/unshacled#name":
-      "http://www.w3.org/ns/shacl#name",
+      "https://www.w3.org/ns/shacl#name",
     "https://2019.summerofcode.be/unshacled#namespace":
-      "http://www.w3.org/ns/shacl#namespace",
+      "https://www.w3.org/ns/shacl#namespace",
     "https://2019.summerofcode.be/unshacled#node":
-      "http://www.w3.org/ns/shacl#node",
+      "https://www.w3.org/ns/shacl#node",
     "https://2019.summerofcode.be/unshacled#nodeKind":
-      "http://www.w3.org/ns/shacl#nodeKind",
+      "https://www.w3.org/ns/shacl#nodeKind",
     "https://2019.summerofcode.be/unshacled#nodeValidator":
-      "http://www.w3.org/ns/shacl#nodeValidator",
+      "https://www.w3.org/ns/shacl#nodeValidator",
     "https://2019.summerofcode.be/unshacled#nodes":
-      "http://www.w3.org/ns/shacl#nodes",
+      "https://www.w3.org/ns/shacl#nodes",
     "https://2019.summerofcode.be/unshacled#not":
-      "http://www.w3.org/ns/shacl#not",
+      "https://www.w3.org/ns/shacl#not",
     "https://2019.summerofcode.be/unshacled#object":
-      "http://www.w3.org/ns/shacl#object",
+      "https://www.w3.org/ns/shacl#object",
     "https://2019.summerofcode.be/unshacled#oneOrMorePath":
-      "http://www.w3.org/ns/shacl#oneOrMorePath",
+      "https://www.w3.org/ns/shacl#oneOrMorePath",
     "https://2019.summerofcode.be/unshacled#optional":
-      "http://www.w3.org/ns/shacl#optional",
+      "https://www.w3.org/ns/shacl#optional",
     "https://2019.summerofcode.be/unshacled#or":
-      "http://www.w3.org/ns/shacl#or",
+      "https://www.w3.org/ns/shacl#or",
     "https://2019.summerofcode.be/unshacled#order":
-      "http://www.w3.org/ns/shacl#order",
+      "https://www.w3.org/ns/shacl#order",
     "https://2019.summerofcode.be/unshacled#parameter":
-      "http://www.w3.org/ns/shacl#parameter",
+      "https://www.w3.org/ns/shacl#parameter",
     "https://2019.summerofcode.be/unshacled#path":
-      "http://www.w3.org/ns/shacl#path",
+      "https://www.w3.org/ns/shacl#path",
     "https://2019.summerofcode.be/unshacled#pattern":
-      "http://www.w3.org/ns/shacl#pattern",
+      "https://www.w3.org/ns/shacl#pattern",
     "https://2019.summerofcode.be/unshacled#predicate":
-      "http://www.w3.org/ns/shacl#predicate",
+      "https://www.w3.org/ns/shacl#predicate",
     "https://2019.summerofcode.be/unshacled#prefix":
-      "http://www.w3.org/ns/shacl#prefix",
+      "https://www.w3.org/ns/shacl#prefix",
     "https://2019.summerofcode.be/unshacled#prefixes":
-      "http://www.w3.org/ns/shacl#prefixes",
+      "https://www.w3.org/ns/shacl#prefixes",
     "https://2019.summerofcode.be/unshacled#property":
-      "http://www.w3.org/ns/shacl#property",
+      "https://www.w3.org/ns/shacl#property",
     "https://2019.summerofcode.be/unshacled#propertyValidator":
-      "http://www.w3.org/ns/shacl#propertyValidator",
+      "https://www.w3.org/ns/shacl#propertyValidator",
     "https://2019.summerofcode.be/unshacled#qualifiedMaxCount":
-      "http://www.w3.org/ns/shacl#qualifiedMaxCount",
+      "https://www.w3.org/ns/shacl#qualifiedMaxCount",
     "https://2019.summerofcode.be/unshacled#qualifiedMinCount":
-      "http://www.w3.org/ns/shacl#qualifiedMinCount",
+      "https://www.w3.org/ns/shacl#qualifiedMinCount",
     "https://2019.summerofcode.be/unshacled#qualifiedValueShape":
-      "http://www.w3.org/ns/shacl#qualifiedValueShape",
+      "https://www.w3.org/ns/shacl#qualifiedValueShape",
     "https://2019.summerofcode.be/unshacled#qualifiedValueShapesDisjoint":
-      "http://www.w3.org/ns/shacl#qualifiedValueShapesDisjoint",
+      "https://www.w3.org/ns/shacl#qualifiedValueShapesDisjoint",
     "https://2019.summerofcode.be/unshacled#result":
-      "http://www.w3.org/ns/shacl#result",
+      "https://www.w3.org/ns/shacl#result",
     "https://2019.summerofcode.be/unshacled#resultAnnotation":
-      "http://www.w3.org/ns/shacl#resultAnnotation",
+      "https://www.w3.org/ns/shacl#resultAnnotation",
     "https://2019.summerofcode.be/unshacled#resultMessage":
-      "http://www.w3.org/ns/shacl#resultMessage",
+      "https://www.w3.org/ns/shacl#resultMessage",
     "https://2019.summerofcode.be/unshacled#resultPath":
-      "http://www.w3.org/ns/shacl#resultPath",
+      "https://www.w3.org/ns/shacl#resultPath",
     "https://2019.summerofcode.be/unshacled#resultSeverity":
-      "http://www.w3.org/ns/shacl#resultSeverity",
+      "https://www.w3.org/ns/shacl#resultSeverity",
     "https://2019.summerofcode.be/unshacled#returnType":
-      "http://www.w3.org/ns/shacl#returnType",
+      "https://www.w3.org/ns/shacl#returnType",
     "https://2019.summerofcode.be/unshacled#rule":
-      "http://www.w3.org/ns/shacl#rule",
+      "https://www.w3.org/ns/shacl#rule",
     "https://2019.summerofcode.be/unshacled#select":
-      "http://www.w3.org/ns/shacl#select",
+      "https://www.w3.org/ns/shacl#select",
     "https://2019.summerofcode.be/unshacled#severity":
-      "http://www.w3.org/ns/shacl#severity",
+      "https://www.w3.org/ns/shacl#severity",
     "https://2019.summerofcode.be/unshacled#shapesGraph":
-      "http://www.w3.org/ns/shacl#shapesGraph",
+      "https://www.w3.org/ns/shacl#shapesGraph",
     "https://2019.summerofcode.be/unshacled#shapesGraphWellFormed":
-      "http://www.w3.org/ns/shacl#shapesGraphWellFormed",
+      "https://www.w3.org/ns/shacl#shapesGraphWellFormed",
     "https://2019.summerofcode.be/unshacled#sourceConstraint":
-      "http://www.w3.org/ns/shacl#sourceConstraint",
+      "https://www.w3.org/ns/shacl#sourceConstraint",
     "https://2019.summerofcode.be/unshacled#sourceConstraintComponent":
-      "http://www.w3.org/ns/shacl#sourceConstraintComponent",
+      "https://www.w3.org/ns/shacl#sourceConstraintComponent",
     "https://2019.summerofcode.be/unshacled#sourceShape":
-      "http://www.w3.org/ns/shacl#sourceShape",
+      "https://www.w3.org/ns/shacl#sourceShape",
     "https://2019.summerofcode.be/unshacled#sparql":
-      "http://www.w3.org/ns/shacl#sparql",
+      "https://www.w3.org/ns/shacl#sparql",
     "https://2019.summerofcode.be/unshacled#subject":
-      "http://www.w3.org/ns/shacl#subject",
+      "https://www.w3.org/ns/shacl#subject",
     "https://2019.summerofcode.be/unshacled#suggestedShapesGraph":
-      "http://www.w3.org/ns/shacl#suggestedShapesGraph",
+      "https://www.w3.org/ns/shacl#suggestedShapesGraph",
     "https://2019.summerofcode.be/unshacled#target":
-      "http://www.w3.org/ns/shacl#target",
+      "https://www.w3.org/ns/shacl#target",
     "https://2019.summerofcode.be/unshacled#targetClass":
-      "http://www.w3.org/ns/shacl#targetClass",
+      "https://www.w3.org/ns/shacl#targetClass",
     "https://2019.summerofcode.be/unshacled#targetNode":
-      "http://www.w3.org/ns/shacl#targetNode",
+      "https://www.w3.org/ns/shacl#targetNode",
     "https://2019.summerofcode.be/unshacled#targetObjectsOf":
-      "http://www.w3.org/ns/shacl#targetObjectsOf",
+      "https://www.w3.org/ns/shacl#targetObjectsOf",
     "https://2019.summerofcode.be/unshacled#targetSubjectsOf":
-      "http://www.w3.org/ns/shacl#targetSubjectsOf",
+      "https://www.w3.org/ns/shacl#targetSubjectsOf",
     "https://2019.summerofcode.be/unshacled#this":
-      "http://www.w3.org/ns/shacl#this",
+      "https://www.w3.org/ns/shacl#this",
     "https://2019.summerofcode.be/unshacled#union":
-      "http://www.w3.org/ns/shacl#union",
+      "https://www.w3.org/ns/shacl#union",
     "https://2019.summerofcode.be/unshacled#uniqueLang":
-      "http://www.w3.org/ns/shacl#uniqueLang",
+      "https://www.w3.org/ns/shacl#uniqueLang",
     "https://2019.summerofcode.be/unshacled#update":
-      "http://www.w3.org/ns/shacl#update",
+      "https://www.w3.org/ns/shacl#update",
     "https://2019.summerofcode.be/unshacled#validator":
-      "http://www.w3.org/ns/shacl#validator",
+      "https://www.w3.org/ns/shacl#validator",
     "https://2019.summerofcode.be/unshacled#value":
-      "http://www.w3.org/ns/shacl#value",
+      "https://www.w3.org/ns/shacl#value",
     "https://2019.summerofcode.be/unshacled#xone":
-      "http://www.w3.org/ns/shacl#xone",
+      "https://www.w3.org/ns/shacl#xone",
     "https://2019.summerofcode.be/unshacled#zeroOrMorePath":
-      "http://www.w3.org/ns/shacl#zeroOrMorePath",
+      "https://www.w3.org/ns/shacl#zeroOrMorePath",
     "https://2019.summerofcode.be/unshacled#zeroOrOnePath":
-      "http://www.w3.org/ns/shacl#zeroOrOnePath"
+      "https://www.w3.org/ns/shacl#zeroOrOnePath"
   },
   MODEL: {
-    "http://www.w3.org/ns/shacl#AbstractResult":
+    "https://www.w3.org/ns/shacl#AbstractResult":
       "https://2019.summerofcode.be/unshacled#AbstractResult",
-    "http://www.w3.org/ns/shacl#AndConstraintComponent":
+    "https://www.w3.org/ns/shacl#AndConstraintComponent":
       "https://2019.summerofcode.be/unshacled#AndConstraintComponent",
-    "http://www.w3.org/ns/shacl#AndConstraintComponent-and":
+    "https://www.w3.org/ns/shacl#AndConstraintComponent-and":
       "https://2019.summerofcode.be/unshacled#AndConstraintComponent-and",
-    "http://www.w3.org/ns/shacl#BlankNode":
+    "https://www.w3.org/ns/shacl#BlankNode":
       "https://2019.summerofcode.be/unshacled#BlankNode",
-    "http://www.w3.org/ns/shacl#BlankNodeOrIRI":
+    "https://www.w3.org/ns/shacl#BlankNodeOrIRI":
       "https://2019.summerofcode.be/unshacled#BlankNodeOrIRI",
-    "http://www.w3.org/ns/shacl#BlankNodeOrLiteral":
+    "https://www.w3.org/ns/shacl#BlankNodeOrLiteral":
       "https://2019.summerofcode.be/unshacled#BlankNodeOrLiteral",
-    "http://www.w3.org/ns/shacl#ClassConstraintComponent":
+    "https://www.w3.org/ns/shacl#ClassConstraintComponent":
       "https://2019.summerofcode.be/unshacled#ClassConstraintComponent",
-    "http://www.w3.org/ns/shacl#ClassConstraintComponent-class":
+    "https://www.w3.org/ns/shacl#ClassConstraintComponent-class":
       "https://2019.summerofcode.be/unshacled#ClassConstraintComponent-class",
-    "http://www.w3.org/ns/shacl#ClosedConstraintComponent":
+    "https://www.w3.org/ns/shacl#ClosedConstraintComponent":
       "https://2019.summerofcode.be/unshacled#ClosedConstraintComponent",
-    "http://www.w3.org/ns/shacl#ClosedConstraintComponent-closed":
+    "https://www.w3.org/ns/shacl#ClosedConstraintComponent-closed":
       "https://2019.summerofcode.be/unshacled#ClosedConstraintComponent-closed",
-    "http://www.w3.org/ns/shacl#ClosedConstraintComponent-ignoredProperties":
+    "https://www.w3.org/ns/shacl#ClosedConstraintComponent-ignoredProperties":
       "https://2019.summerofcode.be/unshacled#ClosedConstraintComponent-ignoredProperties",
-    "http://www.w3.org/ns/shacl#ConstraintComponent":
+    "https://www.w3.org/ns/shacl#ConstraintComponent":
       "https://2019.summerofcode.be/unshacled#ConstraintComponent",
-    "http://www.w3.org/ns/shacl#DatatypeConstraintComponent":
+    "https://www.w3.org/ns/shacl#DatatypeConstraintComponent":
       "https://2019.summerofcode.be/unshacled#DatatypeConstraintComponent",
-    "http://www.w3.org/ns/shacl#DatatypeConstraintComponent-datatype":
+    "https://www.w3.org/ns/shacl#DatatypeConstraintComponent-datatype":
       "https://2019.summerofcode.be/unshacled#DatatypeConstraintComponent-datatype",
-    "http://www.w3.org/ns/shacl#DisjointConstraintComponent":
+    "https://www.w3.org/ns/shacl#DisjointConstraintComponent":
       "https://2019.summerofcode.be/unshacled#DisjointConstraintComponent",
-    "http://www.w3.org/ns/shacl#DisjointConstraintComponent-disjoint":
+    "https://www.w3.org/ns/shacl#DisjointConstraintComponent-disjoint":
       "https://2019.summerofcode.be/unshacled#DisjointConstraintComponent-disjoint",
-    "http://www.w3.org/ns/shacl#EqualsConstraintComponent":
+    "https://www.w3.org/ns/shacl#EqualsConstraintComponent":
       "https://2019.summerofcode.be/unshacled#EqualsConstraintComponent",
-    "http://www.w3.org/ns/shacl#EqualsConstraintComponent-equals":
+    "https://www.w3.org/ns/shacl#EqualsConstraintComponent-equals":
       "https://2019.summerofcode.be/unshacled#EqualsConstraintComponent-equals",
-    "http://www.w3.org/ns/shacl#ExpressionConstraintComponent":
+    "https://www.w3.org/ns/shacl#ExpressionConstraintComponent":
       "https://2019.summerofcode.be/unshacled#ExpressionConstraintComponent",
-    "http://www.w3.org/ns/shacl#ExpressionConstraintComponent-expression":
+    "https://www.w3.org/ns/shacl#ExpressionConstraintComponent-expression":
       "https://2019.summerofcode.be/unshacled#ExpressionConstraintComponent-expression",
-    "http://www.w3.org/ns/shacl#Function":
+    "https://www.w3.org/ns/shacl#Function":
       "https://2019.summerofcode.be/unshacled#Function",
-    "http://www.w3.org/ns/shacl#HasValueConstraintComponent":
+    "https://www.w3.org/ns/shacl#HasValueConstraintComponent":
       "https://2019.summerofcode.be/unshacled#HasValueConstraintComponent",
-    "http://www.w3.org/ns/shacl#HasValueConstraintComponent-hasValue":
+    "https://www.w3.org/ns/shacl#HasValueConstraintComponent-hasValue":
       "https://2019.summerofcode.be/unshacled#HasValueConstraintComponent-hasValue",
-    "http://www.w3.org/ns/shacl#IRI":
+    "https://www.w3.org/ns/shacl#IRI":
       "https://2019.summerofcode.be/unshacled#IRI",
-    "http://www.w3.org/ns/shacl#IRIOrLiteral":
+    "https://www.w3.org/ns/shacl#IRIOrLiteral":
       "https://2019.summerofcode.be/unshacled#IRIOrLiteral",
-    "http://www.w3.org/ns/shacl#InConstraintComponent":
+    "https://www.w3.org/ns/shacl#InConstraintComponent":
       "https://2019.summerofcode.be/unshacled#InConstraintComponent",
-    "http://www.w3.org/ns/shacl#InConstraintComponent-in":
+    "https://www.w3.org/ns/shacl#InConstraintComponent-in":
       "https://2019.summerofcode.be/unshacled#InConstraintComponent-in",
-    "http://www.w3.org/ns/shacl#Info":
+    "https://www.w3.org/ns/shacl#Info":
       "https://2019.summerofcode.be/unshacled#Info",
-    "http://www.w3.org/ns/shacl#JSConstraint":
+    "https://www.w3.org/ns/shacl#JSConstraint":
       "https://2019.summerofcode.be/unshacled#JSConstraint",
-    "http://www.w3.org/ns/shacl#JSConstraint-js":
+    "https://www.w3.org/ns/shacl#JSConstraint-js":
       "https://2019.summerofcode.be/unshacled#JSConstraint-js",
-    "http://www.w3.org/ns/shacl#JSConstraintComponent":
+    "https://www.w3.org/ns/shacl#JSConstraintComponent":
       "https://2019.summerofcode.be/unshacled#JSConstraintComponent",
-    "http://www.w3.org/ns/shacl#JSExecutable":
+    "https://www.w3.org/ns/shacl#JSExecutable":
       "https://2019.summerofcode.be/unshacled#JSExecutable",
-    "http://www.w3.org/ns/shacl#JSFunction":
+    "https://www.w3.org/ns/shacl#JSFunction":
       "https://2019.summerofcode.be/unshacled#JSFunction",
-    "http://www.w3.org/ns/shacl#JSLibrary":
+    "https://www.w3.org/ns/shacl#JSLibrary":
       "https://2019.summerofcode.be/unshacled#JSLibrary",
-    "http://www.w3.org/ns/shacl#JSRule":
+    "https://www.w3.org/ns/shacl#JSRule":
       "https://2019.summerofcode.be/unshacled#JSRule",
-    "http://www.w3.org/ns/shacl#JSTarget":
+    "https://www.w3.org/ns/shacl#JSTarget":
       "https://2019.summerofcode.be/unshacled#JSTarget",
-    "http://www.w3.org/ns/shacl#JSTargetType":
+    "https://www.w3.org/ns/shacl#JSTargetType":
       "https://2019.summerofcode.be/unshacled#JSTargetType",
-    "http://www.w3.org/ns/shacl#JSValidator":
+    "https://www.w3.org/ns/shacl#JSValidator":
       "https://2019.summerofcode.be/unshacled#JSValidator",
-    "http://www.w3.org/ns/shacl#LanguageInConstraintComponent":
+    "https://www.w3.org/ns/shacl#LanguageInConstraintComponent":
       "https://2019.summerofcode.be/unshacled#LanguageInConstraintComponent",
-    "http://www.w3.org/ns/shacl#LanguageInConstraintComponent-languageIn":
+    "https://www.w3.org/ns/shacl#LanguageInConstraintComponent-languageIn":
       "https://2019.summerofcode.be/unshacled#LanguageInConstraintComponent-languageIn",
-    "http://www.w3.org/ns/shacl#LessThanConstraintComponent":
+    "https://www.w3.org/ns/shacl#LessThanConstraintComponent":
       "https://2019.summerofcode.be/unshacled#LessThanConstraintComponent",
-    "http://www.w3.org/ns/shacl#LessThanConstraintComponent-lessThan":
+    "https://www.w3.org/ns/shacl#LessThanConstraintComponent-lessThan":
       "https://2019.summerofcode.be/unshacled#LessThanConstraintComponent-lessThan",
-    "http://www.w3.org/ns/shacl#LessThanOrEqualsConstraintComponent":
+    "https://www.w3.org/ns/shacl#LessThanOrEqualsConstraintComponent":
       "https://2019.summerofcode.be/unshacled#LessThanOrEqualsConstraintComponent",
-    "http://www.w3.org/ns/shacl#LessThanOrEqualsConstraintComponent-lessThanOrEquals":
+    "https://www.w3.org/ns/shacl#LessThanOrEqualsConstraintComponent-lessThanOrEquals":
       "https://2019.summerofcode.be/unshacled#LessThanOrEqualsConstraintComponent-lessThanOrEquals",
-    "http://www.w3.org/ns/shacl#Literal":
+    "https://www.w3.org/ns/shacl#Literal":
       "https://2019.summerofcode.be/unshacled#Literal",
-    "http://www.w3.org/ns/shacl#MaxCountConstraintComponent":
+    "https://www.w3.org/ns/shacl#MaxCountConstraintComponent":
       "https://2019.summerofcode.be/unshacled#MaxCountConstraintComponent",
-    "http://www.w3.org/ns/shacl#MaxCountConstraintComponent-maxCount":
+    "https://www.w3.org/ns/shacl#MaxCountConstraintComponent-maxCount":
       "https://2019.summerofcode.be/unshacled#MaxCountConstraintComponent-maxCount",
-    "http://www.w3.org/ns/shacl#MaxExclusiveConstraintComponent":
+    "https://www.w3.org/ns/shacl#MaxExclusiveConstraintComponent":
       "https://2019.summerofcode.be/unshacled#MaxExclusiveConstraintComponent",
-    "http://www.w3.org/ns/shacl#MaxExclusiveConstraintComponent-maxExclusive":
+    "https://www.w3.org/ns/shacl#MaxExclusiveConstraintComponent-maxExclusive":
       "https://2019.summerofcode.be/unshacled#MaxExclusiveConstraintComponent-maxExclusive",
-    "http://www.w3.org/ns/shacl#MaxInclusiveConstraintComponent":
+    "https://www.w3.org/ns/shacl#MaxInclusiveConstraintComponent":
       "https://2019.summerofcode.be/unshacled#MaxInclusiveConstraintComponent",
-    "http://www.w3.org/ns/shacl#MaxInclusiveConstraintComponent-maxInclusive":
+    "https://www.w3.org/ns/shacl#MaxInclusiveConstraintComponent-maxInclusive":
       "https://2019.summerofcode.be/unshacled#MaxInclusiveConstraintComponent-maxInclusive",
-    "http://www.w3.org/ns/shacl#MaxLengthConstraintComponent":
+    "https://www.w3.org/ns/shacl#MaxLengthConstraintComponent":
       "https://2019.summerofcode.be/unshacled#MaxLengthConstraintComponent",
-    "http://www.w3.org/ns/shacl#MaxLengthConstraintComponent-maxLength":
+    "https://www.w3.org/ns/shacl#MaxLengthConstraintComponent-maxLength":
       "https://2019.summerofcode.be/unshacled#MaxLengthConstraintComponent-maxLength",
-    "http://www.w3.org/ns/shacl#MinCountConstraintComponent":
+    "https://www.w3.org/ns/shacl#MinCountConstraintComponent":
       "https://2019.summerofcode.be/unshacled#MinCountConstraintComponent",
-    "http://www.w3.org/ns/shacl#MinCountConstraintComponent-minCount":
+    "https://www.w3.org/ns/shacl#MinCountConstraintComponent-minCount":
       "https://2019.summerofcode.be/unshacled#MinCountConstraintComponent-minCount",
-    "http://www.w3.org/ns/shacl#MinExclusiveConstraintComponent":
+    "https://www.w3.org/ns/shacl#MinExclusiveConstraintComponent":
       "https://2019.summerofcode.be/unshacled#MinExclusiveConstraintComponent",
-    "http://www.w3.org/ns/shacl#MinExclusiveConstraintComponent-minExclusive":
+    "https://www.w3.org/ns/shacl#MinExclusiveConstraintComponent-minExclusive":
       "https://2019.summerofcode.be/unshacled#MinExclusiveConstraintComponent-minExclusive",
-    "http://www.w3.org/ns/shacl#MinInclusiveConstraintComponent":
+    "https://www.w3.org/ns/shacl#MinInclusiveConstraintComponent":
       "https://2019.summerofcode.be/unshacled#MinInclusiveConstraintComponent",
-    "http://www.w3.org/ns/shacl#MinInclusiveConstraintComponent-minInclusive":
+    "https://www.w3.org/ns/shacl#MinInclusiveConstraintComponent-minInclusive":
       "https://2019.summerofcode.be/unshacled#MinInclusiveConstraintComponent-minInclusive",
-    "http://www.w3.org/ns/shacl#MinLengthConstraintComponent":
+    "https://www.w3.org/ns/shacl#MinLengthConstraintComponent":
       "https://2019.summerofcode.be/unshacled#MinLengthConstraintComponent",
-    "http://www.w3.org/ns/shacl#MinLengthConstraintComponent-minLength":
+    "https://www.w3.org/ns/shacl#MinLengthConstraintComponent-minLength":
       "https://2019.summerofcode.be/unshacled#MinLengthConstraintComponent-minLength",
-    "http://www.w3.org/ns/shacl#NodeConstraintComponent":
+    "https://www.w3.org/ns/shacl#NodeConstraintComponent":
       "https://2019.summerofcode.be/unshacled#NodeConstraintComponent",
-    "http://www.w3.org/ns/shacl#NodeConstraintComponent-node":
+    "https://www.w3.org/ns/shacl#NodeConstraintComponent-node":
       "https://2019.summerofcode.be/unshacled#NodeConstraintComponent-node",
-    "http://www.w3.org/ns/shacl#NodeKind":
+    "https://www.w3.org/ns/shacl#NodeKind":
       "https://2019.summerofcode.be/unshacled#NodeKind",
-    "http://www.w3.org/ns/shacl#NodeKindConstraintComponent":
+    "https://www.w3.org/ns/shacl#NodeKindConstraintComponent":
       "https://2019.summerofcode.be/unshacled#NodeKindConstraintComponent",
-    "http://www.w3.org/ns/shacl#NodeKindConstraintComponent-nodeKind":
+    "https://www.w3.org/ns/shacl#NodeKindConstraintComponent-nodeKind":
       "https://2019.summerofcode.be/unshacled#NodeKindConstraintComponent-nodeKind",
-    "http://www.w3.org/ns/shacl#NodeShape":
+    "https://www.w3.org/ns/shacl#NodeShape":
       "https://2019.summerofcode.be/unshacled#NodeShape",
-    "http://www.w3.org/ns/shacl#NotConstraintComponent":
+    "https://www.w3.org/ns/shacl#NotConstraintComponent":
       "https://2019.summerofcode.be/unshacled#NotConstraintComponent",
-    "http://www.w3.org/ns/shacl#NotConstraintComponent-not":
+    "https://www.w3.org/ns/shacl#NotConstraintComponent-not":
       "https://2019.summerofcode.be/unshacled#NotConstraintComponent-not",
-    "http://www.w3.org/ns/shacl#OrConstraintComponent":
+    "https://www.w3.org/ns/shacl#OrConstraintComponent":
       "https://2019.summerofcode.be/unshacled#OrConstraintComponent",
-    "http://www.w3.org/ns/shacl#OrConstraintComponent-or":
+    "https://www.w3.org/ns/shacl#OrConstraintComponent-or":
       "https://2019.summerofcode.be/unshacled#OrConstraintComponent-or",
-    "http://www.w3.org/ns/shacl#Parameter":
+    "https://www.w3.org/ns/shacl#Parameter":
       "https://2019.summerofcode.be/unshacled#Parameter",
-    "http://www.w3.org/ns/shacl#Parameterizable":
+    "https://www.w3.org/ns/shacl#Parameterizable":
       "https://2019.summerofcode.be/unshacled#Parameterizable",
-    "http://www.w3.org/ns/shacl#PatternConstraintComponent":
+    "https://www.w3.org/ns/shacl#PatternConstraintComponent":
       "https://2019.summerofcode.be/unshacled#PatternConstraintComponent",
-    "http://www.w3.org/ns/shacl#PatternConstraintComponent-flags":
+    "https://www.w3.org/ns/shacl#PatternConstraintComponent-flags":
       "https://2019.summerofcode.be/unshacled#PatternConstraintComponent-flags",
-    "http://www.w3.org/ns/shacl#PatternConstraintComponent-pattern":
+    "https://www.w3.org/ns/shacl#PatternConstraintComponent-pattern":
       "https://2019.summerofcode.be/unshacled#PatternConstraintComponent-pattern",
-    "http://www.w3.org/ns/shacl#PrefixDeclaration":
+    "https://www.w3.org/ns/shacl#PrefixDeclaration":
       "https://2019.summerofcode.be/unshacled#PrefixDeclaration",
-    "http://www.w3.org/ns/shacl#PropertyConstraintComponent":
+    "https://www.w3.org/ns/shacl#PropertyConstraintComponent":
       "https://2019.summerofcode.be/unshacled#PropertyConstraintComponent",
-    "http://www.w3.org/ns/shacl#PropertyConstraintComponent-property":
+    "https://www.w3.org/ns/shacl#PropertyConstraintComponent-property":
       "https://2019.summerofcode.be/unshacled#PropertyConstraintComponent-property",
-    "http://www.w3.org/ns/shacl#PropertyGroup":
+    "https://www.w3.org/ns/shacl#PropertyGroup":
       "https://2019.summerofcode.be/unshacled#PropertyGroup",
-    "http://www.w3.org/ns/shacl#PropertyShape":
+    "https://www.w3.org/ns/shacl#PropertyShape":
       "https://2019.summerofcode.be/unshacled#PropertyShape",
-    "http://www.w3.org/ns/shacl#QualifiedMaxCountConstraintComponent":
+    "https://www.w3.org/ns/shacl#QualifiedMaxCountConstraintComponent":
       "https://2019.summerofcode.be/unshacled#QualifiedMaxCountConstraintComponent",
-    "http://www.w3.org/ns/shacl#QualifiedMaxCountConstraintComponent-qualifiedMaxCount":
+    "https://www.w3.org/ns/shacl#QualifiedMaxCountConstraintComponent-qualifiedMaxCount":
       "https://2019.summerofcode.be/unshacled#QualifiedMaxCountConstraintComponent-qualifiedMaxCount",
-    "http://www.w3.org/ns/shacl#QualifiedMaxCountConstraintComponent-qualifiedValueShape":
+    "https://www.w3.org/ns/shacl#QualifiedMaxCountConstraintComponent-qualifiedValueShape":
       "https://2019.summerofcode.be/unshacled#QualifiedMaxCountConstraintComponent-qualifiedValueShape",
-    "http://www.w3.org/ns/shacl#QualifiedMaxCountConstraintComponent-qualifiedValueShapesDisjoint":
+    "https://www.w3.org/ns/shacl#QualifiedMaxCountConstraintComponent-qualifiedValueShapesDisjoint":
       "https://2019.summerofcode.be/unshacled#QualifiedMaxCountConstraintComponent-qualifiedValueShapesDisjoint",
-    "http://www.w3.org/ns/shacl#QualifiedMinCountConstraintComponent":
+    "https://www.w3.org/ns/shacl#QualifiedMinCountConstraintComponent":
       "https://2019.summerofcode.be/unshacled#QualifiedMinCountConstraintComponent",
-    "http://www.w3.org/ns/shacl#QualifiedMinCountConstraintComponent-qualifiedMinCount":
+    "https://www.w3.org/ns/shacl#QualifiedMinCountConstraintComponent-qualifiedMinCount":
       "https://2019.summerofcode.be/unshacled#QualifiedMinCountConstraintComponent-qualifiedMinCount",
-    "http://www.w3.org/ns/shacl#QualifiedMinCountConstraintComponent-qualifiedValueShape":
+    "https://www.w3.org/ns/shacl#QualifiedMinCountConstraintComponent-qualifiedValueShape":
       "https://2019.summerofcode.be/unshacled#QualifiedMinCountConstraintComponent-qualifiedValueShape",
-    "http://www.w3.org/ns/shacl#QualifiedMinCountConstraintComponent-qualifiedValueShapesDisjoint":
+    "https://www.w3.org/ns/shacl#QualifiedMinCountConstraintComponent-qualifiedValueShapesDisjoint":
       "https://2019.summerofcode.be/unshacled#QualifiedMinCountConstraintComponent-qualifiedValueShapesDisjoint",
-    "http://www.w3.org/ns/shacl#ResultAnnotation":
+    "https://www.w3.org/ns/shacl#ResultAnnotation":
       "https://2019.summerofcode.be/unshacled#ResultAnnotation",
-    "http://www.w3.org/ns/shacl#Rule":
+    "https://www.w3.org/ns/shacl#Rule":
       "https://2019.summerofcode.be/unshacled#Rule",
-    "http://www.w3.org/ns/shacl#SPARQLAskExecutable":
+    "https://www.w3.org/ns/shacl#SPARQLAskExecutable":
       "https://2019.summerofcode.be/unshacled#SPARQLAskExecutable",
-    "http://www.w3.org/ns/shacl#SPARQLAskValidator":
+    "https://www.w3.org/ns/shacl#SPARQLAskValidator":
       "https://2019.summerofcode.be/unshacled#SPARQLAskValidator",
-    "http://www.w3.org/ns/shacl#SPARQLConstraint":
+    "https://www.w3.org/ns/shacl#SPARQLConstraint":
       "https://2019.summerofcode.be/unshacled#SPARQLConstraint",
-    "http://www.w3.org/ns/shacl#SPARQLConstraintComponent":
+    "https://www.w3.org/ns/shacl#SPARQLConstraintComponent":
       "https://2019.summerofcode.be/unshacled#SPARQLConstraintComponent",
-    "http://www.w3.org/ns/shacl#SPARQLConstraintComponent-sparql":
+    "https://www.w3.org/ns/shacl#SPARQLConstraintComponent-sparql":
       "https://2019.summerofcode.be/unshacled#SPARQLConstraintComponent-sparql",
-    "http://www.w3.org/ns/shacl#SPARQLConstructExecutable":
+    "https://www.w3.org/ns/shacl#SPARQLConstructExecutable":
       "https://2019.summerofcode.be/unshacled#SPARQLConstructExecutable",
-    "http://www.w3.org/ns/shacl#SPARQLExecutable":
+    "https://www.w3.org/ns/shacl#SPARQLExecutable":
       "https://2019.summerofcode.be/unshacled#SPARQLExecutable",
-    "http://www.w3.org/ns/shacl#SPARQLFunction":
+    "https://www.w3.org/ns/shacl#SPARQLFunction":
       "https://2019.summerofcode.be/unshacled#SPARQLFunction",
-    "http://www.w3.org/ns/shacl#SPARQLRule":
+    "https://www.w3.org/ns/shacl#SPARQLRule":
       "https://2019.summerofcode.be/unshacled#SPARQLRule",
-    "http://www.w3.org/ns/shacl#SPARQLSelectExecutable":
+    "https://www.w3.org/ns/shacl#SPARQLSelectExecutable":
       "https://2019.summerofcode.be/unshacled#SPARQLSelectExecutable",
-    "http://www.w3.org/ns/shacl#SPARQLSelectValidator":
+    "https://www.w3.org/ns/shacl#SPARQLSelectValidator":
       "https://2019.summerofcode.be/unshacled#SPARQLSelectValidator",
-    "http://www.w3.org/ns/shacl#SPARQLTarget":
+    "https://www.w3.org/ns/shacl#SPARQLTarget":
       "https://2019.summerofcode.be/unshacled#SPARQLTarget",
-    "http://www.w3.org/ns/shacl#SPARQLTargetType":
+    "https://www.w3.org/ns/shacl#SPARQLTargetType":
       "https://2019.summerofcode.be/unshacled#SPARQLTargetType",
-    "http://www.w3.org/ns/shacl#SPARQLUpdateExecutable":
+    "https://www.w3.org/ns/shacl#SPARQLUpdateExecutable":
       "https://2019.summerofcode.be/unshacled#SPARQLUpdateExecutable",
-    "http://www.w3.org/ns/shacl#Severity":
+    "https://www.w3.org/ns/shacl#Severity":
       "https://2019.summerofcode.be/unshacled#Severity",
-    "http://www.w3.org/ns/shacl#Shape":
+    "https://www.w3.org/ns/shacl#Shape":
       "https://2019.summerofcode.be/unshacled#Shape",
-    "http://www.w3.org/ns/shacl#Target":
+    "https://www.w3.org/ns/shacl#Target":
       "https://2019.summerofcode.be/unshacled#Target",
-    "http://www.w3.org/ns/shacl#TargetType":
+    "https://www.w3.org/ns/shacl#TargetType":
       "https://2019.summerofcode.be/unshacled#TargetType",
-    "http://www.w3.org/ns/shacl#TripleRule":
+    "https://www.w3.org/ns/shacl#TripleRule":
       "https://2019.summerofcode.be/unshacled#TripleRule",
-    "http://www.w3.org/ns/shacl#UniqueLangConstraintComponent":
+    "https://www.w3.org/ns/shacl#UniqueLangConstraintComponent":
       "https://2019.summerofcode.be/unshacled#UniqueLangConstraintComponent",
-    "http://www.w3.org/ns/shacl#UniqueLangConstraintComponent-uniqueLang":
+    "https://www.w3.org/ns/shacl#UniqueLangConstraintComponent-uniqueLang":
       "https://2019.summerofcode.be/unshacled#UniqueLangConstraintComponent-uniqueLang",
-    "http://www.w3.org/ns/shacl#ValidationReport":
+    "https://www.w3.org/ns/shacl#ValidationReport":
       "https://2019.summerofcode.be/unshacled#ValidationReport",
-    "http://www.w3.org/ns/shacl#ValidationResult":
+    "https://www.w3.org/ns/shacl#ValidationResult":
       "https://2019.summerofcode.be/unshacled#ValidationResult",
-    "http://www.w3.org/ns/shacl#Validator":
+    "https://www.w3.org/ns/shacl#Validator":
       "https://2019.summerofcode.be/unshacled#Validator",
-    "http://www.w3.org/ns/shacl#Violation":
+    "https://www.w3.org/ns/shacl#Violation":
       "https://2019.summerofcode.be/unshacled#Violation",
-    "http://www.w3.org/ns/shacl#Warning":
+    "https://www.w3.org/ns/shacl#Warning":
       "https://2019.summerofcode.be/unshacled#Warning",
-    "http://www.w3.org/ns/shacl#XoneConstraintComponent":
+    "https://www.w3.org/ns/shacl#XoneConstraintComponent":
       "https://2019.summerofcode.be/unshacled#XoneConstraintComponent",
-    "http://www.w3.org/ns/shacl#XoneConstraintComponent-xone":
+    "https://www.w3.org/ns/shacl#XoneConstraintComponent-xone":
       "https://2019.summerofcode.be/unshacled#XoneConstraintComponent-xone",
-    "http://www.w3.org/ns/shacl#alternativePath":
+    "https://www.w3.org/ns/shacl#alternativePath":
       "https://2019.summerofcode.be/unshacled#alternativePath",
-    "http://www.w3.org/ns/shacl#and":
+    "https://www.w3.org/ns/shacl#and":
       "https://2019.summerofcode.be/unshacled#and",
-    "http://www.w3.org/ns/shacl#annotationProperty":
+    "https://www.w3.org/ns/shacl#annotationProperty":
       "https://2019.summerofcode.be/unshacled#annotationProperty",
-    "http://www.w3.org/ns/shacl#annotationValue":
+    "https://www.w3.org/ns/shacl#annotationValue":
       "https://2019.summerofcode.be/unshacled#annotationValue",
-    "http://www.w3.org/ns/shacl#annotationVarName":
+    "https://www.w3.org/ns/shacl#annotationVarName":
       "https://2019.summerofcode.be/unshacled#annotationVarName",
-    "http://www.w3.org/ns/shacl#ask":
+    "https://www.w3.org/ns/shacl#ask":
       "https://2019.summerofcode.be/unshacled#ask",
-    "http://www.w3.org/ns/shacl#class":
+    "https://www.w3.org/ns/shacl#class":
       "https://2019.summerofcode.be/unshacled#class",
-    "http://www.w3.org/ns/shacl#closed":
+    "https://www.w3.org/ns/shacl#closed":
       "https://2019.summerofcode.be/unshacled#closed",
-    "http://www.w3.org/ns/shacl#condition":
+    "https://www.w3.org/ns/shacl#condition":
       "https://2019.summerofcode.be/unshacled#condition",
-    "http://www.w3.org/ns/shacl#conforms":
+    "https://www.w3.org/ns/shacl#conforms":
       "https://2019.summerofcode.be/unshacled#conforms",
-    "http://www.w3.org/ns/shacl#construct":
+    "https://www.w3.org/ns/shacl#construct":
       "https://2019.summerofcode.be/unshacled#construct",
-    "http://www.w3.org/ns/shacl#datatype":
+    "https://www.w3.org/ns/shacl#datatype":
       "https://2019.summerofcode.be/unshacled#datatype",
-    "http://www.w3.org/ns/shacl#deactivated":
+    "https://www.w3.org/ns/shacl#deactivated":
       "https://2019.summerofcode.be/unshacled#deactivated",
-    "http://www.w3.org/ns/shacl#declare":
+    "https://www.w3.org/ns/shacl#declare":
       "https://2019.summerofcode.be/unshacled#declare",
-    "http://www.w3.org/ns/shacl#defaultValue":
+    "https://www.w3.org/ns/shacl#defaultValue":
       "https://2019.summerofcode.be/unshacled#defaultValue",
-    "http://www.w3.org/ns/shacl#description":
+    "https://www.w3.org/ns/shacl#description":
       "https://2019.summerofcode.be/unshacled#description",
-    "http://www.w3.org/ns/shacl#detail":
+    "https://www.w3.org/ns/shacl#detail":
       "https://2019.summerofcode.be/unshacled#detail",
-    "http://www.w3.org/ns/shacl#disjoint":
+    "https://www.w3.org/ns/shacl#disjoint":
       "https://2019.summerofcode.be/unshacled#disjoint",
-    "http://www.w3.org/ns/shacl#entailment":
+    "https://www.w3.org/ns/shacl#entailment":
       "https://2019.summerofcode.be/unshacled#entailment",
-    "http://www.w3.org/ns/shacl#equals":
+    "https://www.w3.org/ns/shacl#equals":
       "https://2019.summerofcode.be/unshacled#equals",
-    "http://www.w3.org/ns/shacl#expression":
+    "https://www.w3.org/ns/shacl#expression":
       "https://2019.summerofcode.be/unshacled#expression",
-    "http://www.w3.org/ns/shacl#filterShape":
+    "https://www.w3.org/ns/shacl#filterShape":
       "https://2019.summerofcode.be/unshacled#filterShape",
-    "http://www.w3.org/ns/shacl#flags":
+    "https://www.w3.org/ns/shacl#flags":
       "https://2019.summerofcode.be/unshacled#flags",
-    "http://www.w3.org/ns/shacl#focusNode":
+    "https://www.w3.org/ns/shacl#focusNode":
       "https://2019.summerofcode.be/unshacled#focusNode",
-    "http://www.w3.org/ns/shacl#group":
+    "https://www.w3.org/ns/shacl#group":
       "https://2019.summerofcode.be/unshacled#group",
-    "http://www.w3.org/ns/shacl#hasValue":
+    "https://www.w3.org/ns/shacl#hasValue":
       "https://2019.summerofcode.be/unshacled#hasValue",
-    "http://www.w3.org/ns/shacl#ignoredProperties":
+    "https://www.w3.org/ns/shacl#ignoredProperties":
       "https://2019.summerofcode.be/unshacled#ignoredProperties",
-    "http://www.w3.org/ns/shacl#in":
+    "https://www.w3.org/ns/shacl#in":
       "https://2019.summerofcode.be/unshacled#in",
-    "http://www.w3.org/ns/shacl#intersection":
+    "https://www.w3.org/ns/shacl#intersection":
       "https://2019.summerofcode.be/unshacled#intersection",
-    "http://www.w3.org/ns/shacl#inversePath":
+    "https://www.w3.org/ns/shacl#inversePath":
       "https://2019.summerofcode.be/unshacled#inversePath",
-    "http://www.w3.org/ns/shacl#js":
+    "https://www.w3.org/ns/shacl#js":
       "https://2019.summerofcode.be/unshacled#js",
-    "http://www.w3.org/ns/shacl#jsFunctionName":
+    "https://www.w3.org/ns/shacl#jsFunctionName":
       "https://2019.summerofcode.be/unshacled#jsFunctionName",
-    "http://www.w3.org/ns/shacl#jsLibrary":
+    "https://www.w3.org/ns/shacl#jsLibrary":
       "https://2019.summerofcode.be/unshacled#jsLibrary",
-    "http://www.w3.org/ns/shacl#jsLibraryURL":
+    "https://www.w3.org/ns/shacl#jsLibraryURL":
       "https://2019.summerofcode.be/unshacled#jsLibraryURL",
-    "http://www.w3.org/ns/shacl#labelTemplate":
+    "https://www.w3.org/ns/shacl#labelTemplate":
       "https://2019.summerofcode.be/unshacled#labelTemplate",
-    "http://www.w3.org/ns/shacl#languageIn":
+    "https://www.w3.org/ns/shacl#languageIn":
       "https://2019.summerofcode.be/unshacled#languageIn",
-    "http://www.w3.org/ns/shacl#lessThan":
+    "https://www.w3.org/ns/shacl#lessThan":
       "https://2019.summerofcode.be/unshacled#lessThan",
-    "http://www.w3.org/ns/shacl#lessThanOrEquals":
+    "https://www.w3.org/ns/shacl#lessThanOrEquals":
       "https://2019.summerofcode.be/unshacled#lessThanOrEquals",
-    "http://www.w3.org/ns/shacl#maxCount":
+    "https://www.w3.org/ns/shacl#maxCount":
       "https://2019.summerofcode.be/unshacled#maxCount",
-    "http://www.w3.org/ns/shacl#maxExclusive":
+    "https://www.w3.org/ns/shacl#maxExclusive":
       "https://2019.summerofcode.be/unshacled#maxExclusive",
-    "http://www.w3.org/ns/shacl#maxInclusive":
+    "https://www.w3.org/ns/shacl#maxInclusive":
       "https://2019.summerofcode.be/unshacled#maxInclusive",
-    "http://www.w3.org/ns/shacl#maxLength":
+    "https://www.w3.org/ns/shacl#maxLength":
       "https://2019.summerofcode.be/unshacled#maxLength",
-    "http://www.w3.org/ns/shacl#message":
+    "https://www.w3.org/ns/shacl#message":
       "https://2019.summerofcode.be/unshacled#message",
-    "http://www.w3.org/ns/shacl#minCount":
+    "https://www.w3.org/ns/shacl#minCount":
       "https://2019.summerofcode.be/unshacled#minCount",
-    "http://www.w3.org/ns/shacl#minExclusive":
+    "https://www.w3.org/ns/shacl#minExclusive":
       "https://2019.summerofcode.be/unshacled#minExclusive",
-    "http://www.w3.org/ns/shacl#minInclusive":
+    "https://www.w3.org/ns/shacl#minInclusive":
       "https://2019.summerofcode.be/unshacled#minInclusive",
-    "http://www.w3.org/ns/shacl#minLength":
+    "https://www.w3.org/ns/shacl#minLength":
       "https://2019.summerofcode.be/unshacled#minLength",
-    "http://www.w3.org/ns/shacl#name":
+    "https://www.w3.org/ns/shacl#name":
       "https://2019.summerofcode.be/unshacled#name",
-    "http://www.w3.org/ns/shacl#namespace":
+    "https://www.w3.org/ns/shacl#namespace":
       "https://2019.summerofcode.be/unshacled#namespace",
-    "http://www.w3.org/ns/shacl#node":
+    "https://www.w3.org/ns/shacl#node":
       "https://2019.summerofcode.be/unshacled#node",
-    "http://www.w3.org/ns/shacl#nodeKind":
+    "https://www.w3.org/ns/shacl#nodeKind":
       "https://2019.summerofcode.be/unshacled#nodeKind",
-    "http://www.w3.org/ns/shacl#nodeValidator":
+    "https://www.w3.org/ns/shacl#nodeValidator":
       "https://2019.summerofcode.be/unshacled#nodeValidator",
-    "http://www.w3.org/ns/shacl#nodes":
+    "https://www.w3.org/ns/shacl#nodes":
       "https://2019.summerofcode.be/unshacled#nodes",
-    "http://www.w3.org/ns/shacl#not":
+    "https://www.w3.org/ns/shacl#not":
       "https://2019.summerofcode.be/unshacled#not",
-    "http://www.w3.org/ns/shacl#object":
+    "https://www.w3.org/ns/shacl#object":
       "https://2019.summerofcode.be/unshacled#object",
-    "http://www.w3.org/ns/shacl#oneOrMorePath":
+    "https://www.w3.org/ns/shacl#oneOrMorePath":
       "https://2019.summerofcode.be/unshacled#oneOrMorePath",
-    "http://www.w3.org/ns/shacl#optional":
+    "https://www.w3.org/ns/shacl#optional":
       "https://2019.summerofcode.be/unshacled#optional",
-    "http://www.w3.org/ns/shacl#or":
+    "https://www.w3.org/ns/shacl#or":
       "https://2019.summerofcode.be/unshacled#or",
-    "http://www.w3.org/ns/shacl#order":
+    "https://www.w3.org/ns/shacl#order":
       "https://2019.summerofcode.be/unshacled#order",
-    "http://www.w3.org/ns/shacl#parameter":
+    "https://www.w3.org/ns/shacl#parameter":
       "https://2019.summerofcode.be/unshacled#parameter",
-    "http://www.w3.org/ns/shacl#path":
+    "https://www.w3.org/ns/shacl#path":
       "https://2019.summerofcode.be/unshacled#path",
-    "http://www.w3.org/ns/shacl#pattern":
+    "https://www.w3.org/ns/shacl#pattern":
       "https://2019.summerofcode.be/unshacled#pattern",
-    "http://www.w3.org/ns/shacl#predicate":
+    "https://www.w3.org/ns/shacl#predicate":
       "https://2019.summerofcode.be/unshacled#predicate",
-    "http://www.w3.org/ns/shacl#prefix":
+    "https://www.w3.org/ns/shacl#prefix":
       "https://2019.summerofcode.be/unshacled#prefix",
-    "http://www.w3.org/ns/shacl#prefixes":
+    "https://www.w3.org/ns/shacl#prefixes":
       "https://2019.summerofcode.be/unshacled#prefixes",
-    "http://www.w3.org/ns/shacl#property":
+    "https://www.w3.org/ns/shacl#property":
       "https://2019.summerofcode.be/unshacled#property",
-    "http://www.w3.org/ns/shacl#propertyValidator":
+    "https://www.w3.org/ns/shacl#propertyValidator":
       "https://2019.summerofcode.be/unshacled#propertyValidator",
-    "http://www.w3.org/ns/shacl#qualifiedMaxCount":
+    "https://www.w3.org/ns/shacl#qualifiedMaxCount":
       "https://2019.summerofcode.be/unshacled#qualifiedMaxCount",
-    "http://www.w3.org/ns/shacl#qualifiedMinCount":
+    "https://www.w3.org/ns/shacl#qualifiedMinCount":
       "https://2019.summerofcode.be/unshacled#qualifiedMinCount",
-    "http://www.w3.org/ns/shacl#qualifiedValueShape":
+    "https://www.w3.org/ns/shacl#qualifiedValueShape":
       "https://2019.summerofcode.be/unshacled#qualifiedValueShape",
-    "http://www.w3.org/ns/shacl#qualifiedValueShapesDisjoint":
+    "https://www.w3.org/ns/shacl#qualifiedValueShapesDisjoint":
       "https://2019.summerofcode.be/unshacled#qualifiedValueShapesDisjoint",
-    "http://www.w3.org/ns/shacl#result":
+    "https://www.w3.org/ns/shacl#result":
       "https://2019.summerofcode.be/unshacled#result",
-    "http://www.w3.org/ns/shacl#resultAnnotation":
+    "https://www.w3.org/ns/shacl#resultAnnotation":
       "https://2019.summerofcode.be/unshacled#resultAnnotation",
-    "http://www.w3.org/ns/shacl#resultMessage":
+    "https://www.w3.org/ns/shacl#resultMessage":
       "https://2019.summerofcode.be/unshacled#resultMessage",
-    "http://www.w3.org/ns/shacl#resultPath":
+    "https://www.w3.org/ns/shacl#resultPath":
       "https://2019.summerofcode.be/unshacled#resultPath",
-    "http://www.w3.org/ns/shacl#resultSeverity":
+    "https://www.w3.org/ns/shacl#resultSeverity":
       "https://2019.summerofcode.be/unshacled#resultSeverity",
-    "http://www.w3.org/ns/shacl#returnType":
+    "https://www.w3.org/ns/shacl#returnType":
       "https://2019.summerofcode.be/unshacled#returnType",
-    "http://www.w3.org/ns/shacl#rule":
+    "https://www.w3.org/ns/shacl#rule":
       "https://2019.summerofcode.be/unshacled#rule",
-    "http://www.w3.org/ns/shacl#select":
+    "https://www.w3.org/ns/shacl#select":
       "https://2019.summerofcode.be/unshacled#select",
-    "http://www.w3.org/ns/shacl#severity":
+    "https://www.w3.org/ns/shacl#severity":
       "https://2019.summerofcode.be/unshacled#severity",
-    "http://www.w3.org/ns/shacl#shapesGraph":
+    "https://www.w3.org/ns/shacl#shapesGraph":
       "https://2019.summerofcode.be/unshacled#shapesGraph",
-    "http://www.w3.org/ns/shacl#shapesGraphWellFormed":
+    "https://www.w3.org/ns/shacl#shapesGraphWellFormed":
       "https://2019.summerofcode.be/unshacled#shapesGraphWellFormed",
-    "http://www.w3.org/ns/shacl#sourceConstraint":
+    "https://www.w3.org/ns/shacl#sourceConstraint":
       "https://2019.summerofcode.be/unshacled#sourceConstraint",
-    "http://www.w3.org/ns/shacl#sourceConstraintComponent":
+    "https://www.w3.org/ns/shacl#sourceConstraintComponent":
       "https://2019.summerofcode.be/unshacled#sourceConstraintComponent",
-    "http://www.w3.org/ns/shacl#sourceShape":
+    "https://www.w3.org/ns/shacl#sourceShape":
       "https://2019.summerofcode.be/unshacled#sourceShape",
-    "http://www.w3.org/ns/shacl#sparql":
+    "https://www.w3.org/ns/shacl#sparql":
       "https://2019.summerofcode.be/unshacled#sparql",
-    "http://www.w3.org/ns/shacl#subject":
+    "https://www.w3.org/ns/shacl#subject":
       "https://2019.summerofcode.be/unshacled#subject",
-    "http://www.w3.org/ns/shacl#suggestedShapesGraph":
+    "https://www.w3.org/ns/shacl#suggestedShapesGraph":
       "https://2019.summerofcode.be/unshacled#suggestedShapesGraph",
-    "http://www.w3.org/ns/shacl#target":
+    "https://www.w3.org/ns/shacl#target":
       "https://2019.summerofcode.be/unshacled#target",
-    "http://www.w3.org/ns/shacl#targetClass":
+    "https://www.w3.org/ns/shacl#targetClass":
       "https://2019.summerofcode.be/unshacled#targetClass",
-    "http://www.w3.org/ns/shacl#targetNode":
+    "https://www.w3.org/ns/shacl#targetNode":
       "https://2019.summerofcode.be/unshacled#targetNode",
-    "http://www.w3.org/ns/shacl#targetObjectsOf":
+    "https://www.w3.org/ns/shacl#targetObjectsOf":
       "https://2019.summerofcode.be/unshacled#targetObjectsOf",
-    "http://www.w3.org/ns/shacl#targetSubjectsOf":
+    "https://www.w3.org/ns/shacl#targetSubjectsOf":
       "https://2019.summerofcode.be/unshacled#targetSubjectsOf",
-    "http://www.w3.org/ns/shacl#this":
+    "https://www.w3.org/ns/shacl#this":
       "https://2019.summerofcode.be/unshacled#this",
-    "http://www.w3.org/ns/shacl#union":
+    "https://www.w3.org/ns/shacl#union":
       "https://2019.summerofcode.be/unshacled#union",
-    "http://www.w3.org/ns/shacl#uniqueLang":
+    "https://www.w3.org/ns/shacl#uniqueLang":
       "https://2019.summerofcode.be/unshacled#uniqueLang",
-    "http://www.w3.org/ns/shacl#update":
+    "https://www.w3.org/ns/shacl#update":
       "https://2019.summerofcode.be/unshacled#update",
-    "http://www.w3.org/ns/shacl#validator":
+    "https://www.w3.org/ns/shacl#validator":
       "https://2019.summerofcode.be/unshacled#validator",
-    "http://www.w3.org/ns/shacl#value":
+    "https://www.w3.org/ns/shacl#value":
       "https://2019.summerofcode.be/unshacled#value",
-    "http://www.w3.org/ns/shacl#xone":
+    "https://www.w3.org/ns/shacl#xone":
       "https://2019.summerofcode.be/unshacled#xone",
-    "http://www.w3.org/ns/shacl#zeroOrMorePath":
+    "https://www.w3.org/ns/shacl#zeroOrMorePath":
       "https://2019.summerofcode.be/unshacled#zeroOrMorePath",
-    "http://www.w3.org/ns/shacl#zeroOrOnePath":
+    "https://www.w3.org/ns/shacl#zeroOrOnePath":
       "https://2019.summerofcode.be/unshacled#zeroOrOnePath"
   }
 };
