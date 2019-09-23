@@ -2,13 +2,13 @@ import { TERM } from "../translation/terminology";
 
 export const ENTER = 13; // Enter key code.
 
-export const DEFAULT_BASE_URI = "http://example.org/ns/unshacled/";
+export const DEFAULT_BASE_URI = "https://example.org/ns/unshacled/";
 export const IDENTIFIER = "shapes";
 /* Used for the `path` predicate. */
-export const SCHEMA_URI = "http://schema.org/";
-export const LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
+export const SCHEMA_URI = "https://schema.org/";
+export const LABEL = "https://www.w3.org/2000/01/rdf-schema#label";
 /** Used to change SHACL specific predicates to the internal model. */
-export const SHACL_URI = "http://www.w3.org/ns/shacl#";
+export const SHACL_URI = "https://www.w3.org/ns/shacl#";
 
 /* Indicates which constraints should be visualized in a single entry. */
 export const SINGLE_ENTRY = ["property"];

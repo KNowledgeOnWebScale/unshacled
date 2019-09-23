@@ -3,34 +3,34 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b0",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#address"
+            "@id": "https://example.org/ns#address"
           }
         ],
-        "http://www.w3.org/ns/shacl#class": [
+        "https://www.w3.org/ns/shacl#class": [
           {
-            "@id": "http://example.org/ns#PostalAddress"
+            "@id": "https://example.org/ns#PostalAddress"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#ClassExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#ClassExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b0"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           },
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Carol"
+            "@id": "https://example.org/ns#Carol"
           }
         ]
       }
@@ -38,75 +38,75 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b1",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#age"
+            "@id": "https://example.org/ns#age"
           }
         ],
-        "http://www.w3.org/ns/shacl#datatype": [
+        "https://www.w3.org/ns/shacl#datatype": [
           {
-            "@id": "http://www.w3.org/2001/XMLSchema#integer"
+            "@id": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#DatatypeExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#DatatypeExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b1"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           },
           {
-            "@id": "http://example.org/ns#Carol"
+            "@id": "https://example.org/ns#Carol"
           }
         ]
       }
     ],
     [
       {
-        "@id": "http://example.org/ns#NodeKindExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#nodeKind": [
+        "@id": "https://example.org/ns#NodeKindExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#nodeKind": [
           {
-            "@id": "http://www.w3.org/ns/shacl#IRI"
+            "@id": "https://www.w3.org/ns/shacl#IRI"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetObjectsOf": [
+        "https://www.w3.org/ns/shacl#targetObjectsOf": [
           {
-            "@id": "http://example.org/ns#knows"
+            "@id": "https://example.org/ns#knows"
           }
         ]
       }
     ],
     [
       {
-        "@id": "http://example.org/ns#MinCountExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#PropertyShape"],
-        "http://www.w3.org/ns/shacl#path": [
+        "@id": "https://example.org/ns#MinCountExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#PropertyShape"],
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#name"
+            "@id": "https://example.org/ns#name"
           }
         ],
-        "http://www.w3.org/ns/shacl#minCount": [
+        "https://www.w3.org/ns/shacl#minCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -114,29 +114,29 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b2",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#birthDate"
+            "@id": "https://example.org/ns#birthDate"
           }
         ],
-        "http://www.w3.org/ns/shacl#maxCount": [
+        "https://www.w3.org/ns/shacl#maxCount": [
           {
             "@value": "1",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#MaxCountExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#MaxCountExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b2"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -144,32 +144,32 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b3",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#hasKeys"
+            "@id": "https://example.org/ns#hasKeys"
           }
         ],
-        "http://www.w3.org/ns/shacl#minExclusive": [
+        "https://www.w3.org/ns/shacl#minExclusive": [
           {
             "@value": "2",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#MinExclusiveExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#MinExclusiveExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b3"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -177,32 +177,32 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b4",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#hasKeys"
+            "@id": "https://example.org/ns#hasKeys"
           }
         ],
-        "http://www.w3.org/ns/shacl#minInclusive": [
+        "https://www.w3.org/ns/shacl#minInclusive": [
           {
             "@value": "2",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#MinInclusiveExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#MinInclusiveExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b4"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -210,32 +210,32 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b5",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#hasKeys"
+            "@id": "https://example.org/ns#hasKeys"
           }
         ],
-        "http://www.w3.org/ns/shacl#maxExclusive": [
+        "https://www.w3.org/ns/shacl#maxExclusive": [
           {
             "@value": "2",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#MaxExclusiveExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#MaxExclusiveExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b5"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -243,32 +243,32 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b6",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#hasKeys"
+            "@id": "https://example.org/ns#hasKeys"
           }
         ],
-        "http://www.w3.org/ns/shacl#maxInclusive": [
+        "https://www.w3.org/ns/shacl#maxInclusive": [
           {
             "@value": "2",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#MaxInclusiveExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#MaxInclusiveExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b6"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -276,32 +276,32 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b7",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
-            "@id": "http://example.org/ns#password"
+            "@id": "https://example.org/ns#password"
           }
         ],
-        "http://www.w3.org/ns/shacl#minLength": [
+        "https://www.w3.org/ns/shacl#minLength": [
           {
             "@value": "8",
-            "@type": "http://www.w3.org/2001/XMLSchema#integer"
+            "@type": "https://www.w3.org/2001/XMLSchema#integer"
           }
         ]
       },
       {
-        "@id": "http://example.org/ns#MinLengthExampleShape",
-        "@type": ["http://www.w3.org/ns/shacl#NodeShape"],
-        "http://www.w3.org/ns/shacl#property": [
+        "@id": "https://example.org/ns#MinLengthExampleShape",
+        "@type": ["https://www.w3.org/ns/shacl#NodeShape"],
+        "https://www.w3.org/ns/shacl#property": [
           {
             "@id": "_:b7"
           }
         ],
-        "http://www.w3.org/ns/shacl#targetNode": [
+        "https://www.w3.org/ns/shacl#targetNode": [
           {
-            "@id": "http://example.org/ns#Alice"
+            "@id": "https://example.org/ns#Alice"
           },
           {
-            "@id": "http://example.org/ns#Bob"
+            "@id": "https://example.org/ns#Bob"
           }
         ]
       }
@@ -309,7 +309,7 @@ const EXAMPLES = {
     [
       {
         "@id": "_:b8",
-        "http://www.w3.org/ns/shacl#path": [
+        "https://www.w3.org/ns/shacl#path": [
           {
             "@id": "http://example.org/ns#password"
           }
