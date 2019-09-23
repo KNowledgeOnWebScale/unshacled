@@ -51,6 +51,7 @@ const shapeModule = {
       state.model = JSON.stringify(model).includes(SHACL_URI)
         ? ShaclTranslator.toModelSimple(model)
         : model;
+      model = JSON.parse(JSON.stringify(model).replace("http:", "https:"));
 
       /* Update y values and set coordinates. */
       for (const shape of state.model) {

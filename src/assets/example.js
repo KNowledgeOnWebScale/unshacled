@@ -1,11 +1,11 @@
 const exampleData =
   `${String(
     `${String(
-      "@prefix ex: <http://example.org/ns#> ." +
-        "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ." +
-        "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ." +
-        "@prefix schema: <http://schema.org/> ." +
-        "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> ."
+      "@prefix ex: <https://example.org/ns#> ." +
+        "@prefix rdf: <https://www.w3.org/1999/02/22-rdf-syntax-ns#> ." +
+        "@prefix rdfs: <https://www.w3.org/2000/01/rdf-schema#> ." +
+        "@prefix schema: <https://schema.org/> ." +
+        "@prefix xsd: <https://www.w3.org/2001/XMLSchema#> ."
     )}ex:Bob` +
       `    a schema:Person ;` +
       `    schema:givenName "Robert" ;` +
@@ -20,12 +20,12 @@ const exampleData =
 const exampleShapes =
   `${String(
     `${String(
-      "@prefix dash: <http://datashapes.org/dash#> ." +
-        "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ." +
-        "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ." +
-        "@prefix schema: <http://schema.org/> ." +
-        "@prefix sh: <http://www.w3.org/ns/shacl#> ." +
-        "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> ."
+      "@prefix dash: <https://datashapes.org/dash#> ." +
+        "@prefix rdf: <https://www.w3.org/1999/02/22-rdf-syntax-ns#> ." +
+        "@prefix rdfs: <https://www.w3.org/2000/01/rdf-schema#> ." +
+        "@prefix schema: <https://schema.org/> ." +
+        "@prefix sh: <https://www.w3.org/ns/shacl#> ." +
+        "@prefix xsd: <https://www.w3.org/2001/XMLSchema#> ."
     )}schema:PersonShape` +
       `    a sh:NodeShape ;` +
       `    sh:targetClass schema:Person ;` +
@@ -65,17 +65,17 @@ const exampleShapesJSON =
   "[\n" +
   "  {\n" +
   '    "@id": "_:b0",\n' +
-  '    "http://www.w3.org/ns/shacl#path": [\n' +
+  '    "https://www.w3.org/ns/shacl#path": [\n' +
   "      {\n" +
-  '        "@id": "http://schema.org/givenName"\n' +
+  '        "@id": "https://schema.org/givenName"\n' +
   "      }\n" +
   "    ],\n" +
-  '    "http://www.w3.org/ns/shacl#datatype": [\n' +
+  '    "https://www.w3.org/ns/shacl#datatype": [\n' +
   "      {\n" +
-  '        "@id": "http://www.w3.org/2001/XMLSchema#string"\n' +
+  '        "@id": "https://www.w3.org/2001/XMLSchema#string"\n' +
   "      }\n" +
   "    ],\n" +
-  '    "http://www.w3.org/ns/shacl#name": [\n' +
+  '    "https://www.w3.org/ns/shacl#name": [\n' +
   "      {\n" +
   '        "@value": "given name",\n' +
   '        "@language": "en"\n' +
@@ -84,39 +84,39 @@ const exampleShapesJSON =
   "  },\n" +
   "  {\n" +
   '    "@id": "_:b1",\n' +
-  '    "http://www.w3.org/ns/shacl#path": [\n' +
+  '    "https://www.w3.org/ns/shacl#path": [\n' +
   "      {\n" +
-  '        "@id": "http://schema.org/birthDate"\n' +
+  '        "@id": "https://schema.org/birthDate"\n' +
   "      }\n" +
   "    ],\n" +
-  '    "http://www.w3.org/ns/shacl#lessThan": [\n' +
+  '    "https://www.w3.org/ns/shacl#lessThan": [\n' +
   "      {\n" +
-  '        "@id": "http://schema.org/deathDate"\n' +
+  '        "@id": "https://schema.org/deathDate"\n' +
   "      }\n" +
   "    ],\n" +
-  '    "http://www.w3.org/ns/shacl#maxCount": [\n' +
+  '    "https://www.w3.org/ns/shacl#maxCount": [\n' +
   "      {\n" +
   '        "@value": "1",\n' +
-  '        "@type": "http://www.w3.org/2001/XMLSchema#integer"\n' +
+  '        "@type": "https://www.w3.org/2001/XMLSchema#integer"\n' +
   "      }\n" +
   "    ]\n" +
   "  },\n" +
   "  {\n" +
   '    "@id": "_:b11",\n' +
-  '    "http://www.w3.org/ns/shacl#datatype": [\n' +
+  '    "https://www.w3.org/ns/shacl#datatype": [\n' +
   "      {\n" +
-  '        "@id": "http://www.w3.org/2001/XMLSchema#integer"\n' +
+  '        "@id": "https://www.w3.org/2001/XMLSchema#integer"\n' +
   "      }\n" +
   "    ]\n" +
   "  },\n" +
   "  {\n" +
   '    "@id": "_:b2",\n' +
-  '    "http://www.w3.org/ns/shacl#path": [\n' +
+  '    "https://www.w3.org/ns/shacl#path": [\n' +
   "      {\n" +
-  '        "@id": "http://schema.org/gender"\n' +
+  '        "@id": "https://schema.org/gender"\n' +
   "      }\n" +
   "    ],\n" +
-  '    "http://www.w3.org/ns/shacl#in": [\n' +
+  '    "https://www.w3.org/ns/shacl#in": [\n' +
   "      {\n" +
   '        "@list": [\n' +
   "          {\n" +
@@ -131,38 +131,38 @@ const exampleShapesJSON =
   "  },\n" +
   "  {\n" +
   '    "@id": "_:b5",\n' +
-  '    "http://www.w3.org/ns/shacl#path": [\n' +
+  '    "https://www.w3.org/ns/shacl#path": [\n' +
   "      {\n" +
-  '        "@id": "http://schema.org/address"\n' +
+  '        "@id": "https://schema.org/address"\n' +
   "      }\n" +
   "    ],\n" +
-  '    "http://www.w3.org/ns/shacl#node": [\n' +
+  '    "https://www.w3.org/ns/shacl#node": [\n' +
   "      {\n" +
-  '        "@id": "http://schema.org/AddressShape"\n' +
+  '        "@id": "https://schema.org/AddressShape"\n' +
   "      }\n" +
   "    ]\n" +
   "  },\n" +
   "  {\n" +
   '    "@id": "_:b6",\n' +
-  '    "http://www.w3.org/ns/shacl#path": [\n' +
+  '    "https://www.w3.org/ns/shacl#path": [\n' +
   "      {\n" +
-  '        "@id": "http://schema.org/streetAddress"\n' +
+  '        "@id": "https://schema.org/streetAddress"\n' +
   "      }\n" +
   "    ],\n" +
-  '    "http://www.w3.org/ns/shacl#datatype": [\n' +
+  '    "https://www.w3.org/ns/shacl#datatype": [\n' +
   "      {\n" +
-  '        "@id": "http://www.w3.org/2001/XMLSchema#string"\n' +
+  '        "@id": "https://www.w3.org/2001/XMLSchema#string"\n' +
   "      }\n" +
   "    ]\n" +
   "  },\n" +
   "  {\n" +
   '    "@id": "_:b7",\n' +
-  '    "http://www.w3.org/ns/shacl#path": [\n' +
+  '    "https://www.w3.org/ns/shacl#path": [\n' +
   "      {\n" +
-  '        "@id": "http://schema.org/postalCode"\n' +
+  '        "@id": "https://schema.org/postalCode"\n' +
   "      }\n" +
   "    ],\n" +
-  '    "http://www.w3.org/ns/shacl#or": [\n' +
+  '    "https://www.w3.org/ns/shacl#or": [\n' +
   "      {\n" +
   '        "@list": [\n' +
   "          {\n" +
@@ -174,39 +174,39 @@ const exampleShapesJSON =
   "        ]\n" +
   "      }\n" +
   "    ],\n" +
-  '    "http://www.w3.org/ns/shacl#minInclusive": [\n' +
+  '    "https://www.w3.org/ns/shacl#minInclusive": [\n' +
   "      {\n" +
   '        "@value": "10000",\n' +
-  '        "@type": "http://www.w3.org/2001/XMLSchema#integer"\n' +
+  '        "@type": "https://www.w3.org/2001/XMLSchema#integer"\n' +
   "      }\n" +
   "    ],\n" +
-  '    "http://www.w3.org/ns/shacl#maxInclusive": [\n' +
+  '    "https://www.w3.org/ns/shacl#maxInclusive": [\n' +
   "      {\n" +
   '        "@value": "99999",\n' +
-  '        "@type": "http://www.w3.org/2001/XMLSchema#integer"\n' +
+  '        "@type": "https://www.w3.org/2001/XMLSchema#integer"\n' +
   "      }\n" +
   "    ]\n" +
   "  },\n" +
   "  {\n" +
   '    "@id": "_:b9",\n' +
-  '    "http://www.w3.org/ns/shacl#datatype": [\n' +
+  '    "https://www.w3.org/ns/shacl#datatype": [\n' +
   "      {\n" +
-  '        "@id": "http://www.w3.org/2001/XMLSchema#string"\n' +
+  '        "@id": "https://www.w3.org/2001/XMLSchema#string"\n' +
   "      }\n" +
   "    ]\n" +
   "  },\n" +
   "  {\n" +
-  '    "@id": "http://schema.org/AddressShape",\n' +
+  '    "@id": "https://schema.org/AddressShape",\n' +
   '    "@type": [\n' +
-  '      "http://www.w3.org/ns/shacl#NodeShape"\n' +
+  '      "https://www.w3.org/ns/shacl#NodeShape"\n' +
   "    ],\n" +
-  '    "http://www.w3.org/ns/shacl#closed": [\n' +
+  '    "https://www.w3.org/ns/shacl#closed": [\n' +
   "      {\n" +
   '        "@value": "true",\n' +
-  '        "@type": "http://www.w3.org/2001/XMLSchema#boolean"\n' +
+  '        "@type": "https://www.w3.org/2001/XMLSchema#boolean"\n' +
   "      }\n" +
   "    ],\n" +
-  '    "http://www.w3.org/ns/shacl#property": [\n' +
+  '    "https://www.w3.org/ns/shacl#property": [\n' +
   "      {\n" +
   '        "@id": "_:b6"\n' +
   "      },\n" +
@@ -216,16 +216,16 @@ const exampleShapesJSON =
   "    ]\n" +
   "  },\n" +
   "  {\n" +
-  '    "@id": "http://schema.org/PersonShape",\n' +
+  '    "@id": "https://schema.org/PersonShape",\n' +
   '    "@type": [\n' +
-  '      "http://www.w3.org/ns/shacl#NodeShape"\n' +
+  '      "https://www.w3.org/ns/shacl#NodeShape"\n' +
   "    ],\n" +
-  '    "http://www.w3.org/ns/shacl#targetClass": [\n' +
+  '    "https://www.w3.org/ns/shacl#targetClass": [\n' +
   "      {\n" +
-  '        "@id": "http://schema.org/Person"\n' +
+  '        "@id": "https://schema.org/Person"\n' +
   "      }\n" +
   "    ],\n" +
-  '    "http://www.w3.org/ns/shacl#property": [\n' +
+  '    "https://www.w3.org/ns/shacl#property": [\n' +
   "      {\n" +
   '        "@id": "_:b0"\n' +
   "      },\n" +
