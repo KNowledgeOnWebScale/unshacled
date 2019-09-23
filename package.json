@@ -27,7 +27,8 @@
     "vue-konva": "^2.0.7",
     "vue-multipane": "^0.9.5",
     "vue-split-layout": "0.0.13",
-    "vuex": "^3.0.1"
+    "vuex": "^3.0.1",
+    "vuex-undo-redo": "^1.1.4"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.5.5",

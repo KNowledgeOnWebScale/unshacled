@@ -14,17 +14,12 @@
     </multipane>
   </div>
 </template>
-
 <script>
-import Vue from "vue";
-import PortalVue from "portal-vue";
 import { Multipane, MultipaneResizer } from "vue-multipane";
 import NavBar from "./components/NavBar.vue";
 import Editor from "./components/Editor.vue";
 import DataTextView from "./components/DataTextView.vue";
 import { MARGIN_TOP } from "./config/konvaConfigs";
-
-Vue.use(PortalVue);
 
 export default {
   name: "App",

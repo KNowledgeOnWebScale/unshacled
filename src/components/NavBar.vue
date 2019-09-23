@@ -66,6 +66,19 @@
 
       <sui-menu-item
         class="clickable"
+        icon="undo alterate"
+        :disabled="!undoable()"
+        @click="undoAction"
+      ></sui-menu-item>
+      <sui-menu-item
+        class="clickable"
+        icon="redo alternate"
+        :disabled="!redoable()"
+        @click="redoAction"
+      ></sui-menu-item>
+
+      <sui-menu-item
+        class="clickable"
         icon="trash"
         @click="toggleClearModal"
       ></sui-menu-item>
@@ -186,6 +199,20 @@ export default {
     dataFileUploaded() {
       return this.$store.state.mData.dataFile.length > 0;
     },
+
+    undoAction() {
+      if (this.undoable()) this.undo();
+    },
+    redoAction() {
+      if (this.redoable()) this.redo();
+    },
+    undoable() {
+      return this.done.length > 0;
+    },
+    redoable() {
+      return this.undone.length > 0;
+    },
+
     /** Validate the data using the current model. */
     validate() {
       this.$store.dispatch("validateWithCurrentModel");

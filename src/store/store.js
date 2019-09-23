@@ -17,6 +17,7 @@ import configModule from "./configModule";
 import { exampleData, exampleShapes } from "../assets/example";
 import ParserManager from "../parsing/parserManager";
 import { ETF } from "../util/enums/extensionToFormat";
+import {config} from "@vue/test-utils";
 
 Vue.use(Vuex);
 
@@ -38,6 +39,35 @@ export default new Vuex.Store({
     mConfig: configModule
   },
   mutations: {
+    /**
+     * Default empty state. This method is required by the VuexUndoRedo plugin.
+     */
+    emptyState() {
+      console.log("emptyState");
+      this.replaceState({
+        editor: null,
+        showClearModal: false,
+        showExportModal: false,
+        pathModal: {
+          show: false,
+          editing: false,
+          shapeID: ""
+        },
+        exportType: "",
+        mData: dataModule.state,
+        mConfig: configModule.state,
+        mShape: shapeModule.state
+      });
+    },
+
+    /**
+     * TODO
+     * Save the state to use the VuexUndoRedoPlugin.
+     */
+    saveState() {
+      // Is it enough to do nothing? FIXME
+    },
+
     /**
      * Save a reference to the editor.
      * @param state
