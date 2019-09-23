@@ -45,11 +45,9 @@
                   <sui-table-cell class="one wide">
                     <sui-checkbox
                       :id="prefix"
-                      v-model="currentBaseURI"
-                      :value="getURI(prefix)"
+                      v-model="checked[prefix]"
                       class="clickable"
-                      radio
-                      @mouseup="updateBaseUri(prefix)"
+                      @mouseup="e => updateBaseUri(e.target, prefix)"
                     ></sui-checkbox>
                   </sui-table-cell>
 
@@ -105,8 +103,16 @@ export default {
   data() {
     return {
       input: "",
-      currentBaseURI: ""
+      currentBaseURI: "",
+      checked: {}
     };
+  },
+  created() {
+    /* Populate the checked dictionary. */
+    const self = this;
+    Object.keys(self.$store.getters.namespaces).map(prefix => {
+      self.checked[prefix] = self.isBaseURI(prefix);
+    });
   },
   mounted() {
     /* Remove the input field from the top of the table. */
@@ -173,11 +179,23 @@ export default {
     /**
      * Update the base URI to the URI corresponding to the given prefix.
      */
-    updateBaseUri(prefix) {
-      const uri = this.$store.getters.namespaces[prefix];
+    updateBaseUri(target, prefix) {
+      const { namespaces, uriByPrefix } = this.$store.getters;
+      const uri = namespaces[prefix];
       const { baseURI } = this.$store.state.mConfig;
+      const currentPrefix = uriByPrefix(this.currentBaseURI);
+
       if (uri === baseURI) {
-        document.getElementById(prefix).childNodes[0].checked = false;
+        // Uncheck the prefix if it was previously checked.
+        this.checked[prefix] = false;
+        target.checked = false;
+      } else {
+        target.checked = true;
+        if (currentPrefix && currentPrefix !== "") {
+          // Uncheck the old one.
+          this.checked[currentPrefix] = false;
+          document.getElementById(currentPrefix).children[0].checked = false;
+        }
       }
       this.$store.commit("setBaseUri", { uri: uri === baseURI ? "" : uri });
     },
@@ -266,6 +284,7 @@ export default {
   min-width: 100%;
   max-width: 100%;
 }
+
 .table-body {
   height: 35vh;
   min-height: 20vh;
@@ -276,6 +295,7 @@ export default {
 .clickable {
   cursor: pointer;
 }
+
 .unclickable {
   cursor: default;
 }
