@@ -165,9 +165,12 @@ const dataModule = {
      * @param {array} model the shapes we want to use as a model now.
      */
     updateModel({ commit, rootGetters, rootState }, model) {
-      commit("setModel", { model, getters: rootGetters }, { root: true });
+      const mutations = [
+        { type: "setModel", payload: { model, getters: rootGetters } }
+      ];
+      mutations.forEach(m => commit(`${m.type}`, m.payload));
       /* Save the state to undo later. */
-      commit("saveState", { state: rootState });
+      commit("saveOperation", { state: rootState, mutations });
     },
 
     /**
@@ -217,9 +220,13 @@ const dataModule = {
       try {
         JSON.parse(dataText); /* Try parsing the text first. */
         /* Call mutation if the parsing was successful. */
-        commit("setJsonData", { text: dataText });
+        const mutations = {
+          type: "setJsonData",
+          payload: { text: dataText }
+        };
+        mutations.forEach(m => commit(`${m.type}`, m.payload));
         /* Save the state to undo later. */
-        commit("saveState", { state: rootState });
+        commit("saveOperation", { state: rootState, mutations });
       } catch (e) {
         console.err("Entered data is no valid JSON.");
       }

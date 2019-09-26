@@ -17,7 +17,6 @@ import configModule from "./configModule";
 import { exampleData, exampleShapes } from "../assets/example";
 import ParserManager from "../parsing/parserManager";
 import { ETF } from "../util/enums/extensionToFormat";
-import emptyState from "../util/emptyState";
 
 Vue.use(Vuex);
 
@@ -40,24 +39,10 @@ export default new Vuex.Store({
   },
   mutations: {
     /**
-     * Default empty state. This method is required by the VuexUndoRedo plugin.
+     * Save the state and the executed mutations for use in the undo/redo functionality.
+     * This method does nothing on its own.
      */
-    emptyState() {
-      console.log("emptyState");
-      this.replaceState(emptyState);
-    },
-
-    /**
-     * TODO
-     * Save the state to use the VuexUndoRedoPlugin.
-     */
-    saveState(state, { mutations }) {
-      console.log("saveState");
-      console.log(
-        mutations ? mutations.map(m => `${m.type}`) : "[no mutations]"
-      );
-      // Is it enough to do nothing? FIXME
-    },
+    saveOperation(_, { state, mutations }) {},
 
     /**
      * Save a reference to the editor.
@@ -66,6 +51,16 @@ export default new Vuex.Store({
      */
     setEditor(state, editor) {
       Vue.set(state, "editor", editor);
+    },
+
+    /**
+     * Helper mutation. Removes the element at the given index of the given list.
+     * @param state
+     * @param {array} list the list where the element should be removed.
+     * @param {number} index the index of the element that should be removed.
+     */
+    removeElementFromList(state, { list, index }) {
+      list.splice(index, 1);
     },
 
     /* MODALS ======================================================================================================= */
@@ -108,37 +103,28 @@ export default new Vuex.Store({
     /**
      * Load in some example data.
      */
-    loadExample({ getters, commit }) {
+    loadExample({ getters, commit, rootState }) {
       const self = this;
-      /* Clear the existing data first. */
-      this.commit("clear");
-      /* Set the new data. */
-      this.commit("setData", {
-        name: "example.ttl",
-        contents: exampleData,
-        extension: "ttl"
-      });
-      /* Set the new model. */
       ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
         self.commit("setModel", { model, getters });
-      });
+        const mutations = [
+          { type: "clear" }, // Clear the existing data first.
+          {
+            type: "setData", // Set the new data.
+            payload: {
+              name: "example.ttl",
+              contents: exampleData,
+              extension: "ttl"
+            }
+          },
+          { type: "setModel", payload: { model, getters } } // Set the new model.
+        ];
 
-      /* Save the state to undo later. */
-      ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
-        commit("saveState", {
-          mutations: [
-            { type: "clear" },
-            {
-              type: "setData",
-              payload: {
-                name: "example.ttl",
-                contents: exampleData,
-                extension: "ttl"
-              }
-            },
-            { type: "setModel", payload: { model, getters } }
-          ]
-        });
+        /* Execute the mutations. */
+        mutations.forEach(m => commit(`${m.type}`, m.payload));
+
+        /* Save the state to undo later. */
+        commit("saveOperation", { state: rootState, mutations });
       });
     }
   },

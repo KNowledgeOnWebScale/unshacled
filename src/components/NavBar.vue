@@ -76,12 +76,15 @@
         :disabled="!$root.canUndo()"
         @click="undoAction"
       ></sui-menu-item>
+      <!--
+      TODO implement redo functionality.
       <sui-menu-item
         class="clickable"
         icon="redo alternate"
         :disabled="!$root.canRedo()"
         @click="redoAction"
       ></sui-menu-item>
+      -->
 
       <!--
       <sui-menu-menu position="right">

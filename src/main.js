@@ -14,7 +14,6 @@ Vue.use(SuiVue);
 Vue.use(VueKonva);
 Vue.use(Vuex);
 Vue.use(PortalVue);
-/* Ignore all mutations except the dedicated `saveState`-mutation. */
 
 new Vue({
   store,
