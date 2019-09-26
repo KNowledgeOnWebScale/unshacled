@@ -125,6 +125,9 @@ const constraintModule = {
 
       /* Close the predicate modal if needed. */
       if (state.mModal.show) commit("togglePredicateModal", {});
+
+      /* Save the state to undo later. */
+      commit("saveState", { state: rootState });
     },
 
     /* EDIT ========================================================================================================= */
@@ -225,12 +228,13 @@ const constraintModule = {
      * Update the constraint value of the given shape.
      * @param rootGetters
      * @param commit
+     * @param rootState
      * @param {string} shapeID the ID of the shape.
      * @param {string} constraintID the ID of the constraint we want to update.
      * @param {object} newValue the new value of the given constraint.
      */
     updateConstraint(
-      { rootGetters, commit },
+      { rootGetters, commit, rootState },
       { shapeID, constraintID, newValue }
     ) {
       commit("setConstraintValue", {
@@ -238,6 +242,9 @@ const constraintModule = {
         constraintID,
         value: newValue
       });
+
+      /* Save the state to undo later. */
+      commit("saveState", { state: rootState });
     },
 
     /* DELETE ======================================================================================================= */
@@ -253,18 +260,24 @@ const constraintModule = {
       { shapeID, constraintID }
     ) {
       const shape = getters.shapeWithID(shapeID);
-      commit(
-        "deleteConstraintFromShape",
-        { shape, constraintID },
-        { root: true }
-      );
+      commit("deleteConstraintFromShape", { shape, constraintID });
 
       /* Update the y values. */
-      commit(
-        "updateYValues",
-        { shapeID, shapes: rootState.mShape.model },
-        { root: true }
-      );
+      commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
+
+      /* Save the state to undo later. */
+      commit("saveState", {
+        mutations: [
+          {
+            type: "deleteConstraintFromShape",
+            payload: { shape, constraintID }
+          },
+          {
+            type: "updateYValues",
+            payload: { shapeID, shapes: rootState.mShape.model }
+          }
+        ]
+      });
     },
 
     /**
@@ -300,6 +313,9 @@ const constraintModule = {
 
       /* Update the y values. */
       commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
+
+      /* Save the state to undo later. */
+      commit("saveState", { state: rootState });
     },
 
     /**
@@ -343,6 +359,9 @@ const constraintModule = {
 
       /* Update the y values. */
       commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
+
+      /* Save the state to undo later. */
+      commit("saveState", { state: rootState });
     }
   },
 

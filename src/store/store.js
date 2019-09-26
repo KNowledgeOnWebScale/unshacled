@@ -17,7 +17,7 @@ import configModule from "./configModule";
 import { exampleData, exampleShapes } from "../assets/example";
 import ParserManager from "../parsing/parserManager";
 import { ETF } from "../util/enums/extensionToFormat";
-import {config} from "@vue/test-utils";
+import emptyState from "../util/emptyState";
 
 Vue.use(Vuex);
 
@@ -44,27 +44,18 @@ export default new Vuex.Store({
      */
     emptyState() {
       console.log("emptyState");
-      this.replaceState({
-        editor: null,
-        showClearModal: false,
-        showExportModal: false,
-        pathModal: {
-          show: false,
-          editing: false,
-          shapeID: ""
-        },
-        exportType: "",
-        mData: dataModule.state,
-        mConfig: configModule.state,
-        mShape: shapeModule.state
-      });
+      this.replaceState(emptyState);
     },
 
     /**
      * TODO
      * Save the state to use the VuexUndoRedoPlugin.
      */
-    saveState() {
+    saveState(state, { mutations }) {
+      console.log("saveState");
+      console.log(
+        mutations ? mutations.map(m => `${m.type}`) : "[no mutations]"
+      );
       // Is it enough to do nothing? FIXME
     },
 
@@ -117,7 +108,7 @@ export default new Vuex.Store({
     /**
      * Load in some example data.
      */
-    loadExample({ getters }) {
+    loadExample({ getters, commit }) {
       const self = this;
       /* Clear the existing data first. */
       this.commit("clear");
@@ -130,6 +121,24 @@ export default new Vuex.Store({
       /* Set the new model. */
       ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
         self.commit("setModel", { model, getters });
+      });
+
+      /* Save the state to undo later. */
+      ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
+        commit("saveState", {
+          mutations: [
+            { type: "clear" },
+            {
+              type: "setData",
+              payload: {
+                name: "example.ttl",
+                contents: exampleData,
+                extension: "ttl"
+              }
+            },
+            { type: "setModel", payload: { model, getters } }
+          ]
+        });
       });
     }
   },

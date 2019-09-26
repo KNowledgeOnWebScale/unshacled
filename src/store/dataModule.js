@@ -160,11 +160,14 @@ const dataModule = {
     /**
      * Set the model to the given one.
      * @param commit
-     * @param getters
+     * @param rootGetters
+     * @param rootState
      * @param {array} model the shapes we want to use as a model now.
      */
-    updateModel({ commit, rootGetters }, model) {
+    updateModel({ commit, rootGetters, rootState }, model) {
       commit("setModel", { model, getters: rootGetters }, { root: true });
+      /* Save the state to undo later. */
+      commit("saveState", { state: rootState });
     },
 
     /**
@@ -206,14 +209,17 @@ const dataModule = {
     /**
      * Update the data file to the given data text.
      * If the given text is not valid JSON, this wil print an error.
+     * @param state
      * @param commit
      * @param {string} dataText the text we want to use as data.
      */
-    updateData({ commit }, { dataText }) {
+    updateData({ rootState, commit }, { dataText }) {
       try {
         JSON.parse(dataText); /* Try parsing the text first. */
         /* Call mutation if the parsing was successful. */
         commit("setJsonData", { text: dataText });
+        /* Save the state to undo later. */
+        commit("saveState", { state: rootState });
       } catch (e) {
         console.err("Entered data is no valid JSON.");
       }
