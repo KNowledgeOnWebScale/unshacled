@@ -127,7 +127,7 @@ const constraintModule = {
       if (state.mModal.show) commit("togglePredicateModal", {});
 
       /* Save the state to undo later. */
-      commit("saveState", { state: rootState });
+      commit("saveOperation", { state: rootState });
     },
 
     /* EDIT ========================================================================================================= */
@@ -237,14 +237,20 @@ const constraintModule = {
       { rootGetters, commit, rootState },
       { shapeID, constraintID, newValue }
     ) {
-      commit("setConstraintValue", {
-        shape: rootGetters.shapeWithID(shapeID),
-        constraintID,
-        value: newValue
-      });
+      const mutations = [
+        {
+          type: "setConstraintValue",
+          payload: {
+            shape: rootGetters.shapeWithID(shapeID),
+            constraintID,
+            value: newValue
+          }
+        }
+      ];
+      mutations.forEach(m => commit(`${m.type}`, m.payload));
 
       /* Save the state to undo later. */
-      commit("saveState", { state: rootState });
+      commit("saveOperation", { mutations });
     },
 
     /* DELETE ======================================================================================================= */
@@ -260,24 +266,22 @@ const constraintModule = {
       { shapeID, constraintID }
     ) {
       const shape = getters.shapeWithID(shapeID);
-      commit("deleteConstraintFromShape", { shape, constraintID });
+      const mutations = [
+        {
+          type: "deleteConstraintFromShape",
+          payload: { shape, constraintID }
+        },
+        {
+          type: "updateYValues",
+          payload: { shapeID, shapes: rootState.mShape.model }
+        }
+      ];
 
-      /* Update the y values. */
-      commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
+      /* Execute the mutations. */
+      mutations.forEach(m => commit(`${m.type}`, m.payload));
 
       /* Save the state to undo later. */
-      commit("saveState", {
-        mutations: [
-          {
-            type: "deleteConstraintFromShape",
-            payload: { shape, constraintID }
-          },
-          {
-            type: "updateYValues",
-            payload: { shapeID, shapes: rootState.mShape.model }
-          }
-        ]
-      });
+      commit("saveOperation", { mutations });
     },
 
     /**
@@ -301,21 +305,46 @@ const constraintModule = {
       const iter = getValueType(constraintID).includes(ValueTypes.LIST)
         ? constraint[0]["@list"]
         : constraint;
-      iter.splice(valueIndex, 1);
 
+      const mutations = [
+        {
+          type: "removeElementFromList",
+          payload: { list: iter, index: valueIndex }
+        }
+      ];
+      /* Execute the removal. */
+      commit(`${mutations[0].type}`, mutations[0].payload);
+
+      let lastIndex = 1;
       /* Delete the constraint from the shape if there are no values left. */
       if (iter.length === 0) {
-        this.dispatch("deleteConstraintFromShapeWithID", {
-          shapeID,
-          constraintID
-        });
+        // Updating the y values should happen last, so insert this mutation on the second to last place.
+        const shape = getters.shapeWithID(shapeID);
+        mutations.push(
+          {
+            type: "deleteConstraintFromShape",
+            payload: { shape, constraintID }
+          },
+          {
+            type: "updateYValues",
+            payload: { shapeID, shapes: rootState.mShape.model }
+          }
+        );
+        /* Execute the removal. */
+        commit(`${mutations[1].type}`, mutations[1].payload);
+        commit(`${mutations[2].type}`, mutations[2].payload);
+        lastIndex += 2;
       }
 
-      /* Update the y values. */
-      commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
+      mutations.push({
+        type: "updateYValues", // Update the y values.
+        payload: { shapeID, shapes: rootState.mShape.model }
+      });
+      /* Execute the updating of the y values. */
+      commit(`${mutations[lastIndex].type}`, mutations[lastIndex].payload);
 
       /* Save the state to undo later. */
-      commit("saveState", { state: rootState });
+      commit("saveOperation", { mutations });
     },
 
     /**
@@ -334,6 +363,7 @@ const constraintModule = {
       { shapeID, constraintID, value }
     ) {
       const constraint = getters.shapeWithID(shapeID)[constraintID];
+      const mutations = [];
 
       /* If the value is a list, then remove from that list instead of directly. */
       const iter = getValueType(constraintID).includes(ValueTypes.LIST)
@@ -345,23 +375,39 @@ const constraintModule = {
         const val = iter[i];
         if (val["@id"] === value || val["@value"] === value || val === value) {
           /* Delete this value from the list if it is the value we want to remove. */
-          iter.splice(i, 1);
+          mutations.push({
+            type: "removeElementFromList",
+            payload: { list: iter, index: i }
+          });
         }
       }
 
       /* Delete the constraint from the shape if there are no values left. */
       if (iter.length === 0) {
-        this.dispatch("deleteConstraintFromShapeWithID", {
-          shapeID,
-          constraintID
-        });
+        const shape = getters.shapeWithID(shapeID);
+        mutations.push(
+          {
+            type: "deleteConstraintFromShape",
+            payload: { shape, constraintID }
+          },
+          {
+            type: "updateYValues",
+            payload: { shapeID, shapes: rootState.mShape.model }
+          }
+        );
       }
 
       /* Update the y values. */
-      commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
+      mutations.push({
+        type: "updateYValues",
+        payload: { shapeID, shapes: rootState.mShape.model }
+      });
+
+      /* Execute the mutations. */
+      mutations.forEach(m => commit(`${m.type}`, m.payload));
 
       /* Save the state to undo later. */
-      commit("saveState", { state: rootState });
+      commit("saveOperation", { mutations });
     }
   },
 

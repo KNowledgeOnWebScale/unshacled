@@ -42,7 +42,7 @@ export default new Vuex.Store({
      * Save the state and the executed mutations for use in the undo/redo functionality.
      * This method does nothing on its own.
      */
-    saveOperation(_, { state, mutations }) {},
+    saveOperation(_, { mutations }) {},
 
     /**
      * Save a reference to the editor.
@@ -124,7 +124,7 @@ export default new Vuex.Store({
         mutations.forEach(m => commit(`${m.type}`, m.payload));
 
         /* Save the state to undo later. */
-        commit("saveOperation", { state: rootState, mutations });
+        commit("saveOperation", { mutations });
       });
     }
   },

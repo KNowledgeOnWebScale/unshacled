@@ -22,6 +22,7 @@ const undoRedoMixin = {
       if (mutation.type === "saveOperation") {
         /* Only for `saveOperation` mutations, the payload will be added to the list of operations. */
         this.done.push(mutation.payload);
+        console.log(this.done);
       }
       if (
         this.newOperation &&

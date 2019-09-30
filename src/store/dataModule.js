@@ -170,7 +170,7 @@ const dataModule = {
       ];
       mutations.forEach(m => commit(`${m.type}`, m.payload));
       /* Save the state to undo later. */
-      commit("saveOperation", { state: rootState, mutations });
+      commit("saveOperation", { mutations });
     },
 
     /**
@@ -226,7 +226,7 @@ const dataModule = {
         };
         mutations.forEach(m => commit(`${m.type}`, m.payload));
         /* Save the state to undo later. */
-        commit("saveOperation", { state: rootState, mutations });
+        commit("saveOperation", { mutations });
       } catch (e) {
         console.err("Entered data is no valid JSON.");
       }
