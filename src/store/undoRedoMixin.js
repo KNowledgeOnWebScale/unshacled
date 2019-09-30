@@ -17,12 +17,17 @@ const undoRedoMixin = {
     };
   },
   created() {
+    /* Bind its methods. */
+    this.undo = this.undo.bind(this);
+    this.redo = this.redo.bind(this);
+    this.canUndo = this.canUndo.bind(this);
+    this.canRedo = this.canRedo.bind(this);
+
     /* Listen to mutations. */
     this.$store.subscribe(mutation => {
       if (mutation.type === "saveOperation") {
         /* Only for `saveOperation` mutations, the payload will be added to the list of operations. */
-        this.done.push(mutation.payload);
-        console.log(this.done);
+        this.done.push(JSON.parse(JSON.stringify(mutation.payload)));
       }
       if (
         this.newOperation &&
@@ -57,14 +62,24 @@ const undoRedoMixin = {
         const operation = this.done.pop();
         this.undone.push(operation); // Add this operation to the list of operations that have been undone.
         this.newOperation = false;
-        this.$store.replaceState(JSON.parse(JSON.stringify(emptyState))); // Parse the stringified version to create a new object.
+        console.log(this.done);
+
+        const n = this.done.length;
+        let newState = emptyState;
+        if (n > 0) {
+          const last = this.done[this.done.length - 1];
+          newState = last.state;
+        }
+        console.log(JSON.stringify(newState.mShape.model, null, 2));
+        this.$store.replaceState(JSON.parse(JSON.stringify(newState))); // Parse the stringified version to create a new object.
 
         /* Execute the mutations that have been executed in every executed operation. */
-        this.done.forEach(operation => {
-          operation.mutations.forEach(mutation =>
-            this.$store.commit(`${mutation.type}`, mutation.payload)
-          );
-        });
+        // this.done.forEach(operation => {
+        //   this.$store.dispatch(
+        //     `${operation.action.type}`,
+        //     operation.action.args
+        //   );
+        // });
         this.newOperation = true;
       }
     },

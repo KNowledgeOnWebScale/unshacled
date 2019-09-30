@@ -248,12 +248,19 @@ export default {
         finalInput = "0";
 
       if (!this.error) {
-        this.$store.dispatch(this.$props.modalProperties.onExit, {
+        const { onExit } = this.$props.modalProperties;
+        const args = {
           predicate,
           valueType,
           shapeID: this.$props.modalProperties.shapeID,
           input: finalInput,
           inputType: this.$store.getters.objects(predicate)[0]
+        };
+        this.$store.dispatch(onExit, args);
+        /* Save the operation to undo. */
+        this.$store.commit("saveOperation", {
+          state: this.$store.state,
+          action: { type: onExit, args }
         });
         this.reset();
       }

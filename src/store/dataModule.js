@@ -6,6 +6,7 @@ import ValidatorManager from "../validation/validatorManager";
 import language from "../util/enums/languages";
 import { downloadFile } from "../util";
 import ShaclTranslator from "../translation/shaclTranslator";
+import undoRedoMixin from "./undoRedoMixin";
 
 /**
  * This module contains everything to handle data imports/exports and validation.
@@ -42,15 +43,18 @@ const dataModule = {
      * @param {string} name the name of the data file.
      * @param {string} contents the contents of a read data file.
      * @param {string} extension the extension of the data file.
+     * @param rootState
      */
     setData(state, { name, contents, extension }) {
       Vue.set(state, "dataFileName", name);
       Vue.set(state, "dataFile", contents);
       Vue.set(state, "dataFileExtension", extension);
+
       /* Parse the data from Turtle to JSON. */
-      ParserManager.parse(contents, ETF.ttl).then(data =>
-        Vue.set(state, "dataText", JSON.stringify(data, null, 2))
-      );
+      const self = this;
+      ParserManager.parse(contents, ETF.ttl).then(data => {
+        Vue.set(state, "dataText", JSON.stringify(data, null, 2));
+      });
     },
 
     /**
@@ -140,10 +144,10 @@ const dataModule = {
     /**
      * Takes a file and reads the extension.
      * Depending on the used format, it will use the correct parser to turn it into an internal model.
-     * @param {any} _
+     * @param {any} rootState
      * @param {any} file the uploaded file
      * */
-    uploadSchemaFile(_, file) {
+    uploadSchemaFile({ commit, rootState }, file) {
       const reader = new FileReader();
       const fileExtension = file.name.split(".").pop();
       const type = ETF[fileExtension];
@@ -153,6 +157,10 @@ const dataModule = {
       reader.onload = function(event) {
         ParserManager.parse(event.target.result, type).then(e => {
           self.dispatch("updateModel", e);
+          self.commit("saveOperation", {
+            state: rootState,
+            action: { type: "updateModel", args: e }
+          });
         });
       };
     },
@@ -165,12 +173,7 @@ const dataModule = {
      * @param {array} model the shapes we want to use as a model now.
      */
     updateModel({ commit, rootGetters, rootState }, model) {
-      const mutations = [
-        { type: "setModel", payload: { model, getters: rootGetters } }
-      ];
-      mutations.forEach(m => commit(`${m.type}`, m.payload));
-      /* Save the state to undo later. */
-      commit("saveOperation", { mutations });
+      commit("setModel", { model, getters: rootGetters, rootState });
     },
 
     /**
@@ -216,17 +219,11 @@ const dataModule = {
      * @param commit
      * @param {string} dataText the text we want to use as data.
      */
-    updateData({ rootState, commit }, { dataText }) {
+    updateData({ commit }, { dataText }) {
       try {
         JSON.parse(dataText); /* Try parsing the text first. */
         /* Call mutation if the parsing was successful. */
-        const mutations = {
-          type: "setJsonData",
-          payload: { text: dataText }
-        };
-        mutations.forEach(m => commit(`${m.type}`, m.payload));
-        /* Save the state to undo later. */
-        commit("saveOperation", { mutations });
+        commit("setJsonData", { text: dataText });
       } catch (e) {
         console.err("Entered data is no valid JSON.");
       }

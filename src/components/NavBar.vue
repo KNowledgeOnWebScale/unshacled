@@ -179,6 +179,11 @@ export default {
     /** Load the example. */
     loadExample() {
       this.$store.dispatch("loadExample");
+      /* Save the state to undo later. */
+      this.$store.commit("saveOperation", {
+        state: this.$store.state,
+        action: { type: "loadExample" }
+      });
     },
 
     /** Read the entered text file and upload it as the new model. */

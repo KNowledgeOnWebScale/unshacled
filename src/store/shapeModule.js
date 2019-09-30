@@ -6,6 +6,7 @@ import { LABEL, SHACL_URI } from "../util/constants";
 import { TERM } from "../translation/terminology";
 import getValueType from "../util/enums/ValueType";
 import ShaclTranslator from "../translation/shaclTranslator";
+import undoRedoMixin from "./undoRedoMixin";
 
 /**
  * This module contains everything to modify the shapes.
@@ -45,6 +46,7 @@ const shapeModule = {
      * @param state
      * @param {object} model the model we want to set.
      * @param {object} getters the store's getters.
+     * @param rootState
      */
     setModel(state, { model, getters }) {
       /* Parse the model if necessary. */

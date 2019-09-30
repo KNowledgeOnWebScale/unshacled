@@ -198,10 +198,18 @@ export default {
      * @param {number} index the index of the value in the constraint.
      */
     deleteConstraintValue(index) {
-      this.$store.dispatch("deleteConstraintValueWithIndex", {
+      const args = {
         shapeID: this.$props.shapeID,
         constraintID: this.$props.constraintID,
         valueIndex: index
+      };
+      this.$store.dispatch("deleteConstraintValueWithIndex", args);
+      this.$store.commit("saveOperation", {
+        state: this.$store.state,
+        action: {
+          type: "deleteConstraintValueWithIndex",
+          args
+        }
       });
       this.$store.commit("updateYValues", {
         shapeID: this.$props.shapeID,

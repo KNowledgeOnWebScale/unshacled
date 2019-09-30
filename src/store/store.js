@@ -17,6 +17,7 @@ import configModule from "./configModule";
 import { exampleData, exampleShapes } from "../assets/example";
 import ParserManager from "../parsing/parserManager";
 import { ETF } from "../util/enums/extensionToFormat";
+import undoRedoMixin from "./undoRedoMixin";
 
 Vue.use(Vuex);
 
@@ -42,7 +43,7 @@ export default new Vuex.Store({
      * Save the state and the executed mutations for use in the undo/redo functionality.
      * This method does nothing on its own.
      */
-    saveOperation(_, { mutations }) {},
+    saveOperation(_, { state, action }) {},
 
     /**
      * Save a reference to the editor.
@@ -106,25 +107,13 @@ export default new Vuex.Store({
     loadExample({ getters, commit, rootState }) {
       const self = this;
       ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
-        self.commit("setModel", { model, getters });
-        const mutations = [
-          { type: "clear" }, // Clear the existing data first.
-          {
-            type: "setData", // Set the new data.
-            payload: {
-              name: "example.ttl",
-              contents: exampleData,
-              extension: "ttl"
-            }
-          },
-          { type: "setModel", payload: { model, getters } } // Set the new model.
-        ];
-
-        /* Execute the mutations. */
-        mutations.forEach(m => commit(`${m.type}`, m.payload));
-
-        /* Save the state to undo later. */
-        commit("saveOperation", { mutations });
+        commit("clear");
+        commit("setData", {
+          name: "example.ttl",
+          contents: exampleData,
+          extension: "ttl"
+        });
+        commit("setModel", { model, getters, rootState });
       });
     }
   },
