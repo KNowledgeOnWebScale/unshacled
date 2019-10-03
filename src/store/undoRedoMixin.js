@@ -62,15 +62,15 @@ const undoRedoMixin = {
         const operation = this.done.pop();
         this.undone.push(operation); // Add this operation to the list of operations that have been undone.
         this.newOperation = false;
-        console.log(this.done);
+        console.log("done:", this.done);
 
         const n = this.done.length;
         let newState = emptyState;
         if (n > 0) {
           const last = this.done[this.done.length - 1];
-          newState = last.state;
+          console.log("last:", last.action.type);
+          newState = JSON.parse(JSON.stringify(last.state));
         }
-        console.log(JSON.stringify(newState.mShape.model, null, 2));
         this.$store.replaceState(JSON.parse(JSON.stringify(newState))); // Parse the stringified version to create a new object.
 
         /* Execute the mutations that have been executed in every executed operation. */

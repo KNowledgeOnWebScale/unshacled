@@ -43,18 +43,13 @@ const dataModule = {
      * @param {string} name the name of the data file.
      * @param {string} contents the contents of a read data file.
      * @param {string} extension the extension of the data file.
-     * @param rootState
+     * @param {string} data the data parsed from the given file.
      */
-    setData(state, { name, contents, extension }) {
+    setData(state, { name, contents, extension, data }) {
       Vue.set(state, "dataFileName", name);
       Vue.set(state, "dataFile", contents);
       Vue.set(state, "dataFileExtension", extension);
-
-      /* Parse the data from Turtle to JSON. */
-      const self = this;
-      ParserManager.parse(contents, ETF.ttl).then(data => {
-        Vue.set(state, "dataText", JSON.stringify(data, null, 2));
-      });
+      Vue.set(state, "dataText", JSON.stringify(data, null, 2));
     },
 
     /**
@@ -125,20 +120,42 @@ const dataModule = {
 
   actions: {
     /**
-     * Receives a datafile and takes its content to the state.
+     * Receives a datafile and sends its contents to the parser.
      * @param state
-     * @param commit
+     * @param dispatch
      * @param {any} file file containing data to check on.
      * */
-    uploadDataFile({ commit }, file) {
+    uploadDataFile({ dispatch }, file) {
       const reader = new FileReader();
       reader.readAsText(file);
       reader.onload = event =>
-        commit("setData", {
+        dispatch("setDataFile", {
           name: file.name,
           contents: event.target.result,
           extension: file.name.split(".").pop()
         });
+    },
+
+    /**
+     * Parse the given data file and send its contents to the state
+     * @param commit
+     * @param rootState
+     * @param {string} name the name of the data file.
+     * @param {string} contents the contents of a read data file.
+     * @param {string} extension the extension of the data file.
+     */
+    setDataFile({ commit, rootState }, { name, contents, extension }) {
+      return new Promise((resolve, reject) => {
+        try {
+          /* Parse the data from Turtle to JSON. */
+          ParserManager.parse(contents, ETF.ttl).then(data => {
+            commit("setData", { name, contents, extension, data });
+            resolve(rootState);
+          });
+        } catch (e) {
+          reject(e);
+        }
+      });
     },
 
     /**
@@ -147,7 +164,7 @@ const dataModule = {
      * @param {any} rootState
      * @param {any} file the uploaded file
      * */
-    uploadSchemaFile({ commit, rootState }, file) {
+    uploadSchemaFile({ rootState }, file) {
       const reader = new FileReader();
       const fileExtension = file.name.split(".").pop();
       const type = ETF[fileExtension];
@@ -172,8 +189,8 @@ const dataModule = {
      * @param rootState
      * @param {array} model the shapes we want to use as a model now.
      */
-    updateModel({ commit, rootGetters, rootState }, model) {
-      commit("setModel", { model, getters: rootGetters, rootState });
+    updateModel({ commit, rootGetters }, model) {
+      commit("setModel", { model, getters: rootGetters });
     },
 
     /**

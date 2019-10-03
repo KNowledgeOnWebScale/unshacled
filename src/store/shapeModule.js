@@ -50,10 +50,11 @@ const shapeModule = {
      */
     setModel(state, { model, getters }) {
       /* Parse the model if necessary. */
-      state.model = JSON.stringify(model).includes(SHACL_URI)
+      model = JSON.stringify(model).includes(SHACL_URI)
         ? ShaclTranslator.toModelSimple(model)
         : model;
       model = JSON.parse(JSON.stringify(model).replace("http:", "https:"));
+      Vue.set(state, "model", model);
 
       /* Update y values and set coordinates. */
       for (const shape of state.model) {

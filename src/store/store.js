@@ -104,16 +104,24 @@ export default new Vuex.Store({
     /**
      * Load in some example data.
      */
-    loadExample({ getters, commit, rootState }) {
-      const self = this;
-      ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
-        commit("clear");
-        commit("setData", {
-          name: "example.ttl",
-          contents: exampleData,
-          extension: "ttl"
+    loadExample({ getters, commit, dispatch, rootState }) {
+      return new Promise((resolve, reject) => {
+        ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
+          commit("clear");
+          dispatch("setDataFile", {
+            name: "example.ttl",
+            contents: exampleData,
+            extension: "ttl"
+          }).then(() => {
+            commit("setModel", { model, getters });
+
+            if (rootState.mShape.model.length > 0) {
+              resolve(rootState);
+            } else {
+              reject(Error("Something went wrong."));
+            }
+          });
         });
-        commit("setModel", { model, getters, rootState });
       });
     }
   },
