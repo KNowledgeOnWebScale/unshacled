@@ -167,6 +167,11 @@ export default {
     /** Create a new node shape. */
     createNodeShape() {
       this.$store.dispatch("addNodeShape");
+      /* Save the state to undo later. */
+      this.$store.commit("saveOperation", {
+        state: this.$store.state,
+        action: { type: "addNodeShape" }
+      });
     },
     /** Toggle the visibility of the path modal to add a new property. */
     createPropertyShape() {

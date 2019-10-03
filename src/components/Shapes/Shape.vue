@@ -306,6 +306,7 @@ export default {
         ? "deleteNodeShape"
         : "deletePropertyShape";
       this.$store.dispatch(action, this.$props.id);
+      /* Save the state to undo later. */
       this.$store.commit("saveOperation", {
         state: this.$store.state,
         action: {

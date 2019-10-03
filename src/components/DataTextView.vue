@@ -77,6 +77,7 @@ export default {
      */
     updateData() {
       this.$store.dispatch("updateData", { dataText: this.dataText });
+      /* Save the state to undo later. */
       this.$store.commit("saveOperation", {
         state: this.$store.state,
         action: {

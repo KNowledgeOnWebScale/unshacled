@@ -174,6 +174,7 @@ const dataModule = {
       reader.onload = function(event) {
         ParserManager.parse(event.target.result, type).then(e => {
           self.dispatch("updateModel", e);
+          /* Save the state to undo later. */
           self.commit("saveOperation", {
             state: rootState,
             action: { type: "updateModel", args: e }

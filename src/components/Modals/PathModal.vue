@@ -97,26 +97,39 @@ export default {
     confirm() {
       /* Check if the entered value is valid. */
       if (!this.error()) {
+        let operation;
+        let args;
+
         if (this.$props.editing) {
           /* Edit the path if the user is editing a shape. */
           const { shapeID } = this.$props;
           const p = TERM.path;
-          this.$store.dispatch("stopConstraintEdit", {
+          operation = "stopConstraintEdit";
+          args = {
             shapeID,
             predicate: p,
             valueType: ValueType(p),
             input: prefixToUri(this.$store.state.mConfig.namespaces, this.path),
             inputType: this.$store.getters.objects(p)[0]
-          });
+          };
         } else {
           /* Create a new property shape. */
-          this.$store.dispatch("addPropertyShape", {
-            path: this.path
-          });
+          operation = "addPropertyShape";
+          args = { path: this.path };
         }
+
+        /* Execute the operation with the needed arguments. */
+        this.$store.dispatch(operation, args);
+
         /* Close and clear the modal. */
         this.$store.commit("togglePathModal", {});
         this.path = "";
+
+        /* Save the state to undo later. */
+        this.$store.commit("saveOperation", {
+          state: this.$store.state,
+          action: { type: operation, args }
+        });
       }
     },
 

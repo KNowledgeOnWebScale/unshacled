@@ -196,6 +196,7 @@ export default {
         newID: id
       };
       this.$store.dispatch("editShape", args);
+      /* Save the state to undo later. */
       this.$store.commit("saveOperation", {
         state: this.$store.state,
         action: { type: "editShape", args }
@@ -233,6 +234,7 @@ export default {
             newValue: [{ "@value": value, "@language": language }]
           };
           this.$store.dispatch("updateConstraint", args);
+          /* Save the state to undo later. */
           this.$store.commit("saveOperation", {
             state: this.$store.state,
             action: {
@@ -251,6 +253,7 @@ export default {
             language
           };
           this.$store.dispatch("addPredicate", args);
+          /* Save the state to undo later. */
           this.$store.commit("saveOperation", {
             state: this.$store.state,
             action: { type: "addPredicate", args }
@@ -263,6 +266,7 @@ export default {
           constraintID
         };
         this.$store.dispatch("deleteConstraintFromShapeWithID", args);
+        /* Save the state to undo later. */
         this.$store.commit("saveOperation", {
           state: this.$store.state,
           action: {
