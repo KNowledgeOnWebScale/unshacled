@@ -1,6 +1,7 @@
 import { TERM } from "../translation/terminology";
 
 export const ENTER = 13; // Enter key code.
+export const MAX_NUM_OPERATIONS = 100; // Maximum number of operations a user can undo.
 
 export const DEFAULT_BASE_URI = "https://example.org/ns/unshacled/";
 export const IDENTIFIER = "shapes";

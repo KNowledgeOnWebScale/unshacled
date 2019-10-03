@@ -1,6 +1,7 @@
 // Based on https://github.com/anthonygore/vuex-undo-redo/blob/master/src/plugin.js
 
 import emptyState from "../util/emptyState";
+import { MAX_NUM_OPERATIONS } from "../util/constants";
 
 const undoRedoMixin = {
   /**
@@ -28,6 +29,11 @@ const undoRedoMixin = {
       if (mutation.type === "saveOperation") {
         /* Only for `saveOperation` mutations, the payload will be added to the list of operations. */
         this.done.push(JSON.parse(JSON.stringify(mutation.payload)));
+        const ops = this.done.length;
+        if (ops > MAX_NUM_OPERATIONS) {
+          /* Limit the number of undoable operations. */
+          this.done = this.done.slice(ops - MAX_NUM_OPERATIONS);
+        }
       }
       if (
         this.newOperation &&
@@ -62,24 +68,14 @@ const undoRedoMixin = {
         const operation = this.done.pop();
         this.undone.push(operation); // Add this operation to the list of operations that have been undone.
         this.newOperation = false;
-        console.log("done:", this.done);
 
         const n = this.done.length;
         let newState = emptyState;
         if (n > 0) {
-          const last = this.done[this.done.length - 1];
-          console.log("last:", last.action.type);
-          newState = JSON.parse(JSON.stringify(last.state));
+          newState = this.done[this.done.length - 1].state;
         }
-        this.$store.replaceState(JSON.parse(JSON.stringify(newState))); // Parse the stringified version to create a new object.
-
-        /* Execute the mutations that have been executed in every executed operation. */
-        // this.done.forEach(operation => {
-        //   this.$store.dispatch(
-        //     `${operation.action.type}`,
-        //     operation.action.args
-        //   );
-        // });
+        /* Parse the stringified version to create a new object. */
+        this.$store.replaceState(JSON.parse(JSON.stringify(newState)));
         this.newOperation = true;
       }
     },
@@ -92,10 +88,7 @@ const undoRedoMixin = {
       if (this.canRedo()) {
         const operation = this.undone.pop();
         this.newOperation = false;
-        // FIXME this does not work due to different ID's!
-        operation.forEach(step => {
-          this.$store.commit(`${step.type}`, step.payload);
-        });
+        this.$store.replaceState(JSON.parse(JSON.stringify(operation.state)));
         this.done.push(operation); // Add this operation to the list of operations that have been done.
         this.newOperation = true;
       }
