@@ -77,6 +77,7 @@ const undoRedoMixin = {
         /* Parse the stringified version to create a new object. */
         this.$store.replaceState(JSON.parse(JSON.stringify(newState)));
         this.newOperation = true;
+        this.$store.commit("undo");
       }
     },
 

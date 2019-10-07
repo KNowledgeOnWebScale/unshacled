@@ -22,10 +22,10 @@
         ></relationship>
       </v-group>
       <div v-for="(obj, key) in this.$store.getters.propertyShapes" :key="key">
-        <shape :id="key" :node-shape="false"></shape>
+        <shape :id="key" :ref="key" :node-shape="false"></shape>
       </div>
       <div v-for="(obj, key) in this.$store.getters.nodeShapes" :key="key">
-        <shape :id="key" :node-shape="true"></shape>
+        <shape :id="key" :ref="key" :node-shape="true"></shape>
       </div>
     </v-layer>
   </v-stage>
@@ -59,6 +59,13 @@ export default {
     /* React to window resizing. */
     window.addEventListener("resize", this.handleResize);
     this.handleResize();
+
+    const self = this;
+    this.$store.subscribe(mutation => {
+      if (mutation.type === "undo")
+        for (const shape of Object.values(self.getShapeObjects()))
+          if (shape) shape.updatePosition();
+    });
   },
 
   updated() {
@@ -121,6 +128,17 @@ export default {
 
       stage.position(newPos); /* Reposition the stage. */
       stage.batchDraw(); /* Redraw the stage. */
+    },
+
+    /**
+     * TODO
+     */
+    getShapeObjects() {
+      const output = {};
+      for (const ref of Object.keys(this.$refs))
+        if (!["relationships", "stage"].includes(ref))
+          output[ref] = this.$refs[ref][0];
+      return output;
     }
   }
 };

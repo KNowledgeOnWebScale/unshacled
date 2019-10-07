@@ -43,8 +43,15 @@ export default new Vuex.Store({
      * This method does nothing on its own, but the payload is used to undo/redo the action.
      */
     saveOperation(_, { state, action }) {
-      console.log("Operation saved:", action.type);
+      console.log("[Saved]", action.type);
     },
+
+    /**
+     * Mutation that is called whenever an undo is executed.
+     * Components can subscribe to the store's mutations and react to this specific mutation.
+     * Using subscriptions instead of events since they're easier to work with regarding Vue components.
+     */
+    undo() {},
 
     /**
      * Save a reference to the editor.
