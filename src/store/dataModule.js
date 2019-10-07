@@ -213,7 +213,7 @@ const dataModule = {
 
     /**
      * Export the internal model to a file.
-     * // FIXME the default is SHACL for now
+     * FIXME the default is SHACL for now
      * @param rootState
      * @param rootGetters
      * @param {string} filename the name of the exported file.

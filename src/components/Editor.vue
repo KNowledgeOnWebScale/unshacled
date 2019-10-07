@@ -133,7 +133,7 @@ export default {
     },
 
     /**
-     * TODO
+     * Return all the shape objects that are currently visualized in the editor.
      */
     getShapeObjects() {
       const output = {};
