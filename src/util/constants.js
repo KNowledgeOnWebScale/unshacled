@@ -15,6 +15,7 @@ export const SHACL_URI = "http://www.w3.org/ns/shacl#";
 export const SINGLE_ENTRY = ["property"];
 
 /* Regular expression to test URI's. */
+// FIXME check the validity
 export const IRI_REGEX = new RegExp(
   // eslint-disable-next-line no-useless-escape
   /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/

@@ -5,7 +5,7 @@ import { MAX_NUM_OPERATIONS } from "../util/constants";
 
 const undoRedoMixin = {
   /**
-   * `done`: list of operations that have been executed.
+   * `done`: list of operations that have been executed. Contains 100 operations.
    * `undone`: list of operations that have been undone.
    * `newOperation`: indicates if the next operation is a new one.
    * @returns {{newOperation: boolean, done: [], undone: []}}
