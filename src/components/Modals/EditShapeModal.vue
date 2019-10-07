@@ -196,11 +196,6 @@ export default {
         newID: id
       };
       this.$store.dispatch("editShape", args);
-      /* Save the state to undo later. */
-      this.$store.commit("saveOperation", {
-        state: this.$store.state,
-        action: { type: "editShape", args }
-      });
 
       /* Update the shape label (in case of a node shape) or name (in case of a property shape). */
       this.handleConstraint(
@@ -210,6 +205,12 @@ export default {
       );
       /* Update the shape description. */
       this.handleConstraint(TERM.description, description, descrLang);
+
+      /* Save the state to undo later. */
+      this.$store.commit("saveOperation", {
+        state: this.$store.state,
+        action: { type: "editShape", args } // FIXME actually multiple actions executed
+      });
     },
 
     /**
@@ -234,14 +235,6 @@ export default {
             newValue: [{ "@value": value, "@language": language }]
           };
           this.$store.dispatch("updateConstraint", args);
-          /* Save the state to undo later. */
-          this.$store.commit("saveOperation", {
-            state: this.$store.state,
-            action: {
-              type: "updateConstraint",
-              args
-            }
-          });
         } else {
           /* Add the predicate to the shape if needed. */
           const args = {
@@ -253,11 +246,6 @@ export default {
             language
           };
           this.$store.dispatch("addPredicate", args);
-          /* Save the state to undo later. */
-          this.$store.commit("saveOperation", {
-            state: this.$store.state,
-            action: { type: "addPredicate", args }
-          });
         }
       } else {
         /* Delete the value if the user has not filled in anything. */
@@ -266,14 +254,6 @@ export default {
           constraintID
         };
         this.$store.dispatch("deleteConstraintFromShapeWithID", args);
-        /* Save the state to undo later. */
-        this.$store.commit("saveOperation", {
-          state: this.$store.state,
-          action: {
-            type: "deleteConstraintFromShapeWithID",
-            args
-          }
-        });
       }
     },
 

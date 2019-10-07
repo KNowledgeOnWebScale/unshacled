@@ -222,11 +222,6 @@ const constraintModule = {
         newValue: updated
       };
       dispatch("updateConstraint", args);
-      /* Save the state to undo later. */
-      commit("saveOperation", {
-        state: rootState,
-        action: { type: "updateConstraint", args }
-      });
     },
 
     /**

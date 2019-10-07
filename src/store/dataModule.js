@@ -121,19 +121,28 @@ const dataModule = {
   actions: {
     /**
      * Receives a datafile and sends its contents to the parser.
-     * @param state
+     * @param commit
      * @param dispatch
      * @param {any} file file containing data to check on.
      * */
-    uploadDataFile({ dispatch }, file) {
+    uploadDataFile({ commit, dispatch }, file) {
       const reader = new FileReader();
       reader.readAsText(file);
-      reader.onload = event =>
-        dispatch("setDataFile", {
+
+      reader.onload = event => {
+        const args = {
           name: file.name,
           contents: event.target.result,
           extension: file.name.split(".").pop()
-        });
+        };
+        dispatch("setDataFile", args).then(newState =>
+          /* Save the state to undo later. */
+          commit("saveOperation", {
+            state: newState,
+            action: { type: "setDataFile", args }
+          })
+        );
+      };
     },
 
     /**

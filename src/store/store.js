@@ -17,7 +17,6 @@ import configModule from "./configModule";
 import { exampleData, exampleShapes } from "../assets/example";
 import ParserManager from "../parsing/parserManager";
 import { ETF } from "../util/enums/extensionToFormat";
-import undoRedoMixin from "./undoRedoMixin";
 
 Vue.use(Vuex);
 
@@ -44,7 +43,7 @@ export default new Vuex.Store({
      * This method does nothing on its own, but the payload is used to undo/redo the action.
      */
     saveOperation(_, { state, action }) {
-      console.log(action.type);
+      console.log("Operation saved:", action.type);
     },
 
     /**
