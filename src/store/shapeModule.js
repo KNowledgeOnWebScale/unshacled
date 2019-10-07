@@ -6,6 +6,7 @@ import { LABEL, SHACL_URI } from "../util/constants";
 import { TERM } from "../translation/terminology";
 import getValueType from "../util/enums/ValueType";
 import ShaclTranslator from "../translation/shaclTranslator";
+import undoRedoMixin from "./undoRedoMixin";
 
 /**
  * This module contains everything to modify the shapes.
@@ -45,13 +46,15 @@ const shapeModule = {
      * @param state
      * @param {object} model the model we want to set.
      * @param {object} getters the store's getters.
+     * @param rootState
      */
     setModel(state, { model, getters }) {
       /* Parse the model if necessary. */
-      state.model = JSON.stringify(model).includes(SHACL_URI)
+      model = JSON.stringify(model).includes(SHACL_URI)
         ? ShaclTranslator.toModelSimple(model)
         : model;
       model = JSON.parse(JSON.stringify(model).replace("http:", "https:"));
+      Vue.set(state, "model", model);
 
       /* Update y values and set coordinates. */
       for (const shape of state.model) {

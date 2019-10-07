@@ -1,10 +1,12 @@
 import Vue from "vue";
+import Vuex from "vuex";
 import SuiVue from "semantic-ui-vue";
 import VueKonva from "vue-konva";
-import Vuex from "vuex";
 import PortalVue from "portal-vue";
+
 import App from "./App.vue";
 import store from "./store/store";
+import undoRedoMixin from "./store/undoRedoMixin";
 import "semantic-ui-css/semantic.min.css";
 
 Vue.config.productionTip = false;
@@ -15,5 +17,6 @@ Vue.use(PortalVue);
 
 new Vue({
   store,
+  mixins: [undoRedoMixin],
   render: h => h(App)
 }).$mount("#app");

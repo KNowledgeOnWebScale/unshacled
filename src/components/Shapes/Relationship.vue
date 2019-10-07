@@ -184,6 +184,13 @@ export default {
     click() {
       this.hover = false;
       this.$store.dispatch("deleteConstraintValue", this.$props.onClickProps);
+      this.$store.commit("saveOperation", {
+        state: this.$store.state,
+        action: {
+          type: "deleteConstraintValue",
+          args: this.$props.onClickProps
+        }
+      });
     },
 
     /**

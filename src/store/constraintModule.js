@@ -157,6 +157,8 @@ const constraintModule = {
     /**
      * Get the values from the predicate model and execute the edit.
      * @param state
+     * @param commit
+     * @param dispatch
      * @param rootGetters
      * @param {string} shapeID the ID of the shape we are editing.
      * @param {string} constraintID the ID of the constraint we are editing.
@@ -165,7 +167,7 @@ const constraintModule = {
      * @param {string} inputType the type of the input
      */
     stopConstraintEdit(
-      { state, rootGetters },
+      { state, commit, dispatch, rootGetters, rootState },
       { shapeID, predicate: constraintID, valueType, input, inputType }
     ) {
       /* Update the modal state. */
@@ -214,17 +216,19 @@ const constraintModule = {
       }
 
       /* Dispatch the action to update the constraint with the updated value. */
-      this.dispatch("updateConstraint", {
+      const args = {
         shapeID,
         constraintID,
         newValue: updated
-      });
+      };
+      dispatch("updateConstraint", args);
     },
 
     /**
      * Update the constraint value of the given shape.
      * @param rootGetters
      * @param commit
+     * @param rootState
      * @param {string} shapeID the ID of the shape.
      * @param {string} constraintID the ID of the constraint we want to update.
      * @param {object} newValue the new value of the given constraint.
@@ -253,18 +257,8 @@ const constraintModule = {
       { shapeID, constraintID }
     ) {
       const shape = getters.shapeWithID(shapeID);
-      commit(
-        "deleteConstraintFromShape",
-        { shape, constraintID },
-        { root: true }
-      );
-
-      /* Update the y values. */
-      commit(
-        "updateYValues",
-        { shapeID, shapes: rootState.mShape.model },
-        { root: true }
-      );
+      commit("deleteConstraintFromShape", { shape, constraintID });
+      commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
     },
 
     /**
@@ -288,17 +282,18 @@ const constraintModule = {
       const iter = getValueType(constraintID).includes(ValueTypes.LIST)
         ? constraint[0]["@list"]
         : constraint;
-      iter.splice(valueIndex, 1);
+
+      commit("removeElementFromList", { list: iter, index: valueIndex });
 
       /* Delete the constraint from the shape if there are no values left. */
       if (iter.length === 0) {
-        this.dispatch("deleteConstraintFromShapeWithID", {
-          shapeID,
-          constraintID
-        });
+        // Updating the y values should happen last, so insert this mutation on the second to last place.
+        const shape = getters.shapeWithID(shapeID);
+        commit("deleteConstraintFromShape", { shape, constraintID });
+        commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
       }
 
-      /* Update the y values. */
+      /* Execute the updating of the y values. */
       commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
     },
 
@@ -329,16 +324,15 @@ const constraintModule = {
         const val = iter[i];
         if (val["@id"] === value || val["@value"] === value || val === value) {
           /* Delete this value from the list if it is the value we want to remove. */
-          iter.splice(i, 1);
+          commit("removeElementFromList", { list: iter, index: i });
         }
       }
 
       /* Delete the constraint from the shape if there are no values left. */
       if (iter.length === 0) {
-        this.dispatch("deleteConstraintFromShapeWithID", {
-          shapeID,
-          constraintID
-        });
+        const shape = getters.shapeWithID(shapeID);
+        commit("deleteConstraintFromShape", { shape, constraintID });
+        commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
       }
 
       /* Update the y values. */

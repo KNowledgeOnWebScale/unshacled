@@ -14,17 +14,12 @@
     </multipane>
   </div>
 </template>
-
 <script>
-import Vue from "vue";
-import PortalVue from "portal-vue";
 import { Multipane, MultipaneResizer } from "vue-multipane";
 import NavBar from "./components/NavBar.vue";
 import Editor from "./components/Editor.vue";
 import DataTextView from "./components/DataTextView.vue";
 import { MARGIN_TOP } from "./config/konvaConfigs";
-
-Vue.use(PortalVue);
 
 export default {
   name: "App",
@@ -47,9 +42,10 @@ export default {
 };
 
 /* Require approval before closing the page. */
-window.onbeforeunload = function() {
-  return "Are you sure you want to quit without saving? Any unsaved progress will be lost.";
-};
+// TODO enable this again
+// window.onbeforeunload = function() {
+//   return "Are you sure you want to quit without saving? Any unsaved progress will be lost.";
+// };
 </script>
 
 <style lang="scss">

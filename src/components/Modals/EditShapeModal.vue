@@ -191,10 +191,12 @@ export default {
       this.$store.commit("toggleEditShapeModal", {});
 
       /* Update the shape ID. */
-      this.$store.dispatch("editShape", {
+      const args = {
         oldID: modProps.id,
         newID: id
-      });
+      };
+      this.$store.dispatch("editShape", args);
+
       /* Update the shape label (in case of a node shape) or name (in case of a property shape). */
       this.handleConstraint(
         modProps.nodeShape ? LABEL : TERM.name,
@@ -203,6 +205,12 @@ export default {
       );
       /* Update the shape description. */
       this.handleConstraint(TERM.description, description, descrLang);
+
+      /* Save the state to undo later. */
+      this.$store.commit("saveOperation", {
+        state: this.$store.state,
+        action: { type: "editShape", args } // FIXME actually multiple actions executed
+      });
     },
 
     /**
@@ -221,28 +229,31 @@ export default {
         /* Update or add the value accordingly. */
         if (shape[constraintID]) {
           /* Update the value of the existing constraint if the shape already has this predicate. */
-          this.$store.dispatch("updateConstraint", {
+          const args = {
             shapeID,
             constraintID,
             newValue: [{ "@value": value, "@language": language }]
-          });
+          };
+          this.$store.dispatch("updateConstraint", args);
         } else {
           /* Add the predicate to the shape if needed. */
-          this.$store.dispatch("addPredicate", {
+          const args = {
             shapeID,
             predicate: constraintID,
             valueType: getValueType(constraintID),
             input: value,
             object: XML_DATATYPES.string,
             language
-          });
+          };
+          this.$store.dispatch("addPredicate", args);
         }
       } else {
         /* Delete the value if the user has not filled in anything. */
-        this.$store.dispatch("deleteConstraintFromShapeWithID", {
+        const args = {
           shapeID,
           constraintID
-        });
+        };
+        this.$store.dispatch("deleteConstraintFromShapeWithID", args);
       }
     },
 

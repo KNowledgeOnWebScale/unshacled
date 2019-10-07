@@ -128,7 +128,8 @@ const configModule = {
       } else if (editField === "uri" && state.namespaces[editRow] !== input) {
         // Update the given URI.
         console.log(editRow, getters.uriByPrefix(state.baseURI));
-        if (editRow === getters.uriByPrefix(state.baseURI)) commit("setBaseUri", { uri: input });
+        if (editRow === getters.uriByPrefix(state.baseURI))
+          commit("setBaseUri", { uri: input });
         commit("updateNamespaceURI", { prefix: editRow, newURI: input });
       }
       commit("clearTableEdit"); /* Stop editing and clear the table. */

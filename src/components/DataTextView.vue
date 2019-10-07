@@ -77,6 +77,14 @@ export default {
      */
     updateData() {
       this.$store.dispatch("updateData", { dataText: this.dataText });
+      /* Save the state to undo later. */
+      this.$store.commit("saveOperation", {
+        state: this.$store.state,
+        action: {
+          type: "updateData",
+          args: { dataText: this.dataText }
+        }
+      });
     },
     /**
      * Check if the data in the text field has changed in comparison to the data in the store.

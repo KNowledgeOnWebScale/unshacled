@@ -70,6 +70,19 @@
         @click="toggleClearModal"
       ></sui-menu-item>
 
+      <sui-menu-item
+        class="clickable"
+        icon="undo alterate"
+        :disabled="!$root.canUndo()"
+        @click="undoAction"
+      ></sui-menu-item>
+      <sui-menu-item
+        class="clickable"
+        icon="redo alternate"
+        :disabled="!$root.canRedo()"
+        @click="redoAction"
+      ></sui-menu-item>
+
       <!--
       <sui-menu-menu position="right">
         <sui-menu-item class="clickable" icon="user"></sui-menu-item>
@@ -154,6 +167,11 @@ export default {
     /** Create a new node shape. */
     createNodeShape() {
       this.$store.dispatch("addNodeShape");
+      /* Save the state to undo later. */
+      this.$store.commit("saveOperation", {
+        state: this.$store.state,
+        action: { type: "addNodeShape" }
+      });
     },
     /** Toggle the visibility of the path modal to add a new property. */
     createPropertyShape() {
@@ -162,7 +180,17 @@ export default {
 
     /** Load the example. */
     loadExample() {
-      this.$store.dispatch("loadExample");
+      const self = this;
+      this.$store.dispatch("loadExample").then(
+        () => {
+          /* Save the state to undo later. */
+          self.$store.commit("saveOperation", {
+            state: self.$store.state,
+            action: { type: "loadExample" }
+          });
+        },
+        err => console.log(err)
+      );
     },
 
     /** Read the entered text file and upload it as the new model. */
@@ -186,6 +214,14 @@ export default {
     dataFileUploaded() {
       return this.$store.state.mData.dataFile.length > 0;
     },
+
+    undoAction() {
+      if (this.$root.canUndo()) this.$root.undo();
+    },
+    redoAction() {
+      if (this.$root.canRedo()) this.$root.redo();
+    },
+
     /** Validate the data using the current model. */
     validate() {
       this.$store.dispatch("validateWithCurrentModel");

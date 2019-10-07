@@ -39,12 +39,37 @@ export default new Vuex.Store({
   },
   mutations: {
     /**
+     * Save the state and the executed mutations for use in the undo/redo functionality.
+     * This method does nothing on its own, but the payload is used to undo/redo the action.
+     */
+    saveOperation(_, { state, action }) {
+      console.log("[Saved]", action.type);
+    },
+
+    /**
+     * Mutation that is called whenever an undo is executed.
+     * Components can subscribe to the store's mutations and react to this specific mutation.
+     * Using subscriptions instead of events since they're easier to work with regarding Vue components.
+     */
+    undo() {},
+
+    /**
      * Save a reference to the editor.
      * @param state
      * @param {object} editor the editor object.
      */
     setEditor(state, editor) {
       Vue.set(state, "editor", editor);
+    },
+
+    /**
+     * Helper mutation. Removes the element at the given index of the given list.
+     * @param state
+     * @param {array} list the list where the element should be removed.
+     * @param {number} index the index of the element that should be removed.
+     */
+    removeElementFromList(state, { list, index }) {
+      list.splice(index, 1);
     },
 
     /* MODALS ======================================================================================================= */
@@ -87,19 +112,24 @@ export default new Vuex.Store({
     /**
      * Load in some example data.
      */
-    loadExample({ getters }) {
-      const self = this;
-      /* Clear the existing data first. */
-      this.commit("clear");
-      /* Set the new data. */
-      this.commit("setData", {
-        name: "example.ttl",
-        contents: exampleData,
-        extension: "ttl"
-      });
-      /* Set the new model. */
-      ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
-        self.commit("setModel", { model, getters });
+    loadExample({ getters, commit, dispatch, rootState }) {
+      return new Promise((resolve, reject) => {
+        ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
+          commit("clear");
+          dispatch("setDataFile", {
+            name: "example.ttl",
+            contents: exampleData,
+            extension: "ttl"
+          }).then(() => {
+            commit("setModel", { model, getters });
+
+            if (rootState.mShape.model.length > 0) {
+              resolve(rootState);
+            } else {
+              reject(Error("Something went wrong."));
+            }
+          });
+        });
       });
     }
   },

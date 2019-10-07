@@ -183,13 +183,20 @@ export default {
      * Delete the current constraint from its shape.
      */
     deleteConstraint() {
-      this.$store.dispatch("deleteConstraintFromShapeWithID", {
+      const args = {
         shapeID: this.$props.shapeID,
         constraintID: this.$props.constraintID
-      });
+      };
+      this.$store.dispatch("deleteConstraintFromShapeWithID", args);
       this.$store.commit("updateYValues", {
         shapeID: this.$props.shapeID,
         shapes: this.$store.state.mShape.model
+      });
+
+      /* Save the state to undo later. */
+      this.$store.commit("saveOperation", {
+        state: this.$store.state,
+        action: { type: "deleteConstraintFromShapeWithID", args }
       });
     },
 
@@ -198,10 +205,19 @@ export default {
      * @param {number} index the index of the value in the constraint.
      */
     deleteConstraintValue(index) {
-      this.$store.dispatch("deleteConstraintValueWithIndex", {
+      const args = {
         shapeID: this.$props.shapeID,
         constraintID: this.$props.constraintID,
         valueIndex: index
+      };
+      this.$store.dispatch("deleteConstraintValueWithIndex", args);
+      /* Save the state to undo later. */
+      this.$store.commit("saveOperation", {
+        state: this.$store.state,
+        action: {
+          type: "deleteConstraintValueWithIndex",
+          args
+        }
       });
       this.$store.commit("updateYValues", {
         shapeID: this.$props.shapeID,
