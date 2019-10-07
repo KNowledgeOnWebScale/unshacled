@@ -37,7 +37,7 @@ const undoRedoMixin = {
       }
       if (
         this.newOperation &&
-        !["updateYValues", "updateCoordinates"].includes(mutation.type) // Moving a shape won't trigger this.
+        !["updateYValues", "updateCoordinates", "undo"].includes(mutation.type) // Moving a shape won't trigger this.
       ) {
         /* Clear the list of operations that have been undone. */
         this.undone = [];
@@ -69,21 +69,20 @@ const undoRedoMixin = {
         this.undone.push(operation); // Add this operation to the list of operations that have been undone.
         this.newOperation = false;
 
+        /* Determine the new state. */
         const n = this.done.length;
         let newState = emptyState;
-        if (n > 0) {
-          newState = this.done[this.done.length - 1].state;
-        }
+        if (n > 0) newState = this.done[this.done.length - 1].state;
+
         /* Parse the stringified version to create a new object. */
         this.$store.replaceState(JSON.parse(JSON.stringify(newState)));
         this.newOperation = true;
-        this.$store.commit("undo");
+        this.$store.commit("undo"); // Event
       }
     },
 
     /**
      * Redo the last operation that has been undone.
-     * FIXME Not operational yet.
      */
     redo() {
       if (this.canRedo()) {
