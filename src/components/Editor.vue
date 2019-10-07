@@ -61,7 +61,9 @@ export default {
     this.handleResize();
 
     const self = this;
+    /* React to undo operations. */
     this.$store.subscribe(mutation => {
+      /* Update the shape's positions to make sure the relationship arrows are updated accordingly. */
       if (mutation.type === "undo")
         for (const shape of Object.values(self.getShapeObjects()))
           if (shape) shape.updatePosition();
