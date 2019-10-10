@@ -1,5 +1,6 @@
 import Vue from "vue";
 import { clone } from "ramda";
+import { IDENTIFIER } from "./constants";
 
 export { default as getNonOverlappingCoordinates } from "./getNonOverlappingCoordinates"; // prettier-ignore
 export { default as traverse } from "./traverse";
@@ -7,8 +8,8 @@ export { default as XML_DATATYPES } from "./enums/xmlDatatypes";
 
 /**
  * Prompt to download a file with the given filename and contents.
- * @param filename
- * @param contents
+ * @param {string} filename the name of the file we want to download.
+ * @param {string} contents the contents of the file.
  */
 export function downloadFile(filename, contents) {
   const element = document.createElement("a");
@@ -45,13 +46,25 @@ export function groupBy(dictionary, key, deleteKey = false) {
 }
 
 /**
- * Calculate the distance between the two given points.
- * @returns {number}
- * @param x1
- * @param y1
- * @param x2
- * @param y2
+ * Swap the keys and values from `namespaces`.
  */
-export function distance(x1, y1, x2, y2) {
-  return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+export function swapKeyValue(object) {
+  const output = {};
+  Object.keys(object).map(key => {
+    output[object[key]] = key;
+  });
+  return output;
+}
+
+/**
+ * Generate an UUID using the current set base URI and the `uuid/v4` generator.
+ * @param baseURI
+ * @returns {string}
+ */
+export function generateUUID(baseURI) {
+  if (baseURI === "") {
+    return `${IDENTIFIER}/${require("uuid/v4")()}`;
+  } else {
+    return `${baseURI}${require("uuid/v4")()}`;
+  }
 }

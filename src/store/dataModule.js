@@ -4,7 +4,6 @@ import ParserManager from "../parsing/parserManager";
 import SerializerManager from "../parsing/serializerManager";
 import ValidatorManager from "../validation/validatorManager";
 import language from "../util/enums/languages";
-import getConstraints from "../util/constraintSelector";
 import { downloadFile } from "../util";
 import ShaclTranslator from "../translation/shaclTranslator";
 
@@ -18,143 +17,274 @@ const dataModule = {
     dataFile: {},
     dataFileName: String,
     dataFileExtension: String,
+    dataText: "",
     validationReport: {},
     showValidationReportModal: false
   },
+
   mutations: {
+    /**
+     * Show the validation report modal.
+     * @param state
+     */
+    toggleValidationReport(state) {
+      event.preventDefault();
+      Vue.set(
+        state,
+        "showValidationReportModal",
+        !state.showValidationReportModal
+      );
+    },
+
+    /**
+     * Clear the data from the current state.
+     * @param state
+     */
+    clearData(state) {
+      Vue.set(state, "dataFileName", undefined);
+      Vue.set(state, "dataFile", {});
+      Vue.set(state, "dataFileExtension", undefined);
+      Vue.set(state, "dataText", "");
+    },
+
     /**
      * Set the data file to the given contents.
      * @param state
-     * @param contents the contents of a read data file.
-     * @param extension the extension of the data file.
+     * @param {string} name the name of the data file.
+     * @param {string} contents the contents of a read data file.
+     * @param {string} extension the extension of the data file.
+     * @param {string} data the data parsed from the given file.
      */
-    setDataFile(state, { name, contents, extension }) {
+    setData(state, { name, contents, extension, data }) {
       Vue.set(state, "dataFileName", name);
       Vue.set(state, "dataFile", contents);
       Vue.set(state, "dataFileExtension", extension);
+      Vue.set(state, "dataText", JSON.stringify(data, null, 2));
+    },
+
+    /**
+     * Set the given JSON data as the current data file.
+     * @param state
+     * @param {string} text the data in JSON format.
+     */
+    setJsonData(state, { text }) {
+      Vue.set(state, "dataText", text);
+      Vue.set(state, "dataFileExtension", "json");
+      Vue.set(state, "dataFile", text);
     },
 
     /**
      * Parse the model to the expected format and validate the data file using these shapes.
      * If there is no data file loaded, this will print an error.
      * @param state
-     * @param model
+     * @param {object} model the current model.
      */
     validateWithModel(state, model) {
+      /**
+       * Validate the given data using the given model in the given format.
+       * Use the generated report to show the validation report modal.
+       *
+       * Used to avoid code duplication.
+       * Does not work if placed outside `validateWithModel` due to the way the mutations work.
+       *
+       * @param state
+       * @param {object} data the data objects in Turtle.
+       * @param {object} shapes the shape objects in SHACL.
+       * @param {string} format the format of the data.
+       */
+      const validateData = function(state, data, shapes, format) {
+        ValidatorManager.validate(data, shapes, format)
+          .then(report => {
+            Vue.set(state, "validationReport", report);
+            Vue.set(state, "showValidationReportModal", true);
+          })
+          .catch(e => console.error(`Error while validating: ${e}`));
+      };
+
+      /* Check if there is data loaded. */
       if (state.dataFile.length > 0) {
+        /* Serialize the model to SHACL. */
         SerializerManager.serialize(
           ShaclTranslator.toSHACLSimple(model),
           ETF.ttl
         )
           .then(shapes => {
-            if (state.dataFileExtension === "json")
-              throw "JSON data files are not yet supported."; // FIXME
-            // SerializerManager.serialize(state.dataFile, ETF.ttl).then(result => console.log(result)); // FIXME this errors
-
-            ValidatorManager.validate(state.dataFile, shapes, state.format)
-              .then(report => {
-                state.validationReport = report;
-                state.showValidationReportModal = true;
-              })
-              .catch(e => console.error(`Error while validating: ${e}`));
+            if (state.dataFileExtension === "json") {
+              /* Serialize the data to turtle. */
+              SerializerManager.serialize(
+                JSON.parse(state.dataFile),
+                ETF.ttl
+              ).then(data => validateData(state, data, shapes, state.format));
+            } else {
+              /* If the data is already in turtle format, go straight to validating. */
+              validateData(state, state.dataFile, shapes, state.format);
+            }
           })
           .catch(e => console.error(`Error while serializing: ${e}`));
       } else {
+        /* Throw an error if there is no data to validate. */
         console.error("No data file loaded.");
       }
     }
   },
+
   actions: {
     /**
-     * Recieves a datafile and takes its content to the state
-     * @param state
+     * Receives a datafile and sends its contents to the parser.
      * @param commit
-     * @param file The file containing data to check on
+     * @param dispatch
+     * @param {any} file file containing data to check on.
      * */
-    uploadDataFile({ commit }, file) {
+    uploadDataFile({ commit, dispatch }, file) {
       const reader = new FileReader();
       reader.readAsText(file);
-      reader.onload = event =>
-        commit("setDataFile", {
+
+      reader.onload = event => {
+        const args = {
           name: file.name,
           contents: event.target.result,
           extension: file.name.split(".").pop()
-        });
+        };
+        dispatch("setDataFile", args).then(newState =>
+          /* Save the state to undo later. */
+          commit("saveOperation", {
+            state: newState,
+            action: { type: "setDataFile", args }
+          })
+        );
+      };
     },
 
     /**
-     * Takes a file, reads the extension and depending on the format uses the correct parser to turn it into an intern model
-     * @param _
-     * @param file The uploaded file
+     * Parse the given data file and send its contents to the state
+     * @param commit
+     * @param rootState
+     * @param {string} name the name of the data file.
+     * @param {string} contents the contents of a read data file.
+     * @param {string} extension the extension of the data file.
+     */
+    setDataFile({ commit, rootState }, { name, contents, extension }) {
+      return new Promise((resolve, reject) => {
+        try {
+          if (extension.toLowerCase() === "json") {
+            alert("Importing JSON files is not yet supported.");
+            throw new Error("Importing JSON files is not yet supported.");
+          } else {
+            /* Parse the data from Turtle to JSON. */
+            ParserManager.parse(contents, ETF[extension]).then(data => {
+              commit("setData", { name, contents, extension, data });
+              resolve(rootState);
+            });
+          }
+        } catch (e) {
+          reject(e);
+        }
+      });
+    },
+
+    /**
+     * Takes a file and reads the extension.
+     * Depending on the used format, it will use the correct parser to turn it into an internal model.
+     * @param {any} rootState
+     * @param {any} file the uploaded file
      * */
-    uploadSchemaFile(_, file) {
+    uploadSchemaFile({ rootState }, file) {
       const reader = new FileReader();
-      const fileExtension = file.name.split(".").pop();
+      const fileExtension = file.name
+        .split(".")
+        .pop()
+        .toLowerCase();
       const type = ETF[fileExtension];
       const self = this;
 
-      reader.readAsText(file);
-      reader.onload = function(event) {
-        ParserManager.parse(event.target.result, type).then(e => {
-          self.dispatch("updateModel", e);
-        });
-      };
+      if (fileExtension === "json") {
+        alert("Importing JSON files is not yet supported.");
+        throw new Error("Importing JSON files is not yet supported.");
+      } else {
+        reader.readAsText(file);
+        reader.onload = function(event) {
+          ParserManager.parse(event.target.result, type).then(e => {
+            self.dispatch("updateModel", e);
+            /* Save the state to undo later. */
+            self.commit("saveOperation", {
+              state: rootState,
+              action: { type: "updateModel", args: e }
+            });
+          });
+        };
+      }
     },
 
     /**
      * Set the model to the given one.
      * @param commit
-     * @param getters
-     * @param model
+     * @param rootGetters
+     * @param rootState
+     * @param {array} model the shapes we want to use as a model now.
      */
     updateModel({ commit, rootGetters }, model) {
-      commit("setModel", { model, getters: rootGetters }, { root: true });
+      commit("setModel", { model, getters: rootGetters });
     },
 
     /**
      * Validate the interal model.
      * @param rootState
      */
-    validate({ rootState }) {
+    validateWithCurrentModel({ rootState }) {
       this.commit("validateWithModel", rootState.mShape.model);
     },
 
     /**
      * Export the internal model to a file.
-     * // FIXME the default is SHACL for now
+     * FIXME the default is SHACL for now
      * @param rootState
-     * @param filename
+     * @param rootGetters
+     * @param {string} filename the name of the exported file.
+     * @param {string} extension the extension of the exported file.
      */
-    exportFileWithName({ rootState, rootGetters }, args) {
-      const { filename, extension } = args;
-      const type = ETF[extension];
+    exportFileWithName({ rootGetters }, { filename, extension }) {
       if (extension === "json") {
+        /* If the file is in JSON, export the model directly. */
         downloadFile(
           filename,
           JSON.stringify(rootGetters.internalModelToJson, null, 2)
         );
-      } else {
+      } else if (extension === "nt") {
+        /* Otherwise, serialize to (n-triples) Turtle first. */
         SerializerManager.serialize(
-          ShaclTranslator.toSHACLSimple(rootState.mShape.model),
-          type
-        ).then(e => downloadFile(filename, e));
+          ShaclTranslator.toSHACL(rootGetters.shapes),
+          ETF.ttl
+        ).then(e => {
+          downloadFile(filename, e);
+        });
+      } else {
+        console.err(`Extension ${extension} not supported.`);
       }
-    }
-  },
-  getters: {
-    /**
-     * Get all the constraints for the current format.
-     * @param state
-     * @returns {null}
-     */
-    validators: state => {
-      return getConstraints(state.format);
     },
 
     /**
-     * TODO
+     * Update the data file to the given data text.
+     * If the given text is not valid JSON, this wil print an error.
      * @param state
-     * @returns {string}
+     * @param commit
+     * @param {string} dataText the text we want to use as data.
+     */
+    updateData({ commit }, { dataText }) {
+      try {
+        JSON.parse(dataText); /* Try parsing the text first. */
+        /* Call mutation if the parsing was successful. */
+        commit("setJsonData", { text: dataText });
+      } catch (e) {
+        console.err("Entered data is no valid JSON.");
+      }
+    }
+  },
+
+  getters: {
+    /**
+     * Get the validation report.
+     * @param state
+     * @returns {string} the validation report as a string.
      */
     validationReport: state => {
       return state.ValidationReport;

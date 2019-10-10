@@ -9,6 +9,8 @@
       v-if="hover"
       :config="getButtonConfig()"
       @click="click()"
+      @mouseenter="setCursor('pointer')"
+      @mouseleave="setCursor('')"
     ></v-circle>
   </v-group>
 </template>
@@ -21,11 +23,12 @@ import {
   RELATIONSHIP_ARROW_CONFIG,
   RELATIONSHIP_LABEL_RECT_CONFIG,
   RELATIONSHIP_LABEL_TEXT_CONFIG,
-  MARGIN
-} from "../../util/konvaConfigs";
-import nearestPointOnPerimeter from "../../util/nearestPointOnPerimeter";
-import { urlToName } from "../../util/urlParser";
-import { distance } from "../../util";
+  MARGIN,
+  pointerCursor,
+  resetCursor
+} from "../../config/konvaConfigs";
+import { nearestPointOnPerimeter, distance } from "../../util/calculations";
+import { uriToPrefix } from "../../util/urlParser";
 
 export default {
   name: "Relationship",
@@ -47,6 +50,10 @@ export default {
       required: true
     }
   },
+  /**
+   * Hover {boolean} indicates if the mouse is hovering over this relationship.
+   * @returns {{hover: boolean}}
+   */
   data() {
     return {
       hover: false
@@ -55,7 +62,7 @@ export default {
   methods: {
     /**
      * Get the end points of the relationship line.
-     * @returns {array}
+     * @returns {[number]} a list of coordinates: [x1, y1, x2, y2]
      */
     getEndPoints() {
       const { from, to, constraintID } = this.$props;
@@ -65,11 +72,12 @@ export default {
         yValues
       } = this.$store.state.mShape.mCoordinate;
 
-      // Center points of the shapes.
+      /* Determine the center points of the start shape. */
       const start = {
         x: coordinates[from].x + WIDTH / 2,
         y: coordinates[from].y + yValues[from][constraintID] + HEIGHT
       };
+      /* Determine the closest point on the end shape's perimeter. */
       const end = nearestPointOnPerimeter(
         coordinates[to],
         {
@@ -79,7 +87,7 @@ export default {
         start
       );
 
-      // Grab the nearest edge of the start shape.
+      /* Grab the nearest edge of the start shape. */
       const edges = {
         xl: coordinates[from].x,
         xr: coordinates[from].x + WIDTH,
@@ -90,18 +98,17 @@ export default {
       start.x = distLeft < distRight ? edges.xl : edges.xr;
       start.y = edges.y;
 
-      return [
-        start.x, // x1
-        start.y, // y1
-        end.x, // x2
-        end.y // y2
-      ];
+      return [start.x, start.y, end.x, end.y]; // x1, y1, x2, y2
     },
 
+    /**
+     * Get the configurations for the components of the relationship depending on the end points of the arrow.
+     * @returns {{line: object, label: object, text: object, rect: object}}
+     */
     getConfigs() {
       const DEGREES = 180;
 
-      // Get the end points and the rotation of the arrow.
+      /* Determine the end points and the rotation of the arrow. */
       const points = this.getEndPoints();
       const dx = points[2] - points[0];
       const dy = points[3] - points[1];
@@ -110,6 +117,7 @@ export default {
       rotation > DEGREES / 2 ? (rotation -= DEGREES) : null;
       rotation < -DEGREES / 2 ? (rotation += DEGREES) : null;
 
+      /* Create and return the configuration objects using these end points and rotations. */
       return {
         line: {
           ...RELATIONSHIP_ARROW_CONFIG,
@@ -122,7 +130,10 @@ export default {
         },
         text: {
           ...RELATIONSHIP_LABEL_TEXT_CONFIG,
-          text: urlToName(this.$props.constraintID)
+          text: uriToPrefix(
+            this.$store.state.mConfig.namespaces,
+            this.$props.constraintID
+          )
         },
         rect: {
           ...RELATIONSHIP_LABEL_RECT_CONFIG,
@@ -132,6 +143,11 @@ export default {
       };
     },
 
+    /**
+     * Get the configuration for the label rectangle.
+     * This one is not included in `getConfigs` because it relies on the previously drawn line.
+     * @returns {any} a configuration object.
+     */
     getLabelRectConfig() {
       const configs = this.getConfigs();
       if (this.$refs.text && this.$refs.text.getNode()) {
@@ -146,6 +162,7 @@ export default {
     /**
      * Get the button configuration.
      * This one is not included in `getConfigs` because it relies on the previously drawn line.
+     * @returns {any} a configuration object.
      */
     getButtonConfig() {
       const arrow = this.$refs.arrow.getNode();
@@ -167,6 +184,22 @@ export default {
     click() {
       this.hover = false;
       this.$store.dispatch("deleteConstraintValue", this.$props.onClickProps);
+      this.$store.commit("saveOperation", {
+        state: this.$store.state,
+        action: {
+          type: "deleteConstraintValue",
+          args: this.$props.onClickProps
+        }
+      });
+    },
+
+    /**
+     * Set the cursor type according to the passed argument.
+     * @param {string} type the type of cursor we want to use.
+     */
+    setCursor(type) {
+      if (type === "pointer") pointerCursor();
+      else resetCursor();
     }
   }
 };

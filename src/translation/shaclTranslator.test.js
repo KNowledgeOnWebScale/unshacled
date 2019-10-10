@@ -34,11 +34,11 @@ test("translate dictionary to model", async () => {
     ]
   };
   const shaclDictionary = {
-    "http://www.w3.org/ns/shacl#NodeShape": [
-      "http://www.w3.org/ns/shacl#property",
-      "http://www.w3.org/ns/shacl#rule",
-      "http://www.w3.org/ns/shacl#severity",
-      "http://www.w3.org/ns/shacl#sparql",
+    "https://www.w3.org/ns/shacl#NodeShape": [
+      "https://www.w3.org/ns/shacl#property",
+      "https://www.w3.org/ns/shacl#rule",
+      "https://www.w3.org/ns/shacl#severity",
+      "https://www.w3.org/ns/shacl#sparql",
     ]
   };
   const translated = await ShaclTranslator.toModel(naiveCopy(shaclDictionary));

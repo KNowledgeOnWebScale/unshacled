@@ -1,9 +1,9 @@
 <template>
   <div>
-    <sui-menu ref="navbar" attached="top" inverted>
+    <sui-menu id="navbar" ref="navbar" attached="top" inverted>
       <sui-dropdown item icon="file alternate" simple>
         <sui-dropdown-menu>
-          <sui-dropdown-item @click="$refs.importShapes.click()">
+          <sui-dropdown-item @mouseup="() => $refs.importShapes.click()">
             <label for="file">Import Shapes...</label>
             <input
               id="file"
@@ -14,7 +14,7 @@
             />
           </sui-dropdown-item>
 
-          <sui-dropdown-item @click="$refs.importData.click()">
+          <sui-dropdown-item @mouseup="() => $refs.importData.click()">
             <label for="dataFile">Import Data...</label>
             <input
               id="dataFile"
@@ -33,6 +33,12 @@
 
           <sui-dropdown-item @click="loadExample">
             Load Example
+          </sui-dropdown-item>
+
+          <sui-dropdown-divider></sui-dropdown-divider>
+
+          <sui-dropdown-item @click="toggleNamespaceModal">
+            Namespaces...
           </sui-dropdown-item>
         </sui-dropdown-menu>
       </sui-dropdown>
@@ -61,23 +67,49 @@
       <sui-menu-item
         class="clickable"
         icon="trash"
+        :disabled="!canClear()"
         @click="toggleClearModal"
       ></sui-menu-item>
 
+      <sui-menu-item
+        class="clickable"
+        icon="undo alterate"
+        :disabled="!$root.canUndo()"
+        @click="undoOperation"
+      ></sui-menu-item>
+      <sui-menu-item
+        class="clickable"
+        icon="redo alternate"
+        :disabled="!$root.canRedo()"
+        @click="redoOperation"
+      ></sui-menu-item>
+
+      <!--
       <sui-menu-menu position="right">
         <sui-menu-item class="clickable" icon="user"></sui-menu-item>
+      </sui-menu-menu>
+      -->
+      <sui-menu-menu position="right">
+        <a href="https://github.com/oSoc19/unshacled/" target="_blank">
+          <sui-menu-item class="clickable" icon="github"></sui-menu-item>
+        </a>
       </sui-menu-menu>
     </sui-menu>
 
     <clear-modal></clear-modal>
     <export-modal></export-modal>
-    <path-modal></path-modal>
+    <namespace-modal></namespace-modal>
+
+    <path-modal
+      :editing="$store.state.pathModal.editing"
+      :shape-i-d="$store.state.pathModal.shapeID"
+    ></path-modal>
     <validation-report-modal
       :report="this.$store.state.mData.validationReport"
     ></validation-report-modal>
 
     <predicate-modal
-      :modal-properties="$store.state.mShape.mConstraint.predicateModal"
+      :modal-properties="$store.state.mShape.mConstraint.mModal"
     ></predicate-modal>
     <edit-shape-modal
       :modal-properties="$store.state.mShape.shapeModal"
@@ -97,10 +129,12 @@ import PredicateModal from "./Modals/PredicateModal.vue";
 import ExportModal from "./Modals/ExportModal.vue";
 import PathModal from "./Modals/PathModal.vue";
 import EditShapeModal from "./Modals/EditShapeModal.vue";
+import NamespaceModal from "./Modals/NamespaceModal.vue";
 
 export default {
   name: "NavBar",
   components: {
+    NamespaceModal,
     EditShapeModal,
     PathModal,
     ExportModal,
@@ -110,44 +144,104 @@ export default {
     ValidationReportModal,
     PredicateModal
   },
+  /**
+   * Get the string representations of the given languages.
+   * Used because the values from `languages` cannot be referenced directly from the HTML.
+   * @returns {{shacl: *, shex: *}}
+   */
   data() {
     return {
-      uuid: require("uuid/v4"),
       shacl: languages.SHACL,
       shex: languages.SHEX
     };
   },
   methods: {
+    /** Toggle the visibility of the clear modal. */
     toggleClearModal() {
-      this.$store.commit("toggleClearModal");
+      if (this.canClear()) this.$store.commit("toggleClearModal");
     },
+    /** Toggle the visibility of the namespace modal. */
+    toggleNamespaceModal() {
+      this.$store.commit("toggleNamespaceModal");
+    },
+
+    /** Create a new node shape. */
     createNodeShape() {
-      this.$store.dispatch("addNodeShape", this.uuid());
+      this.$store.dispatch("addNodeShape");
+      /* Save the state to undo later. */
+      this.$store.commit("saveOperation", {
+        state: this.$store.state,
+        action: { type: "addNodeShape" }
+      });
     },
+    /** Toggle the visibility of the path modal to add a new property. */
     createPropertyShape() {
-      this.$store.commit("togglePathModal");
+      this.$store.commit("togglePathModal", {});
     },
 
+    /** Load the example. */
     loadExample() {
-      this.$store.dispatch("loadExample");
+      const self = this;
+      this.$store.dispatch("loadExample").then(
+        () => {
+          /* Save the state to undo later. */
+          self.$store.commit("saveOperation", {
+            state: self.$store.state,
+            action: { type: "loadExample" }
+          });
+        },
+        err => console.log(err)
+      );
     },
 
+    /** Read the entered text file and upload it as the new model. */
     readTextFile() {
       const file = document.getElementById("file").files[0];
       this.$store.dispatch("uploadSchemaFile", file);
     },
+    /** Toggle the export modal using the given file type. */
     exportFile(type) {
       this.$store.commit("toggleExportModal", type);
     },
+    /** Read the entered data file and upload it as the new data. */
     uploadDataFile() {
       const file = document.getElementById("dataFile").files[0];
       this.$store.dispatch("uploadDataFile", file);
     },
+    /**
+     * Check if there is a data file loaded.
+     * @returns {boolean} `true` if there is at least one data file loaded.
+     */
     dataFileUploaded() {
       return this.$store.state.mData.dataFile.length > 0;
     },
+
+    /**
+     * Check if there is anything to clear in the current state.
+     */
+    canClear() {
+      return (
+        this.$store.state.mShape.model.length > 0 ||
+        this.$store.state.mData.dataText.length > 0
+      );
+    },
+
+    /**
+     * Undo the most recent operation, if possible.
+     */
+    undoOperation() {
+      if (this.$root.canUndo()) this.$root.undo();
+    },
+    /**
+     * Undo the most recent operation, if possible.
+     */
+    redoOperation() {
+      if (this.$root.canRedo()) this.$root.redo();
+    },
+
+    /** Validate the data using the current model. */
     validate() {
-      this.$store.dispatch("validate");
+      this.$store.dispatch("validateWithCurrentModel");
     }
   }
 };

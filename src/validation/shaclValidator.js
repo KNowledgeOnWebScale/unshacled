@@ -1,14 +1,14 @@
 const SHACLValidator = require("shacl-js");
 
 /**
- *  Validator class for SHACL
+ * Validator class for SHACL.
  */
 export default class ShaclValidator {
   /**
-   * Validates SHACL data using shapes
-   * @param data Data in turtle
-   * @param shapes Shapes in turtle
-   * @returns {Promise<Object>} Returns a promise which resolves to a SHACL report
+   * Validates SHACL data using shapes.
+   * @param data {string} data in turtle
+   * @param shapes {string} shapes in turtle
+   * @returns {Promise<Object>} Returns a promise which resolves to a SHACL report.
    */
   static validate(data, shapes) {
     return new Promise((resolve, reject) => {

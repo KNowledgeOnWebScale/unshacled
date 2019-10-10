@@ -1,7 +1,7 @@
 <template>
   <div>
     <sui-modal
-      v-model="this.$store.state.mData.showValidationReportModal"
+      v-model="$store.state.mData.showValidationReportModal"
       @submit.prevent="toggleModal"
     >
       <sui-modal-header>
@@ -29,7 +29,7 @@
             <p>The following shapes do not conform:</p>
             <ul>
               <li v-for="value of getGeneralReport().nodes" :key="value">
-                {{ value }}
+                {{ getPrefixedUri(value) }}
               </li>
             </ul>
             <p>More details can be found below.</p>
@@ -69,7 +69,9 @@
         </sui-segment>
       </sui-modal-content>
       <sui-modal-actions>
-        <sui-button @click="toggleModal">Close</sui-button>
+        <sui-button id="close" tab-index="0" @click="toggleModal">
+          Close
+        </sui-button>
       </sui-modal-actions>
     </sui-modal>
   </div>
@@ -77,9 +79,9 @@
 
 <script>
 import { SHACL_URI } from "../../util/constants";
-import { urlToName } from "../../util/urlParser";
+import { uriToPrefix } from "../../util/urlParser";
 import { groupBy } from "../../util";
-import {capitalizeFirstLetter} from "../../util/strings";
+import { capitalizeFirstLetter } from "../../util/strings";
 
 export default {
   name: "ValidationReportModal",
@@ -89,13 +91,28 @@ export default {
       type: Object
     }
   },
+  mounted() {
+    /* Focus the clear button when the modal is called. */
+    const self = this;
+    this.$store.watch(
+      () => self.$store.state.mData.showValidationReportModal,
+      () => {
+        if (self.$store.state.mData.showValidationReportModal)
+          document.getElementById("close").focus();
+      }
+    );
+  },
   methods: {
+    /**
+     * Toggle the visibility of the modal.
+     */
     toggleModal() {
       this.$store.commit("toggleValidationReport");
     },
 
     /**
-     * Returns a boolean value to indicate whether the data conforms to the model.
+     * Check if the data conforms to the model.
+     * @returns {boolean} indicates whether the data conforms to the model.
      */
     conforms() {
       return (
@@ -107,7 +124,8 @@ export default {
     /**
      * Capitalize the first letter of the given string.
      * Used because `capitalizeFirstLetter` cannot be called directly from the HTML.
-     * @param string
+     * @param {string} string the string we want to edit.
+     * @returns {string} the given string with its first letter capitalized.
      */
     cfl(string) {
       return capitalizeFirstLetter(string);
@@ -115,6 +133,8 @@ export default {
 
     /**
      * Get the general report of the validation report as an object.
+     * This object is used to populate the validation modal.
+     * @returns {object} a report object.
      */
     getGeneralReport() {
       const { validationNode } = this.$props.report;
@@ -123,7 +143,7 @@ export default {
         generalReport.conforms =
           validationNode[`${SHACL_URI}conforms`][0]["@value"];
 
-        // Only generate the results if the data does not conform.
+        /* Only generate the results if the data does not conform. */
         if (generalReport.conforms !== "true") {
           generalReport.nodeIDs = [];
           generalReport.nodes = [];
@@ -137,14 +157,15 @@ export default {
           generalReport.nodeIDs = new Set(generalReport.nodeIDs);
           generalReport.nodes = new Set(generalReport.nodes);
         }
-
         return generalReport;
       }
-      return {};
+      return {}; // No validation report.
     },
 
     /**
      * Get the validation results as a dictionary.
+     * This object is used to populate the validation modal.
+     * @returns {object} a dictionary of the shape IDs to their validation results.
      */
     getValidationResults() {
       const { graph } = this.$props.report;
@@ -172,6 +193,8 @@ export default {
 
     /**
      * Get the validation results as a dictionary without URIs.
+     * This object is used to populate the validation modal.
+     * @returns {object}
      */
     getSimpleResults() {
       const results = this.getValidationResults();
@@ -181,8 +204,13 @@ export default {
           const r = results[key];
           simple[key] = {};
           for (const constr of Object.keys(r)) {
-            const name = urlToName(r[constr]);
-            if (name !== "(undefined)") simple[key][constr] = name;
+            if (r[constr]) {
+              const name = uriToPrefix(
+                this.$store.state.mConfig.namespaces,
+                r[constr]
+              );
+              if (name !== "(undefined)") simple[key][constr] = name;
+            }
           }
           simple[key].message = r.message;
         }
@@ -193,9 +221,19 @@ export default {
 
     /**
      * Get the validation results grouped by node.
+     * @returns {object} the validation result object grouped using the "node" key.
      */
     getResultsByNode() {
       return groupBy(this.getSimpleResults(), "node", true);
+    },
+
+    /**
+     * Change the URI in the given string to a prefix.
+     * @param {string} string the string we want to change.
+     * @returns {string} the given string with the namespace replaced by the corresponding prefix.
+     */
+    getPrefixedUri(string) {
+      return uriToPrefix(this.$store.getters.namespaces, string);
     }
   }
 };

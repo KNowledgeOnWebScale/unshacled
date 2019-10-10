@@ -1,14 +1,14 @@
 {
-    "@context": { "@vocab": "http://schema.org/" },
+    "@context": { "@vocab": "https://schema.org/" },
 
-    "@id": "http://example.org/ns#Bob",
+    "@id": "https://example.org/ns#Bob",
     "@type": "Person",
     "givenName": "Robert",
     "familyName": "Junior",
     "birthDate": "1971-07-07",
     "deathDate": "1968-09-10",
     "address": {
-        "@id": "http://example.org/ns#BobsAddress",
+        "@id": "https://example.org/ns#BobsAddress",
         "streetAddress": "1600 Amphitheatre Pkway",
         "postalCode": 9404
     }

@@ -1,4 +1,466 @@
-const shacl = [
+import ShaclTranslator from "../../translation/shaclTranslator";
+import { uriToPrefix } from "../urlParser";
+
+getReady;
+const initialConstraints = [];
+let getReady = function() {
+  // Filters through vocabulary file to find all the constraints and then maps them into clean objects
+
+  json.forEach(obj => {
+    if (obj["@type"] === "http://www.w3.org/ns/shacl#ConstraintComponent") {
+      initialConstraints.push(simplifyCons(obj));
+    }
+  });
+
+  // Filters through the vocabulary to find all parameters and links the parameters to corresponding constraints
+  json.forEach(obj => {
+    if (obj["@type"] === "http://www.w3.org/ns/shacl#Parameter") {
+      simplifyParameter(obj);
+    }
+  });
+};
+
+function simplifyCons(obj) {
+  const constraint = {};
+  constraint.comment = obj[
+    "http://www.w3.org/2000/01/rdf-schema#comment"
+  ].shift()["@value"];
+  constraint.definedby = obj[
+    "http://www.w3.org/2000/01/rdf-schema#isDefinedBy"
+  ].shift()["@id"];
+  constraint.label = obj["http://www.w3.org/2000/01/rdf-schema#label"].shift()[
+    "@value"
+  ];
+  constraint.parameter = obj["http://www.w3.org/ns/shacl#parameter"].shift()[
+    "@id"
+  ];
+  return constraint;
+}
+
+function simplifyParameter(obj) {
+  const parameter = {};
+  const constraint = initialConstraints
+    .filter(constraint => constraint.parameter === obj["@id"])
+    .shift();
+  parameter.definedby = obj[
+    "http://www.w3.org/2000/01/rdf-schema#isDefinedBy"
+  ].shift()["@id"];
+  parameter.path = obj["http://www.w3.org/ns/shacl#path"].shift()["@id"];
+  parameter.optional = !obj["http://www.w3.org/ns/shacl#optional"];
+  parameter.datatype = obj["http://www.w3.org/ns/shacl#datatype"]
+    ? obj["http://www.w3.org/ns/shacl#datatype"].shift()["@id"]
+    : null;
+  if (constraint) constraint.parameter = parameter;
+}
+
+/**
+ * Group the given dictionary of objects by the given key.
+ * @param {object} xs
+ * @param {string} key
+ * @returns {any}
+ */
+function groupBy(xs, key) {
+  return xs.reduce((rv, x) => {
+    (rv[x[key]] = rv[x[key]] || []).push(x);
+    return rv;
+  }, {});
+}
+
+// These are the constraints with the type added manually
+const constraintsWithTypes = [
+  {
+    type: "Logical Constraints",
+    comment:
+      "A constraint component that can be used to test whether a value node conforms to all members of a provided list of shapes.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "And constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#and",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "Value Type Constraints",
+    comment:
+      "A constraint component that can be used to verify that each value node is an instance of a given type.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Class constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#class",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "Other Constraints",
+    comment:
+      "A constraint component that can be used to indicate that focus nodes must only have values for those properties that have been explicitly enumerated via sh:property/sh:path.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Closed constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#closed",
+      optional: "true",
+      datatype: "http://www.w3.org/2001/XMLSchema#boolean"
+    }
+  },
+  {
+    type: "Value Type Constraints",
+    comment:
+      "A constraint component that can be used to restrict the datatype of all value nodes.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Datatype constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#datatype",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "Property Pair Constraints",
+    comment:
+      "A constraint component that can be used to verify that the set of value nodes is disjoint with the the set of nodes that have the focus node as subject and the value of a given property as predicate.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Disjoint constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#disjoint",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "Property Pair Constraints",
+    comment:
+      "A constraint component that can be used to verify that the set of value nodes is equal to the set of nodes that have the focus node as subject and the value of a given property as predicate.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Equals constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#equals",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "Shape-Based Constraints",
+    comment:
+      "A constraint component that can be used to verify that a given node expression produces true for all value nodes.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Expression constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#expression",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "Other Constraints",
+    comment:
+      "A constraint component that can be used to verify that one of the value nodes is a given RDF node.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Has-value constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#hasValue",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "Other Constraints",
+    comment:
+      "A constraint component that can be used to exclusively enumerate the permitted value nodes.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "In constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#in",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "String-Based Constraints",
+    comment:
+      "A constraint component that can be used to enumerate language tags that all value nodes must have.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Language-in constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#languageIn",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "Property Pair Constraints",
+    comment:
+      "A constraint component that can be used to verify that each value node is smaller than all the nodes that have the focus node as subject and the value of a given property as predicate.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Less-than constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#lessThan",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "Property Pair Constraints",
+    comment:
+      "A constraint component that can be used to verify that every value node is smaller than all the nodes that have the focus node as subject and the value of a given property as predicate.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "less-than-or-equals constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#lessThanOrEquals",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "Cardinality Constraints",
+    comment:
+      "A constraint component that can be used to restrict the maximum number of value nodes.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Max-count constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#maxCount",
+      optional: "true",
+      datatype: "http://www.w3.org/2001/XMLSchema#integer"
+    }
+  },
+  {
+    type: "Value Range Constraints",
+    comment:
+      "A constraint component that can be used to restrict the range of value nodes with a maximum exclusive value.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Max-exclusive constraints",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#maxExclusive",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "Value Range Constraints",
+    comment:
+      "A constraint component that can be used to restrict the range of value nodes with a maximum inclusive value.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Max-inclusive constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#maxInclusive",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "String-Based Constraints",
+    comment:
+      "A constraint component that can be used to restrict the maximum string length of value nodes.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Max-length constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#maxLength",
+      optional: "true",
+      datatype: "http://www.w3.org/2001/XMLSchema#integer"
+    }
+  },
+  {
+    type: "Cardinality Constraints",
+    comment:
+      "A constraint component that can be used to restrict the minimum number of value nodes.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Min-count constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#minCount",
+      optional: "true",
+      datatype: "http://www.w3.org/2001/XMLSchema#integer"
+    }
+  },
+  {
+    type: "Value Range Constraints",
+    comment:
+      "A constraint component that can be used to restrict the range of value nodes with a minimum exclusive value.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Min-exclusive constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#minExclusive",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "Value Range Constraints",
+    comment:
+      "A constraint component that can be used to restrict the range of value nodes with a minimum inclusive value.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Min-inclusive constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#minInclusive",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "String-Based Constraints",
+    comment:
+      "A constraint component that can be used to restrict the minimum string length of value nodes.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Min-length constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#minLength",
+      optional: "true",
+      datatype: "http://www.w3.org/2001/XMLSchema#integer"
+    }
+  },
+  {
+    type: "Shape-Based Constraints",
+    comment:
+      "A constraint component that can be used to verify that all value nodes conform to the given node shape.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Node constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#node",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "Value Type Constraints",
+    comment:
+      "A constraint component that can be used to restrict the RDF node kind of each value node.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Node-kind constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#nodeKind",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "Logical Constraints",
+    comment:
+      "A constraint component that can be used to verify that value nodes do not conform to a given shape.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Not constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#not",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "Logical Constraints",
+    comment:
+      "A constraint component that can be used to restrict the value nodes so that they conform to at least one out of several provided shapes.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Or constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#or",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "String-Based Constraints",
+    comment:
+      "A constraint component that can be used to verify that every value node matches a given regular expression.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Pattern constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#pattern",
+      optional: "true",
+      datatype: "http://www.w3.org/2001/XMLSchema#string"
+    }
+  },
+  {
+    type: "Shape-Based Constraints",
+    comment:
+      "A constraint component that can be used to verify that all value nodes conform to the given property shape.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Property constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#property",
+      optional: "true",
+      datatype: null
+    }
+  },
+  {
+    type: "Shape-Based Constraints",
+    comment:
+      "A constraint component that can be used to verify that a specified maximum number of value nodes conforms to a given shape.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Qualified-max-count constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#qualifiedMaxCount",
+      optional: "true",
+      datatype: "http://www.w3.org/2001/XMLSchema#integer"
+    }
+  },
+  {
+    type: "Shape-Based Constraints",
+    comment:
+      "A constraint component that can be used to verify that a specified minimum number of value nodes conforms to a given shape.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Qualified-min-count constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#qualifiedMinCount",
+      optional: "true",
+      datatype: "http://www.w3.org/2001/XMLSchema#integer"
+    }
+  },
+  {
+    type: "String-Based Constraints",
+    comment:
+      "A constraint component that can be used to specify that no pair of value nodes may use the same language tag.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Unique-languages constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#uniqueLang",
+      optional: "true",
+      datatype: "http://www.w3.org/2001/XMLSchema#boolean"
+    }
+  },
+  {
+    type: "Logical Constraints",
+    comment:
+      "A constraint component that can be used to restrict the value nodes so that they conform to exactly one out of several provided shapes.",
+    definedby: "http://www.w3.org/ns/shacl#",
+    label: "Exactly one constraint component",
+    parameter: {
+      definedby: "http://www.w3.org/ns/shacl#",
+      path: "http://www.w3.org/ns/shacl#xone",
+      optional: "true",
+      datatype: null
+    }
+  }
+];
+
+const json = [
   {
     "@id": "_:b0",
     "http://www.w3.org/ns/shacl#prefix": [
@@ -11,6 +473,117 @@ const shacl = [
         "@value": "http://www.w3.org/ns/shacl#"
       }
     ]
+  },
+  {
+    "@id": "_:b1",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#first": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#BlankNode"
+      }
+    ],
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest": [
+      {
+        "@id": "_:b2"
+      }
+    ]
+  },
+  {
+    "@id": "_:b2",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#first": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#IRI"
+      }
+    ],
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest": [
+      {
+        "@id": "_:b3"
+      }
+    ]
+  },
+  {
+    "@id": "_:b3",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#first": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#Literal"
+      }
+    ],
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest": [
+      {
+        "@id": "_:b4"
+      }
+    ]
+  },
+  {
+    "@id": "_:b4",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#first": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#BlankNodeOrIRI"
+      }
+    ],
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest": [
+      {
+        "@id": "_:b5"
+      }
+    ]
+  },
+  {
+    "@id": "_:b5",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#first": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#BlankNodeOrLiteral"
+      }
+    ],
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest": [
+      {
+        "@id": "_:b6"
+      }
+    ]
+  },
+  {
+    "@id": "_:b6",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#first": [
+      {
+        "@id": "http://www.w3.org/ns/shacl#IRIOrLiteral"
+      }
+    ],
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest": [
+      {
+        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"
+      }
+    ]
+  },
+  {
+    "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
+  },
+  {
+    "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+  },
+  {
+    "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"
+  },
+  {
+    "@id": "http://www.w3.org/2000/01/rdf-schema#Class"
+  },
+  {
+    "@id": "http://www.w3.org/2000/01/rdf-schema#Datatype"
+  },
+  {
+    "@id": "http://www.w3.org/2000/01/rdf-schema#Resource"
+  },
+  {
+    "@id": "http://www.w3.org/2001/XMLSchema#anyURI"
+  },
+  {
+    "@id": "http://www.w3.org/2001/XMLSchema#boolean"
+  },
+  {
+    "@id": "http://www.w3.org/2001/XMLSchema#integer"
+  },
+  {
+    "@id": "http://www.w3.org/2001/XMLSchema#string"
+  },
+  {
+    "@id": "http://www.w3.org/2002/07/owl#Ontology"
   },
   {
     "@id": "http://www.w3.org/ns/shacl#",
@@ -277,8 +850,7 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#optional": [
       {
-        "@value": "true",
-        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+        "@value": true
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -331,7 +903,8 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#parameter": [
       {
-        "@id": "http://www.w3.org/ns/shacl#DatatypeConstraintComponent-datatype"
+        "@id":
+          "http://www.w3.org/ns/shacl#DatatypeConstraintComponent-datatype"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -355,8 +928,7 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#maxCount": [
       {
-        "@value": "1",
-        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+        "@value": 1
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -383,7 +955,8 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#parameter": [
       {
-        "@id": "http://www.w3.org/ns/shacl#DisjointConstraintComponent-disjoint"
+        "@id":
+          "http://www.w3.org/ns/shacl#DisjointConstraintComponent-disjoint"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -544,7 +1117,8 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#parameter": [
       {
-        "@id": "http://www.w3.org/ns/shacl#HasValueConstraintComponent-hasValue"
+        "@id":
+          "http://www.w3.org/ns/shacl#HasValueConstraintComponent-hasValue"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -646,8 +1220,7 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#maxCount": [
       {
-        "@value": "1",
-        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+        "@value": 1
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -986,8 +1559,7 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#maxCount": [
       {
-        "@value": "1",
-        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+        "@value": 1
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1014,7 +1586,8 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#parameter": [
       {
-        "@id": "http://www.w3.org/ns/shacl#LessThanConstraintComponent-lessThan"
+        "@id":
+          "http://www.w3.org/ns/shacl#LessThanConstraintComponent-lessThan"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1129,7 +1702,8 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#parameter": [
       {
-        "@id": "http://www.w3.org/ns/shacl#MaxCountConstraintComponent-maxCount"
+        "@id":
+          "http://www.w3.org/ns/shacl#MaxCountConstraintComponent-maxCount"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1153,8 +1727,7 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#maxCount": [
       {
-        "@value": "1",
-        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+        "@value": 1
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1202,8 +1775,7 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#maxCount": [
       {
-        "@value": "1",
-        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+        "@value": 1
       }
     ],
     "http://www.w3.org/ns/shacl#nodeKind": [
@@ -1256,8 +1828,7 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#maxCount": [
       {
-        "@value": "1",
-        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+        "@value": 1
       }
     ],
     "http://www.w3.org/ns/shacl#nodeKind": [
@@ -1314,8 +1885,7 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#maxCount": [
       {
-        "@value": "1",
-        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+        "@value": 1
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1342,7 +1912,8 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#parameter": [
       {
-        "@id": "http://www.w3.org/ns/shacl#MinCountConstraintComponent-minCount"
+        "@id":
+          "http://www.w3.org/ns/shacl#MinCountConstraintComponent-minCount"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1366,8 +1937,7 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#maxCount": [
       {
-        "@value": "1",
-        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+        "@value": 1
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1415,8 +1985,7 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#maxCount": [
       {
-        "@value": "1",
-        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+        "@value": 1
       }
     ],
     "http://www.w3.org/ns/shacl#nodeKind": [
@@ -1469,8 +2038,7 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#maxCount": [
       {
-        "@value": "1",
-        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+        "@value": 1
       }
     ],
     "http://www.w3.org/ns/shacl#nodeKind": [
@@ -1527,8 +2095,7 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#maxCount": [
       {
-        "@value": "1",
-        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+        "@value": 1
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1623,7 +2190,8 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#parameter": [
       {
-        "@id": "http://www.w3.org/ns/shacl#NodeKindConstraintComponent-nodeKind"
+        "@id":
+          "http://www.w3.org/ns/shacl#NodeKindConstraintComponent-nodeKind"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1642,32 +2210,12 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#in": [
       {
-        "@list": [
-          {
-            "@id": "http://www.w3.org/ns/shacl#BlankNode"
-          },
-          {
-            "@id": "http://www.w3.org/ns/shacl#IRI"
-          },
-          {
-            "@id": "http://www.w3.org/ns/shacl#Literal"
-          },
-          {
-            "@id": "http://www.w3.org/ns/shacl#BlankNodeOrIRI"
-          },
-          {
-            "@id": "http://www.w3.org/ns/shacl#BlankNodeOrLiteral"
-          },
-          {
-            "@id": "http://www.w3.org/ns/shacl#IRIOrLiteral"
-          }
-        ]
+        "@id": "_:b1"
       }
     ],
     "http://www.w3.org/ns/shacl#maxCount": [
       {
-        "@value": "1",
-        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+        "@value": 1
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1884,8 +2432,7 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#optional": [
       {
-        "@value": "true",
-        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+        "@value": true
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1958,7 +2505,8 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#parameter": [
       {
-        "@id": "http://www.w3.org/ns/shacl#PropertyConstraintComponent-property"
+        "@id":
+          "http://www.w3.org/ns/shacl#PropertyConstraintComponent-property"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -2122,8 +2670,7 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#optional": [
       {
-        "@value": "true",
-        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+        "@value": true
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -2219,8 +2766,7 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#optional": [
       {
-        "@value": "true",
-        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+        "@value": true
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -2843,8 +3389,7 @@ const shacl = [
     ],
     "http://www.w3.org/ns/shacl#maxCount": [
       {
-        "@value": "1",
-        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+        "@value": 1
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -3015,6 +3560,7 @@ const shacl = [
       }
     ]
   },
+
   {
     "@id": "http://www.w3.org/ns/shacl#alternativePath",
     "@type": ["http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"],
@@ -5875,7 +6421,138 @@ const shacl = [
         "@id": "http://www.w3.org/ns/shacl#"
       }
     ]
+  },
+  {
+    "@id": "http://www.w3.org/ns/shacl-shacl#"
   }
 ];
 
-export { shacl as default };
+// The core SHACL constraints divided by category.
+export const constraintsByTypes = {
+  "Value Type Constraints": [
+    "http://www.w3.org/ns/shacl#class",
+    // "http://www.w3.org/ns/shacl#path",
+    "http://www.w3.org/ns/shacl#datatype",
+    "http://www.w3.org/ns/shacl#nodeKind"
+  ],
+  "Cardinality Constraints": [
+    "http://www.w3.org/ns/shacl#minCount",
+    "http://www.w3.org/ns/shacl#maxCount"
+  ],
+  "Value Range Constraints": [
+    "http://www.w3.org/ns/shacl#minInclusive",
+    "http://www.w3.org/ns/shacl#minExclusive",
+    "http://www.w3.org/ns/shacl#maxInclusive",
+    "http://www.w3.org/ns/shacl#maxExclusive"
+  ],
+  "String-Based Constraints": [
+    "http://www.w3.org/ns/shacl#name",
+    "http://www.w3.org/ns/shacl#minLength",
+    "http://www.w3.org/ns/shacl#maxLength",
+    "http://www.w3.org/ns/shacl#pattern",
+    "http://www.w3.org/ns/shacl#languageIn",
+    "http://www.w3.org/ns/shacl#uniqueLang"
+  ],
+  "Property Pair Constraints": [
+    "http://www.w3.org/ns/shacl#equals",
+    "http://www.w3.org/ns/shacl#disjoint",
+    "http://www.w3.org/ns/shacl#lessThan",
+    "http://www.w3.org/ns/shacl#lessThanOrEquals"
+  ],
+  "Logical Constraints": [
+    "http://www.w3.org/ns/shacl#not",
+    "http://www.w3.org/ns/shacl#and",
+    "http://www.w3.org/ns/shacl#or",
+    "http://www.w3.org/ns/shacl#xone"
+  ],
+  "Shape-Based Constraints": [
+    "http://www.w3.org/ns/shacl#node",
+    "http://www.w3.org/ns/shacl#targetNode",
+    "http://www.w3.org/ns/shacl#targetClass",
+    "http://www.w3.org/ns/shacl#targetObjectsOf",
+    "http://www.w3.org/ns/shacl#property",
+    "http://www.w3.org/ns/shacl#qualifiedValueShape",
+    "http://www.w3.org/ns/shacl#qualifiedMinCount",
+    "http://www.w3.org/ns/shacl#qualifiedMaxCount"
+  ],
+  "Other Constraints": [
+    "http://www.w3.org/ns/shacl#closed",
+    "http://www.w3.org/ns/shacl#ignoredProperties",
+    "http://www.w3.org/ns/shacl#hasValue",
+    "http://www.w3.org/ns/shacl#in"
+  ]
+};
+
+/**
+ * Get an object mapping the category types to a list of custom constraints in that category.
+ */
+export function customConstraintsByCategory() {
+  const output = {};
+  for (const type in constraintsByTypes) {
+    const byType = [];
+    for (const constraint of constraintsByTypes[type]) {
+      byType.push(ShaclTranslator.toModelSimple(constraint));
+    }
+    output[type] = byType;
+  }
+  return output;
+}
+
+/**
+ * Get the table contents of the possible constraints.
+ * Every constraint will be transformed into an object:
+ * {
+ *   id {string} the full ID of the constraint,
+ *   predicate {string} the name of the predicate that will be used to visualize,
+ *   type {string} the name of the category,
+ *   description {string} the description of the constraint
+ * }
+ * @param {object} namespaces map of prefixes to URIs.
+ * @returns {[]} list of constraint objects meant for visualization.
+ */
+export function tableContents(namespaces) {
+  const allConstraints = [].concat(...Object.values(constraintsByTypes));
+  const contents = [];
+  allConstraints.map(constraint => {
+    const id = ShaclTranslator.toModelSimple(constraint);
+    contents.push({
+      id,
+      predicate: uriToPrefix(namespaces, id),
+      type: getConstraintCategory(id).replace(" Constraints", ""),
+      description: json.filter(obj => obj["@id"] === constraint)[0][
+        "http://www.w3.org/2000/01/rdf-schema#comment"
+      ][0]["@value"]
+    });
+  });
+  return contents;
+}
+
+/**
+ * Get the constraint category of the constraint with the given ID.
+ * @param {string} constraintID the ID of the constraint we want to get the category from.
+ * @returns {string} the category of the given constraint.
+ */
+export function getConstraintCategory(constraintID) {
+  constraintID = ShaclTranslator.toSHACLSimple(constraintID);
+  for (const type in constraintsByTypes) {
+    if (constraintsByTypes[type].includes(constraintID)) return type;
+  }
+}
+
+/**
+ * Get the value type of the constraint with the given ID.
+ * @param {string} constraintID the ID of the constraint whose value type we want to determine.
+ * @returns {string} possible values:
+ *                    Class, Datatype,  NodeKind, List;
+ *                    Property, PropertyShape, NodeShape, Shape;
+ *                    integer, string, boolean.
+ */
+export function getConstraintValueType(constraintID) {
+  const object = json.filter(
+    c => c["@id"] === ShaclTranslator.toSHACLSimple(constraintID)
+  )[0];
+  const range = object["http://www.w3.org/2000/01/rdf-schema#range"];
+  return range ? ShaclTranslator.toModelSimple(range[0]["@id"]) : "";
+}
+
+export const groupedConstraints = groupBy(constraintsWithTypes, "type");

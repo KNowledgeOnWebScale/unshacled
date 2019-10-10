@@ -4,8 +4,8 @@
 export default class XMLSerializer {
   /**
    * Takes a JSON-LD document and desired format type, returns the document as format.
-   * @param json JSON-LD representation
-   * @param type Format to serialize to e.g. "application/rdf+xml" Accepted types include: RDF/XML
+   * @param {string} json JSON-LD representation
+   * @param {string} type Format to serialize to e.g. "application/rdf+xml" Accepted types include: RDF/XML
    * @returns {Promise<String>} Promise which resolves to RDF/XML String
    */
   static serialize(json, type) {

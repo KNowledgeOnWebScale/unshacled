@@ -1,18 +1,23 @@
 <template>
   <div>
-    <sui-modal v-model="this.$store.state.showExportModal">
+    <sui-modal v-model="$store.state.showExportModal">
       <sui-modal-header>
         Export Shapes as {{ $store.state.exportType }}
       </sui-modal-header>
       <sui-modal-content>
-        <sui-form>
+        <sui-form @submit.prevent="confirm">
           <sui-form-field inline>
             <label>Filename</label>
-            <input v-model="filename" />
+            <input id="filename" v-model="filename" @keyup="handleKeyPress" />
             .
-            <select v-model="extension" class="field ui fluid dropdown">
+            <select
+              v-model="extension"
+              class="field ui fluid dropdown"
+              @keyup="handleKeyPress"
+            >
               <option>json</option>
-              <option>ttl</option>
+              <option>nt</option>
+              <option disabled>ttl</option>
             </select>
           </sui-form-field>
         </sui-form>
@@ -22,15 +27,17 @@
         </sui-segment>
       </sui-modal-content>
       <sui-modal-actions>
-        <sui-button @click="cancel">Cancel</sui-button>
-        <sui-button positive @click.native="confirm">Export</sui-button>
+        <sui-button tab-index="0" @click="cancel">Cancel</sui-button>
+        <sui-button tab-index="0" positive @click.native="confirm">
+          Export
+        </sui-button>
       </sui-modal-actions>
     </sui-modal>
   </div>
 </template>
 
 <script>
-import { ETF } from "../../util/enums/extensionToFormat";
+import { ENTER } from "../../util/constants";
 
 export default {
   name: "ExportModal",
@@ -41,11 +48,29 @@ export default {
       error: false
     };
   },
+  mounted() {
+    /* Focus the input field when the modal is called. */
+    const self = this;
+    this.$store.watch(
+      () => self.$store.state.showExportModal,
+      () => {
+        if (self.$store.state.showExportModal)
+          document.getElementById("filename").focus();
+      }
+    );
+  },
   methods: {
+    /**
+     * Confirm on enter press.
+     * @param {any} e key press event
+     */
+    handleKeyPress(e) {
+      if (e.keyCode === ENTER) this.confirm();
+    },
+
     /**
      * Check if the entered filename is valid.
      * If so, export the file and close the modal.
-     * Otherwise, show an error message.
      */
     confirm() {
       const output = `${this.filename}.${this.extension}`;
@@ -54,31 +79,34 @@ export default {
           filename: output,
           extension: this.extension
         });
-        this.toggleExportModal();
+        this.closeExportModal();
       }
     },
 
+    /**
+     * Cancel and close the modal without saving any changes.
+     */
     cancel() {
-      this.toggleExportModal();
+      this.closeExportModal();
     },
 
     /**
      * Clear the field and close the modal.
      */
-    toggleExportModal() {
+    closeExportModal() {
+      this.$store.commit("toggleExportModal", "");
       this.filename = "";
       this.extension = "json";
-      this.$store.commit("toggleExportModal", "");
     },
 
     /**
      * Check if the filename is valid.
      * Toggle the error message if needed.
-     * @param filename
-     * @returns {*} boolean, indicates if the filename is valid.
+     * @param {string} filename the filename we want to check.
+     * @returns {boolean|*} boolean, indicates if the filename is valid.
      */
     checkFilename(filename) {
-      const bool = filename.match(/^[\w,\s-]+\.[A-Za-z]+/);
+      const bool = filename.match(/^[\w,\s-]+\.[A-Za-z0-9]+/);
       this.error = !bool;
       return bool;
     }

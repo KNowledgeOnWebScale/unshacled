@@ -11,7 +11,12 @@
         <!-- Header -->
         <v-group @click="startEditing">
           <v-rect :config="shapeConfig"></v-rect>
-          <v-text ref="shapeLabel" :config="getLabelTextConfig()"></v-text>
+          <v-text
+            ref="shapeLabel"
+            :config="getLabelTextConfig()"
+            @mouseenter="setCursor('text')"
+            @mouseleave="setCursor('')"
+          ></v-text>
           <v-text ref="shapeURI" :config="getURITextConfig()"></v-text>
         </v-group>
 
@@ -29,11 +34,15 @@
           v-if="hover"
           :config="deleteNodeConfig"
           @click="deleteShape"
+          @mouseenter="setCursor('pointer')"
+          @mouseleave="setCursor('')"
         ></v-circle>
         <v-circle
-          v-if="hover && !adding"
+          v-if="hover"
           :config="addPredicateConfig"
-          @mousedown="addPredicate"
+          @click="addPredicate"
+          @mouseenter="setCursor('pointer')"
+          @mouseleave="setCursor('')"
         ></v-circle>
       </v-group>
 
@@ -52,7 +61,7 @@
 
 <script>
 import Constraint from "./Constraint.vue";
-import { urlToName } from "../../util/urlParser";
+import { uriToPrefix } from "../../util/urlParser";
 import {
   DELETE_BUTTON_CONFIG,
   LABEL_TEXT_CONFIG,
@@ -63,14 +72,17 @@ import {
   TEXT_OFFSET,
   OFFSET,
   DESCRIPTION_RECT_CONFIG,
+  DESCRIPTION_TITLE_CONFIG,
   DESCRIPTION_TEXT_CONFIG,
   MAX_LENGTH,
   TEXT_SIZE,
-  WIDTH,
-  MARGIN
-} from "../../util/konvaConfigs";
+  pointerCursor,
+  resetCursor,
+  textCursor
+} from "../../config/konvaConfigs";
 import { TERM } from "../../translation/terminology";
 import { abbreviate } from "../../util/strings";
+import { LABEL } from "../../util/constants";
 
 export default {
   name: "Shape",
@@ -85,19 +97,26 @@ export default {
       required: true
     }
   },
+  /**
+   * Hover {boolean} indicates if the user is hovering over this shape.
+   * TitleHover {boolean} indicates if the user is hovering over the title of this shape.
+   * ShapeConfig {object} configuration object for the rectangle of the shape.
+   * DeleteNodeConfig {object} configuration of the delete button.
+   * IDTextConfig {object} configuration of the ID text.
+   * AddPredicateConfig {object} configuration of the "add predicate"-button
+   * @returns {{hover: boolean, titleHover: boolean, shapeConfig: object, deleteNodeConfig: object, idTextConfig: object, addPredicateConfig: object}}}
+   */
   data() {
     return {
       hover: false,
       titleHover: false,
-      editing: false,
-      adding: false,
       shapeConfig: this.$props.nodeShape
         ? NODE_SHAPE_CONFIG
         : PROPERTY_SHAPE_CONFIG,
       deleteNodeConfig: DELETE_BUTTON_CONFIG,
       idTextConfig: {
         ...LABEL_TEXT_CONFIG,
-        text: urlToName(this.$props.id)
+        text: uriToPrefix(this.$store.state.mConfig.namespaces, this.$props.id)
       },
       addPredicateConfig: ADD_PREDICATE_CONFIG
     };
@@ -105,12 +124,13 @@ export default {
   mounted() {
     const self = this;
     const { id } = this.$props;
-    // Move the shape to the defined coordinate.
+    /* Move the shape to the defined coordinate. */
     this.$refs.posRef
       .getNode()
       .setPosition(this.$store.state.mShape.mCoordinate.coordinates[id]);
     this.updatePosition();
 
+    /* Update the constraints when the store state changes. */
     this.$store.watch(
       () => self.$store.getters.shapeConstraints(self.$props.id),
       () => {
@@ -121,11 +141,17 @@ export default {
   },
   methods: {
     /**
-     * @returns {{}} the configuration of the main text
+     * Create the label text configuration object.
+     * Abbreviate the text if needed and change the namespace URL to the prefix if possible.
+     * @returns {object} the configuration object for the label.
      */
     getLabelTextConfig() {
-      const label = this.$store.getters.labelForId(this.id);
-      const text = label ? abbreviate(label) : abbreviate(urlToName(this.id));
+      const label = this.$store.getters.labelsForIds[this.id];
+      const text = label
+        ? abbreviate(label)
+        : abbreviate(
+            uriToPrefix(this.$store.state.mConfig.namespaces, this.id)
+          );
       return {
         ...LABEL_TEXT_CONFIG,
         y: label ? OFFSET : TEXT_OFFSET,
@@ -134,15 +160,18 @@ export default {
     },
 
     /**
-     * @returns {{}} the configuration of the URI
+     * Create the URI text configuration object.
+     * Abbreviate the URI if needed.
+     * @returns {object} the configuration of the URI.
      */
     getURITextConfig() {
-      const label = this.$store.getters.labelForId(this.id);
+      const label = this.$store.getters.labelsForIds[this.id];
       const text = label ? abbreviate(this.id) : "";
       return { ...URI_TEXT_CONFIG, text };
     },
 
     /**
+     * Check if this shape has a description.
      * @returns {boolean} value that indicates if this shape has a description.
      */
     hasDescription() {
@@ -158,47 +187,34 @@ export default {
     },
 
     /**
-     * Get the configuration for the visualization of the description.
+     * Get the configuration objects for the visualization of the description.
+     * @returns {{rect: object, title: object, text: object}}
      */
     getDescriptionConfig() {
-      // Check if the shape has a description.
+      /* Check if the shape has a description first. */
       if (this.hasDescription()) {
         const text = this.$store.getters.shapeWithID(this.id)[
           TERM.description
         ][0]["@value"];
 
         // Constants for the configuration.
-        const x = WIDTH + MARGIN;
-        const textX = x + 2 * MARGIN;
-        const offset = TEXT_OFFSET / 2;
         let lines = Math.ceil(text.length / MAX_LENGTH);
         if (lines < 2) lines = 2;
 
         return {
           rect: {
             ...DESCRIPTION_RECT_CONFIG,
-            x,
-            height: lines * TEXT_SIZE + TEXT_OFFSET,
-            width: WIDTH + 4 * MARGIN
+            height: lines * TEXT_SIZE + TEXT_OFFSET
           },
-          title: {
-            ...DESCRIPTION_TEXT_CONFIG,
-            text: "Description",
-            fontStyle: "bold",
-            x: textX,
-            y: offset
-          },
+          title: DESCRIPTION_TITLE_CONFIG,
           text: {
             ...DESCRIPTION_TEXT_CONFIG,
-            x: textX,
-            y: offset + TEXT_OFFSET,
-            width: WIDTH,
             text
           }
         };
       }
 
-      // If the shape does not have a description, do not return any configuration.
+      /* If the shape does not have a description, no configurations are needed. */
       return {
         rect: {},
         title: {},
@@ -208,7 +224,7 @@ export default {
 
     /**
      * Get an object containing all the constraints.
-     * @returns an object mapping every constraint name to a (list of) values.
+     * @returns {object} an object mapping every constraint name to a (list of) values.
      */
     getConstraints() {
       return this.$store.getters.shapeConstraints(this.$props.id);
@@ -218,11 +234,14 @@ export default {
      * Takes the coordinates from this node shape and calls store to update them.
      */
     updatePosition() {
+      /* Determine the current position. */
       const pos = this.$refs.posRef.getNode().position();
+      /* Update the y values of the components relative to this shape. */
       this.$store.commit("updateYValues", {
         shapeID: this.$props.id,
         shapes: this.$store.state.mShape.model
       });
+      /* Update the coordinates of this shape. */
       this.$store.commit("updateCoordinates", {
         shapeID: this.$props.id,
         x: pos.x,
@@ -244,46 +263,67 @@ export default {
     },
 
     /**
-     * Call the ReactiveInput component to start editing using the given text node.
+     * Toggle the shape modal to start editing this shape's properties.
      */
     startEditing() {
       const shape = this.$store.getters.shapeWithID(this.id);
+
+      /* Get the label and its language. */
+      const labelConstraint = shape[TERM.name]
+        ? shape[TERM.name]
+        : shape[LABEL]
+        ? shape[LABEL]
+        : null;
+      const label = labelConstraint ? labelConstraint[0]["@value"] : "";
+      const labelLang = labelConstraint
+        ? labelConstraint[0]["@language"]
+        : "en";
+
+      /* Get the description and its language. */
       const description = shape[TERM.description]
         ? shape[TERM.description][0]["@value"]
         : "";
+      const descrLang = shape[TERM.description]
+        ? shape[TERM.description][0]["@language"]
+        : "en";
+
+      /* Toggle the modal. */
       this.$store.commit("toggleEditShapeModal", {
         id: this.id,
-        label: this.$store.getters.labelForId(this.id),
+        label,
+        labelLang,
         description,
+        descrLang,
         nodeShape: this.nodeShape
       });
     },
 
     /**
-     * Stop editing.
-     * Check if the filled in value is valid and unique.
-     * Call the store to edit the node shape if possible.
-     */
-    stopEditing(newValue) {
-      // Check if the new value is valid and unique.
-      if (newValue !== "" && !this.$store.getters.shapes[newValue]) {
-        const args = {
-          oldID: this.$props.id,
-          newID: newValue
-        };
-        this.$store.dispatch("editShape", args);
-      }
-    },
-
-    /**
-     * Delete this node shape.
+     * Delete this shape.
      */
     deleteShape() {
-      if (this.$refs.reactiveInput) this.$refs.reactiveInput.stopEditing();
       const action = this.$props.nodeShape
         ? "deleteNodeShape"
         : "deletePropertyShape";
       this.$store.dispatch(action, this.$props.id);
+      /* Save the state to undo later. */
+      this.$store.commit("saveOperation", {
+        state: this.$store.state,
+        action: {
+          type: action,
+          args: this.$props.id
+        }
+      });
+    },
+
+    /**
+     * Set the cursor type according to the passed argument.
+     * @param {string} type "pointer" || "text" || *: the type of cursor we want to use.
+     */
+    setCursor(type) {
+      if (type === "pointer") pointerCursor();
+      else if (type === "text") textCursor();
+      else resetCursor();
     }
   }
 };

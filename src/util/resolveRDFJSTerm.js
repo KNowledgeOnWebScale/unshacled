@@ -4,8 +4,8 @@ const { namedNode, literal, blankNode, defaultGraph } = DataFactory;
 
 /**
  * Resolves RDF JS Term
- * @param term
- * @returns {*}
+ * @param {object} term
+ * @returns {any}
  */
 export default function resolveRDFJSTerm(term) {
   switch (term.termType) {
