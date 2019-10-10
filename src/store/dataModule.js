@@ -226,8 +226,8 @@ const dataModule = {
           filename,
           JSON.stringify(rootGetters.internalModelToJson, null, 2)
         );
-      } else if (extension === "ttl") {
-        /* Otherwise, serialize to Turtle first. */
+      } else if (extension === "nt") {
+        /* Otherwise, serialize to (n-triples) Turtle first. */
         SerializerManager.serialize(
           ShaclTranslator.toSHACL(rootGetters.shapes),
           ETF.ttl
