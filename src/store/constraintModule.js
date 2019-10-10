@@ -86,12 +86,18 @@ const constraintModule = {
       /* Don't add the value if it is a duplicate. */
       if (!duplicate) {
         /* Create the object we want to add. */
-        const value = isID
+        let value = isID
           ? { "@id": input }
           : { "@type": inputType, "@value": input };
         if (language) {
           value["@language"] = language;
           Vue.delete(value, "@type");
+        }
+
+        /* Add a property shape if needed. */
+        if (predicate === TERM.property && !getters.shapeWithID(input)) {
+          dispatch("addPropertyShape", { path: input });
+          value = rootState.mShape.model[rootState.mShape.model.length - 1]; // Update the constraint value.
         }
 
         // TODO take multiple languages into account
@@ -109,11 +115,6 @@ const constraintModule = {
           shapeID,
           value: rootState.mShape.model[shapeID]
         });
-
-        /* Add a property shape if needed. */
-        if (predicate === TERM.property) {
-          dispatch("addPropertyShape", { id: input, path: "(undefined)" });
-        }
 
         /* Update the y values. */
         commit(
@@ -167,7 +168,7 @@ const constraintModule = {
      * @param {string} inputType the type of the input
      */
     stopConstraintEdit(
-      { state, commit, dispatch, rootGetters, rootState },
+      { state, dispatch, rootGetters },
       { shapeID, predicate: constraintID, valueType, input, inputType }
     ) {
       /* Update the modal state. */

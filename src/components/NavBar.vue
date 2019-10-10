@@ -3,7 +3,7 @@
     <sui-menu id="navbar" ref="navbar" attached="top" inverted>
       <sui-dropdown item icon="file alternate" simple>
         <sui-dropdown-menu>
-          <sui-dropdown-item @click="$refs.importShapes.click()">
+          <sui-dropdown-item @mouseup="() => $refs.importShapes.click()">
             <label for="file">Import Shapes...</label>
             <input
               id="file"
@@ -14,7 +14,7 @@
             />
           </sui-dropdown-item>
 
-          <sui-dropdown-item @click="$refs.importData.click()">
+          <sui-dropdown-item @mouseup="() => $refs.importData.click()">
             <label for="dataFile">Import Data...</label>
             <input
               id="dataFile"
@@ -67,6 +67,7 @@
       <sui-menu-item
         class="clickable"
         icon="trash"
+        :disabled="!canClear()"
         @click="toggleClearModal"
       ></sui-menu-item>
 
@@ -74,13 +75,13 @@
         class="clickable"
         icon="undo alterate"
         :disabled="!$root.canUndo()"
-        @click="undoAction"
+        @click="undoOperation"
       ></sui-menu-item>
       <sui-menu-item
         class="clickable"
         icon="redo alternate"
         :disabled="!$root.canRedo()"
-        @click="redoAction"
+        @click="redoOperation"
       ></sui-menu-item>
 
       <!--
@@ -157,7 +158,7 @@ export default {
   methods: {
     /** Toggle the visibility of the clear modal. */
     toggleClearModal() {
-      this.$store.commit("toggleClearModal");
+      if (this.canClear()) this.$store.commit("toggleClearModal");
     },
     /** Toggle the visibility of the namespace modal. */
     toggleNamespaceModal() {
@@ -215,10 +216,26 @@ export default {
       return this.$store.state.mData.dataFile.length > 0;
     },
 
-    undoAction() {
+    /**
+     * Check if there is anything to clear in the current state.
+     */
+    canClear() {
+      return (
+        this.$store.state.mShape.model.length > 0 ||
+        this.$store.state.mData.dataText.length > 0
+      );
+    },
+
+    /**
+     * Undo the most recent operation, if possible.
+     */
+    undoOperation() {
       if (this.$root.canUndo()) this.$root.undo();
     },
-    redoAction() {
+    /**
+     * Undo the most recent operation, if possible.
+     */
+    redoOperation() {
       if (this.$root.canRedo()) this.$root.redo();
     },
 

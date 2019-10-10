@@ -16,7 +16,8 @@
               @keyup="handleKeyPress"
             >
               <option>json</option>
-              <option>ttl</option>
+              <option>nt</option>
+              <option disabled>ttl</option>
             </select>
           </sui-form-field>
         </sui-form>

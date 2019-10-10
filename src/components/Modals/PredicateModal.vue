@@ -70,7 +70,9 @@
       <sui-button
         tab-index="0"
         positive
-        :disabled="$props.modalProperties.selected === ''"
+        :disabled="
+          $props.modalProperties.selected === '' || values.input === ''
+        "
         @click="exit"
       >
         {{ $props.modalProperties.editing ? "Confirm" : "Add" }}

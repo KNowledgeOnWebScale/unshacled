@@ -115,7 +115,9 @@ export default new Vuex.Store({
     loadExample({ getters, commit, dispatch, rootState }) {
       return new Promise((resolve, reject) => {
         ParserManager.parse(exampleShapes, ETF["ttl"]).then(model => {
-          commit("clear");
+          commit("clearModel");
+          commit("clearData");
+
           dispatch("setDataFile", {
             name: "example.ttl",
             contents: exampleData,

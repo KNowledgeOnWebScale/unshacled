@@ -6,7 +6,6 @@ import { LABEL, SHACL_URI } from "../util/constants";
 import { TERM } from "../translation/terminology";
 import getValueType from "../util/enums/ValueType";
 import ShaclTranslator from "../translation/shaclTranslator";
-import undoRedoMixin from "./undoRedoMixin";
 
 /**
  * This module contains everything to modify the shapes.
@@ -36,7 +35,7 @@ const shapeModule = {
      * Clear all shapes and properties from the current state.
      * @param state
      */
-    clear(state) {
+    clearModel(state) {
       Vue.set(state, "model", []);
       this.commit("clearLocations");
     },
@@ -53,7 +52,7 @@ const shapeModule = {
       model = JSON.stringify(model).includes(SHACL_URI)
         ? ShaclTranslator.toModelSimple(model)
         : model;
-      model = JSON.parse(JSON.stringify(model).replace("http:", "https:"));
+      model = JSON.parse(JSON.stringify(model));
       Vue.set(state, "model", model);
 
       /* Update y values and set coordinates. */

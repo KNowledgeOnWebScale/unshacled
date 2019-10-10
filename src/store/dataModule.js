@@ -6,7 +6,6 @@ import ValidatorManager from "../validation/validatorManager";
 import language from "../util/enums/languages";
 import { downloadFile } from "../util";
 import ShaclTranslator from "../translation/shaclTranslator";
-import undoRedoMixin from "./undoRedoMixin";
 
 /**
  * This module contains everything to handle data imports/exports and validation.
@@ -35,6 +34,17 @@ const dataModule = {
         "showValidationReportModal",
         !state.showValidationReportModal
       );
+    },
+
+    /**
+     * Clear the data from the current state.
+     * @param state
+     */
+    clearData(state) {
+      Vue.set(state, "dataFileName", undefined);
+      Vue.set(state, "dataFile", {});
+      Vue.set(state, "dataFileExtension", undefined);
+      Vue.set(state, "dataText", "");
     },
 
     /**
@@ -156,11 +166,16 @@ const dataModule = {
     setDataFile({ commit, rootState }, { name, contents, extension }) {
       return new Promise((resolve, reject) => {
         try {
-          /* Parse the data from Turtle to JSON. */
-          ParserManager.parse(contents, ETF.ttl).then(data => {
-            commit("setData", { name, contents, extension, data });
-            resolve(rootState);
-          });
+          if (extension.toLowerCase() === "json") {
+            alert("Importing JSON files is not yet supported.");
+            throw new Error("Importing JSON files is not yet supported.");
+          } else {
+            /* Parse the data from Turtle to JSON. */
+            ParserManager.parse(contents, ETF[extension]).then(data => {
+              commit("setData", { name, contents, extension, data });
+              resolve(rootState);
+            });
+          }
         } catch (e) {
           reject(e);
         }
@@ -175,21 +190,29 @@ const dataModule = {
      * */
     uploadSchemaFile({ rootState }, file) {
       const reader = new FileReader();
-      const fileExtension = file.name.split(".").pop();
+      const fileExtension = file.name
+        .split(".")
+        .pop()
+        .toLowerCase();
       const type = ETF[fileExtension];
       const self = this;
 
-      reader.readAsText(file);
-      reader.onload = function(event) {
-        ParserManager.parse(event.target.result, type).then(e => {
-          self.dispatch("updateModel", e);
-          /* Save the state to undo later. */
-          self.commit("saveOperation", {
-            state: rootState,
-            action: { type: "updateModel", args: e }
+      if (fileExtension === "json") {
+        alert("Importing JSON files is not yet supported.");
+        throw new Error("Importing JSON files is not yet supported.");
+      } else {
+        reader.readAsText(file);
+        reader.onload = function(event) {
+          ParserManager.parse(event.target.result, type).then(e => {
+            self.dispatch("updateModel", e);
+            /* Save the state to undo later. */
+            self.commit("saveOperation", {
+              state: rootState,
+              action: { type: "updateModel", args: e }
+            });
           });
-        });
-      };
+        };
+      }
     },
 
     /**
@@ -226,8 +249,8 @@ const dataModule = {
           filename,
           JSON.stringify(rootGetters.internalModelToJson, null, 2)
         );
-      } else if (extension === "ttl") {
-        /* Otherwise, serialize to Turtle first. */
+      } else if (extension === "nt") {
+        /* Otherwise, serialize to (n-triples) Turtle first. */
         SerializerManager.serialize(
           ShaclTranslator.toSHACL(rootGetters.shapes),
           ETF.ttl
