@@ -6,7 +6,6 @@ import ValidatorManager from "../validation/validatorManager";
 import language from "../util/enums/languages";
 import { downloadFile } from "../util";
 import ShaclTranslator from "../translation/shaclTranslator";
-import undoRedoMixin from "./undoRedoMixin";
 
 /**
  * This module contains everything to handle data imports/exports and validation.

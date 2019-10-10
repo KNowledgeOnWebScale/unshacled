@@ -167,7 +167,7 @@ const constraintModule = {
      * @param {string} inputType the type of the input
      */
     stopConstraintEdit(
-      { state, commit, dispatch, rootGetters, rootState },
+      { state, dispatch, rootGetters },
       { shapeID, predicate: constraintID, valueType, input, inputType }
     ) {
       /* Update the modal state. */
