@@ -37,6 +37,17 @@ const dataModule = {
     },
 
     /**
+     * Clear the data from the current state.
+     * @param state
+     */
+    clearData(state) {
+      Vue.set(state, "dataFileName", undefined);
+      Vue.set(state, "dataFile", {});
+      Vue.set(state, "dataFileExtension", undefined);
+      Vue.set(state, "dataText", "");
+    },
+
+    /**
      * Set the data file to the given contents.
      * @param state
      * @param {string} name the name of the data file.

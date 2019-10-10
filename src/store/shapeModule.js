@@ -35,7 +35,7 @@ const shapeModule = {
      * Clear all shapes and properties from the current state.
      * @param state
      */
-    clear(state) {
+    clearModel(state) {
       Vue.set(state, "model", []);
       this.commit("clearLocations");
     },

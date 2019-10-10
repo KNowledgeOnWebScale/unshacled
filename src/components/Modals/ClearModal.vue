@@ -44,7 +44,8 @@ export default {
      * Confirm the modal. This will clear the editor and close the modal.
      */
     confirm() {
-      this.$store.commit("clear");
+      this.$store.commit("clearModel");
+      this.$store.commit("clearData");
       this.toggleClearModal();
     },
     /**
