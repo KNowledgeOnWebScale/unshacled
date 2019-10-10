@@ -3,7 +3,7 @@
     <sui-menu id="navbar" ref="navbar" attached="top" inverted>
       <sui-dropdown item icon="file alternate" simple>
         <sui-dropdown-menu>
-          <sui-dropdown-item @click="$refs.importShapes.click()">
+          <sui-dropdown-item @mouseup="() => $refs.importShapes.click()">
             <label for="file">Import Shapes...</label>
             <input
               id="file"
@@ -14,7 +14,7 @@
             />
           </sui-dropdown-item>
 
-          <sui-dropdown-item @click="$refs.importData.click()">
+          <sui-dropdown-item @mouseup="() => $refs.importData.click()">
             <label for="dataFile">Import Data...</label>
             <input
               id="dataFile"

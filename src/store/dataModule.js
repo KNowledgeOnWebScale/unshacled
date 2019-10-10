@@ -156,11 +156,16 @@ const dataModule = {
     setDataFile({ commit, rootState }, { name, contents, extension }) {
       return new Promise((resolve, reject) => {
         try {
-          /* Parse the data from Turtle to JSON. */
-          ParserManager.parse(contents, ETF.ttl).then(data => {
-            commit("setData", { name, contents, extension, data });
-            resolve(rootState);
-          });
+          if (extension.toLowerCase() === "json") {
+            alert("Importing JSON files is not yet supported.");
+            throw new Error("Importing JSON files is not yet supported.");
+          } else {
+            /* Parse the data from Turtle to JSON. */
+            ParserManager.parse(contents, ETF[extension]).then(data => {
+              commit("setData", { name, contents, extension, data });
+              resolve(rootState);
+            });
+          }
         } catch (e) {
           reject(e);
         }
@@ -175,21 +180,29 @@ const dataModule = {
      * */
     uploadSchemaFile({ rootState }, file) {
       const reader = new FileReader();
-      const fileExtension = file.name.split(".").pop();
+      const fileExtension = file.name
+        .split(".")
+        .pop()
+        .toLowerCase();
       const type = ETF[fileExtension];
       const self = this;
 
-      reader.readAsText(file);
-      reader.onload = function(event) {
-        ParserManager.parse(event.target.result, type).then(e => {
-          self.dispatch("updateModel", e);
-          /* Save the state to undo later. */
-          self.commit("saveOperation", {
-            state: rootState,
-            action: { type: "updateModel", args: e }
+      if (fileExtension === "json") {
+        alert("Importing JSON files is not yet supported.");
+        throw new Error("Importing JSON files is not yet supported.");
+      } else {
+        reader.readAsText(file);
+        reader.onload = function(event) {
+          ParserManager.parse(event.target.result, type).then(e => {
+            self.dispatch("updateModel", e);
+            /* Save the state to undo later. */
+            self.commit("saveOperation", {
+              state: rootState,
+              action: { type: "updateModel", args: e }
+            });
           });
-        });
-      };
+        };
+      }
     },
 
     /**
