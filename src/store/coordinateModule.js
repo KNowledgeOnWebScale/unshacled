@@ -81,10 +81,8 @@ const coordinateModule = {
       let i = 1;
       for (const con of Object.keys(constraints)) {
         Vue.set(state.yValues[shapeID], con, i * HEIGHT);
-        /* Determine if every value has to be on a separate line. */
-        i += SINGLE_ENTRY.includes(urlToName(con)) ? 1 : constraints[con];
+        i += 1;
       }
-
       /* Set the bottom coordinate. */
       Vue.set(state.heights, shapeID, i * HEIGHT);
     },

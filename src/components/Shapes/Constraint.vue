@@ -4,6 +4,7 @@
 
     <v-group @mouseenter="hoverKey = true" @mouseleave="hoverKey = false">
       <v-text ref="key" :config="getConfigs().keyConfig"></v-text>
+      <v-text :config="getValueConfig(getConstraintValues())"></v-text>
       <v-circle
         v-if="hoverKey && canBeDeleted()"
         :config="getConfigs().deleteConstraint"
@@ -13,9 +14,7 @@
       ></v-circle>
     </v-group>
 
-    <v-line :config="getConfigs().lineConfig"></v-line>
-
-    <v-group @mouseenter="hoverValues = true" @mouseleave="hoverValues = false">
+    <!-- <v-group @mouseenter="hoverValues = true" @mouseleave="hoverValues = false">
       <div v-for="(value, index) of getConstraintValues()" :key="index">
         <v-text
           :config="getValueConfig(value, index)"
@@ -31,7 +30,7 @@
           @mouseleave="setCursor('')"
         ></v-circle>
       </div>
-    </v-group>
+    </v-group> -->
   </v-group>
 </template>
 
@@ -41,7 +40,6 @@ import {
   WIDTH,
   CONSTRAINT_CONFIG,
   CONSTRAINT_TEXT_CONFIG,
-  CONSTRAINT_SEPARATION_LINE,
   DELETE_BUTTON_CONFIG,
   TEXT_OFFSET,
   MAX_LENGTH,
@@ -83,31 +81,26 @@ export default {
    * HoverKey {boolean} indicates if the mouse is hovering over the key of the constraint.
    * HoverValues {boolean} indicates if the mouse is hovering over the values of the constraint.
    *
-   * LineConfig {} the configuration of the line that seperates the key and the value.
    * RectangleConfig {} the configuration of the rectangle.
    * KeyConfig {} the configuration of the key text field.
    * ValueConfig {} the configuration of the value text field.
    * DeleteConstraintConfig {} the configuration of the delete button.
    *
-   * @returns {{hoverKey: boolean, hoverValues: boolean, lineConfig: {}, rectangleConfig: {}, keyConfig: {}, valueConfig: {}, deleteConstraintConfig: {}}}
+   * @returns {{hoverKey: boolean, hoverValues: boolean, rectangleConfig: {}, keyConfig: {}, valueConfig: {}, deleteConstraintConfig: {}}}
    */
   data() {
     return {
       hoverKey: false,
       hoverValues: false,
 
-      lineConfig: {
-        ...CONSTRAINT_SEPARATION_LINE,
-        points: [0, HEIGHT, WIDTH, HEIGHT] // [x1, y1, x2, y2]
-      },
       rectangleConfig: {
         ...CONSTRAINT_CONFIG,
         stroke: this.$props.stroke
       },
       keyConfig: {
         ...CONSTRAINT_TEXT_CONFIG,
+        x: TEXT_OFFSET,
         y: TEXT_OFFSET,
-        fontStyle: "italic",
         text: uriToPrefix(
           this.$store.state.mConfig.namespaces,
           this.$props.constraintID
@@ -115,7 +108,8 @@ export default {
       },
       valueConfig: {
         ...CONSTRAINT_TEXT_CONFIG,
-        y: TEXT_OFFSET + HEIGHT
+        y: TEXT_OFFSET,
+        x: WIDTH / 3
       },
       deleteConstraintConfig: {
         ...DELETE_BUTTON_CONFIG,
@@ -336,21 +330,17 @@ export default {
     /**
      * Get the configurations for the different visualization components.
      * This is mainly to dynamically set the y values and heights of the different components.
-     * @returns {{lineConfig: object, rectangleConfig: object, keyConfig: object, valueConfig: object, deleteConstraint: object}}
+     * @returns {{rectangleConfig: object, keyConfig: object, valueConfig: object, deleteConstraint: object}}
      */
     getConfigs() {
       /* Determine the current y value. */
       const y = this.getYValue();
-      const points = [...this.lineConfig.points];
-      points[1] += y;
-      points[3] += y;
 
       return {
-        lineConfig: { ...this.lineConfig, points },
         rectangleConfig: {
           ...this.rectangleConfig,
           y,
-          height: (this.getNumConstraintValues() + 1) * HEIGHT
+          height: (this.getNumConstraintValues()) * HEIGHT
         },
         keyConfig: {
           ...this.keyConfig,
@@ -374,13 +364,17 @@ export default {
      * @param {number} index the index of the constraint value.
      * @returns {{y: number, text: string}}
      */
-    getValueConfig(value, index) {
+    getValueConfig(value) {
+      if ( value.length === 1 ){
+        const val = value[0];
+        value = val;
+      }
       const text = uriToPrefix(this.$store.state.mConfig.namespaces, value);
       // Determine if the value has to move up to free up space for the label/name.
       const move = text.length - 2 > MAX_LENGTH ? -HEIGHT / 6 : 0;
       return {
         ...this.valueConfig,
-        y: this.valueConfig.y + this.getYValue() + index * HEIGHT + move,
+        y: this.valueConfig.y + this.getYValue() + move,
         text
       };
     },
