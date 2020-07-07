@@ -47,20 +47,23 @@
       </v-group>
 
       <!-- Constraints -->
-      <div v-for="(prop, key) in getConstraints()" :key="key">
-        <constraint
-          :constraint-i-d="key"
-          :shape-i-d="$props.id"
-          :node-shape="$props.nodeShape"
-          :stroke="shapeConfig.stroke"
-        ></constraint>
-      </div>
+      <v-group>
+        <v-rect :config="constraintsConfig"></v-rect>
+        <div v-for="(prop, key) in getConstraints()" :key="key">
+          <constraint
+            :constraint-i-d="key"
+            :shape-i-d="$props.id"
+            :node-shape="$props.nodeShape"
+            :stroke="shapeConfig.stroke"
+          ></constraint>
+        </div>
+      </v-group>
     </v-group>
   </div>
 </template>
 
 <script>
-import Constraint from "./Constraint.vue";
+import Constraint from "./NewConstraint.vue";
 import { uriToPrefix } from "../../util/urlParser";
 import {
   DELETE_BUTTON_CONFIG,
@@ -78,7 +81,8 @@ import {
   TEXT_SIZE,
   pointerCursor,
   resetCursor,
-  textCursor
+  textCursor,
+  HEIGHT
 } from "../../config/konvaConfigs";
 import { TERM } from "../../translation/terminology";
 import { abbreviate } from "../../util/strings";
@@ -113,6 +117,9 @@ export default {
       shapeConfig: this.$props.nodeShape
         ? NODE_SHAPE_CONFIG
         : PROPERTY_SHAPE_CONFIG,
+      shapeLabel: this.$props.nodeShape
+        ? "<<NodeConditions>>"
+        : "<<PropertyConditions>>",
       deleteNodeConfig: DELETE_BUTTON_CONFIG,
       idTextConfig: {
         ...LABEL_TEXT_CONFIG,
@@ -147,11 +154,7 @@ export default {
      */
     getLabelTextConfig() {
       const label = this.$store.getters.labelsForIds[this.id];
-      const text = label
-        ? abbreviate(label)
-        : abbreviate(
-            uriToPrefix(this.$store.state.mConfig.namespaces, this.id)
-          );
+      const text = this.shapeLabel;
       return {
         ...LABEL_TEXT_CONFIG,
         y: label ? OFFSET : TEXT_OFFSET,
@@ -166,7 +169,7 @@ export default {
      */
     getURITextConfig() {
       const label = this.$store.getters.labelsForIds[this.id];
-      const text = label ? abbreviate(this.id) : "";
+      const text = label ? abbreviate(label) : "";
       return { ...URI_TEXT_CONFIG, text };
     },
 

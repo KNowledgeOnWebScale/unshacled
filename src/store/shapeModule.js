@@ -309,13 +309,13 @@ const shapeModule = {
       const { shapes } = getters;
       // Get the label of every shape.
       for (const shapeID of Object.keys(shapes)) {
-        /* PropertyShapes have a name. */
-        const name = shapes[shapeID][TERM.name];
-        if (name) output[shapeID] = name[0]["@value"];
-
         /* NodeShapes have a label. */
         const label = shapes[shapeID][LABEL];
         if (label) output[shapeID] = label[0]["@value"];
+
+        /* PropertyShapes have a name. */
+        const name = shapes[shapeID][TERM.name];
+        if (name) output[shapeID] = name[0]["@value"];
       }
       return output;
     },
