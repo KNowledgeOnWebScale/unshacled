@@ -1,7 +1,7 @@
 /* CONSTANTS ======================================================================================================== */
 
 export const WIDTH = 250; // Width of a rectangle.
-export const HEIGHT = 50; // Width of a rectangle.
+export const HEIGHT = 40; // Width of a rectangle.
 export const MARGIN = 5;
 export const MARGIN_TOP = 40; // Margin to accomodate the navbar.
 export const OFFSET = 10; // General offset.
@@ -31,6 +31,7 @@ export const SHAPE_CONFIG = {
  */
 export const NODE_SHAPE_CONFIG = {
   ...SHAPE_CONFIG,
+  height: HEIGHT + 10,
   fill: "white",
   stroke: "black"
 };
@@ -41,6 +42,7 @@ export const NODE_SHAPE_CONFIG = {
  */
 export const PROPERTY_SHAPE_CONFIG = {
   ...SHAPE_CONFIG,
+  height: HEIGHT + 10,
   fill: "white",
   stroke: "black"
 };

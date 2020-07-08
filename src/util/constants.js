@@ -22,9 +22,25 @@ export const IRI_REGEX = new RegExp(
 );
 export const BLANK_REGEX = new RegExp(/^_:.+/);
 
+/* All properties that get visualised in ShapeUML as a variation of appliesOn() */
+export const APPLIES_ON = [
+  TERM.targetNode,
+  TERM.targetClass,
+  TERM.targetSubjectsOf,
+  TERM.targetObjectsOf
+]
+
+/* All properties that get visualised in the second 'info' box of a ShapeUML shape */
+export const INFO_PROPERTIES = [
+  "@id",
+  TERM.path,
+  ...APPLIES_ON,
+  TERM.severity
+];
+
 /* Properties that are ignored when visualizing. */
 export const IGNORED_PROPERTIES = [
-  "@id",
+  ...INFO_PROPERTIES,
   "@type",
   LABEL,
   TERM.name,

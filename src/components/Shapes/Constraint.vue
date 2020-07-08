@@ -4,7 +4,11 @@
 
     <v-group @mouseenter="hoverKey = true" @mouseleave="hoverKey = false">
       <v-text ref="key" :config="getConfigs().keyConfig"></v-text>
-      <v-text :config="getValueConfig(getConstraintValues())"></v-text>
+      <v-text 
+        :config="getValueConfig(getConstraintValues())"
+        @click="editValue(index)"
+        @mouseenter="setCursor('text')"
+        @mouseleave="setCursor('')"></v-text>
       <v-circle
         v-if="hoverKey && canBeDeleted()"
         :config="getConfigs().deleteConstraint"
@@ -13,24 +17,6 @@
         @mouseleave="setCursor('')"
       ></v-circle>
     </v-group>
-
-    <!-- <v-group @mouseenter="hoverValues = true" @mouseleave="hoverValues = false">
-      <div v-for="(value, index) of getConstraintValues()" :key="index">
-        <v-text
-          :config="getValueConfig(value, index)"
-          @click="editValue(index)"
-          @mouseenter="setCursor('text')"
-          @mouseleave="setCursor('')"
-        ></v-text>
-        <v-circle
-          v-if="hoverValues && !isListOfValues() && canBeDeleted()"
-          :config="getDeleteValueConfig(index)"
-          @click="deleteConstraintValue(index)"
-          @mouseenter="setCursor('pointer')"
-          @mouseleave="setCursor('')"
-        ></v-circle>
-      </div>
-    </v-group> -->
   </v-group>
 </template>
 
@@ -101,9 +87,11 @@ export default {
         ...CONSTRAINT_TEXT_CONFIG,
         x: TEXT_OFFSET,
         y: TEXT_OFFSET,
-        text: uriToPrefix(
-          this.$store.state.mConfig.namespaces,
-          this.$props.constraintID
+        text: this.$props.constraintID === "@id"
+          ? "IRI"
+          : uriToPrefix(
+            this.$store.state.mConfig.namespaces,
+            this.$props.constraintID
         )
       },
       valueConfig: {
@@ -241,13 +229,18 @@ export default {
      */
     getConstraintValues() {
       const { shapeID, constraintID } = this.$props;
+      const info = this.$store.getters.shapeInfo(shapeID);
       const constraints = this.$store.getters.shapeConstraints(shapeID);
       const output = [];
+
+      Object.assign(constraints, info);
 
       if (constraints && constraints[constraintID]) {
         if (constraintID === TERM.path) {
           /* Show the full path. */
           return [constraints[constraintID][0]["@id"]];
+        } else if (constraintID === "@id"){
+          return constraints[constraintID]
         }
 
         /* Get the constraint's value type. */
@@ -370,6 +363,7 @@ export default {
         value = val;
       }
       const text = uriToPrefix(this.$store.state.mConfig.namespaces, value);
+      
       // Determine if the value has to move up to free up space for the label/name.
       const move = text.length - 2 > MAX_LENGTH ? -HEIGHT / 6 : 0;
       return {

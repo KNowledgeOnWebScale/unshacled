@@ -5,7 +5,7 @@ import ValueType, {
 } from "../util/enums/ValueType";
 import { urlToName } from "../util/urlParser";
 import { HEIGHT } from "../config/konvaConfigs";
-import { IGNORED_PROPERTIES, SINGLE_ENTRY } from "../util/constants";
+import { IGNORED_PROPERTIES, SINGLE_ENTRY, INFO_PROPERTIES } from "../util/constants";
 
 /**
  * This module contains everything regarding coordinates, locations and positioning.
@@ -64,7 +64,7 @@ const coordinateModule = {
       /* Get the IDs of all the constraints and the number of values for each constraint. */
       const constraints = {};
       for (const c in shape) {
-        if (!IGNORED_PROPERTIES.includes(c)) {
+        if (INFO_PROPERTIES.includes(c) || !IGNORED_PROPERTIES.includes(c)) {
           const vt = ValueType(c)
             ? ValueType(c)
             : getValueTypeFromConstraint(shape[c]);
@@ -80,11 +80,11 @@ const coordinateModule = {
       /* Calculate their y values. */
       let i = 1;
       for (const con of Object.keys(constraints)) {
-        Vue.set(state.yValues[shapeID], con, i * HEIGHT);
+        Vue.set(state.yValues[shapeID], con, i * HEIGHT + 10);
         i += 1;
       }
       /* Set the bottom coordinate. */
-      Vue.set(state.heights, shapeID, i * HEIGHT);
+      Vue.set(state.heights, shapeID, i * HEIGHT + 10);
     },
 
     /**

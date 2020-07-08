@@ -1,5 +1,6 @@
 import Vue from "vue";
 import constraintModule from "./constraintModule";
+import shapeInfoModule from "./shapeInfoModule"
 import { generateUUID, getNonOverlappingCoordinates } from "../util";
 import coordinateModule from "./coordinateModule";
 import { LABEL, SHACL_URI } from "../util/constants";

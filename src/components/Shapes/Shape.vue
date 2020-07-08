@@ -21,7 +21,7 @@
         </v-group>
 
         <!-- Description -->
-        <v-group v-if="hasDescription() && titleHover">
+        <v-group v-show="hasDescription() && titleHover">
           <v-rect :config="getDescriptionConfig().rect"></v-rect>
           <v-text :config="getDescriptionConfig().title"></v-text>
           <v-text :config="getDescriptionConfig().text"></v-text>
@@ -45,10 +45,20 @@
           @mouseleave="setCursor('')"
         ></v-circle>
       </v-group>
+      
+      <v-group>
+        <div v-for="(prop, key) in getShapeInfo()" :key="key">
+          <constraint
+            :constraint-i-d="key"
+            :shape-i-d="$props.id"
+            :node-shape="$props.nodeShape"
+            :stroke="shapeConfig.stroke"
+          ></constraint>
+        </div>
+      </v-group>
 
       <!-- Constraints -->
       <v-group>
-        <v-rect :config="constraintsConfig"></v-rect>
         <div v-for="(prop, key) in getConstraints()" :key="key">
           <constraint
             :constraint-i-d="key"
@@ -63,7 +73,7 @@
 </template>
 
 <script>
-import Constraint from "./Constraint";
+import Constraint from "./Constraint.vue";
 import { uriToPrefix } from "../../util/urlParser";
 import {
   DELETE_BUTTON_CONFIG,
@@ -139,6 +149,7 @@ export default {
     /* Update the constraints when the store state changes. */
     this.$store.watch(
       () => self.$store.getters.shapeConstraints(self.$props.id),
+      () => self.$store.getters.shapeInfo(self.$props.id),
       () => {
         self.getConstraints();
         self.getDescriptionConfig();
@@ -230,6 +241,15 @@ export default {
      */
     getConstraints() {
       return this.$store.getters.shapeConstraints(this.$props.id);
+    },
+
+    /**
+     * Get an object containing all the information about the shape.
+     * @returns {object} an object mapping every informative constraint name to a (list of) values.
+     */
+    getShapeInfo() {
+      // console.log(this.$store.getters.shapeInfo(this.$props.id));
+      return this.$store.getters.shapeInfo(this.$props.id);
     },
 
     /**
