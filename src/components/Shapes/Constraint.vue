@@ -1,6 +1,6 @@
 <template>
   <v-group>
-    <v-rect :config="getConfigs().rectangleConfig"></v-rect>
+    <!-- <v-rect :config="getConfigs().rectangleConfig"></v-rect> -->
 
     <v-group @mouseenter="hoverKey = true" @mouseleave="hoverKey = false">
       <v-text ref="key" :config="getConfigs().keyConfig"></v-text>
@@ -293,21 +293,6 @@ export default {
       return output;
     },
 
-    /**
-     * Get the number of constraint values in this constraint.
-     * This is used to determine the size of the rectangle.
-     * @returns {number} the number of constraint values.
-     */
-    getNumConstraintValues() {
-      const { shapeID, constraintID } = this.$props;
-      const cvs = this.$store.getters.shapeWithID(shapeID)[constraintID];
-      return SINGLE_ENTRY.includes(urlToName(constraintID))
-        ? 1 /* For certain constraints, the values will be listed as a single value. */
-        : cvs.length > 0 && cvs[0]["@list"]
-        ? cvs[0]["@list"].length // Get the number of elements if it's a list.
-        : cvs.length;
-    },
-
     /* CONFIGURATIONS =============================================================================================== */
 
     /**
@@ -333,7 +318,7 @@ export default {
         rectangleConfig: {
           ...this.rectangleConfig,
           y,
-          height: (this.getNumConstraintValues()) * HEIGHT
+          height: HEIGHT
         },
         keyConfig: {
           ...this.keyConfig,

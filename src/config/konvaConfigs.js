@@ -2,6 +2,7 @@
 
 export const WIDTH = 250; // Width of a rectangle.
 export const HEIGHT = 40; // Width of a rectangle.
+export const HEIGHT_HEADER = HEIGHT + 10; // Height of the top part of a shape, containing title, kind of shape...
 export const MARGIN = 5;
 export const MARGIN_TOP = 40; // Margin to accomodate the navbar.
 export const OFFSET = 10; // General offset.
@@ -31,7 +32,7 @@ export const SHAPE_CONFIG = {
  */
 export const NODE_SHAPE_CONFIG = {
   ...SHAPE_CONFIG,
-  height: HEIGHT + 10,
+  height: HEIGHT_HEADER,
   fill: "white",
   stroke: "black"
 };
@@ -42,7 +43,7 @@ export const NODE_SHAPE_CONFIG = {
  */
 export const PROPERTY_SHAPE_CONFIG = {
   ...SHAPE_CONFIG,
-  height: HEIGHT + 10,
+  height: HEIGHT_HEADER,
   fill: "white",
   stroke: "black"
 };
@@ -58,6 +59,17 @@ export const DESCRIPTION_RECT_CONFIG = {
   stroke: "lightgrey",
   strokeWidth: 1
 };
+
+/**
+ * Configuration for the rectangles around the information properties
+ * as well as the constraints.
+ * @type {{fill: string, stroke: string}}
+ */
+export const PROPERTY_RECT_CONFIG = {
+  ...SHAPE_CONFIG,
+  fill: "white",
+  stroke: "black"
+}
 
 /* CONSTRAINTS ====================================================================================================== */
 

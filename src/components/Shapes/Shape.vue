@@ -46,7 +46,9 @@
         ></v-circle>
       </v-group>
       
+      <!-- Shape information -->
       <v-group>
+        <v-rect :config="getInfoShapeConfig()"></v-rect>
         <div v-for="(prop, key) in getShapeInfo()" :key="key">
           <constraint
             :constraint-i-d="key"
@@ -59,6 +61,7 @@
 
       <!-- Constraints -->
       <v-group>
+        <v-rect :config="getConstraintShapeConfig()"></v-rect>
         <div v-for="(prop, key) in getConstraints()" :key="key">
           <constraint
             :constraint-i-d="key"
@@ -87,11 +90,15 @@ import {
   DESCRIPTION_RECT_CONFIG,
   DESCRIPTION_TITLE_CONFIG,
   DESCRIPTION_TEXT_CONFIG,
+  PROPERTY_RECT_CONFIG,
   MAX_LENGTH,
   TEXT_SIZE,
   pointerCursor,
   resetCursor,
-  textCursor
+  textCursor,
+  SHAPE_CONFIG,
+  HEIGHT_HEADER,
+  HEIGHT
 } from "../../config/konvaConfigs";
 import { TERM } from "../../translation/terminology";
 import { abbreviate } from "../../util/strings";
@@ -181,6 +188,25 @@ export default {
       const label = this.$store.getters.labelsForIds[this.id];
       const text = label ? abbreviate(label) : "";
       return { ...URI_TEXT_CONFIG, text };
+    },
+
+    getInfoShapeConfig() {
+      const infoAmount = this.$store.getters.getInfoAmount(this.id);
+      return {
+        ...PROPERTY_RECT_CONFIG,
+        height: infoAmount * HEIGHT,
+        y: HEIGHT_HEADER
+      }
+    },
+
+    getConstraintShapeConfig() {
+      const infoAmount = this.$store.getters.getInfoAmount(this.id);
+      const constraintAmount = this.$store.getters.getConstraintAmount(this.id);
+      return {
+        ...PROPERTY_RECT_CONFIG,
+        height: constraintAmount * HEIGHT,
+        y: HEIGHT_HEADER + (infoAmount * HEIGHT)
+      }
     },
 
     /**

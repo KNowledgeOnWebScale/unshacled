@@ -407,6 +407,34 @@ const constraintModule = {
     },
 
     /**
+     * Get the amount of constraints of the shape with the given ID.
+     * ShapeID {string} the ID of the shape whose constraints we want to get.
+     * @param _state
+     * @param _getters
+     * @param _rootState
+     * @param rootGetters
+     * @returns {function}
+     */
+    getConstraintAmount: (
+      _state,
+      _getters,
+      _rootState,
+      rootGetters
+    ) => shapeID => {
+      let i = 0;
+      const shape = rootGetters.shapeWithID(shapeID);
+
+      if (shape) {
+        for (const prop in shape) {
+          if (!IGNORED_PROPERTIES.includes(prop)) i += 1
+        }
+        return i;
+      } else {
+        return undefined;
+      }
+    },
+
+    /**
      * Get a map of the information constraints of the shape with the given ID.
      * ShapeID {string} the ID of the shape whose constraints we want to get.
      * @param _state
@@ -443,6 +471,34 @@ const constraintModule = {
           }
         }
         return constraints;
+      } else {
+        return undefined;
+      }
+    },
+
+    /**
+     * Get the amount of information properties of the shape with the given ID.
+     * ShapeID {string} the ID of the shape whose constraints we want to get.
+     * @param _state
+     * @param _getters
+     * @param _rootState
+     * @param rootGetters
+     * @returns {function}
+     */
+    getInfoAmount: (
+      _state,
+      _getters,
+      _rootState,
+      rootGetters
+    ) => shapeID => {
+      let i = 0;
+      const shape = rootGetters.shapeWithID(shapeID);
+      
+      if (shape) {
+        for (const prop in shape) {
+          if (INFO_PROPERTIES.includes(prop)) i += 1
+        }
+        return i;
       } else {
         return undefined;
       }
