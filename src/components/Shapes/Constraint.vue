@@ -34,7 +34,7 @@ import {
   resetCursor
 } from "../../config/konvaConfigs";
 import { uriToPrefix, urlToName } from "../../util/urlParser";
-import { SINGLE_ENTRY } from "../../util/constants";
+import { SINGLE_ENTRY, APPLIES_ON } from "../../util/constants";
 import ValueType, {
   getValueTypeFromConstraint,
   ValueTypes
@@ -86,13 +86,7 @@ export default {
       keyConfig: {
         ...CONSTRAINT_TEXT_CONFIG,
         x: TEXT_OFFSET,
-        y: TEXT_OFFSET,
-        text: this.$props.constraintID === "@id"
-          ? "IRI"
-          : uriToPrefix(
-            this.$store.state.mConfig.namespaces,
-            this.$props.constraintID
-        )
+        y: TEXT_OFFSET
       },
       valueConfig: {
         ...CONSTRAINT_TEXT_CONFIG,
@@ -224,6 +218,26 @@ export default {
     },
 
     /**
+     * Get the correct value formatting for when a key is one of the "appliesOn" keys
+     * @param {string} key the key, used to check which formatting shoudl be applied to the value.
+     * @param {string} value the value that has to be formatted.
+     * @returns {string} the formatted value.
+     */
+    appliesOnValue (key, value) {
+      let namespaces = this.$store.state.mConfig.namespaces;
+      switch (key) {
+        case TERM.targetNode:
+          return `instance(${uriToPrefix(namespaces, value)})`;
+        case TERM.targetClass:
+          return `class(${uriToPrefix(namespaces, value)})`;
+        case TERM.targetSubjectsOf:
+          return `subjectsOf(${uriToPrefix(namespaces, value)})`;
+        case TERM.targetObjectsOf:
+          return `objectsOf(${uriToPrefix(namespaces, value)})`;
+      }
+    },
+
+    /**
      * Get all the constraint values of this predicate, used to visualize the constraint.
      * @returns {[string]} a list of all the constraint values as strings.
      */
@@ -240,7 +254,9 @@ export default {
           /* Show the full path. */
           return [constraints[constraintID][0]["@id"]];
         } else if (constraintID === "@id"){
-          return constraints[constraintID]
+          return constraints[constraintID];
+        } else if (APPLIES_ON.includes(constraintID)){
+          return this.appliesOnValue(constraintID, constraints[constraintID][0]["@id"]);
         }
 
         /* Get the constraint's value type. */
@@ -314,6 +330,19 @@ export default {
       /* Determine the current y value. */
       const y = this.getYValue();
 
+      const key = this.$props.constraintID;
+      let keyText;
+      if ( key === "@id" ){
+        keyText = "IRI"
+      } else if ( APPLIES_ON.includes(key) ){
+        keyText = "appliesOn"
+      } else {
+        keyText = uriToPrefix(
+            this.$store.state.mConfig.namespaces,
+            this.$props.constraintID
+            )
+      }
+
       return {
         rectangleConfig: {
           ...this.rectangleConfig,
@@ -322,7 +351,8 @@ export default {
         },
         keyConfig: {
           ...this.keyConfig,
-          y: this.keyConfig.y + y
+          y: this.keyConfig.y + y,
+          text: keyText
         },
         valueConfig: {
           ...this.valueConfig,
