@@ -190,21 +190,33 @@ export default {
       return { ...URI_TEXT_CONFIG, text };
     },
 
+    /**
+     * Get the config for the rectangle around the shape information
+     * the y value starts below the header
+     * the height is the amount of information properties * the common height of a property box
+     * @returns {object} the configuration for the rectangle around the shape information
+     */
     getInfoShapeConfig() {
       const infoAmount = this.$store.getters.getInfoAmount(this.id);
       return {
         ...PROPERTY_RECT_CONFIG,
-        height: infoAmount * HEIGHT,
+        height: infoAmount ? infoAmount * HEIGHT : HEIGHT,
         y: HEIGHT_HEADER
       }
     },
 
+    /**
+     * Get the config for the rectangle around the shape constraints
+     * the y value starts below the information rectangle
+     * the height is the amount of constraints * the common height of a property box
+     * @returns {object} the configuration for the rectangle around the shape constraints
+     */
     getConstraintShapeConfig() {
       const infoAmount = this.$store.getters.getInfoAmount(this.id);
       const constraintAmount = this.$store.getters.getConstraintAmount(this.id);
       return {
         ...PROPERTY_RECT_CONFIG,
-        height: constraintAmount * HEIGHT,
+        height: constraintAmount ? constraintAmount * HEIGHT : HEIGHT,
         y: HEIGHT_HEADER + (infoAmount * HEIGHT)
       }
     },

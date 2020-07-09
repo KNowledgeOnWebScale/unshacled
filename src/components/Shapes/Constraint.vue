@@ -1,22 +1,18 @@
 <template>
-  <v-group>
-    <!-- <v-rect :config="getConfigs().rectangleConfig"></v-rect> -->
-
-    <v-group @mouseenter="hoverKey = true" @mouseleave="hoverKey = false">
-      <v-text ref="key" :config="getConfigs().keyConfig"></v-text>
-      <v-text 
-        :config="getValueConfig(getConstraintValues())"
-        @click="editValue(index)"
-        @mouseenter="setCursor('text')"
-        @mouseleave="setCursor('')"></v-text>
-      <v-circle
-        v-if="hoverKey && canBeDeleted()"
-        :config="getConfigs().deleteConstraint"
-        @click="deleteConstraint"
-        @mouseenter="setCursor('pointer')"
-        @mouseleave="setCursor('')"
-      ></v-circle>
-    </v-group>
+  <v-group @mouseenter="hoverKey = true" @mouseleave="hoverKey = false">
+    <v-text ref="key" :config="getConfigs().keyConfig"></v-text>
+    <v-text 
+      :config="getValueConfig(getConstraintValues())"
+      @click="editValue(index)"
+      @mouseenter="setCursor('text')"
+      @mouseleave="setCursor('')"></v-text>
+    <v-circle
+      v-if="hoverKey && canBeDeleted()"
+      :config="getConfigs().deleteConstraint"
+      @click="deleteConstraint"
+      @mouseenter="setCursor('pointer')"
+      @mouseleave="setCursor('')"
+    ></v-circle>
   </v-group>
 </template>
 
