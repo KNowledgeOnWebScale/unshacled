@@ -3,7 +3,7 @@
     <v-text ref="key" :config="getConfigs().keyConfig"></v-text>
     <v-text 
       :config="getValueConfig(getConstraintValues())"
-      @click="editValue(index)"
+      @click="editValue(0)"
       @mouseenter="setCursor('text')"
       @mouseleave="setCursor('')"></v-text>
     <v-circle
