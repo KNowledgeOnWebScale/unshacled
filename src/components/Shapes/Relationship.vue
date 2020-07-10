@@ -1,10 +1,10 @@
 <template>
   <v-group ref="group" @mouseenter="hover = true" @mouseleave="hover = false">
+    <v-arrow ref="arrow" :config="getConfigs().line"></v-arrow>
     <v-group ref="label" :config="getConfigs().label">
       <v-rect :config="getLabelRectConfig()"></v-rect>
       <v-text ref="text" :config="getConfigs().text"></v-text>
     </v-group>
-    <v-arrow ref="arrow" :config="getConfigs().line"></v-arrow>
     <v-circle
       v-if="hover"
       :config="getButtonConfig()"

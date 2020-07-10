@@ -358,9 +358,21 @@ const shapeModule = {
     propertyShapes(state) {
       const propertyShapes = {};
       for (const item of state.model) {
-        if (!item["@type"]) propertyShapes[item["@id"]] = item;
+        if (!item["@type"] && item[TERM.path]) propertyShapes[item["@id"]] = item;
       }
       return propertyShapes;
+    },
+
+    /**
+     * Get a dictionary mapping ID's to the respective property shape objects.
+     * @param state 
+     */
+    nonSpecifiedShapes(state) {
+      const shapes = {};
+      for (const item of state.model) {
+        if (!item["@type"] && !item[TERM.path]) shapes[item["@id"]] = item;
+      }
+      return shapes;
     },
 
     /**

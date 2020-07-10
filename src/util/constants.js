@@ -46,3 +46,11 @@ export const IGNORED_PROPERTIES = [
   TERM.name,
   TERM.description
 ];
+
+/* These properties have to be included in the properties of a shape, but can't be shown as text, only as a relationship */
+export const RELATIONSHIP_PROPERTIES = [
+  TERM.and,
+  TERM.or,
+  TERM.xone,
+  TERM.property
+]

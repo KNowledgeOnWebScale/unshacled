@@ -112,9 +112,13 @@ export default {
       type: String,
       required: true
     },
-    nodeShape: {
+    hasType: {
       type: Boolean,
       required: true
+    },
+    nodeShape: {
+      type: Boolean,
+      required: false
     }
   },
   /**
@@ -133,9 +137,11 @@ export default {
       shapeConfig: this.$props.nodeShape
         ? NODE_SHAPE_CONFIG
         : PROPERTY_SHAPE_CONFIG,
-      shapeLabel: this.$props.nodeShape
+      shapeLabel: this.$props.hasType
+        ? this.$props.nodeShape
         ? "<<NodeConditions>>"
-        : "<<PropertyConditions>>",
+        : "<<PropertyConditions>>"
+        : "<<Conditions>>",
       deleteNodeConfig: DELETE_BUTTON_CONFIG,
       idTextConfig: {
         ...LABEL_TEXT_CONFIG,
