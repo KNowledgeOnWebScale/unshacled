@@ -63,24 +63,40 @@ const coordinateModule = {
 
       /* Get the IDs of all the constraints and the number of values for each constraint. */
       const constraints = {};
+      const info = {};
       for (const c in shape) {
-        if (INFO_PROPERTIES.includes(c) || !IGNORED_PROPERTIES.includes(c)) {
+        if (INFO_PROPERTIES.includes(c)) {
           if ( !(c === "@id" && shape[c][0] === "_") ){
             const vt = ValueType(c)
               ? ValueType(c)
               : getValueTypeFromConstraint(shape[c]);
-            constraints[c] =
+            info[c] =
               shape[c].length > 1
                 ? shape[c].length
                 : vt.includes(ValueTypes.LIST)
                 ? shape[c][0]["@list"].length
                 : shape[c].length;
           }
+        } else if ( !IGNORED_PROPERTIES.includes(c) ){
+          const vt = ValueType(c)
+            ? ValueType(c)
+            : getValueTypeFromConstraint(shape[c]);
+          constraints[c] =
+            shape[c].length > 1
+              ? shape[c].length
+              : vt.includes(ValueTypes.LIST)
+              ? shape[c][0]["@list"].length
+              : shape[c].length;
         }
       }
 
       /* Calculate their y values. */
       let i = 1;
+      for (const con of Object.keys(info)) {
+        Vue.set(state.yValues[shapeID], con, i * HEIGHT + 10);
+        i += 1;
+      }
+      console.log(constraints);
       for (const con of Object.keys(constraints)) {
         Vue.set(state.yValues[shapeID], con, i * HEIGHT + 10);
         i += 1;
