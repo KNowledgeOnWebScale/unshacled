@@ -96,7 +96,9 @@ const coordinateModule = {
         Vue.set(state.yValues[shapeID], con, i * HEIGHT + 10);
         i += 1;
       }
-      console.log(constraints);
+      if (i === 1){
+        i += 1
+      }
       for (const con of Object.keys(constraints)) {
         Vue.set(state.yValues[shapeID], con, i * HEIGHT + 10);
         i += 1;

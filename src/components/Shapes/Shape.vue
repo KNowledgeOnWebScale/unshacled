@@ -217,7 +217,7 @@ export default {
       return {
         ...PROPERTY_RECT_CONFIG,
         height: constraintAmount ? constraintAmount * HEIGHT : HEIGHT,
-        y: HEIGHT_HEADER + (infoAmount * HEIGHT)
+        y: infoAmount ? HEIGHT_HEADER + (infoAmount * HEIGHT) : HEIGHT_HEADER + HEIGHT
       }
     },
 
