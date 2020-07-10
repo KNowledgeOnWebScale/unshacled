@@ -1,10 +1,10 @@
 <template>
   <v-group ref="group" @mouseenter="hover = true" @mouseleave="hover = false">
-    <v-arrow ref="arrow" :config="getConfigs().line"></v-arrow>
     <v-group ref="label" :config="getConfigs().label">
       <v-rect :config="getLabelRectConfig()"></v-rect>
       <v-text ref="text" :config="getConfigs().text"></v-text>
     </v-group>
+    <v-arrow ref="arrow" :config="getConfigs().line"></v-arrow>
     <v-circle
       v-if="hover"
       :config="getButtonConfig()"
@@ -23,6 +23,7 @@ import {
   RELATIONSHIP_ARROW_CONFIG,
   RELATIONSHIP_LABEL_RECT_CONFIG,
   RELATIONSHIP_LABEL_TEXT_CONFIG,
+  RELATIONSHIP_LABEL_OFFSET,
   MARGIN,
   pointerCursor,
   resetCursor
@@ -75,7 +76,7 @@ export default {
       /* Determine the center points of the start shape. */
       const start = {
         x: coordinates[from].x + WIDTH / 2,
-        y: coordinates[from].y + yValues[from][constraintID] + HEIGHT
+        y: coordinates[from].y + yValues[from][constraintID] + RELATIONSHIP_LABEL_OFFSET
       };
       /* Determine the closest point on the end shape's perimeter. */
       const end = nearestPointOnPerimeter(
@@ -124,9 +125,9 @@ export default {
           points
         },
         label: {
-          x: (points[0] + points[2]) / 2,
-          y: (points[1] + points[3] - 2 * MARGIN) / 2,
-          rotation
+          x: (points[0] + points[2]) / 2 + 10,
+          y: (points[1] + points[3] - 2 * MARGIN) / 2
+          // rotation
         },
         text: {
           ...RELATIONSHIP_LABEL_TEXT_CONFIG,

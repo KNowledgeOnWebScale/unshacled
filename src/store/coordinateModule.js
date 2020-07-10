@@ -65,15 +65,17 @@ const coordinateModule = {
       const constraints = {};
       for (const c in shape) {
         if (INFO_PROPERTIES.includes(c) || !IGNORED_PROPERTIES.includes(c)) {
-          const vt = ValueType(c)
-            ? ValueType(c)
-            : getValueTypeFromConstraint(shape[c]);
-          constraints[c] =
-            shape[c].length > 1
-              ? shape[c].length
-              : vt.includes(ValueTypes.LIST)
-              ? shape[c][0]["@list"].length
-              : shape[c].length;
+          if ( !(c === "@id" && shape[c][0] === "_") ){
+            const vt = ValueType(c)
+              ? ValueType(c)
+              : getValueTypeFromConstraint(shape[c]);
+            constraints[c] =
+              shape[c].length > 1
+                ? shape[c].length
+                : vt.includes(ValueTypes.LIST)
+                ? shape[c][0]["@list"].length
+                : shape[c].length;
+          }
         }
       }
 

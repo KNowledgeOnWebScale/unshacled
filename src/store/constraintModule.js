@@ -458,7 +458,9 @@ const constraintModule = {
           if (INFO_PROPERTIES.includes(prop)) {
             if (shape[prop].length > 1) {
               if(prop === "@id"){
-                constraints[prop] = shape[prop];
+                if ( shape[prop][0] !== "_" ){
+                  constraints[prop] = shape[prop];
+                }
               } else {
                 /* Get the ID of every element in the list. */
                 const properties = [];
@@ -497,6 +499,10 @@ const constraintModule = {
       if (shape) {
         for (const prop in shape) {
           if (INFO_PROPERTIES.includes(prop)) i += 1
+        }
+        const iri = shape["@id"];
+        if ( iri ){
+          if ( iri[0] === "_" ) i -= 1;
         }
         return i;
       } else {

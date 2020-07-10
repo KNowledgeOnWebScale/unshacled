@@ -9,6 +9,8 @@ export const OFFSET = 10; // General offset.
 export const TEXT_OFFSET = 15; // Offset for text.
 export const MAX_LENGTH = 30; // Maximum length for labels.
 
+export const RELATIONSHIP_LABEL_OFFSET = 10;
+
 export const TEXT_SIZE = 12; // Default text size.
 const CONSTRAINT_TEXT_SIZE = TEXT_SIZE; // Smaller text size.
 const BUTTON_OFFSET = 240;
