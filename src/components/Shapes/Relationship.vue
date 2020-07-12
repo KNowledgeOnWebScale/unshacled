@@ -76,7 +76,11 @@ export default {
       /* Determine the center points of the start shape. */
       const start = {
         x: coordinates[from].x + WIDTH / 2,
-        y: coordinates[from].y + yValues[from][constraintID] + RELATIONSHIP_LABEL_OFFSET
+        y: yValues[from][constraintID]
+          ? coordinates[from].y +
+            yValues[from][constraintID] +
+            RELATIONSHIP_LABEL_OFFSET
+          : coordinates[from].y + RELATIONSHIP_LABEL_OFFSET
       };
       /* Determine the closest point on the end shape's perimeter. */
       const end = nearestPointOnPerimeter(
@@ -92,7 +96,9 @@ export default {
       const edges = {
         xl: coordinates[from].x,
         xr: coordinates[from].x + WIDTH,
-        y: coordinates[from].y + yValues[from][constraintID] + HEIGHT
+        y: yValues[from][constraintID]
+          ? coordinates[from].y + yValues[from][constraintID] + HEIGHT
+          : coordinates[from].y + HEIGHT
       };
       const distLeft = distance(edges.xl, edges.y, end.x, end.y);
       const distRight = distance(edges.xr, edges.y, end.x, end.y);
@@ -125,7 +131,7 @@ export default {
           points
         },
         label: {
-          x: (points[0] + points[2]) / 2 + 10,
+          x: (points[0] + points[2]) / 2 + RELATIONSHIP_LABEL_OFFSET,
           y: (points[1] + points[3] - 2 * MARGIN) / 2
           // rotation
         },

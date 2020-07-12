@@ -6,7 +6,11 @@ import getValueType, {
   getValueTypeFromConstraint,
   ValueTypes
 } from "../util/enums/ValueType";
-import { IGNORED_PROPERTIES, INFO_PROPERTIES } from "../util/constants";
+import {
+  IGNORED_PROPERTIES,
+  INFO_PROPERTIES,
+  RELATIONSHIP_PROPERTIES
+} from "../util/constants";
 import predicateModalModule from "./modals/predicateModalModule";
 
 /**
@@ -389,6 +393,38 @@ const constraintModule = {
       if (shape) {
         for (const prop in shape) {
           /* Only handle the constraints that are not ignored. */
+          if (
+            !IGNORED_PROPERTIES.includes(prop) &&
+            !RELATIONSHIP_PROPERTIES.includes(prop)
+          ) {
+            if (shape[prop].length > 1) {
+              /* Get the ID of every element in the list. */
+              const properties = [];
+              Object.values(shape[prop]).map(p => properties.push(p["@id"]));
+              constraints[prop] = properties;
+            } else {
+              constraints[prop] = shape[prop];
+            }
+          }
+        }
+        return constraints;
+      } else {
+        return undefined;
+      }
+    },
+
+    shapeConstraintsWithRels: (
+      _state,
+      _getters,
+      _rootState,
+      rootGetters
+    ) => shapeID => {
+      const constraints = {};
+      const shape = rootGetters.shapeWithID(shapeID);
+
+      if (shape) {
+        for (const prop in shape) {
+          /* Only handle the constraints that are not ignored. */
           if (!IGNORED_PROPERTIES.includes(prop)) {
             if (shape[prop].length > 1) {
               /* Get the ID of every element in the list. */
@@ -426,7 +462,11 @@ const constraintModule = {
 
       if (shape) {
         for (const prop in shape) {
-          if (!IGNORED_PROPERTIES.includes(prop)) i += 1
+          if (
+            !IGNORED_PROPERTIES.includes(prop) &&
+            !RELATIONSHIP_PROPERTIES.includes(prop)
+          )
+            i += 1;
         }
         return i;
       } else {
@@ -443,12 +483,7 @@ const constraintModule = {
      * @param rootGetters
      * @returns {function}
      */
-    shapeInfo: (
-      _state,
-      _getters,
-      _rootState,
-      rootGetters
-    ) => shapeID => {
+    shapeInfo: (_state, _getters, _rootState, rootGetters) => shapeID => {
       const constraints = {};
       const shape = rootGetters.shapeWithID(shapeID);
 
@@ -457,8 +492,8 @@ const constraintModule = {
           /* Only handle the constraints that are not ignored. */
           if (INFO_PROPERTIES.includes(prop)) {
             if (shape[prop].length > 1) {
-              if(prop === "@id"){
-                if ( shape[prop][0] !== "_" ){
+              if (prop === "@id") {
+                if (shape[prop][0] !== "_") {
                   constraints[prop] = shape[prop];
                 }
               } else {
@@ -487,22 +522,17 @@ const constraintModule = {
      * @param rootGetters
      * @returns {function}
      */
-    getInfoAmount: (
-      _state,
-      _getters,
-      _rootState,
-      rootGetters
-    ) => shapeID => {
+    getInfoAmount: (_state, _getters, _rootState, rootGetters) => shapeID => {
       let i = 0;
       const shape = rootGetters.shapeWithID(shapeID);
-      
+
       if (shape) {
         for (const prop in shape) {
-          if (INFO_PROPERTIES.includes(prop)) i += 1
+          if (INFO_PROPERTIES.includes(prop)) i += 1;
         }
         const iri = shape["@id"];
-        if ( iri ){
-          if ( iri[0] === "_" ) i -= 1;
+        if (iri) {
+          if (iri[0] === "_") i -= 1;
         }
         return i;
       } else {
@@ -529,7 +559,7 @@ const constraintModule = {
       const output = {};
 
       /* Check every constraint of the given shape. */
-      const constraints = getters.shapeConstraints(shapeID);
+      const constraints = getters.shapeConstraintsWithRels(shapeID);
       for (const c of Object.keys(constraints)) {
         const vt = getValueType(c)
           ? getValueType(c)

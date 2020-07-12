@@ -5,7 +5,7 @@ import ValueType, {
 } from "../util/enums/ValueType";
 import { urlToName } from "../util/urlParser";
 import { HEIGHT } from "../config/konvaConfigs";
-import { IGNORED_PROPERTIES, SINGLE_ENTRY, INFO_PROPERTIES } from "../util/constants";
+import { IGNORED_PROPERTIES, SINGLE_ENTRY, INFO_PROPERTIES, RELATIONSHIP_PROPERTIES } from "../util/constants";
 
 /**
  * This module contains everything regarding coordinates, locations and positioning.
@@ -77,7 +77,7 @@ const coordinateModule = {
                 ? shape[c][0]["@list"].length
                 : shape[c].length;
           }
-        } else if ( !IGNORED_PROPERTIES.includes(c) ){
+        } else if ( !IGNORED_PROPERTIES.includes(c)  && !RELATIONSHIP_PROPERTIES.includes(c)){
           const vt = ValueType(c)
             ? ValueType(c)
             : getValueTypeFromConstraint(shape[c]);
