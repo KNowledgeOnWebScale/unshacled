@@ -5,7 +5,11 @@
       <v-text ref="text" :config="getConfigs().text"></v-text>
     </v-group>
 
-    <v-group v-if="cardinalityPresent" ref="cardinalityLabel" :config="getConfigs().cardinalityLabel">
+    <v-group
+      v-if="cardinalityPresent"
+      ref="cardinalityLabel"
+      :config="getConfigs().cardinalityLabel"
+    >
       <v-rect :config="getRectConfig(this.$refs.cardinalityText)"></v-rect>
       <v-text
         ref="cardinalityText"
