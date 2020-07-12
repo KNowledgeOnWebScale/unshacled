@@ -413,7 +413,7 @@ const constraintModule = {
       }
     },
 
-  /**
+    /**
      * Get a map of the constraints of the shape with the given ID.
      * This map also includes the relationship constraints and is used to draw the relationships.
      * ShapeID {string} the ID of the shape whose constraints we want to get.

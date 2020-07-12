@@ -1,10 +1,10 @@
 <template>
   <v-group ref="group" @mouseenter="hover = true" @mouseleave="hover = false">
-    <v-arrow ref="arrow" :config="getConfigs().line"></v-arrow>
     <v-group ref="label" :config="getConfigs().label">
       <v-rect :config="getLabelRectConfig()"></v-rect>
       <v-text ref="text" :config="getConfigs().text"></v-text>
     </v-group>
+    <v-arrow ref="arrow" :config="getConfigs().line"></v-arrow>
     <v-circle
       v-if="hover"
       :config="getButtonConfig()"
@@ -30,6 +30,7 @@ import {
 } from "../../config/konvaConfigs";
 import { nearestPointOnPerimeter, distance } from "../../util/calculations";
 import { uriToPrefix } from "../../util/urlParser";
+import { TERM } from "../../translation/terminology";
 
 export default {
   name: "Relationship",
@@ -137,10 +138,7 @@ export default {
         },
         text: {
           ...RELATIONSHIP_LABEL_TEXT_CONFIG,
-          text: uriToPrefix(
-            this.$store.state.mConfig.namespaces,
-            this.$props.constraintID
-          )
+          text: this.getLabelText()
         },
         rect: {
           ...RELATIONSHIP_LABEL_RECT_CONFIG,
@@ -164,6 +162,35 @@ export default {
         };
       }
       return configs.rect;
+    },
+
+    /**
+     * Get the correct label to display next to the relationship arrows, depending on the type of relationship.
+     * @returns {string} the correct relationship label.
+     */
+    getLabelText() {
+      if (this.$props.constraintID === TERM.property) {
+        return uriToPrefix(
+          this.$store.state.mConfig.namespaces,
+          this.getPathFromId(this.$props.to)
+        );
+      } else {
+        return "not a property";
+      }
+    },
+
+    /**
+     * Takes in a shapeId for a PropertyShape and returns that PropertyShape's sh:path value.
+     * @param {string} id The unique identifier for the PropertyShape
+     * @returns {string} That PropertyShape's sh:path value
+     */
+    getPathFromId(id) {
+      for (const shape of this.$store.state.mShape.model) {
+        if (shape["@id"] === id) {
+          return shape[TERM.path][0]["@id"];
+        }
+      }
+      return undefined;
     },
 
     /**
