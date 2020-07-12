@@ -1,9 +1,18 @@
 <template>
   <v-group ref="group" @mouseenter="hover = true" @mouseleave="hover = false">
     <v-group ref="label" :config="getConfigs().label">
-      <v-rect :config="getLabelRectConfig()"></v-rect>
+      <v-rect :config="getRectConfig(this.$refs.text)"></v-rect>
       <v-text ref="text" :config="getConfigs().text"></v-text>
     </v-group>
+
+    <v-group v-if="cardinalityPresent" ref="cardinalityLabel" :config="getConfigs().cardinalityLabel">
+      <v-rect :config="getRectConfig(this.$refs.cardinalityText)"></v-rect>
+      <v-text
+        ref="cardinalityText"
+        :config="getConfigs().cardinalityText"
+      ></v-text>
+    </v-group>
+
     <v-arrow ref="arrow" :config="getConfigs().line"></v-arrow>
     <v-circle
       v-if="hover"
@@ -58,7 +67,8 @@ export default {
    */
   data() {
     return {
-      hover: false
+      hover: false,
+      cardinalityPresent: false
     };
   },
   methods: {
@@ -111,19 +121,11 @@ export default {
 
     /**
      * Get the configurations for the components of the relationship depending on the end points of the arrow.
-     * @returns {{line: object, label: object, text: object, rect: object}}
+     * @returns {{line: object, label: object, text: object, rect: object, cardinalityLabel: object, cardinalityText: object}}
      */
     getConfigs() {
-      const DEGREES = 180;
-
       /* Determine the end points and the rotation of the arrow. */
       const points = this.getEndPoints();
-      const dx = points[2] - points[0];
-      const dy = points[3] - points[1];
-
-      let rotation = Math.atan2(dy, dx) * (DEGREES / Math.PI);
-      rotation > DEGREES / 2 ? (rotation -= DEGREES) : null;
-      rotation < -DEGREES / 2 ? (rotation += DEGREES) : null;
 
       /* Create and return the configuration objects using these end points and rotations. */
       return {
@@ -134,7 +136,6 @@ export default {
         label: {
           x: (points[0] + points[2]) / 2 + RELATIONSHIP_LABEL_OFFSET,
           y: (points[1] + points[3] - 2 * MARGIN) / 2
-          // rotation
         },
         text: {
           ...RELATIONSHIP_LABEL_TEXT_CONFIG,
@@ -144,21 +145,30 @@ export default {
           ...RELATIONSHIP_LABEL_RECT_CONFIG,
           x: -MARGIN,
           y: -MARGIN
+        },
+        cardinalityLabel: {
+          x: points[2] + RELATIONSHIP_LABEL_OFFSET,
+          y: points[3] - RELATIONSHIP_LABEL_OFFSET
+        },
+        cardinalityText: {
+          ...RELATIONSHIP_LABEL_TEXT_CONFIG,
+          text: this.getCardinalityLabelText()
         }
       };
     },
 
     /**
-     * Get the configuration for the label rectangle.
-     * This one is not included in `getConfigs` because it relies on the previously drawn line.
+     * Get the configuration for a label rectangle.
+     * This one is not included in `getConfigs` because it relies on the previously drawn text.
+     * This checks how wide the text in the label is and adjusts the rectangle accordingly.
      * @returns {any} a configuration object.
      */
-    getLabelRectConfig() {
+    getRectConfig(ref) {
       const configs = this.getConfigs();
-      if (this.$refs.text && this.$refs.text.getNode()) {
+      if (ref && ref.getNode()) {
         return {
           ...configs.rect,
-          width: this.$refs.text.getNode().width() + MARGIN * 2
+          width: ref.getNode().width() + MARGIN * 2
         };
       }
       return configs.rect;
@@ -172,7 +182,7 @@ export default {
       if (this.$props.constraintID === TERM.property) {
         return uriToPrefix(
           this.$store.state.mConfig.namespaces,
-          this.getPathFromId(this.$props.to)
+          this.getPropertyFromId(TERM.path, this.$props.to)
         );
       } else {
         return "not a property";
@@ -180,14 +190,39 @@ export default {
     },
 
     /**
-     * Takes in a shapeId for a PropertyShape and returns that PropertyShape's sh:path value.
+     * Returns the cardinality of the PropertyShape, derived from the sh:minCount and sh:maxCount constraints.
+     * This label has the format "x..y" with
+     *  x = 0 when there is no minCount and the value of minCount when it is present
+     *  y = * when there is no maxCount and the value of maxCount when it is present
+     * @returns {string} The text for the cardinality label with the proper formatting and values
+     */
+    getCardinalityLabelText() {
+      const minCount = this.getPropertyFromId(TERM.minCount, this.$props.to);
+      const maxCount = this.getPropertyFromId(TERM.maxCount, this.$props.to);
+
+      this.cardinalityPresent = minCount || maxCount;
+
+      return `${minCount || "0"}..${maxCount || "*"}`;
+    },
+
+    /**
+     * Takes in a shapeId for a PropertyShape and returns that PropertyShape's <property> value.
+     * @param {string} property The property that has to be looked up in the PropertyShape
      * @param {string} id The unique identifier for the PropertyShape
      * @returns {string} That PropertyShape's sh:path value
      */
-    getPathFromId(id) {
+    getPropertyFromId(property, id) {
       for (const shape of this.$store.state.mShape.model) {
         if (shape["@id"] === id) {
-          return shape[TERM.path][0]["@id"];
+          if (shape[property]) {
+            if (shape[property][0]["@id"]) {
+              return shape[property][0]["@id"];
+            } else {
+              return shape[property][0]["@value"];
+            }
+          } else {
+            return undefined;
+          }
         }
       }
       return undefined;
