@@ -2,17 +2,14 @@
 
 export const WIDTH = 250; // Width of a rectangle.
 export const HEIGHT = 40; // Width of a rectangle.
-export const HEIGHT_HEADER = HEIGHT + 10; // Height of the top part of a shape, containing title, kind of shape...
 export const MARGIN = 5;
 export const MARGIN_TOP = 40; // Margin to accomodate the navbar.
 export const OFFSET = 10; // General offset.
 export const TEXT_OFFSET = 15; // Offset for text.
 export const MAX_LENGTH = 30; // Maximum length for labels.
 
-export const RELATIONSHIP_LABEL_OFFSET = 10;
-
 export const TEXT_SIZE = 12; // Default text size.
-const CONSTRAINT_TEXT_SIZE = TEXT_SIZE; // Smaller text size.
+const SMALL_TEXT_SIZE = TEXT_SIZE - 2; // Smaller text size.
 const BUTTON_OFFSET = 240;
 
 /* SHAPES =========================================================================================================== */
@@ -25,7 +22,7 @@ export const SHAPE_CONFIG = {
   y: 0,
   height: HEIGHT,
   width: WIDTH,
-  strokeWidth: 2
+  strokeWidth: 3
 };
 
 /**
@@ -34,9 +31,8 @@ export const SHAPE_CONFIG = {
  */
 export const NODE_SHAPE_CONFIG = {
   ...SHAPE_CONFIG,
-  height: HEIGHT_HEADER,
-  fill: "white",
-  stroke: "black"
+  fill: "lightgreen",
+  stroke: "green"
 };
 
 /**
@@ -45,9 +41,8 @@ export const NODE_SHAPE_CONFIG = {
  */
 export const PROPERTY_SHAPE_CONFIG = {
   ...SHAPE_CONFIG,
-  height: HEIGHT_HEADER,
-  fill: "white",
-  stroke: "black"
+  fill: "lightblue",
+  stroke: "blue"
 };
 
 /**
@@ -61,17 +56,6 @@ export const DESCRIPTION_RECT_CONFIG = {
   stroke: "lightgrey",
   strokeWidth: 1
 };
-
-/**
- * Configuration for the rectangles around the information properties
- * as well as the constraints.
- * @type {{fill: string, stroke: string}}
- */
-export const PROPERTY_RECT_CONFIG = {
-  ...SHAPE_CONFIG,
-  fill: "white",
-  stroke: "black"
-}
 
 /* CONSTRAINTS ====================================================================================================== */
 
@@ -88,12 +72,14 @@ export const CONSTRAINT_SEPARATION_LINE = {
 
 /**
  * Configuration for the constraint rectangle.
- * @type {{width: number, fill: string, height: number}}
+ * @type {{strokeWidth: number, width: number, fill: string, stroke: string, height: number}}
  */
 export const CONSTRAINT_CONFIG = {
-  height: HEIGHT,
+  height: 2 * HEIGHT,
   width: WIDTH,
-  fill: "white"
+  fill: "white",
+  stroke: "black",
+  strokeWidth: 2
 };
 
 /* TEXT ============================================================================================================= */
@@ -115,7 +101,8 @@ const TEXT_CONFIG = {
  */
 export const LABEL_TEXT_CONFIG = {
   ...TEXT_CONFIG,
-  y: OFFSET
+  y: OFFSET,
+  fontStyle: "bold"
 };
 
 /**
@@ -124,9 +111,9 @@ export const LABEL_TEXT_CONFIG = {
  */
 export const URI_TEXT_CONFIG = {
   ...TEXT_CONFIG,
-  y: OFFSET + TEXT_SIZE + 5,
-  fontSize: TEXT_SIZE,
-  fontStyle: "bold"
+  y: OFFSET + TEXT_SIZE + 2,
+  fontSize: SMALL_TEXT_SIZE,
+  fontStyle: "italic"
 };
 
 /**
@@ -134,10 +121,7 @@ export const URI_TEXT_CONFIG = {
  * @type {{width: number, fontSize: number, text: string, align: string}}
  */
 export const CONSTRAINT_TEXT_CONFIG = {
-  ...TEXT_CONFIG,
-  align: "left",
-  width: WIDTH / 2,
-  fontSize: CONSTRAINT_TEXT_SIZE
+  ...TEXT_CONFIG
 };
 
 /**

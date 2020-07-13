@@ -5,7 +5,7 @@ import ValueType, {
 } from "../util/enums/ValueType";
 import { urlToName } from "../util/urlParser";
 import { HEIGHT } from "../config/konvaConfigs";
-import { IGNORED_PROPERTIES, SINGLE_ENTRY } from "../util/constants";
+import { IGNORED_PROPERTIES, SINGLE_ENTRY, INFO_PROPERTIES, RELATIONSHIP_PROPERTIES } from "../util/constants";
 
 /**
  * This module contains everything regarding coordinates, locations and positioning.
@@ -63,8 +63,21 @@ const coordinateModule = {
 
       /* Get the IDs of all the constraints and the number of values for each constraint. */
       const constraints = {};
+      const info = {};
       for (const c in shape) {
-        if (!IGNORED_PROPERTIES.includes(c)) {
+        if (INFO_PROPERTIES.includes(c)) {
+          if ( !(c === "@id" && shape[c][0] === "_") ){
+            const vt = ValueType(c)
+              ? ValueType(c)
+              : getValueTypeFromConstraint(shape[c]);
+            info[c] =
+              shape[c].length > 1
+                ? shape[c].length
+                : vt.includes(ValueTypes.LIST)
+                ? shape[c][0]["@list"].length
+                : shape[c].length;
+          }
+        } else if ( !IGNORED_PROPERTIES.includes(c)  && !RELATIONSHIP_PROPERTIES.includes(c)){
           const vt = ValueType(c)
             ? ValueType(c)
             : getValueTypeFromConstraint(shape[c]);
@@ -79,14 +92,19 @@ const coordinateModule = {
 
       /* Calculate their y values. */
       let i = 1;
-      for (const con of Object.keys(constraints)) {
-        Vue.set(state.yValues[shapeID], con, i * HEIGHT);
-        /* Determine if every value has to be on a separate line. */
-        i += SINGLE_ENTRY.includes(urlToName(con)) ? 2 : 1 + constraints[con];
+      for (const con of Object.keys(info)) {
+        Vue.set(state.yValues[shapeID], con, i * HEIGHT + 10);
+        i += 1;
       }
-
+      if (i === 1){
+        i += 1
+      }
+      for (const con of Object.keys(constraints)) {
+        Vue.set(state.yValues[shapeID], con, i * HEIGHT + 10);
+        i += 1;
+      }
       /* Set the bottom coordinate. */
-      Vue.set(state.heights, shapeID, i * HEIGHT);
+      Vue.set(state.heights, shapeID, i * HEIGHT + 10);
     },
 
     /**

@@ -21,11 +21,14 @@
           :on-click-props="obj.onClick"
         ></relationship>
       </v-group>
+      <div v-for="(obj, key) in this.$store.getters.nonSpecifiedShapes" :key="key">
+        <shape :id="key" :ref="key" :hasType="false"></shape>
+      </div>
       <div v-for="(obj, key) in this.$store.getters.propertyShapes" :key="key">
-        <shape :id="key" :ref="key" :node-shape="false"></shape>
+        <shape :id="key" :ref="key" :hasType="true" :node-shape="false"></shape>
       </div>
       <div v-for="(obj, key) in this.$store.getters.nodeShapes" :key="key">
-        <shape :id="key" :ref="key" :node-shape="true"></shape>
+        <shape :id="key" :ref="key" :hasType="true" :node-shape="true"></shape>
       </div>
     </v-layer>
   </v-stage>

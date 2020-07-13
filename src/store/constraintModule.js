@@ -6,12 +6,16 @@ import getValueType, {
   getValueTypeFromConstraint,
   ValueTypes
 } from "../util/enums/ValueType";
-import { IGNORED_PROPERTIES } from "../util/constants";
+import {
+  IGNORED_PROPERTIES,
+  INFO_PROPERTIES,
+  RELATIONSHIP_PROPERTIES
+} from "../util/constants";
 import predicateModalModule from "./modals/predicateModalModule";
 
 /**
  * This module contains everything to change the shape constraints.
- * @type {{mutations: {setConstraintValue(*, {shape: Object, constraintID: string, value: Object}): void, deleteConstraintFromShape(*, {shape: Object, constraintID?: *}): void}, state: {constraintIndex: number}, getters: {shapeConstraints: (function(*, *, *, *): Function), shapeProperties: (function(*, *, *): function(*): []), shapeIDConstraints: (function(*, *, *, *): function(*=))}, actions: {startConstraintEdit({state: *, commit: *}, {shapeID: string, shapeType: string, constraintID: string, index: number, value: string}): void, updateConstraint({rootGetters: *, commit: *}, {shapeID: string, constraintID: string, newValue: Object}): void, addPredicate({state: *, getters: *, commit: *, dispatch: *, rootState: *}, {shapeID: string, predicate: string, valueType: string, input: string, object: string, language: string}): void, deleteConstraintValueWithIndex({getters: *, commit: *, rootState: *}, {shapeID: string, constraintID: string, valueIndex: number}): void, stopConstraintEdit({state: *, rootGetters: *}, {shapeID: string, predicate: string, object: string, valueType: string, input: string}): void, deleteConstraintValue({getters: *, commit: *, rootState: *}, {shapeID: string, constraintID: string, value: string}): void, deleteConstraintFromShapeWithID({getters: *, commit: *, rootState: *}, {shapeID: string, constraintID: *}): void}, modules: {mModal: *}}}
+ * @type {{mutations: {setConstraintValue(*, {shape: Object, constraintID: string, value: Object}): void, deleteConstraintFromShape(*, {shape: Object, constraintID?: *}): void}, state: {constraintIndex: number}, getters: {shapeConstraints: (function(*, *, *, *): Function), shapeInfo: (function(*, *, *, *): Function), shapeProperties: (function(*, *, *): function(*): []), shapeIDConstraints: (function(*, *, *, *): function(*=))}, actions: {startConstraintEdit({state: *, commit: *}, {shapeID: string, shapeType: string, constraintID: string, index: number, value: string}): void, updateConstraint({rootGetters: *, commit: *}, {shapeID: string, constraintID: string, newValue: Object}): void, addPredicate({state: *, getters: *, commit: *, dispatch: *, rootState: *}, {shapeID: string, predicate: string, valueType: string, input: string, object: string, language: string}): void, deleteConstraintValueWithIndex({getters: *, commit: *, rootState: *}, {shapeID: string, constraintID: string, valueIndex: number}): void, stopConstraintEdit({state: *, rootGetters: *}, {shapeID: string, predicate: string, object: string, valueType: string, input: string}): void, deleteConstraintValue({getters: *, commit: *, rootState: *}, {shapeID: string, constraintID: string, value: string}): void, deleteConstraintFromShapeWithID({getters: *, commit: *, rootState: *}, {shapeID: string, constraintID: *}): void}, modules: {mModal: *}}}
  */
 const constraintModule = {
   state: {
@@ -389,6 +393,48 @@ const constraintModule = {
       if (shape) {
         for (const prop in shape) {
           /* Only handle the constraints that are not ignored. */
+          if (
+            !IGNORED_PROPERTIES.includes(prop) &&
+            !RELATIONSHIP_PROPERTIES.includes(prop)
+          ) {
+            if (shape[prop].length > 1) {
+              /* Get the ID of every element in the list. */
+              const properties = [];
+              Object.values(shape[prop]).map(p => properties.push(p["@id"]));
+              constraints[prop] = properties;
+            } else {
+              constraints[prop] = shape[prop];
+            }
+          }
+        }
+        return constraints;
+      } else {
+        return undefined;
+      }
+    },
+
+  /**
+     * Get a map of the constraints of the shape with the given ID.
+     * This map also includes the relationship constraints and is used to draw the relationships.
+     * ShapeID {string} the ID of the shape whose constraints we want to get.
+     * @param _state
+     * @param _getters
+     * @param _rootState
+     * @param rootGetters
+     * @returns {function}
+     */
+    shapeConstraintsWithRels: (
+      _state,
+      _getters,
+      _rootState,
+      rootGetters
+    ) => shapeID => {
+      const constraints = {};
+      const shape = rootGetters.shapeWithID(shapeID);
+
+      if (shape) {
+        for (const prop in shape) {
+          /* Only handle the constraints that are not ignored. */
           if (!IGNORED_PROPERTIES.includes(prop)) {
             if (shape[prop].length > 1) {
               /* Get the ID of every element in the list. */
@@ -401,6 +447,104 @@ const constraintModule = {
           }
         }
         return constraints;
+      } else {
+        return undefined;
+      }
+    },
+
+    /**
+     * Get the amount of constraints of the shape with the given ID.
+     * ShapeID {string} the ID of the shape whose constraints we want to get.
+     * @param _state
+     * @param _getters
+     * @param _rootState
+     * @param rootGetters
+     * @returns {function}
+     */
+    getConstraintAmount: (
+      _state,
+      _getters,
+      _rootState,
+      rootGetters
+    ) => shapeID => {
+      let i = 0;
+      const shape = rootGetters.shapeWithID(shapeID);
+
+      if (shape) {
+        for (const prop in shape) {
+          if (
+            !IGNORED_PROPERTIES.includes(prop) &&
+            !RELATIONSHIP_PROPERTIES.includes(prop)
+          )
+            i += 1;
+        }
+        return i;
+      } else {
+        return undefined;
+      }
+    },
+
+    /**
+     * Get a map of the information constraints of the shape with the given ID.
+     * ShapeID {string} the ID of the shape whose constraints we want to get.
+     * @param _state
+     * @param _getters
+     * @param _rootState
+     * @param rootGetters
+     * @returns {function}
+     */
+    shapeInfo: (_state, _getters, _rootState, rootGetters) => shapeID => {
+      const constraints = {};
+      const shape = rootGetters.shapeWithID(shapeID);
+
+      if (shape) {
+        for (const prop in shape) {
+          /* Only handle the constraints that are not ignored. */
+          if (INFO_PROPERTIES.includes(prop)) {
+            if (shape[prop].length > 1) {
+              if (prop === "@id") {
+                if (shape[prop][0] !== "_") {
+                  constraints[prop] = shape[prop];
+                }
+              } else {
+                /* Get the ID of every element in the list. */
+                const properties = [];
+                Object.values(shape[prop]).map(p => properties.push(p["@id"]));
+                constraints[prop] = properties;
+              }
+            } else {
+              constraints[prop] = shape[prop];
+            }
+          }
+        }
+        return constraints;
+      } else {
+        return undefined;
+      }
+    },
+
+    /**
+     * Get the amount of information properties of the shape with the given ID.
+     * ShapeID {string} the ID of the shape whose constraints we want to get.
+     * @param _state
+     * @param _getters
+     * @param _rootState
+     * @param rootGetters
+     * @returns {function}
+     */
+    getInfoAmount: (_state, _getters, _rootState, rootGetters) => shapeID => {
+      let i = 0;
+      const shape = rootGetters.shapeWithID(shapeID);
+
+      if (shape) {
+        for (const prop in shape) {
+          if (INFO_PROPERTIES.includes(prop)) i += 1;
+        }
+        const iri = shape["@id"];
+        if (iri) {
+          if (iri[0] === "_") i -= 1;
+        }
+        return i;
       } else {
         return undefined;
       }
@@ -425,7 +569,7 @@ const constraintModule = {
       const output = {};
 
       /* Check every constraint of the given shape. */
-      const constraints = getters.shapeConstraints(shapeID);
+      const constraints = getters.shapeConstraintsWithRels(shapeID);
       for (const c of Object.keys(constraints)) {
         const vt = getValueType(c)
           ? getValueType(c)

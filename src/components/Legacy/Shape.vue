@@ -21,7 +21,7 @@
         </v-group>
 
         <!-- Description -->
-        <v-group v-show="hasDescription() && titleHover">
+        <v-group v-if="hasDescription() && titleHover">
           <v-rect :config="getDescriptionConfig().rect"></v-rect>
           <v-text :config="getDescriptionConfig().title"></v-text>
           <v-text :config="getDescriptionConfig().text"></v-text>
@@ -45,32 +45,16 @@
           @mouseleave="setCursor('')"
         ></v-circle>
       </v-group>
-      
-      <!-- Shape information -->
-      <v-group>
-        <v-rect :config="getInfoShapeConfig()"></v-rect>
-        <div v-for="(prop, key) in getShapeInfo()" :key="key">
-          <constraint
-            :constraint-i-d="key"
-            :shape-i-d="$props.id"
-            :node-shape="$props.nodeShape"
-            :stroke="shapeConfig.stroke"
-          ></constraint>
-        </div>
-      </v-group>
 
       <!-- Constraints -->
-      <v-group>
-        <v-rect :config="getConstraintShapeConfig()"></v-rect>
-        <div v-for="(prop, key) in getConstraints()" :key="key">
-          <constraint
-            :constraint-i-d="key"
-            :shape-i-d="$props.id"
-            :node-shape="$props.nodeShape"
-            :stroke="shapeConfig.stroke"
-          ></constraint>
-        </div>
-      </v-group>
+      <div v-for="(prop, key) in getConstraints()" :key="key">
+        <constraint
+          :constraint-i-d="key"
+          :shape-i-d="$props.id"
+          :node-shape="$props.nodeShape"
+          :stroke="shapeConfig.stroke"
+        ></constraint>
+      </div>
     </v-group>
   </div>
 </template>
@@ -90,15 +74,11 @@ import {
   DESCRIPTION_RECT_CONFIG,
   DESCRIPTION_TITLE_CONFIG,
   DESCRIPTION_TEXT_CONFIG,
-  PROPERTY_RECT_CONFIG,
   MAX_LENGTH,
   TEXT_SIZE,
   pointerCursor,
   resetCursor,
-  textCursor,
-  SHAPE_CONFIG,
-  HEIGHT_HEADER,
-  HEIGHT
+  textCursor
 } from "../../config/konvaConfigs";
 import { TERM } from "../../translation/terminology";
 import { abbreviate } from "../../util/strings";
@@ -112,13 +92,9 @@ export default {
       type: String,
       required: true
     },
-    hasType: {
-      type: Boolean,
-      required: true
-    },
     nodeShape: {
       type: Boolean,
-      required: false
+      required: true
     }
   },
   /**
@@ -137,11 +113,9 @@ export default {
       shapeConfig: this.$props.nodeShape
         ? NODE_SHAPE_CONFIG
         : PROPERTY_SHAPE_CONFIG,
-      shapeLabel: this.$props.hasType
-        ? this.$props.nodeShape
+      shapeLabel: this.$props.nodeShape
         ? "<<NodeConditions>>"
-        : "<<PropertyConditions>>"
-        : "<<Conditions>>",
+        : "<<PropertyConditions>>",
       deleteNodeConfig: DELETE_BUTTON_CONFIG,
       idTextConfig: {
         ...LABEL_TEXT_CONFIG,
@@ -162,7 +136,6 @@ export default {
     /* Update the constraints when the store state changes. */
     this.$store.watch(
       () => self.$store.getters.shapeConstraints(self.$props.id),
-      () => self.$store.getters.shapeInfo(self.$props.id),
       () => {
         self.getConstraints();
         self.getDescriptionConfig();
@@ -177,7 +150,11 @@ export default {
      */
     getLabelTextConfig() {
       const label = this.$store.getters.labelsForIds[this.id];
-      const text = this.shapeLabel;
+      const text = label
+        ? abbreviate(label)
+        : abbreviate(
+            uriToPrefix(this.$store.state.mConfig.namespaces, this.id)
+          );
       return {
         ...LABEL_TEXT_CONFIG,
         y: label ? OFFSET : TEXT_OFFSET,
@@ -192,39 +169,8 @@ export default {
      */
     getURITextConfig() {
       const label = this.$store.getters.labelsForIds[this.id];
-      const text = label ? abbreviate(label) : "";
+      const text = label ? abbreviate(this.id) : "";
       return { ...URI_TEXT_CONFIG, text };
-    },
-
-    /**
-     * Get the config for the rectangle around the shape information
-     * the y value starts below the header
-     * the height is the amount of information properties * the common height of a property box
-     * @returns {object} the configuration for the rectangle around the shape information
-     */
-    getInfoShapeConfig() {
-      const infoAmount = this.$store.getters.getInfoAmount(this.id);
-      return {
-        ...PROPERTY_RECT_CONFIG,
-        height: infoAmount ? infoAmount * HEIGHT : HEIGHT,
-        y: HEIGHT_HEADER
-      }
-    },
-
-    /**
-     * Get the config for the rectangle around the shape constraints
-     * the y value starts below the information rectangle
-     * the height is the amount of constraints * the common height of a property box
-     * @returns {object} the configuration for the rectangle around the shape constraints
-     */
-    getConstraintShapeConfig() {
-      const infoAmount = this.$store.getters.getInfoAmount(this.id);
-      const constraintAmount = this.$store.getters.getConstraintAmount(this.id);
-      return {
-        ...PROPERTY_RECT_CONFIG,
-        height: constraintAmount ? constraintAmount * HEIGHT : HEIGHT,
-        y: infoAmount ? HEIGHT_HEADER + (infoAmount * HEIGHT) : HEIGHT_HEADER + HEIGHT
-      }
     },
 
     /**
@@ -285,15 +231,6 @@ export default {
      */
     getConstraints() {
       return this.$store.getters.shapeConstraints(this.$props.id);
-    },
-
-    /**
-     * Get an object containing all the information about the shape.
-     * @returns {object} an object mapping every informative constraint name to a (list of) values.
-     */
-    getShapeInfo() {
-      // console.log(this.$store.getters.shapeInfo(this.$props.id));
-      return this.$store.getters.shapeInfo(this.$props.id);
     },
 
     /**

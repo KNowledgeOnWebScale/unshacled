@@ -1,37 +1,18 @@
 <template>
-  <v-group>
-    <v-rect :config="getConfigs().rectangleConfig"></v-rect>
-
-    <v-group @mouseenter="hoverKey = true" @mouseleave="hoverKey = false">
-      <v-text ref="key" :config="getConfigs().keyConfig"></v-text>
-      <v-circle
-        v-if="hoverKey && canBeDeleted()"
-        :config="getConfigs().deleteConstraint"
-        @click="deleteConstraint"
-        @mouseenter="setCursor('pointer')"
-        @mouseleave="setCursor('')"
-      ></v-circle>
-    </v-group>
-
-    <v-line :config="getConfigs().lineConfig"></v-line>
-
-    <v-group @mouseenter="hoverValues = true" @mouseleave="hoverValues = false">
-      <div v-for="(value, index) of getConstraintValues()" :key="index">
-        <v-text
-          :config="getValueConfig(value, index)"
-          @click="editValue(index)"
-          @mouseenter="setCursor('text')"
-          @mouseleave="setCursor('')"
-        ></v-text>
-        <v-circle
-          v-if="hoverValues && !isListOfValues() && canBeDeleted()"
-          :config="getDeleteValueConfig(index)"
-          @click="deleteConstraintValue(index)"
-          @mouseenter="setCursor('pointer')"
-          @mouseleave="setCursor('')"
-        ></v-circle>
-      </div>
-    </v-group>
+  <v-group @mouseenter="hoverKey = true" @mouseleave="hoverKey = false">
+    <v-text ref="key" :config="getConfigs().keyConfig"></v-text>
+    <v-text 
+      :config="getValueConfig(getConstraintValues())"
+      @click="editValue(0)"
+      @mouseenter="setCursor('text')"
+      @mouseleave="setCursor('')"></v-text>
+    <v-circle
+      v-if="hoverKey && canBeDeleted()"
+      :config="getConfigs().deleteConstraint"
+      @click="deleteConstraint"
+      @mouseenter="setCursor('pointer')"
+      @mouseleave="setCursor('')"
+    ></v-circle>
   </v-group>
 </template>
 
@@ -41,7 +22,6 @@ import {
   WIDTH,
   CONSTRAINT_CONFIG,
   CONSTRAINT_TEXT_CONFIG,
-  CONSTRAINT_SEPARATION_LINE,
   DELETE_BUTTON_CONFIG,
   TEXT_OFFSET,
   MAX_LENGTH,
@@ -50,7 +30,7 @@ import {
   resetCursor
 } from "../../config/konvaConfigs";
 import { uriToPrefix, urlToName } from "../../util/urlParser";
-import { SINGLE_ENTRY } from "../../util/constants";
+import { SINGLE_ENTRY, APPLIES_ON } from "../../util/constants";
 import ValueType, {
   getValueTypeFromConstraint,
   ValueTypes
@@ -83,39 +63,31 @@ export default {
    * HoverKey {boolean} indicates if the mouse is hovering over the key of the constraint.
    * HoverValues {boolean} indicates if the mouse is hovering over the values of the constraint.
    *
-   * LineConfig {} the configuration of the line that seperates the key and the value.
    * RectangleConfig {} the configuration of the rectangle.
    * KeyConfig {} the configuration of the key text field.
    * ValueConfig {} the configuration of the value text field.
    * DeleteConstraintConfig {} the configuration of the delete button.
    *
-   * @returns {{hoverKey: boolean, hoverValues: boolean, lineConfig: {}, rectangleConfig: {}, keyConfig: {}, valueConfig: {}, deleteConstraintConfig: {}}}
+   * @returns {{hoverKey: boolean, hoverValues: boolean, rectangleConfig: {}, keyConfig: {}, valueConfig: {}, deleteConstraintConfig: {}}}
    */
   data() {
     return {
       hoverKey: false,
       hoverValues: false,
 
-      lineConfig: {
-        ...CONSTRAINT_SEPARATION_LINE,
-        points: [0, HEIGHT, WIDTH, HEIGHT] // [x1, y1, x2, y2]
-      },
       rectangleConfig: {
         ...CONSTRAINT_CONFIG,
         stroke: this.$props.stroke
       },
       keyConfig: {
         ...CONSTRAINT_TEXT_CONFIG,
-        y: TEXT_OFFSET,
-        fontStyle: "italic",
-        text: uriToPrefix(
-          this.$store.state.mConfig.namespaces,
-          this.$props.constraintID
-        )
+        x: TEXT_OFFSET,
+        y: TEXT_OFFSET
       },
       valueConfig: {
         ...CONSTRAINT_TEXT_CONFIG,
-        y: TEXT_OFFSET + HEIGHT
+        y: TEXT_OFFSET,
+        x: WIDTH / 3
       },
       deleteConstraintConfig: {
         ...DELETE_BUTTON_CONFIG,
@@ -242,18 +214,45 @@ export default {
     },
 
     /**
+     * Get the correct value formatting for when a key is one of the "appliesOn" keys
+     * @param {string} key the key, used to check which formatting shoudl be applied to the value.
+     * @param {string} value the value that has to be formatted.
+     * @returns {string} the formatted value.
+     */
+    appliesOnValue (key, value) {
+      let namespaces = this.$store.state.mConfig.namespaces;
+      switch (key) {
+        case TERM.targetNode:
+          return `instance(${uriToPrefix(namespaces, value)})`;
+        case TERM.targetClass:
+          return `class(${uriToPrefix(namespaces, value)})`;
+        case TERM.targetSubjectsOf:
+          return `subjectsOf(${uriToPrefix(namespaces, value)})`;
+        case TERM.targetObjectsOf:
+          return `objectsOf(${uriToPrefix(namespaces, value)})`;
+      }
+    },
+
+    /**
      * Get all the constraint values of this predicate, used to visualize the constraint.
      * @returns {[string]} a list of all the constraint values as strings.
      */
     getConstraintValues() {
       const { shapeID, constraintID } = this.$props;
+      const info = this.$store.getters.shapeInfo(shapeID);
       const constraints = this.$store.getters.shapeConstraints(shapeID);
       const output = [];
+
+      Object.assign(constraints, info);
 
       if (constraints && constraints[constraintID]) {
         if (constraintID === TERM.path) {
           /* Show the full path. */
           return [constraints[constraintID][0]["@id"]];
+        } else if (constraintID === "@id"){
+          return constraints[constraintID];
+        } else if (APPLIES_ON.includes(constraintID)){
+          return this.appliesOnValue(constraintID, constraints[constraintID][0]["@id"]);
         }
 
         /* Get the constraint's value type. */
@@ -306,21 +305,6 @@ export default {
       return output;
     },
 
-    /**
-     * Get the number of constraint values in this constraint.
-     * This is used to determine the size of the rectangle.
-     * @returns {number} the number of constraint values.
-     */
-    getNumConstraintValues() {
-      const { shapeID, constraintID } = this.$props;
-      const cvs = this.$store.getters.shapeWithID(shapeID)[constraintID];
-      return SINGLE_ENTRY.includes(urlToName(constraintID))
-        ? 1 /* For certain constraints, the values will be listed as a single value. */
-        : cvs.length > 0 && cvs[0]["@list"]
-        ? cvs[0]["@list"].length // Get the number of elements if it's a list.
-        : cvs.length;
-    },
-
     /* CONFIGURATIONS =============================================================================================== */
 
     /**
@@ -336,25 +320,35 @@ export default {
     /**
      * Get the configurations for the different visualization components.
      * This is mainly to dynamically set the y values and heights of the different components.
-     * @returns {{lineConfig: object, rectangleConfig: object, keyConfig: object, valueConfig: object, deleteConstraint: object}}
+     * @returns {{rectangleConfig: object, keyConfig: object, valueConfig: object, deleteConstraint: object}}
      */
     getConfigs() {
       /* Determine the current y value. */
       const y = this.getYValue();
-      const points = [...this.lineConfig.points];
-      points[1] += y;
-      points[3] += y;
+
+      const key = this.$props.constraintID;
+      let keyText;
+      if ( key === "@id" ){
+        keyText = "IRI"
+      } else if ( APPLIES_ON.includes(key) ){
+        keyText = "appliesOn"
+      } else {
+        keyText = uriToPrefix(
+            this.$store.state.mConfig.namespaces,
+            this.$props.constraintID
+            )
+      }
 
       return {
-        lineConfig: { ...this.lineConfig, points },
         rectangleConfig: {
           ...this.rectangleConfig,
           y,
-          height: (this.getNumConstraintValues() + 1) * HEIGHT
+          height: HEIGHT
         },
         keyConfig: {
           ...this.keyConfig,
-          y: this.keyConfig.y + y
+          y: this.keyConfig.y + y,
+          text: keyText
         },
         valueConfig: {
           ...this.valueConfig,
@@ -374,13 +368,18 @@ export default {
      * @param {number} index the index of the constraint value.
      * @returns {{y: number, text: string}}
      */
-    getValueConfig(value, index) {
+    getValueConfig(value) {
+      if ( value.length === 1 ){
+        const val = value[0];
+        value = val;
+      }
       const text = uriToPrefix(this.$store.state.mConfig.namespaces, value);
+      
       // Determine if the value has to move up to free up space for the label/name.
       const move = text.length - 2 > MAX_LENGTH ? -HEIGHT / 6 : 0;
       return {
         ...this.valueConfig,
-        y: this.valueConfig.y + this.getYValue() + index * HEIGHT + move,
+        y: this.valueConfig.y + this.getYValue() + move,
         text
       };
     },
