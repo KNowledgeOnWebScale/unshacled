@@ -169,20 +169,36 @@ export default {
      */
     getValidationResults() {
       const { graph } = this.$props.report;
+      console.log(this.$props.report);
       if (graph) {
         const validationResults = {};
         for (const result of graph) {
           if (result["@type"][0].includes("Result")) {
             validationResults[result["@id"]] = {
-              node: result[`${SHACL_URI}focusNode`][0]["@id"],
-              message: result[`${SHACL_URI}resultMessage`][0]["@value"],
-              path: result[`${SHACL_URI}resultPath`][0]["@id"],
-              severity: result[`${SHACL_URI}resultSeverity`][0]["@id"],
-              constraint:
-                result[`${SHACL_URI}sourceConstraintComponent`][0]["@id"],
-              shape: result[`${SHACL_URI}sourceShape`][0]["@id"],
-              valueType: result[`${SHACL_URI}value`][0]["@type"],
-              value: result[`${SHACL_URI}value`][0]["@value"]
+              node: result[`${SHACL_URI}focusNode`]
+                ? result[`${SHACL_URI}focusNode`][0]["@id"]
+                : "Not provided by validation engine",
+              message: result[`${SHACL_URI}resultMessage`]
+                ? result[`${SHACL_URI}resultMessage`][0]["@value"]
+                : "Not provided by validation engine",
+              path: result[`${SHACL_URI}resultPath`]
+                ? result[`${SHACL_URI}resultPath`][0]["@id"]
+                : "Not provided by validation engine",
+              severity: result[`${SHACL_URI}resultSeverity`]
+                ? result[`${SHACL_URI}resultSeverity`][0]["@id"]
+                : "Not provided by validation engine",
+              constraint: result[`${SHACL_URI}sourceConstraintComponent`]
+                ? result[`${SHACL_URI}sourceConstraintComponent`][0]["@id"]
+                : "Not provided by validation engine",
+              shape: result[`${SHACL_URI}sourceShape`]
+                ? result[`${SHACL_URI}sourceShape`][0]["@id"]
+                : "Not provided by validation engine",
+              valueType: result[`${SHACL_URI}value`]
+                ? result[`${SHACL_URI}value`][0]["@type"]
+                : "Not provided by validation engine",
+              value: result[`${SHACL_URI}value`]
+                ? result[`${SHACL_URI}value`][0]["@value"]
+                : "Not provided by validation engine"
             };
           }
         }
