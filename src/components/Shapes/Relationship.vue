@@ -8,7 +8,7 @@
     <v-group
       v-if="cardinalityPresent"
       ref="cardinalityLabel"
-      :config="getConfigs().cardinalityLabel"
+      :config="getCardinalityLabelConfig()"
     >
       <v-rect :config="getRectConfig(this.$refs.cardinalityText)"></v-rect>
       <v-text
@@ -72,7 +72,8 @@ export default {
   data() {
     return {
       hover: false,
-      cardinalityPresent: false
+      cardinalityPresent: false,
+      cardinalityLeft: false
     };
   },
   methods: {
@@ -87,6 +88,12 @@ export default {
         heights,
         yValues
       } = this.$store.state.mShape.mCoordinate;
+
+      /* Check whether the cardinality label should be put on the left side or the right side of the arrowpoint */
+      this.cardinalityLeft =
+        coordinates[to].x + WIDTH > coordinates[from].x + WIDTH / 2 &&
+        coordinates[to].y <
+          coordinates[from].y + RELATIONSHIP_LABEL_RECT_CONFIG.height;
 
       /* Determine the center points of the start shape. */
       const start = {
@@ -165,6 +172,7 @@ export default {
      * Get the configuration for a label rectangle.
      * This one is not included in `getConfigs` because it relies on the previously drawn text.
      * This checks how wide the text in the label is and adjusts the rectangle accordingly.
+     * @param {string} ref The reference for the label text.
      * @returns {any} a configuration object.
      */
     getRectConfig(ref) {
@@ -176,6 +184,31 @@ export default {
         };
       }
       return configs.rect;
+    },
+
+    /**
+     * Get the configuration for the cardinality label, this puts the label on the left side of
+     * the arrow point if the label is hidden behind the "to" shape, otherwise just leaves it on the right side.
+     * @returns {object} a configuration object.
+     */
+    getCardinalityLabelConfig() {
+      const configs = this.getConfigs();
+      if (this.cardinalityLeft) {
+        if (
+          this.$refs.cardinalityText &&
+          this.$refs.cardinalityText.getNode()
+        ) {
+          return {
+            ...configs.cardinalityLabel,
+            x:
+              configs.cardinalityLabel.x -
+              2 * RELATIONSHIP_LABEL_OFFSET -
+              this.$refs.cardinalityText.getNode().width(),
+            y: configs.cardinalityLabel.y + 2 * RELATIONSHIP_LABEL_OFFSET
+          };
+        }
+      }
+      return configs.cardinalityLabel;
     },
 
     /**
