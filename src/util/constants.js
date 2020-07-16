@@ -28,15 +28,10 @@ export const APPLIES_ON = [
   TERM.targetClass,
   TERM.targetSubjectsOf,
   TERM.targetObjectsOf
-]
+];
 
 /* All properties that get visualised in the second 'info' box of a ShapeUML shape */
-export const INFO_PROPERTIES = [
-  "@id",
-  TERM.path,
-  ...APPLIES_ON,
-  TERM.severity
-];
+export const INFO_PROPERTIES = ["@id", TERM.path, ...APPLIES_ON, TERM.severity, TERM.message];
 
 /* Properties that are ignored when visualizing. */
 export const IGNORED_PROPERTIES = [
@@ -53,4 +48,14 @@ export const RELATIONSHIP_PROPERTIES = [
   TERM.or,
   TERM.xone,
   TERM.property
-]
+];
+
+/* These properties have to be visualised in a different way. They change up the path for a PropertyShape */
+export const PATH_PROPERTIES = [
+  TERM.path,
+  TERM.alternativePath,
+  TERM.inversePath,
+  TERM.zeroOrMorePath,
+  TERM.zeroOrOnePath,
+  TERM.oneOrMorePath
+];

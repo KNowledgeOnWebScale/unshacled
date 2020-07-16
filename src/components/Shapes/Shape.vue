@@ -310,6 +310,7 @@ export default {
       /* Update the coordinates of this shape. */
       this.$store.commit("updateCoordinates", {
         shapeID: this.$props.id,
+        shapes: this.$store.state.mShape.model,
         x: pos.x,
         y: pos.y
       });
