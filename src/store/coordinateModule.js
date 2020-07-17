@@ -3,10 +3,13 @@ import ValueType, {
   getValueTypeFromConstraint,
   ValueTypes
 } from "../util/enums/ValueType";
-import { urlToName } from "../util/urlParser";
 import { HEIGHT } from "../config/konvaConfigs";
-import { IGNORED_PROPERTIES, SINGLE_ENTRY, INFO_PROPERTIES, RELATIONSHIP_PROPERTIES } from "../util/constants";
-import { isBlankPathNode } from "../util/isBlankPathNode";
+import {
+  IGNORED_PROPERTIES,
+  INFO_PROPERTIES,
+  RELATIONSHIP_PROPERTIES
+} from "../util/constants";
+import { isBlankPathNode } from "../util/pathPropertyUtil";
 
 /**
  * This module contains everything regarding coordinates, locations and positioning.
@@ -68,7 +71,7 @@ const coordinateModule = {
         const info = {};
         for (const c in shape) {
           if (INFO_PROPERTIES.includes(c)) {
-            if ( !(c === "@id" && shape[c][0] === "_") ){
+            if (!(c === "@id" && shape[c][0] === "_")) {
               const vt = ValueType(c)
                 ? ValueType(c)
                 : getValueTypeFromConstraint(shape[c]);
@@ -79,7 +82,10 @@ const coordinateModule = {
                   ? shape[c][0]["@list"].length
                   : shape[c].length;
             }
-          } else if ( !IGNORED_PROPERTIES.includes(c)  && !RELATIONSHIP_PROPERTIES.includes(c)){
+          } else if (
+            !IGNORED_PROPERTIES.includes(c) &&
+            !RELATIONSHIP_PROPERTIES.includes(c)
+          ) {
             const vt = ValueType(c)
               ? ValueType(c)
               : getValueTypeFromConstraint(shape[c]);
@@ -98,8 +104,8 @@ const coordinateModule = {
           Vue.set(state.yValues[shapeID], con, i * HEIGHT + 10);
           i += 1;
         }
-        if (i === 1){
-          i += 1
+        if (i === 1) {
+          i += 1;
         }
         for (const con of Object.keys(constraints)) {
           Vue.set(state.yValues[shapeID], con, i * HEIGHT + 10);
@@ -122,7 +128,7 @@ const coordinateModule = {
       for (const item of shapes) {
         if (item["@id"] === shapeID) shape = item;
       }
-      if (!isBlankPathNode(shape)){
+      if (!isBlankPathNode(shape)) {
         Vue.set(state.coordinates, shapeID, { x, y });
       }
     },

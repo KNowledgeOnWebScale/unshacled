@@ -1,7 +1,7 @@
 import Vue from "vue";
 import constraintModule from "./constraintModule";
 import { generateUUID, getNonOverlappingCoordinates } from "../util";
-import { isBlankPathNode } from "../util/isBlankPathNode";
+import { isBlankPathNode } from "../util/pathPropertyUtil";
 import coordinateModule from "./coordinateModule";
 import { LABEL, SHACL_URI } from "../util/constants";
 import { TERM } from "../translation/terminology";
@@ -58,7 +58,7 @@ const shapeModule = {
 
       /* Update y values and set coordinates. */
       for (const shape of state.model) {
-        if (!isBlankPathNode(shape)){
+        if (!isBlankPathNode(shape)) {
           this.commit("updateYValues", {
             shapeID: shape["@id"],
             shapes: state.model
@@ -68,7 +68,12 @@ const shapeModule = {
             bottomYs: getters.allBottomYs,
             heights: state.mCoordinate.heights
           });
-          this.commit("updateCoordinates", { shapeID: shape["@id"], shapes: state.model, x, y });
+          this.commit("updateCoordinates", {
+            shapeID: shape["@id"],
+            shapes: state.model,
+            x,
+            y
+          });
         }
       }
     },
@@ -349,7 +354,12 @@ const shapeModule = {
     nodeShapes(state) {
       const nodeShapes = {};
       for (const item of state.model) {
-        if (item["@type"] &&  item["@type"][0] === TERM.NodeShape && !isBlankPathNode(item)) nodeShapes[item["@id"]] = item;
+        if (
+          item["@type"] &&
+          item["@type"][0] === TERM.NodeShape &&
+          !isBlankPathNode(item)
+        )
+          nodeShapes[item["@id"]] = item;
       }
       return nodeShapes;
     },
@@ -360,19 +370,30 @@ const shapeModule = {
     propertyShapes(state) {
       const propertyShapes = {};
       for (const item of state.model) {
-        if (((item["@type"] &&  item["@type"][0] === TERM.PropertyShape) || item[TERM.path]) && !isBlankPathNode(item)) propertyShapes[item["@id"]] = item;
+        if (
+          ((item["@type"] && item["@type"][0] === TERM.PropertyShape) ||
+            item[TERM.path]) &&
+          !isBlankPathNode(item)
+        )
+          propertyShapes[item["@id"]] = item;
       }
       return propertyShapes;
     },
 
     /**
      * Get a dictionary mapping ID's to the respective property shape objects.
-     * @param state 
+     * @param state
      */
     nonSpecifiedShapes(state) {
       const shapes = {};
       for (const item of state.model) {
-        if (((item["@type"] &&  item["@type"][0] === TERM.Shape) || !(item["@type"] || item[TERM.path])) && !isBlankPathNode(item)) shapes[item["@id"]] = item;
+        if (
+          ((item["@type"] && item["@type"][0] === TERM.Shape) ||
+            !(item["@type"] || item[TERM.path])) &&
+          !isBlankPathNode(item)
+        ) {
+          shapes[item["@id"]] = item;
+        }
       }
       return shapes;
     },

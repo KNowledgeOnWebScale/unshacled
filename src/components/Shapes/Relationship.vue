@@ -44,6 +44,7 @@ import {
 import { nearestPointOnPerimeter, distance } from "../../util/calculations";
 import { uriToPrefix } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
+import { isBlankPathNode, parsePath } from "../../util/pathPropertyUtil";
 
 export default {
   name: "Relationship",
@@ -217,10 +218,27 @@ export default {
      */
     getLabelText() {
       if (this.$props.constraintID === TERM.property) {
-        return uriToPrefix(
-          this.$store.state.mConfig.namespaces,
-          this.getPropertyFromId(TERM.path, this.$props.to)
-        );
+        const path = this.getPropertyFromId(TERM.path, this.$props.to);
+        if (path["@value"]) {
+          return path["@value"];
+        } else if (path["@id"]) {
+          const pathNode = this.$store.getters.shapeWithID(path["@id"]);
+          if (pathNode && isBlankPathNode(pathNode)) {
+            return parsePath({
+              partialPath: path["@id"],
+              getters: this.$store.getters
+            });
+          } else {
+            return uriToPrefix(this.$store.getters.namespaces, path["@id"]);
+          }
+        } else if (path["@list"]) {
+          return parsePath({
+            partialPath: path["@list"],
+            getters: this.$store.getters
+          });
+        } else {
+          return "value missing";
+        }
       } else {
         return "not a property";
       }
@@ -234,8 +252,11 @@ export default {
      * @returns {string} The text for the cardinality label with the proper formatting and values
      */
     getCardinalityLabelText() {
-      const minCount = this.getPropertyFromId(TERM.minCount, this.$props.to);
-      const maxCount = this.getPropertyFromId(TERM.maxCount, this.$props.to);
+      const cardMin = this.getPropertyFromId(TERM.minCount, this.$props.to);
+      const minCount = cardMin ? cardMin["@value"] : undefined;
+
+      const cardMax = this.getPropertyFromId(TERM.maxCount, this.$props.to);
+      const maxCount = cardMax ? cardMax["@value"] : undefined;
 
       this.cardinalityPresent = minCount || maxCount;
 
@@ -252,11 +273,7 @@ export default {
       for (const shape of this.$store.state.mShape.model) {
         if (shape["@id"] === id) {
           if (shape[property]) {
-            if (shape[property][0]["@id"]) {
-              return shape[property][0]["@id"];
-            } else {
-              return shape[property][0]["@value"];
-            }
+            return shape[property][0];
           } else {
             return undefined;
           }
