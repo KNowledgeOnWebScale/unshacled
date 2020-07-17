@@ -92,7 +92,6 @@ export function parsePath({ partialPath, getters }) {
         })})+`;
       }
     } else {
-      console.log(partialPath);
       return uriToPrefix(getters.namespaces, partialPath);
     }
   }
