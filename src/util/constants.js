@@ -42,8 +42,14 @@ export const IGNORED_PROPERTIES = [
   TERM.description
 ];
 
+export const COMPLIES_WITH = [
+  TERM.node,
+  TERM.qualifiedValueShape
+];
+
 /* These properties have to be included in the properties of a shape, but can't be shown as text, only as a relationship */
 export const RELATIONSHIP_PROPERTIES = [
+  ...COMPLIES_WITH,
   TERM.and,
   TERM.or,
   TERM.xone,

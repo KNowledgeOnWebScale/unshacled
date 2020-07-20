@@ -37,6 +37,7 @@ import {
   RELATIONSHIP_LABEL_RECT_CONFIG,
   RELATIONSHIP_LABEL_TEXT_CONFIG,
   RELATIONSHIP_LABEL_OFFSET,
+  RELATIONSHIP_DASH_ARRAY,
   MARGIN,
   pointerCursor,
   resetCursor
@@ -45,6 +46,7 @@ import { nearestPointOnPerimeter, distance } from "../../util/calculations";
 import { uriToPrefix } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
 import { isBlankPathNode, parsePath } from "../../util/pathPropertyUtil";
+import { COMPLIES_WITH } from "../../util/constants";
 
 export default {
   name: "Relationship",
@@ -143,6 +145,8 @@ export default {
       return {
         line: {
           ...RELATIONSHIP_ARROW_CONFIG,
+          dash: RELATIONSHIP_DASH_ARRAY,
+          dashEnabled: COMPLIES_WITH.includes(this.$props.constraintID),
           points
         },
         label: {
@@ -239,8 +243,10 @@ export default {
         } else {
           return "value missing";
         }
+      } else if (COMPLIES_WITH.includes(this.$props.constraintID)) {
+        return "compliesWith";
       } else {
-        return "not a property";
+        return "no label";
       }
     },
 
@@ -252,10 +258,22 @@ export default {
      * @returns {string} The text for the cardinality label with the proper formatting and values
      */
     getCardinalityLabelText() {
-      const cardMin = this.getPropertyFromId(TERM.minCount, this.$props.to);
+      const compliesWith = COMPLIES_WITH.includes(this.$props.constraintID);
+
+      let cardMin;
+      if (!compliesWith) {
+        cardMin = this.getPropertyFromId(TERM.minCount, this.$props.to);
+      } else {
+        cardMin = this.getPropertyFromId(TERM.qualifiedMinCount, this.$props.from);
+      }
       const minCount = cardMin ? cardMin["@value"] : undefined;
 
-      const cardMax = this.getPropertyFromId(TERM.maxCount, this.$props.to);
+      let cardMax;
+      if (!compliesWith) {
+        cardMax = this.getPropertyFromId(TERM.maxCount, this.$props.to);
+      } else {
+        cardMax = this.getPropertyFromId(TERM.qualifiedMaxCount, this.$props.from);
+      }
       const maxCount = cardMax ? cardMax["@value"] : undefined;
 
       this.cardinalityPresent = minCount || maxCount;

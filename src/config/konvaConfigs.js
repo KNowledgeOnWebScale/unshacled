@@ -9,7 +9,8 @@ export const OFFSET = 10; // General offset.
 export const TEXT_OFFSET = 15; // Offset for text.
 export const MAX_LENGTH = 30; // Maximum length for labels.
 
-export const RELATIONSHIP_LABEL_OFFSET = 10;
+export const RELATIONSHIP_LABEL_OFFSET = 10; // How far a label should be offset from the relationship arrow
+export const RELATIONSHIP_DASH_ARRAY = [10, 10]; // The dash array for a relationship, to be used for e.g. compliesWith
 
 export const TEXT_SIZE = 12; // Default text size.
 const CONSTRAINT_TEXT_SIZE = TEXT_SIZE; // Smaller text size.
@@ -71,7 +72,7 @@ export const PROPERTY_RECT_CONFIG = {
   ...SHAPE_CONFIG,
   fill: "white",
   stroke: "black"
-}
+};
 
 /* CONSTRAINTS ====================================================================================================== */
 
