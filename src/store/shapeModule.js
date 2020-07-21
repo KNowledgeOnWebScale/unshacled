@@ -3,7 +3,7 @@ import constraintModule from "./constraintModule";
 import { generateUUID, getNonOverlappingCoordinates } from "../util";
 import { isBlankPathNode } from "../util/pathPropertyUtil";
 import coordinateModule from "./coordinateModule";
-import { LABEL, SHACL_URI } from "../util/constants";
+import { LABEL, SHACL_URI, LOGICAL_RELATIONSHIPS } from "../util/constants";
 import { TERM } from "../translation/terminology";
 import getValueType from "../util/enums/ValueType";
 import ShaclTranslator from "../translation/shaclTranslator";
@@ -424,6 +424,46 @@ const shapeModule = {
               constraintID,
               onClick: { shapeID, constraintID, value: idValue }
             });
+          }
+        }
+      }
+      return output;
+    },
+
+    /**
+     * All logical relationships, with their "to" values grouped together in a list.
+     * @param state
+     * @param getters
+     */
+    logicalRelationships: (state, getters) => {
+      const { shapes } = getters;
+      const output = [];
+
+      /* Check every shape. */
+      for (const shapeID of Object.keys(shapes)) {
+        const idConstraints = getters.shapeIDConstraints(shapeID);
+
+        /* Handle every constraint. */
+        for (const constraintID of Object.keys(idConstraints)) {
+          for (const idValue of idConstraints[constraintID]) {
+            /* Create an object to represent the relationship. */
+            if (LOGICAL_RELATIONSHIPS.includes(constraintID)) {
+              let alreadyPresent = false;
+              for (const rel of output) {
+                if (rel.constraintID === constraintID && rel.from === shapeID) {
+                  rel.to.push(idValue);
+                  alreadyPresent = true;
+                  break;
+                }
+              }
+              if (!alreadyPresent) {
+                output.push({
+                  from: shapeID,
+                  to: [idValue],
+                  constraintID
+                });
+              }
+            }
           }
         }
       }

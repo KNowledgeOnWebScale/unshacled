@@ -2,7 +2,8 @@
 
 export const WIDTH = 250; // Width of a rectangle.
 export const HEIGHT = 40; // Width of a rectangle.
-export const HEIGHT_HEADER = HEIGHT + 10; // Height of the top part of a shape, containing title, kind of shape...
+export const HEADER_MARGIN = 10;
+export const HEIGHT_HEADER = HEIGHT + HEADER_MARGIN; // Height of the top part of a shape, containing title, kind of shape...
 export const MARGIN = 5;
 export const MARGIN_TOP = 40; // Margin to accomodate the navbar.
 export const OFFSET = 10; // General offset.
@@ -10,7 +11,10 @@ export const TEXT_OFFSET = 15; // Offset for text.
 export const MAX_LENGTH = 30; // Maximum length for labels.
 
 export const RELATIONSHIP_LABEL_OFFSET = 10; // How far a label should be offset from the relationship arrow
-export const RELATIONSHIP_DASH_ARRAY = [10, 10]; // The dash array for a relationship, to be used for e.g. compliesWith
+const RELATIONSHIP_DASH = 10;
+export const RELATIONSHIP_DASH_ARRAY = [RELATIONSHIP_DASH, RELATIONSHIP_DASH]; // The dash array for a relationship, to be used for e.g. compliesWith
+export const LOGICAL_RELATIONSHIP_OFFSET = 30;
+export const LOGICAL_RELATIONSHIP_APPENDAGE = 50;
 
 export const TEXT_SIZE = 12; // Default text size.
 const CONSTRAINT_TEXT_SIZE = TEXT_SIZE; // Smaller text size.
@@ -125,7 +129,7 @@ export const LABEL_TEXT_CONFIG = {
  */
 export const URI_TEXT_CONFIG = {
   ...TEXT_CONFIG,
-  y: OFFSET + TEXT_SIZE + 5,
+  y: OFFSET + TEXT_SIZE + MARGIN,
   fontSize: TEXT_SIZE,
   fontStyle: "bold"
 };
@@ -199,13 +203,21 @@ export const ADD_PREDICATE_CONFIG = {
 /* RELATIONSHIPS ==================================================================================================== */
 
 /**
- * Configuration for relationship arrows.
- * @type {{strokeWidth: number, pointerWidth: number, pointerLength: number, fill: string, stroke: string}}
+ * Configuration for relationship lines.
+ * @type {{strokeWidth: number, fill: string, stroke: string}}
  */
-export const RELATIONSHIP_ARROW_CONFIG = {
+export const RELATIONSHIP_LINE_CONFIG = {
   stroke: "black",
   fill: "black",
-  strokeWidth: 4,
+  strokeWidth: 4
+};
+
+/**
+ * Configuration for relationship arrows.
+ * @type {{pointerWidth: number, pointerLength: number}}
+ */
+export const RELATIONSHIP_ARROW_CONFIG = {
+  ...RELATIONSHIP_LINE_CONFIG,
   pointerLength: 10,
   pointerWidth: 10
 };

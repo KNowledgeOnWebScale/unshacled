@@ -21,6 +21,20 @@
           :on-click-props="obj.onClick"
         ></relationship>
       </v-group>
+
+      <v-group
+        v-for="(obj, key) in this.$store.getters.logicalRelationships"
+        :key="obj.from"
+        ref="logicalRelationships"
+      >
+        <logical-relationship
+          :id="key"
+          :from="obj.from"
+          :to="obj.to"
+          :constraint-i-d="obj.constraintID"
+        ></logical-relationship>
+      </v-group>
+
       <div v-for="(obj, key) in this.$store.getters.nonSpecifiedShapes" :key="key">
         <shape :id="key" :ref="key" :has-type="false"></shape>
       </div>
@@ -37,11 +51,12 @@
 <script>
 import Shape from "./Shapes/Shape.vue";
 import Relationship from "./Shapes/Relationship.vue";
+import LogicalRelationship from "./Shapes/LogicalRelationship.vue";
 import { MARGIN_TOP } from "../config/konvaConfigs";
 
 export default {
   name: "Editor",
-  components: { Relationship, Shape },
+  components: { Relationship, Shape, LogicalRelationship },
 
   /**
    * ConfigKonva {{width: number, height: number}} the configuration for the Konva stage.

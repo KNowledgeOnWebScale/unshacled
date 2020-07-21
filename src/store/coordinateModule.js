@@ -3,7 +3,7 @@ import ValueType, {
   getValueTypeFromConstraint,
   ValueTypes
 } from "../util/enums/ValueType";
-import { HEIGHT } from "../config/konvaConfigs";
+import { HEIGHT, HEADER_MARGIN } from "../config/konvaConfigs";
 import {
   IGNORED_PROPERTIES,
   INFO_PROPERTIES,
@@ -19,7 +19,8 @@ const coordinateModule = {
   state: {
     yValues: {},
     coordinates: {},
-    heights: {}
+    heights: {},
+    relationshipCoordinates: {}
   },
 
   mutations: {
@@ -101,25 +102,25 @@ const coordinateModule = {
         /* Calculate their y values. */
         let i = 1;
         for (const con of Object.keys(info)) {
-          Vue.set(state.yValues[shapeID], con, i * HEIGHT + 10);
+          Vue.set(state.yValues[shapeID], con, i * HEIGHT + HEADER_MARGIN);
           i += 1;
         }
         if (i === 1) {
           i += 1;
         }
         for (const con of Object.keys(constraints)) {
-          Vue.set(state.yValues[shapeID], con, i * HEIGHT + 10);
+          Vue.set(state.yValues[shapeID], con, i * HEIGHT + HEADER_MARGIN);
           i += 1;
         }
         /* Set the bottom coordinate. */
-        Vue.set(state.heights, shapeID, i * HEIGHT + 10);
+        Vue.set(state.heights, shapeID, i * HEIGHT + HEADER_MARGIN);
       }
     },
 
     /**
      * Update the coordinates of the given shapeID.
      * @param state
-     * @param s{string} hapeID the ID of the shapeID whose location should be updated.
+     * @param {string} shapeID the ID of the shapeID whose location should be updated.
      * @param {number} x the new x coordinate.
      * @param {number} y the new y coordinate.
      */
@@ -131,6 +132,25 @@ const coordinateModule = {
       if (!isBlankPathNode(shape)) {
         Vue.set(state.coordinates, shapeID, { x, y });
       }
+    },
+
+    /**
+     * Updates the coordinates of a relationship arrow.
+     * @param {string} constraintId Used to generate the key in relationshipCoordinates
+     * @param {string} from Used to generate the key in relationshipCoordinates
+     * @param {string} to Used to generate the key in relationshipCoordinates
+     * @param {object} fromCoords The coordinates of the arrow at the from-shape
+     * @param {object} toCoords The coordinates of the arrow at the to-shape
+     */
+    updateRelationshipCoordinates(
+      state,
+      { constraintId, from, to, fromCoords, toCoords }
+    ) {
+      const relKey = `${constraintId} - ${from} - ${to}`;
+      Vue.set(state.relationshipCoordinates, relKey, {
+        from: fromCoords,
+        to: toCoords
+      });
     },
 
     /**

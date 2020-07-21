@@ -31,7 +31,13 @@ export const APPLIES_ON = [
 ];
 
 /* All properties that get visualised in the second 'info' box of a ShapeUML shape */
-export const INFO_PROPERTIES = ["@id", TERM.path, ...APPLIES_ON, TERM.severity, TERM.message];
+export const INFO_PROPERTIES = [
+  "@id",
+  TERM.path,
+  ...APPLIES_ON,
+  TERM.severity,
+  TERM.message
+];
 
 /* Properties that are ignored when visualizing. */
 export const IGNORED_PROPERTIES = [
@@ -42,17 +48,16 @@ export const IGNORED_PROPERTIES = [
   TERM.description
 ];
 
-export const COMPLIES_WITH = [
-  TERM.node,
-  TERM.qualifiedValueShape
-];
+/* The realtionships that have to be visualised as "compliesWith" according to the ShapeUML spec */
+export const COMPLIES_WITH = [TERM.node, TERM.qualifiedValueShape];
+
+/* All on-to-many logical relationships, these have to have a different visualisation  */
+export const LOGICAL_RELATIONSHIPS = [TERM.and, TERM.or, TERM.xone];
 
 /* These properties have to be included in the properties of a shape, but can't be shown as text, only as a relationship */
 export const RELATIONSHIP_PROPERTIES = [
   ...COMPLIES_WITH,
-  TERM.and,
-  TERM.or,
-  TERM.xone,
+  ...LOGICAL_RELATIONSHIPS,
   TERM.property
 ];
 

@@ -138,15 +138,32 @@ export default {
      * @returns {{line: object, label: object, text: object, rect: object, cardinalityLabel: object, cardinalityText: object}}
      */
     getConfigs() {
-      /* Determine the end points and the rotation of the arrow. */
+      /* Determine the end points of the arrow. */
       const points = this.getEndPoints();
 
-      /* Create and return the configuration objects using these end points and rotations. */
+      /* Store the endpoints, to use for the representation of logical relationships */
+      this.$store.commit("updateRelationshipCoordinates", {
+        constraintId: this.$props.constraintID,
+        from: this.$props.from,
+        to: this.$props.to,
+        fromCoords: {
+          x: points[0],
+          y: points[1]
+        },
+        toCoords: {
+          x: points[2],
+          y: points[3]
+        }
+      });
+
+      /* Create and return the configuration objects using these end points. */
       return {
         line: {
           ...RELATIONSHIP_ARROW_CONFIG,
           dash: RELATIONSHIP_DASH_ARRAY,
-          dashEnabled: COMPLIES_WITH.includes(this.$props.constraintID),
+          dashEnabled:
+            COMPLIES_WITH.includes(this.$props.constraintID) ||
+            this.$props.constraintID === TERM.not,
           points
         },
         label: {
@@ -245,8 +262,10 @@ export default {
         }
       } else if (COMPLIES_WITH.includes(this.$props.constraintID)) {
         return "compliesWith";
+      } else if (this.$props.constraintID === TERM.not) {
+        return "NOT";
       } else {
-        return "no label";
+        return "";
       }
     },
 
@@ -258,21 +277,22 @@ export default {
      * @returns {string} The text for the cardinality label with the proper formatting and values
      */
     getCardinalityLabelText() {
-      const compliesWith = COMPLIES_WITH.includes(this.$props.constraintID);
+      const compliesWith =
+        this.$props.constraintID === TERM.qualifiedValueShape;
 
       let cardMin;
-      if (!compliesWith) {
-        cardMin = this.getPropertyFromId(TERM.minCount, this.$props.to);
-      } else {
+      if (compliesWith) {
         cardMin = this.getPropertyFromId(TERM.qualifiedMinCount, this.$props.from);
+      } else {
+        cardMin = this.getPropertyFromId(TERM.minCount, this.$props.to);
       }
       const minCount = cardMin ? cardMin["@value"] : undefined;
 
       let cardMax;
-      if (!compliesWith) {
-        cardMax = this.getPropertyFromId(TERM.maxCount, this.$props.to);
-      } else {
+      if (compliesWith) {
         cardMax = this.getPropertyFromId(TERM.qualifiedMaxCount, this.$props.from);
+      } else {
+        cardMax = this.getPropertyFromId(TERM.maxCount, this.$props.to);
       }
       const maxCount = cardMax ? cardMax["@value"] : undefined;
 
@@ -288,14 +308,9 @@ export default {
      * @returns {string} That PropertyShape's sh:path value
      */
     getPropertyFromId(property, id) {
-      for (const shape of this.$store.state.mShape.model) {
-        if (shape["@id"] === id) {
-          if (shape[property]) {
-            return shape[property][0];
-          } else {
-            return undefined;
-          }
-        }
+      const shape = this.$store.getters.shapeWithID(id);
+      if (shape && shape[property]) {
+        return shape[property][0];
       }
       return undefined;
     },
