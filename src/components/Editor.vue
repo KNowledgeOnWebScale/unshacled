@@ -22,9 +22,11 @@
         ></relationship>
       </v-group>
 
+      <!-- The one-to-many indication for the logical relationships have to be rendered after the normal relationships,
+      since these depend on the coordinates of the arrows-->
       <v-group
         v-for="(obj, key) in this.$store.getters.logicalRelationships"
-        :key="obj.from"
+        :key="key"
         ref="logicalRelationships"
       >
         <logical-relationship

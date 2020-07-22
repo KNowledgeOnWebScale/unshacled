@@ -1,6 +1,6 @@
 <template>
   <v-group v-if="this.$props.to.length >= 2" ref="group">
-    <v-group ref="label" :config="getConfig().label">
+    <v-group ref="label" :config="getLabelConfig(this.$refs.text)">
       <v-rect :config="getRectConfig(this.$refs.text)"></v-rect>
       <v-text ref="text" :config="getConfig().text"></v-text>
     </v-group>
@@ -43,7 +43,7 @@ export default {
   methods: {
     /**
      * Get the end points of the logical relationship line.
-     * @returns {[number]} a list of coordinate objects: [{x1, y1}, {x2, y2}]
+     * @returns {[number]} a list of coordinates: [x1, y1, x2, y2]
      */
     getEndPoints() {
       const { constraintID, from, to } = this.$props;
@@ -64,6 +64,14 @@ export default {
       const fstMidPoint = fstMid.x < sndMid.x ? fstMid : sndMid;
       const sndMidPoint = fstMid.x < sndMid.x ? sndMid : fstMid;
 
+      /**
+       * These next 4 calculations are meant to calculate the coordinates of the "appendages",
+       * the bits that stick out of the side of the logical relationship lines.
+       * First, we calculate the angle of the vector going from fstMidPoint to sndMidPoint,
+       * then, this angle can be input in the formula sin(angle) = opposite side / hypothenuse to find the length of the opposite side (delta y),
+       * since we want a fixed length appendage/hypothenuse.
+       * Finally, the adjacent side or delta x is found with the Pythagorean theorem.
+       * */
       const slope =
         (sndMidPoint.y - fstMidPoint.y) / (sndMidPoint.x - fstMidPoint.x);
       const angle = Math.atan(slope);
@@ -96,7 +104,7 @@ export default {
           points
         },
         label: {
-          x: points[0] - LOGICAL_RELATIONSHIP_OFFSET,
+          x: points[0] - MARGIN,
           y: points[1] - MARGIN
         },
         text: {
@@ -116,7 +124,7 @@ export default {
      * This one is not included in `getConfig` because it relies on the previously drawn text.
      * This checks how wide the text in the label is and adjusts the rectangle accordingly.
      * @param {string} ref The reference for the label text.
-     * @returns {any} a configuration object.
+     * @returns {object} a configuration object.
      */
     getRectConfig(ref) {
       const configs = this.getConfig();
@@ -124,6 +132,24 @@ export default {
         return {
           ...configs.rect,
           width: ref.getNode().width() + MARGIN * 2
+        };
+      }
+      return configs.rect;
+    },
+
+    /**
+     * Get the configuration for a label position.
+     * This one is not included in `getConfig` because it relies on the previously drawn text.
+     * This checks how wide the text in the label is and adjusts the label x coordinate accordingly.
+     * @param {string} ref The reference for the label text.
+     * @returns {object} a configuration object.
+     */
+    getLabelConfig(ref) {
+      const configs = this.getConfig();
+      if (ref && ref.getNode()) {
+        return {
+          ...configs.label,
+          x: configs.label.x - ref.getNode().width()
         };
       }
       return configs.rect;
