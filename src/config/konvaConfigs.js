@@ -13,7 +13,6 @@ export const MAX_LENGTH = 30; // Maximum length for labels.
 export const RELATIONSHIP_LABEL_OFFSET = 10; // How far a label should be offset from the relationship arrow
 const RELATIONSHIP_DASH = 10;
 export const RELATIONSHIP_DASH_ARRAY = [RELATIONSHIP_DASH, RELATIONSHIP_DASH]; // The dash array for a relationship, to be used for e.g. compliesWith
-export const LOGICAL_RELATIONSHIP_OFFSET = 30;
 export const LOGICAL_RELATIONSHIP_APPENDAGE = 50;
 
 export const TEXT_SIZE = 12; // Default text size.

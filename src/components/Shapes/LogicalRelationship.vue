@@ -15,7 +15,6 @@ import {
   RELATIONSHIP_DASH_ARRAY,
   RELATIONSHIP_LABEL_TEXT_CONFIG,
   RELATIONSHIP_LABEL_RECT_CONFIG,
-  LOGICAL_RELATIONSHIP_OFFSET,
   LOGICAL_RELATIONSHIP_APPENDAGE
 } from "../../config/konvaConfigs";
 import { TERM } from "../../translation/terminology";
