@@ -17,7 +17,8 @@
       ></v-text>
     </v-group>
 
-    <v-arrow ref="arrow" :config="getConfigs().line"></v-arrow>
+    <v-line ref="arrow" :config="getConfigs().line"></v-line>
+    <UMLArrowHead ref="arrowhead" :relationship="relationship"></UMLArrowHead>
     <v-circle
       v-if="hover"
       :config="getButtonConfig()"
@@ -47,9 +48,11 @@ import { uriToPrefix } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
 import { isBlankPathNode, parsePath } from "../../util/pathPropertyUtil";
 import { COMPLIES_WITH } from "../../util/constants";
+import UMLArrowHead from "./UMLArrowHead.vue";
 
 export default {
   name: "Relationship",
+  components: { UMLArrowHead },
   props: {
     from: {
       type: String,
@@ -76,7 +79,12 @@ export default {
     return {
       hover: false,
       cardinalityPresent: false,
-      cardinalityLeft: false
+      cardinalityLeft: false,
+      relationship: {
+        constraintID: this.$props.constraintID,
+        from: this.$props.from,
+        to: this.$props.to
+      }
     };
   },
   methods: {
@@ -156,6 +164,8 @@ export default {
         }
       });
 
+      const rotation = Math.tan((points[3] - points[1]) / (points[2] - points[0]));
+
       /* Create and return the configuration objects using these end points. */
       return {
         line: {
@@ -186,6 +196,11 @@ export default {
         cardinalityText: {
           ...RELATIONSHIP_LABEL_TEXT_CONFIG,
           text: this.getCardinalityLabelText()
+        },
+        arrowhead: {
+          x: points[2],
+          y: points[3],
+          rotation
         }
       };
     },

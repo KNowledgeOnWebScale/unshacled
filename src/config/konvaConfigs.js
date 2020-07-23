@@ -15,6 +15,14 @@ const RELATIONSHIP_DASH = 10;
 export const RELATIONSHIP_DASH_ARRAY = [RELATIONSHIP_DASH, RELATIONSHIP_DASH]; // The dash array for a relationship, to be used for e.g. compliesWith
 export const LOGICAL_RELATIONSHIP_APPENDAGE = 50;
 
+export const UML_ARROWHEAD_WIDTH = 12; // The default width of a UML arrowhead, without scaling
+export const UML_ARROWHEAD_HEIGHT = 20; // The default height of a UML arrowhead, without scaling
+export const UML_ARROWHEAD_CENTER_X = UML_ARROWHEAD_WIDTH / 2; // The default centerpoint of a UML arrowhead, without scaling
+export const UML_ARROWHEAD_CENTER_Y = UML_ARROWHEAD_HEIGHT / 2; // The default centerpoint of a UML arrowhead, without scaling
+export const UML_ARROWHEAD_SHIFT = 8; // The amount of pixels the UML arrowhead has to be shifted among the line to not be covered by the "to" shape.
+export const UML_ARROWHEAD_ROTATE = 90; // The amount the UML arrowhead has to be rotated for it to point towards the "to" shape.
+export const HALF_CIRCLE = 180; // This is just so prettifier doesnt't complain at the conversion of radians to degrees.
+
 export const TEXT_SIZE = 12; // Default text size.
 const CONSTRAINT_TEXT_SIZE = TEXT_SIZE; // Smaller text size.
 const BUTTON_OFFSET = 240;
