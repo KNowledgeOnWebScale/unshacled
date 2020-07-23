@@ -55,14 +55,14 @@ export default {
     },
     getConfig() {
       const relationshipID = relationshipUID(this.$props.relationship);
-      const relationshipCoordinates = this.$store.state.mShape.mCoordinate
-        .relationshipCoordinates[relationshipID];
+      const { relationshipCoordinates } = this.$store.state.mShape.mCoordinate;
 
-      const x = relationshipCoordinates.to.x;
-      const y = relationshipCoordinates.to.y;
+      const relCoords = relationshipCoordinates[relationshipID];
 
-      const dy = relationshipCoordinates.to.y - relationshipCoordinates.from.y;
-      const dx = relationshipCoordinates.to.x - relationshipCoordinates.from.x;
+      const { x, y } = relCoords.to;
+
+      const dy = relCoords.to.y - relCoords.from.y;
+      const dx = relCoords.to.x - relCoords.from.x;
       let theta = Math.atan2(dy, dx); // range (-PI, PI]
       theta *= HALF_CIRCLE / Math.PI; // rads to degs, range (-180, 180]
       theta += UML_ARROWHEAD_ROTATE;
@@ -74,8 +74,7 @@ export default {
         Math.pow(UML_ARROWHEAD_SHIFT, 2) - Math.pow(shiftY, 2)
       );
 
-      const shiftDirection =
-        relationshipCoordinates.to.x > relationshipCoordinates.from.x;
+      const shiftDirection = relCoords.to.x > relCoords.from.x;
 
       return {
         x: shiftDirection ? x - shiftX : x + shiftX,
