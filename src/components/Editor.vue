@@ -10,7 +10,7 @@
     <v-layer>
       <v-group
         v-for="(obj, key) in this.$store.getters.relationships"
-        :key="key"
+        :key="relationshipUID(obj)"
         ref="relationships"
       >
         <relationship
@@ -26,7 +26,7 @@
       since these depend on the coordinates of the arrows-->
       <v-group
         v-for="(obj, key) in this.$store.getters.logicalRelationships"
-        :key="key"
+        :key="logicalRelationshipUID(obj)"
         ref="logicalRelationships"
       >
         <logical-relationship
@@ -55,6 +55,10 @@ import Shape from "./Shapes/Shape.vue";
 import Relationship from "./Shapes/Relationship.vue";
 import LogicalRelationship from "./Shapes/LogicalRelationship.vue";
 import { MARGIN_TOP } from "../config/konvaConfigs";
+import {
+  relationshipUID,
+  logicalRelationshipUID
+} from "../util/relationshipUID";
 
 export default {
   name: "Editor",
@@ -161,7 +165,10 @@ export default {
         if (!["relationships", "stage"].includes(ref))
           output[ref] = this.$refs[ref][0];
       return output;
-    }
+    },
+
+    relationshipUID,
+    logicalRelationshipUID
   }
 };
 </script>

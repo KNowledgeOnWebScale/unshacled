@@ -27,6 +27,7 @@ import {
   UML_ARROWHEAD_ROTATE,
   HALF_CIRCLE
 } from "../../config/konvaConfigs";
+import { relationshipUID } from "../../util/relationshipUID";
 
 export default {
   name: "UMLArrowHead",
@@ -53,7 +54,7 @@ export default {
       this.pointerConfig.rotation = rotation;
     },
     getConfig() {
-      const relationshipID = `${this.$props.relationship.constraintID} - ${this.$props.relationship.from} - ${this.$props.relationship.to}`;
+      const relationshipID = relationshipUID(this.$props.relationship);
       const relationshipCoordinates = this.$store.state.mShape.mCoordinate
         .relationshipCoordinates[relationshipID];
 

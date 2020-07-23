@@ -18,7 +18,7 @@
     </v-group>
 
     <v-line ref="arrow" :config="getConfigs().line"></v-line>
-    <UMLArrowHead ref="arrowhead" :relationship="relationship"></UMLArrowHead>
+    <u-m-l-arrow-head :relationship="relationship"></u-m-l-arrow-head>
     <v-circle
       v-if="hover"
       :config="getButtonConfig()"
