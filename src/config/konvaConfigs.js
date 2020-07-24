@@ -1,7 +1,7 @@
 /* CONSTANTS ======================================================================================================== */
 
 export const WIDTH = 250; // Width of a rectangle.
-export const HEIGHT = 40; // Width of a rectangle.
+export const HEIGHT = 40; // Height of a rectangle.
 export const HEADER_MARGIN = 10;
 export const HEIGHT_HEADER = HEIGHT + HEADER_MARGIN; // Height of the top part of a shape, containing title, kind of shape...
 export const MARGIN = 5;
@@ -14,6 +14,15 @@ export const RELATIONSHIP_LABEL_OFFSET = 10; // How far a label should be offset
 const RELATIONSHIP_DASH = 10;
 export const RELATIONSHIP_DASH_ARRAY = [RELATIONSHIP_DASH, RELATIONSHIP_DASH]; // The dash array for a relationship, to be used for e.g. compliesWith
 export const LOGICAL_RELATIONSHIP_APPENDAGE = 50;
+
+export const LABEL_TOP_LEFT = 1; // For placement of relationship cardinality labels
+export const LABEL_TOP_RIGHT = 2; // For placement of relationship cardinality labels
+export const LABEL_BOTTOM_RIGHT = 3; // For placement of relationship cardinality labels
+export const LABEL_BOTTOM_LEFT = 4; // For placement of relationship cardinality labels
+
+export const LABEL_NO_SHIFT = 0; // For placement of relationship labels
+export const LABEL_SHIFT_UP = 1; // For placement of relationship labels
+export const LABEL_SHIFT_DOWN = 2; // For placement of relationship labels
 
 export const UML_ARROWHEAD_WIDTH = 12; // The default width of a UML arrowhead, without scaling
 export const UML_ARROWHEAD_HEIGHT = 20; // The default height of a UML arrowhead, without scaling

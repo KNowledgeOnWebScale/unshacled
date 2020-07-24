@@ -54,19 +54,23 @@ export function intersectionPoint(
 
   const topIntersection = {
     x: (topLeft.y - b) / a,
-    y: topLeft.y
+    y: topLeft.y,
+    side: "T"
   };
   const bottomIntersection = {
     x: (bottomRight.y - b) / a,
-    y: bottomRight.y
+    y: bottomRight.y,
+    side: "B"
   };
   const leftIntersection = {
     x: topLeft.x,
-    y: a * topLeft.x + b
+    y: a * topLeft.x + b,
+    side: "L"
   };
   const rightIntersection = {
     x: bottomRight.x,
-    y: a * bottomRight.x + b
+    y: a * bottomRight.x + b,
+    side: "R"
   };
 
   if (

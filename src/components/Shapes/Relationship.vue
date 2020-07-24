@@ -32,7 +32,6 @@
 <script>
 import {
   WIDTH,
-  HEIGHT,
   DELETE_BUTTON_CONFIG,
   RELATIONSHIP_ARROW_CONFIG,
   RELATIONSHIP_LABEL_RECT_CONFIG,
@@ -41,9 +40,16 @@ import {
   RELATIONSHIP_DASH_ARRAY,
   MARGIN,
   pointerCursor,
-  resetCursor
+  resetCursor,
+  LABEL_TOP_LEFT,
+  LABEL_TOP_RIGHT,
+  LABEL_BOTTOM_LEFT,
+  LABEL_BOTTOM_RIGHT,
+  LABEL_NO_SHIFT,
+  LABEL_SHIFT_DOWN,
+  LABEL_SHIFT_UP
 } from "../../config/konvaConfigs";
-import { nearestPointOnPerimeter, distance, intersectionPoint } from "../../util/calculations";
+import { intersectionPoint } from "../../util/calculations";
 import { uriToPrefix } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
 import { isBlankPathNode, parsePath } from "../../util/pathPropertyUtil";
@@ -79,7 +85,8 @@ export default {
     return {
       hover: false,
       cardinalityPresent: false,
-      cardinalityLeft: false,
+      cardinalitySection: 1,
+      labelShift: 0,
       relationship: {
         constraintID: this.$props.constraintID,
         from: this.$props.from,
@@ -93,12 +100,8 @@ export default {
      * @returns {[number]} a list of coordinates: [x1, y1, x2, y2]
      */
     getEndPoints() {
-      const { from, to, constraintID } = this.$props;
-      const {
-        coordinates,
-        heights,
-        yValues
-      } = this.$store.state.mShape.mCoordinate;
+      const { from, to } = this.$props;
+      const { coordinates, heights } = this.$store.state.mShape.mCoordinate;
 
       /* Check whether the cardinality label should be put on the left side or the right side of the arrowpoint */
       this.cardinalityLeft =
@@ -117,10 +120,28 @@ export default {
         y: coordinates[to].y + heights[to] / 2
       };
 
-      const intersection_start = intersectionPoint(start, end, {x: coordinates[from].x, y: coordinates[from].y}, {x: coordinates[from].x + WIDTH, y: coordinates[from].y + heights[from]});
-      const intersection_end = intersectionPoint(end, start, {x: coordinates[to].x, y: coordinates[to].y}, {x: coordinates[to].x + WIDTH, y: coordinates[to].y + heights[to]});
+      const intersectionStart = intersectionPoint(
+        start,
+        end,
+        { x: coordinates[from].x, y: coordinates[from].y },
+        { x: coordinates[from].x + WIDTH, y: coordinates[from].y + heights[from] }
+      );
+      const intersectionEnd = intersectionPoint(
+        end,
+        start,
+        { x: coordinates[to].x, y: coordinates[to].y },
+        { x: coordinates[to].x + WIDTH, y: coordinates[to].y + heights[to] }
+      );
 
-      return [intersection_start.x, intersection_start.y, intersection_end.x, intersection_end.y]; // x1, y1, x2, y2
+      this.setCardinalitySection(start, intersectionEnd);
+      this.setLabelShift(start, intersectionEnd);
+
+      return [
+        intersectionStart.x,
+        intersectionStart.y,
+        intersectionEnd.x,
+        intersectionEnd.y
+      ]; // x1, y1, x2, y2
     },
 
     /**
@@ -146,7 +167,22 @@ export default {
         }
       });
 
-      const rotation = Math.tan((points[3] - points[1]) / (points[2] - points[0]));
+      const rotation = Math.tan(
+        (points[3] - points[1]) / (points[2] - points[0])
+      );
+
+      let labelY;
+      switch (this.labelShift) {
+        case LABEL_NO_SHIFT:
+          labelY = (points[1] + points[3]) / 2 - 2 * MARGIN;
+          break;
+        case LABEL_SHIFT_UP:
+          labelY = (points[1] + points[3]) / 2 - 3 * MARGIN;
+          break;
+        case LABEL_SHIFT_DOWN:
+          labelY = (points[1] + points[3]) / 2 + MARGIN;
+          break;
+      }
 
       /* Create and return the configuration objects using these end points. */
       return {
@@ -160,7 +196,7 @@ export default {
         },
         label: {
           x: (points[0] + points[2]) / 2 + RELATIONSHIP_LABEL_OFFSET,
-          y: (points[1] + points[3] - 2 * MARGIN) / 2
+          y: labelY
         },
         text: {
           ...RELATIONSHIP_LABEL_TEXT_CONFIG,
@@ -172,8 +208,8 @@ export default {
           y: -MARGIN
         },
         cardinalityLabel: {
-          x: points[2] + RELATIONSHIP_LABEL_OFFSET,
-          y: points[3] - RELATIONSHIP_LABEL_OFFSET
+          x: points[2],
+          y: points[3]
         },
         cardinalityText: {
           ...RELATIONSHIP_LABEL_TEXT_CONFIG,
@@ -206,28 +242,111 @@ export default {
     },
 
     /**
-     * Get the configuration for the cardinality label, this puts the label on the left side of
-     * the arrow point if the label is hidden behind the "to" shape, otherwise just leaves it on the right side.
+     * This sets the section the cardinality label should be placed in, if there is one.
+     * Section 1: top left of the arrowhead
+     * Section 2: top right of the arrowhead
+     * Section 3: bottom right of the arrowhead
+     * Section 4: bottom left of the arrowhead
+     * Section 0: overlapping shapes / something went wrong => no cardinalityLabel should be placed
+     * @param {object} midPoint The center point of the start shape, with an x and y component.
+     * @param {object} endPoint The intersection point of the end shape, with an x, y and "side" component.
+     */
+    setCardinalitySection(midPoint, endPoint) {
+      if (endPoint.side) {
+        switch (endPoint.side) {
+          case "T":
+            this.cardinalitySection =
+              endPoint.x < midPoint.x ? LABEL_TOP_LEFT : LABEL_TOP_RIGHT;
+            break;
+          case "L":
+            this.cardinalitySection =
+              endPoint.y < midPoint.y ? LABEL_TOP_LEFT : LABEL_BOTTOM_LEFT;
+            break;
+          case "B":
+            this.cardinalitySection =
+              endPoint.x < midPoint.x ? LABEL_BOTTOM_LEFT : LABEL_BOTTOM_RIGHT;
+            break;
+          case "R":
+            this.cardinalitySection =
+              endPoint.y < midPoint.y ? LABEL_TOP_RIGHT : LABEL_BOTTOM_RIGHT;
+            break;
+          default:
+            this.cardinalitySection = 0;
+        }
+      } else {
+        this.cardinalitySection = 0;
+      }
+    },
+
+    setLabelShift(midPoint, endPoint) {
+      if (endPoint.side) {
+        switch (endPoint.side) {
+          case "L":
+            this.labelShift =
+              endPoint.y < midPoint.y ? LABEL_SHIFT_DOWN : LABEL_SHIFT_UP;
+            break;
+          case "R":
+            this.labelShift =
+              endPoint.y < midPoint.y ? LABEL_SHIFT_UP : LABEL_SHIFT_DOWN;
+            break;
+          default:
+            this.labelShift = LABEL_NO_SHIFT;
+        }
+      } else {
+        this.labelShift = LABEL_NO_SHIFT;
+      }
+    },
+
+    /**
+     * Get the configuration for the cardinality label, according to the cardinalitySection property;
+     * Section 1: top left of the arrowhead
+     * Section 2: top right of the arrowhead
+     * Section 3: bottom right of the arrowhead
+     * Section 4: bottom left of the arrowhead
+     * Section 0: overlapping shapes / something went wrong => no cardinalityLabel should be placed
      * @returns {object} a configuration object.
      */
     getCardinalityLabelConfig() {
-      const configs = this.getConfigs();
-      if (this.cardinalityLeft) {
-        if (
-          this.$refs.cardinalityText &&
-          this.$refs.cardinalityText.getNode()
-        ) {
-          return {
-            ...configs.cardinalityLabel,
-            x:
-              configs.cardinalityLabel.x -
-              2 * RELATIONSHIP_LABEL_OFFSET -
-              this.$refs.cardinalityText.getNode().width(),
-            y: configs.cardinalityLabel.y + 2 * RELATIONSHIP_LABEL_OFFSET
-          };
+      const { cardinalityLabel } = this.getConfigs();
+
+      if (this.$refs.cardinalityText && this.$refs.cardinalityText.getNode()) {
+        switch (this.cardinalitySection) {
+          case LABEL_TOP_LEFT:
+            return {
+              x:
+                cardinalityLabel.x -
+                this.$refs.cardinalityText.getNode().width() -
+                RELATIONSHIP_LABEL_OFFSET,
+              y:
+                cardinalityLabel.y -
+                this.$refs.cardinalityText.getNode().height() -
+                RELATIONSHIP_LABEL_OFFSET
+            };
+          case LABEL_TOP_RIGHT:
+            return {
+              x: cardinalityLabel.x + RELATIONSHIP_LABEL_OFFSET,
+              y:
+                cardinalityLabel.y -
+                this.$refs.cardinalityText.getNode().height() -
+                RELATIONSHIP_LABEL_OFFSET
+            };
+          case LABEL_BOTTOM_RIGHT:
+            return {
+              x: cardinalityLabel.x + RELATIONSHIP_LABEL_OFFSET,
+              y: cardinalityLabel.y + RELATIONSHIP_LABEL_OFFSET
+            };
+          case LABEL_BOTTOM_LEFT:
+            return {
+              x:
+                cardinalityLabel.x -
+                this.$refs.cardinalityText.getNode().width() -
+                RELATIONSHIP_LABEL_OFFSET,
+              y: cardinalityLabel.y + RELATIONSHIP_LABEL_OFFSET
+            };
         }
+      } else {
+        return cardinalityLabel;
       }
-      return configs.cardinalityLabel;
     },
 
     /**
@@ -279,7 +398,10 @@ export default {
 
       let cardMin;
       if (compliesWith) {
-        cardMin = this.getPropertyFromId(TERM.qualifiedMinCount, this.$props.from);
+        cardMin = this.getPropertyFromId(
+          TERM.qualifiedMinCount,
+          this.$props.from
+        );
       } else {
         cardMin = this.getPropertyFromId(TERM.minCount, this.$props.to);
       }
@@ -287,13 +409,17 @@ export default {
 
       let cardMax;
       if (compliesWith) {
-        cardMax = this.getPropertyFromId(TERM.qualifiedMaxCount, this.$props.from);
+        cardMax = this.getPropertyFromId(
+          TERM.qualifiedMaxCount,
+          this.$props.from
+        );
       } else {
         cardMax = this.getPropertyFromId(TERM.maxCount, this.$props.to);
       }
       const maxCount = cardMax ? cardMax["@value"] : undefined;
 
-      this.cardinalityPresent = minCount || maxCount;
+      this.cardinalityPresent =
+        (minCount || maxCount) && this.cardinalitySection !== 0;
 
       return `${minCount || "0"}..${maxCount || "*"}`;
     },
