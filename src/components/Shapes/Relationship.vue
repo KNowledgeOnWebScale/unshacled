@@ -43,7 +43,7 @@ import {
   pointerCursor,
   resetCursor
 } from "../../config/konvaConfigs";
-import { nearestPointOnPerimeter, distance } from "../../util/calculations";
+import { nearestPointOnPerimeter, distance, intersectionPoint } from "../../util/calculations";
 import { uriToPrefix } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
 import { isBlankPathNode, parsePath } from "../../util/pathPropertyUtil";
@@ -109,36 +109,18 @@ export default {
       /* Determine the center points of the start shape. */
       const start = {
         x: coordinates[from].x + WIDTH / 2,
-        y: yValues[from][constraintID]
-          ? coordinates[from].y +
-            yValues[from][constraintID] +
-            RELATIONSHIP_LABEL_OFFSET
-          : coordinates[from].y + RELATIONSHIP_LABEL_OFFSET
+        y: coordinates[from].y + heights[from] / 2
       };
-      /* Determine the closest point on the end shape's perimeter. */
-      const end = nearestPointOnPerimeter(
-        coordinates[to],
-        {
-          x: coordinates[to].x + WIDTH,
-          y: coordinates[to].y + heights[to]
-        },
-        start
-      );
 
-      /* Grab the nearest edge of the start shape. */
-      const edges = {
-        xl: coordinates[from].x,
-        xr: coordinates[from].x + WIDTH,
-        y: yValues[from][constraintID]
-          ? coordinates[from].y + yValues[from][constraintID] + HEIGHT
-          : coordinates[from].y + HEIGHT
+      const end = {
+        x: coordinates[to].x + WIDTH / 2,
+        y: coordinates[to].y + heights[to] / 2
       };
-      const distLeft = distance(edges.xl, edges.y, end.x, end.y);
-      const distRight = distance(edges.xr, edges.y, end.x, end.y);
-      start.x = distLeft < distRight ? edges.xl : edges.xr;
-      start.y = edges.y;
 
-      return [start.x, start.y, end.x, end.y]; // x1, y1, x2, y2
+      const intersection_start = intersectionPoint(start, end, {x: coordinates[from].x, y: coordinates[from].y}, {x: coordinates[from].x + WIDTH, y: coordinates[from].y + heights[from]});
+      const intersection_end = intersectionPoint(end, start, {x: coordinates[to].x, y: coordinates[to].y}, {x: coordinates[to].x + WIDTH, y: coordinates[to].y + heights[to]});
+
+      return [intersection_start.x, intersection_start.y, intersection_end.x, intersection_end.y]; // x1, y1, x2, y2
     },
 
     /**

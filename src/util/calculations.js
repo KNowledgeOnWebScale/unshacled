@@ -21,6 +21,44 @@ export function nearestPointOnPerimeter(topLeft, bottomRight, reference) {
     : { x, y: b };
 }
 
+function slope(point1, point2) {
+  return (point2.y - point1.y) / (point2.x - point1.x);
+}
+
+export function intersectionPoint(midPoint, destinationPoint, topLeft, bottomRight) {
+  const a = slope(midPoint, destinationPoint);
+  const b = -a * midPoint.x + midPoint.y;
+
+  const topIntersection = {
+    x: (topLeft.y - b) / a,
+    y: topLeft.y
+  }
+  const bottomIntersection = {
+    x: (bottomRight.y - b) / a,
+    y: bottomRight.y
+  }
+  const leftIntersection = {
+    x: topLeft.x,
+    y: a * topLeft.x + b
+  }
+  const rightIntersection = {
+    x: bottomRight.x,
+    y: a * bottomRight.x + b
+  }
+
+  if (topIntersection.x >= topLeft.x && topIntersection.x <= bottomRight.x && destinationPoint.y < midPoint.y) {
+    return topIntersection;
+  } else if (bottomIntersection.x >= topLeft.x && bottomIntersection.x <= bottomRight.x && destinationPoint.y > midPoint.y) {
+    return bottomIntersection;
+  } else if (leftIntersection.y >= topLeft.y && leftIntersection.y <= bottomRight.y && destinationPoint.x < midPoint.x) {
+    return leftIntersection;
+  } else if (rightIntersection.y >= topLeft.y && rightIntersection.y <= bottomRight.y && destinationPoint.x > midPoint.x) {
+    return rightIntersection;
+  } else {
+    return midPoint;
+  }
+}
+
 /**
  * If the given number is outside of the given boundaries, then return the respecitve boundary.
  * @param {number} a the reference number.
