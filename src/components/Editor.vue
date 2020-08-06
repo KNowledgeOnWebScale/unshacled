@@ -10,7 +10,7 @@
     <v-layer>
       <v-group
         v-for="(obj, key) in this.$store.getters.relationships"
-        :key="key"
+        :key="relationshipUID(obj)"
         ref="relationships"
       >
         <relationship
@@ -21,14 +21,30 @@
           :on-click-props="obj.onClick"
         ></relationship>
       </v-group>
+
+      <!-- The one-to-many indication for the logical relationships have to be rendered after the normal relationships,
+      since these depend on the coordinates of the arrows-->
+      <v-group
+        v-for="(obj, key) in this.$store.getters.logicalRelationships"
+        :key="logicalRelationshipUID(obj)"
+        ref="logicalRelationships"
+      >
+        <logical-relationship
+          :id="key"
+          :from="obj.from"
+          :to="obj.to"
+          :constraint-i-d="obj.constraintID"
+        ></logical-relationship>
+      </v-group>
+
       <div v-for="(obj, key) in this.$store.getters.nonSpecifiedShapes" :key="key">
-        <shape :id="key" :ref="key" :hasType="false"></shape>
+        <shape :id="key" :ref="key" :has-type="false"></shape>
       </div>
       <div v-for="(obj, key) in this.$store.getters.propertyShapes" :key="key">
-        <shape :id="key" :ref="key" :hasType="true" :node-shape="false"></shape>
+        <shape :id="key" :ref="key" :has-type="true" :node-shape="false"></shape>
       </div>
       <div v-for="(obj, key) in this.$store.getters.nodeShapes" :key="key">
-        <shape :id="key" :ref="key" :hasType="true" :node-shape="true"></shape>
+        <shape :id="key" :ref="key" :has-type="true" :node-shape="true"></shape>
       </div>
     </v-layer>
   </v-stage>
@@ -37,11 +53,16 @@
 <script>
 import Shape from "./Shapes/Shape.vue";
 import Relationship from "./Shapes/Relationship.vue";
+import LogicalRelationship from "./Shapes/LogicalRelationship.vue";
 import { MARGIN_TOP } from "../config/konvaConfigs";
+import {
+  relationshipUID,
+  logicalRelationshipUID
+} from "../util/relationshipUID";
 
 export default {
   name: "Editor",
-  components: { Relationship, Shape },
+  components: { Relationship, Shape, LogicalRelationship },
 
   /**
    * ConfigKonva {{width: number, height: number}} the configuration for the Konva stage.
@@ -144,7 +165,10 @@ export default {
         if (!["relationships", "stage"].includes(ref))
           output[ref] = this.$refs[ref][0];
       return output;
-    }
+    },
+
+    relationshipUID,
+    logicalRelationshipUID
   }
 };
 </script>

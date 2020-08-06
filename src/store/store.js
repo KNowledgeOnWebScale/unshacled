@@ -135,7 +135,7 @@ export default new Vuex.Store({
       });
     }
   },
-  getters: {
+  getters: { 
     /**
      * Returns the internal model in SHACL, JSON format.
      * @param state

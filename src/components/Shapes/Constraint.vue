@@ -1,11 +1,12 @@
 <template>
   <v-group @mouseenter="hoverKey = true" @mouseleave="hoverKey = false">
     <v-text ref="key" :config="getConfigs().keyConfig"></v-text>
-    <v-text 
+    <v-text
       :config="getValueConfig(getConstraintValues())"
       @click="editValue(0)"
       @mouseenter="setCursor('text')"
-      @mouseleave="setCursor('')"></v-text>
+      @mouseleave="setCursor('')"
+    ></v-text>
     <v-circle
       v-if="hoverKey && canBeDeleted()"
       :config="getConfigs().deleteConstraint"
@@ -37,6 +38,7 @@ import ValueType, {
 } from "../../util/enums/ValueType";
 import { TERM } from "../../translation/terminology";
 import { abbreviate } from "../../util/strings";
+import { isBlankPathNode, parsePath } from "../../util/pathPropertyUtil";
 
 export default {
   name: "Constraint",
@@ -219,17 +221,28 @@ export default {
      * @param {string} value the value that has to be formatted.
      * @returns {string} the formatted value.
      */
-    appliesOnValue (key, value) {
-      let namespaces = this.$store.state.mConfig.namespaces;
+    appliesOnValue(key, value) {
       switch (key) {
         case TERM.targetNode:
-          return `instance(${uriToPrefix(namespaces, value)})`;
+          return `instance(${uriToPrefix(
+            this.$store.getters.namespaces,
+            value
+          )})`;
         case TERM.targetClass:
-          return `class(${uriToPrefix(namespaces, value)})`;
+          return `class(${uriToPrefix(
+            this.$store.getters.namespaces,
+            value
+          )})`;
         case TERM.targetSubjectsOf:
-          return `subjectsOf(${uriToPrefix(namespaces, value)})`;
+          return `subjectsOf(${uriToPrefix(
+            this.$store.getters.namespaces,
+            value
+          )})`;
         case TERM.targetObjectsOf:
-          return `objectsOf(${uriToPrefix(namespaces, value)})`;
+          return `objectsOf(${uriToPrefix(
+            this.$store.getters.namespaces,
+            value
+          )})`;
       }
     },
 
@@ -248,11 +261,38 @@ export default {
       if (constraints && constraints[constraintID]) {
         if (constraintID === TERM.path) {
           /* Show the full path. */
-          return [constraints[constraintID][0]["@id"]];
-        } else if (constraintID === "@id"){
+          const path = constraints[constraintID][0];
+          if (path["@value"]) {
+            return [path["@value"]];
+          } else if (path["@id"]) {
+            const pathNode = this.$store.getters.shapeWithID(path["@id"]);
+            if (pathNode && isBlankPathNode(pathNode)) {
+              return [
+                parsePath({
+                  partialPath: path["@id"],
+                  getters: this.$store.getters
+                })
+              ];
+            } else {
+              return [uriToPrefix(this.$store.getters.namespaces, path["@id"])];
+            }
+          } else if (path["@list"]) {
+            return [
+              parsePath({
+                partialPath: path["@list"],
+                getters: this.$store.getters
+              })
+            ];
+          } else {
+            return ["value missing"];
+          }
+        } else if (constraintID === "@id") {
           return constraints[constraintID];
-        } else if (APPLIES_ON.includes(constraintID)){
-          return this.appliesOnValue(constraintID, constraints[constraintID][0]["@id"]);
+        } else if (APPLIES_ON.includes(constraintID)) {
+          return this.appliesOnValue(
+            constraintID,
+            constraints[constraintID][0]["@id"]
+          );
         }
 
         /* Get the constraint's value type. */
@@ -328,15 +368,15 @@ export default {
 
       const key = this.$props.constraintID;
       let keyText;
-      if ( key === "@id" ){
-        keyText = "IRI"
-      } else if ( APPLIES_ON.includes(key) ){
-        keyText = "appliesOn"
+      if (key === "@id") {
+        keyText = "IRI";
+      } else if (APPLIES_ON.includes(key)) {
+        keyText = "appliesOn";
       } else {
         keyText = uriToPrefix(
-            this.$store.state.mConfig.namespaces,
-            this.$props.constraintID
-            )
+          this.$store.state.mConfig.namespaces,
+          this.$props.constraintID
+        );
       }
 
       return {
@@ -369,12 +409,12 @@ export default {
      * @returns {{y: number, text: string}}
      */
     getValueConfig(value) {
-      if ( value.length === 1 ){
+      if (value.length === 1) {
         const val = value[0];
         value = val;
       }
       const text = uriToPrefix(this.$store.state.mConfig.namespaces, value);
-      
+
       // Determine if the value has to move up to free up space for the label/name.
       const move = text.length - 2 > MAX_LENGTH ? -HEIGHT / 6 : 0;
       return {

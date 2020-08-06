@@ -1,15 +1,36 @@
 /* CONSTANTS ======================================================================================================== */
 
 export const WIDTH = 250; // Width of a rectangle.
-export const HEIGHT = 40; // Width of a rectangle.
-export const HEIGHT_HEADER = HEIGHT + 10; // Height of the top part of a shape, containing title, kind of shape...
+export const HEIGHT = 40; // Height of a rectangle.
+export const HEADER_MARGIN = 10;
+export const HEIGHT_HEADER = HEIGHT + HEADER_MARGIN; // Height of the top part of a shape, containing title, kind of shape...
 export const MARGIN = 5;
 export const MARGIN_TOP = 40; // Margin to accomodate the navbar.
 export const OFFSET = 10; // General offset.
 export const TEXT_OFFSET = 15; // Offset for text.
 export const MAX_LENGTH = 30; // Maximum length for labels.
 
-export const RELATIONSHIP_LABEL_OFFSET = 10;
+export const RELATIONSHIP_LABEL_OFFSET = 10; // How far a label should be offset from the relationship arrow
+const RELATIONSHIP_DASH = 10;
+export const RELATIONSHIP_DASH_ARRAY = [RELATIONSHIP_DASH, RELATIONSHIP_DASH]; // The dash array for a relationship, to be used for e.g. compliesWith
+export const LOGICAL_RELATIONSHIP_APPENDAGE = 50;
+
+export const LABEL_TOP_LEFT = 1; // For placement of relationship cardinality labels
+export const LABEL_TOP_RIGHT = 2; // For placement of relationship cardinality labels
+export const LABEL_BOTTOM_RIGHT = 3; // For placement of relationship cardinality labels
+export const LABEL_BOTTOM_LEFT = 4; // For placement of relationship cardinality labels
+
+export const LABEL_NO_SHIFT = 0; // For placement of relationship labels
+export const LABEL_SHIFT_UP = 1; // For placement of relationship labels
+export const LABEL_SHIFT_DOWN = 2; // For placement of relationship labels
+
+export const UML_ARROWHEAD_WIDTH = 12; // The default width of a UML arrowhead, without scaling
+export const UML_ARROWHEAD_HEIGHT = 20; // The default height of a UML arrowhead, without scaling
+export const UML_ARROWHEAD_CENTER_X = UML_ARROWHEAD_WIDTH / 2; // The default centerpoint of a UML arrowhead, without scaling
+export const UML_ARROWHEAD_CENTER_Y = UML_ARROWHEAD_HEIGHT / 2; // The default centerpoint of a UML arrowhead, without scaling
+export const UML_ARROWHEAD_SHIFT = 8; // The amount of pixels the UML arrowhead has to be shifted among the line to not be covered by the "to" shape.
+export const UML_ARROWHEAD_ROTATE = 90; // The amount the UML arrowhead has to be rotated for it to point towards the "to" shape.
+export const HALF_CIRCLE = 180; // This is just so prettifier doesnt't complain at the conversion of radians to degrees.
 
 export const TEXT_SIZE = 12; // Default text size.
 const CONSTRAINT_TEXT_SIZE = TEXT_SIZE; // Smaller text size.
@@ -71,7 +92,7 @@ export const PROPERTY_RECT_CONFIG = {
   ...SHAPE_CONFIG,
   fill: "white",
   stroke: "black"
-}
+};
 
 /* CONSTRAINTS ====================================================================================================== */
 
@@ -124,7 +145,7 @@ export const LABEL_TEXT_CONFIG = {
  */
 export const URI_TEXT_CONFIG = {
   ...TEXT_CONFIG,
-  y: OFFSET + TEXT_SIZE + 5,
+  y: OFFSET + TEXT_SIZE + MARGIN,
   fontSize: TEXT_SIZE,
   fontStyle: "bold"
 };
@@ -198,13 +219,21 @@ export const ADD_PREDICATE_CONFIG = {
 /* RELATIONSHIPS ==================================================================================================== */
 
 /**
- * Configuration for relationship arrows.
- * @type {{strokeWidth: number, pointerWidth: number, pointerLength: number, fill: string, stroke: string}}
+ * Configuration for relationship lines.
+ * @type {{strokeWidth: number, fill: string, stroke: string}}
  */
-export const RELATIONSHIP_ARROW_CONFIG = {
+export const RELATIONSHIP_LINE_CONFIG = {
   stroke: "black",
   fill: "black",
-  strokeWidth: 4,
+  strokeWidth: 4
+};
+
+/**
+ * Configuration for relationship arrows.
+ * @type {{pointerWidth: number, pointerLength: number}}
+ */
+export const RELATIONSHIP_ARROW_CONFIG = {
+  ...RELATIONSHIP_LINE_CONFIG,
   pointerLength: 10,
   pointerWidth: 10
 };

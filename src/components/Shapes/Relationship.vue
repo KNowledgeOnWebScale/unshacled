@@ -17,7 +17,8 @@
       ></v-text>
     </v-group>
 
-    <v-arrow ref="arrow" :config="getConfigs().line"></v-arrow>
+    <v-line ref="arrow" :config="getConfigs().line"></v-line>
+    <u-m-l-arrow-head :relationship="relationship"></u-m-l-arrow-head>
     <v-circle
       v-if="hover"
       :config="getButtonConfig()"
@@ -31,22 +32,33 @@
 <script>
 import {
   WIDTH,
-  HEIGHT,
   DELETE_BUTTON_CONFIG,
   RELATIONSHIP_ARROW_CONFIG,
   RELATIONSHIP_LABEL_RECT_CONFIG,
   RELATIONSHIP_LABEL_TEXT_CONFIG,
   RELATIONSHIP_LABEL_OFFSET,
+  RELATIONSHIP_DASH_ARRAY,
   MARGIN,
   pointerCursor,
-  resetCursor
+  resetCursor,
+  LABEL_TOP_LEFT,
+  LABEL_TOP_RIGHT,
+  LABEL_BOTTOM_LEFT,
+  LABEL_BOTTOM_RIGHT,
+  LABEL_NO_SHIFT,
+  LABEL_SHIFT_DOWN,
+  LABEL_SHIFT_UP
 } from "../../config/konvaConfigs";
-import { nearestPointOnPerimeter, distance } from "../../util/calculations";
+import { intersectionPoint } from "../../util/calculations";
 import { uriToPrefix } from "../../util/urlParser";
 import { TERM } from "../../translation/terminology";
+import { isBlankPathNode, parsePath } from "../../util/pathPropertyUtil";
+import { COMPLIES_WITH } from "../../util/constants";
+import UMLArrowHead from "./UMLArrowHead.vue";
 
 export default {
   name: "Relationship",
+  components: { UMLArrowHead },
   props: {
     from: {
       type: String,
@@ -73,7 +85,13 @@ export default {
     return {
       hover: false,
       cardinalityPresent: false,
-      cardinalityLeft: false
+      cardinalitySection: 1,
+      labelShift: 0,
+      relationship: {
+        constraintID: this.$props.constraintID,
+        from: this.$props.from,
+        to: this.$props.to
+      }
     };
   },
   methods: {
@@ -82,12 +100,8 @@ export default {
      * @returns {[number]} a list of coordinates: [x1, y1, x2, y2]
      */
     getEndPoints() {
-      const { from, to, constraintID } = this.$props;
-      const {
-        coordinates,
-        heights,
-        yValues
-      } = this.$store.state.mShape.mCoordinate;
+      const { from, to } = this.$props;
+      const { coordinates, heights } = this.$store.state.mShape.mCoordinate;
 
       /* Check whether the cardinality label should be put on the left side or the right side of the arrowpoint */
       this.cardinalityLeft =
@@ -98,36 +112,36 @@ export default {
       /* Determine the center points of the start shape. */
       const start = {
         x: coordinates[from].x + WIDTH / 2,
-        y: yValues[from][constraintID]
-          ? coordinates[from].y +
-            yValues[from][constraintID] +
-            RELATIONSHIP_LABEL_OFFSET
-          : coordinates[from].y + RELATIONSHIP_LABEL_OFFSET
+        y: coordinates[from].y + heights[from] / 2
       };
-      /* Determine the closest point on the end shape's perimeter. */
-      const end = nearestPointOnPerimeter(
-        coordinates[to],
-        {
-          x: coordinates[to].x + WIDTH,
-          y: coordinates[to].y + heights[to]
-        },
-        start
+
+      const end = {
+        x: coordinates[to].x + WIDTH / 2,
+        y: coordinates[to].y + heights[to] / 2
+      };
+
+      const intersectionStart = intersectionPoint(
+        start,
+        end,
+        { x: coordinates[from].x, y: coordinates[from].y },
+        { x: coordinates[from].x + WIDTH, y: coordinates[from].y + heights[from] }
+      );
+      const intersectionEnd = intersectionPoint(
+        end,
+        start,
+        { x: coordinates[to].x, y: coordinates[to].y },
+        { x: coordinates[to].x + WIDTH, y: coordinates[to].y + heights[to] }
       );
 
-      /* Grab the nearest edge of the start shape. */
-      const edges = {
-        xl: coordinates[from].x,
-        xr: coordinates[from].x + WIDTH,
-        y: yValues[from][constraintID]
-          ? coordinates[from].y + yValues[from][constraintID] + HEIGHT
-          : coordinates[from].y + HEIGHT
-      };
-      const distLeft = distance(edges.xl, edges.y, end.x, end.y);
-      const distRight = distance(edges.xr, edges.y, end.x, end.y);
-      start.x = distLeft < distRight ? edges.xl : edges.xr;
-      start.y = edges.y;
+      this.setCardinalitySection(start, intersectionEnd);
+      this.setLabelShift(start, intersectionEnd);
 
-      return [start.x, start.y, end.x, end.y]; // x1, y1, x2, y2
+      return [
+        intersectionStart.x,
+        intersectionStart.y,
+        intersectionEnd.x,
+        intersectionEnd.y
+      ]; // x1, y1, x2, y2
     },
 
     /**
@@ -135,18 +149,54 @@ export default {
      * @returns {{line: object, label: object, text: object, rect: object, cardinalityLabel: object, cardinalityText: object}}
      */
     getConfigs() {
-      /* Determine the end points and the rotation of the arrow. */
+      /* Determine the end points of the arrow. */
       const points = this.getEndPoints();
 
-      /* Create and return the configuration objects using these end points and rotations. */
+      /* Store the endpoints, to use for the representation of logical relationships */
+      this.$store.commit("updateRelationshipCoordinates", {
+        constraintId: this.$props.constraintID,
+        from: this.$props.from,
+        to: this.$props.to,
+        fromCoords: {
+          x: points[0],
+          y: points[1]
+        },
+        toCoords: {
+          x: points[2],
+          y: points[3]
+        }
+      });
+
+      const rotation = Math.tan(
+        (points[3] - points[1]) / (points[2] - points[0])
+      );
+
+      let labelY;
+      switch (this.labelShift) {
+        case LABEL_NO_SHIFT:
+          labelY = (points[1] + points[3]) / 2 - 2 * MARGIN;
+          break;
+        case LABEL_SHIFT_UP:
+          labelY = (points[1] + points[3]) / 2 - 3 * MARGIN;
+          break;
+        case LABEL_SHIFT_DOWN:
+          labelY = (points[1] + points[3]) / 2 + MARGIN;
+          break;
+      }
+
+      /* Create and return the configuration objects using these end points. */
       return {
         line: {
           ...RELATIONSHIP_ARROW_CONFIG,
+          dash: RELATIONSHIP_DASH_ARRAY,
+          dashEnabled:
+            COMPLIES_WITH.includes(this.$props.constraintID) ||
+            this.$props.constraintID === TERM.not,
           points
         },
         label: {
           x: (points[0] + points[2]) / 2 + RELATIONSHIP_LABEL_OFFSET,
-          y: (points[1] + points[3] - 2 * MARGIN) / 2
+          y: labelY
         },
         text: {
           ...RELATIONSHIP_LABEL_TEXT_CONFIG,
@@ -158,12 +208,17 @@ export default {
           y: -MARGIN
         },
         cardinalityLabel: {
-          x: points[2] + RELATIONSHIP_LABEL_OFFSET,
-          y: points[3] - RELATIONSHIP_LABEL_OFFSET
+          x: points[2],
+          y: points[3]
         },
         cardinalityText: {
           ...RELATIONSHIP_LABEL_TEXT_CONFIG,
           text: this.getCardinalityLabelText()
+        },
+        arrowhead: {
+          x: points[2],
+          y: points[3],
+          rotation
         }
       };
     },
@@ -187,28 +242,111 @@ export default {
     },
 
     /**
-     * Get the configuration for the cardinality label, this puts the label on the left side of
-     * the arrow point if the label is hidden behind the "to" shape, otherwise just leaves it on the right side.
+     * This sets the section the cardinality label should be placed in, if there is one.
+     * Section 1: top left of the arrowhead
+     * Section 2: top right of the arrowhead
+     * Section 3: bottom right of the arrowhead
+     * Section 4: bottom left of the arrowhead
+     * Section 0: overlapping shapes / something went wrong => no cardinalityLabel should be placed
+     * @param {object} midPoint The center point of the start shape, with an x and y component.
+     * @param {object} endPoint The intersection point of the end shape, with an x, y and "side" component.
+     */
+    setCardinalitySection(midPoint, endPoint) {
+      if (endPoint.side) {
+        switch (endPoint.side) {
+          case "T":
+            this.cardinalitySection =
+              endPoint.x < midPoint.x ? LABEL_TOP_LEFT : LABEL_TOP_RIGHT;
+            break;
+          case "L":
+            this.cardinalitySection =
+              endPoint.y < midPoint.y ? LABEL_TOP_LEFT : LABEL_BOTTOM_LEFT;
+            break;
+          case "B":
+            this.cardinalitySection =
+              endPoint.x < midPoint.x ? LABEL_BOTTOM_LEFT : LABEL_BOTTOM_RIGHT;
+            break;
+          case "R":
+            this.cardinalitySection =
+              endPoint.y < midPoint.y ? LABEL_TOP_RIGHT : LABEL_BOTTOM_RIGHT;
+            break;
+          default:
+            this.cardinalitySection = 0;
+        }
+      } else {
+        this.cardinalitySection = 0;
+      }
+    },
+
+    setLabelShift(midPoint, endPoint) {
+      if (endPoint.side) {
+        switch (endPoint.side) {
+          case "L":
+            this.labelShift =
+              endPoint.y < midPoint.y ? LABEL_SHIFT_DOWN : LABEL_SHIFT_UP;
+            break;
+          case "R":
+            this.labelShift =
+              endPoint.y < midPoint.y ? LABEL_SHIFT_UP : LABEL_SHIFT_DOWN;
+            break;
+          default:
+            this.labelShift = LABEL_NO_SHIFT;
+        }
+      } else {
+        this.labelShift = LABEL_NO_SHIFT;
+      }
+    },
+
+    /**
+     * Get the configuration for the cardinality label, according to the cardinalitySection property;
+     * Section 1: top left of the arrowhead
+     * Section 2: top right of the arrowhead
+     * Section 3: bottom right of the arrowhead
+     * Section 4: bottom left of the arrowhead
+     * Section 0: overlapping shapes / something went wrong => no cardinalityLabel should be placed
      * @returns {object} a configuration object.
      */
     getCardinalityLabelConfig() {
-      const configs = this.getConfigs();
-      if (this.cardinalityLeft) {
-        if (
-          this.$refs.cardinalityText &&
-          this.$refs.cardinalityText.getNode()
-        ) {
-          return {
-            ...configs.cardinalityLabel,
-            x:
-              configs.cardinalityLabel.x -
-              2 * RELATIONSHIP_LABEL_OFFSET -
-              this.$refs.cardinalityText.getNode().width(),
-            y: configs.cardinalityLabel.y + 2 * RELATIONSHIP_LABEL_OFFSET
-          };
+      const { cardinalityLabel } = this.getConfigs();
+
+      if (this.$refs.cardinalityText && this.$refs.cardinalityText.getNode()) {
+        switch (this.cardinalitySection) {
+          case LABEL_TOP_LEFT:
+            return {
+              x:
+                cardinalityLabel.x -
+                this.$refs.cardinalityText.getNode().width() -
+                RELATIONSHIP_LABEL_OFFSET,
+              y:
+                cardinalityLabel.y -
+                this.$refs.cardinalityText.getNode().height() -
+                RELATIONSHIP_LABEL_OFFSET
+            };
+          case LABEL_TOP_RIGHT:
+            return {
+              x: cardinalityLabel.x + RELATIONSHIP_LABEL_OFFSET,
+              y:
+                cardinalityLabel.y -
+                this.$refs.cardinalityText.getNode().height() -
+                RELATIONSHIP_LABEL_OFFSET
+            };
+          case LABEL_BOTTOM_RIGHT:
+            return {
+              x: cardinalityLabel.x + RELATIONSHIP_LABEL_OFFSET,
+              y: cardinalityLabel.y + RELATIONSHIP_LABEL_OFFSET
+            };
+          case LABEL_BOTTOM_LEFT:
+            return {
+              x:
+                cardinalityLabel.x -
+                this.$refs.cardinalityText.getNode().width() -
+                RELATIONSHIP_LABEL_OFFSET,
+              y: cardinalityLabel.y + RELATIONSHIP_LABEL_OFFSET
+            };
         }
+      } else {
+        return cardinalityLabel;
       }
-      return configs.cardinalityLabel;
     },
 
     /**
@@ -217,12 +355,33 @@ export default {
      */
     getLabelText() {
       if (this.$props.constraintID === TERM.property) {
-        return uriToPrefix(
-          this.$store.state.mConfig.namespaces,
-          this.getPropertyFromId(TERM.path, this.$props.to)
-        );
+        const path = this.getPropertyFromId(TERM.path, this.$props.to);
+        if (path["@value"]) {
+          return path["@value"];
+        } else if (path["@id"]) {
+          const pathNode = this.$store.getters.shapeWithID(path["@id"]);
+          if (pathNode && isBlankPathNode(pathNode)) {
+            return parsePath({
+              partialPath: path["@id"],
+              getters: this.$store.getters
+            });
+          } else {
+            return uriToPrefix(this.$store.getters.namespaces, path["@id"]);
+          }
+        } else if (path["@list"]) {
+          return parsePath({
+            partialPath: path["@list"],
+            getters: this.$store.getters
+          });
+        } else {
+          return "value missing";
+        }
+      } else if (COMPLIES_WITH.includes(this.$props.constraintID)) {
+        return "compliesWith";
+      } else if (this.$props.constraintID === TERM.not) {
+        return "NOT";
       } else {
-        return "not a property";
+        return "";
       }
     },
 
@@ -234,10 +393,33 @@ export default {
      * @returns {string} The text for the cardinality label with the proper formatting and values
      */
     getCardinalityLabelText() {
-      const minCount = this.getPropertyFromId(TERM.minCount, this.$props.to);
-      const maxCount = this.getPropertyFromId(TERM.maxCount, this.$props.to);
+      const compliesWith =
+        this.$props.constraintID === TERM.qualifiedValueShape;
 
-      this.cardinalityPresent = minCount || maxCount;
+      let cardMin;
+      if (compliesWith) {
+        cardMin = this.getPropertyFromId(
+          TERM.qualifiedMinCount,
+          this.$props.from
+        );
+      } else {
+        cardMin = this.getPropertyFromId(TERM.minCount, this.$props.to);
+      }
+      const minCount = cardMin ? cardMin["@value"] : undefined;
+
+      let cardMax;
+      if (compliesWith) {
+        cardMax = this.getPropertyFromId(
+          TERM.qualifiedMaxCount,
+          this.$props.from
+        );
+      } else {
+        cardMax = this.getPropertyFromId(TERM.maxCount, this.$props.to);
+      }
+      const maxCount = cardMax ? cardMax["@value"] : undefined;
+
+      this.cardinalityPresent =
+        (minCount || maxCount) && this.cardinalitySection !== 0;
 
       return `${minCount || "0"}..${maxCount || "*"}`;
     },
@@ -249,18 +431,9 @@ export default {
      * @returns {string} That PropertyShape's sh:path value
      */
     getPropertyFromId(property, id) {
-      for (const shape of this.$store.state.mShape.model) {
-        if (shape["@id"] === id) {
-          if (shape[property]) {
-            if (shape[property][0]["@id"]) {
-              return shape[property][0]["@id"];
-            } else {
-              return shape[property][0]["@value"];
-            }
-          } else {
-            return undefined;
-          }
-        }
+      const shape = this.$store.getters.shapeWithID(id);
+      if (shape && shape[property]) {
+        return shape[property][0];
       }
       return undefined;
     },

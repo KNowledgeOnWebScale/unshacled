@@ -46,6 +46,7 @@ const exampleShapes =
       `    sh:property [` +
       `        sh:path schema:address ;` +
       `        sh:node schema:AddressShape ;` +
+      `        sh:qualifiedMinCount 2 ;` +
       `    ] .`
   )}schema:AddressShape` +
   `    a sh:NodeShape ;` +
