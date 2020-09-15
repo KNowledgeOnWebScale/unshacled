@@ -48,12 +48,12 @@ import {
   LABEL_NO_SHIFT,
   LABEL_SHIFT_DOWN,
   LABEL_SHIFT_UP
-} from "../../config/konvaConfigs";
-import { intersectionPoint } from "../../util/calculations";
-import { uriToPrefix } from "../../util/urlParser";
-import { TERM } from "../../translation/terminology";
-import { isBlankPathNode, parsePath } from "../../util/pathPropertyUtil";
-import { COMPLIES_WITH } from "../../util/constants";
+} from "../../../config/konvaConfigs";
+import { intersectionPoint } from "../../../util/calculations";
+import { uriToPrefix } from "../../../util/urlParser";
+import { TERM } from "../../../translation/terminology";
+import { isBlankPathNode, parsePath } from "../../../util/pathPropertyUtil";
+import { COMPLIES_WITH } from "../../../util/constants";
 import UMLArrowHead from "./UMLArrowHead.vue";
 
 export default {

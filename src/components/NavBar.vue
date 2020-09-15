@@ -49,6 +49,19 @@
         Property
       </sui-menu-item>
 
+      <sui-dropdown item icon="eye" simple>
+        <sui-dropdown-menu>
+          <sui-dropdown-item
+            v-for="(notation, index) in this.$store.getters
+              .possibleVisualNotations"
+            :key="index"
+            @click="changeVisualNotation(notation)"
+          >
+            {{ notation }}
+          </sui-dropdown-item>
+        </sui-dropdown-menu>
+      </sui-dropdown>
+
       <sui-menu-item
         class="clickable"
         icon="check"
@@ -242,6 +255,14 @@ export default {
     /** Validate the data using the current model. */
     validate() {
       this.$store.dispatch("validateWithCurrentModel");
+    },
+
+    /**
+     * Change the current visual notation
+     * @param notation the new visual notation
+     */
+    changeVisualNotation(notation) {
+      this.$store.commit("updateVisualNotation", { notation });
     }
   }
 };

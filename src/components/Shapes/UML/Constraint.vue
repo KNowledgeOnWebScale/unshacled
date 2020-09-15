@@ -29,16 +29,16 @@ import {
   pointerCursor,
   textCursor,
   resetCursor
-} from "../../config/konvaConfigs";
-import { uriToPrefix, urlToName } from "../../util/urlParser";
-import { SINGLE_ENTRY, APPLIES_ON } from "../../util/constants";
+} from "../../../config/konvaConfigs";
+import { uriToPrefix, urlToName } from "../../../util/urlParser";
+import { SINGLE_ENTRY, APPLIES_ON } from "../../../util/constants";
 import ValueType, {
   getValueTypeFromConstraint,
   ValueTypes
-} from "../../util/enums/ValueType";
-import { TERM } from "../../translation/terminology";
-import { abbreviate } from "../../util/strings";
-import { isBlankPathNode, parsePath } from "../../util/pathPropertyUtil";
+} from "../../../util/enums/ValueType";
+import { TERM } from "../../../translation/terminology";
+import { abbreviate } from "../../../util/strings";
+import { isBlankPathNode, parsePath } from "../../../util/pathPropertyUtil";
 
 export default {
   name: "Constraint",

@@ -41,7 +41,9 @@ const configModule = {
       combust: "http://combust.iminds.be/",
       "dbpedia-owl": "http://dbpedia.org/ontology/"
     },
-    baseURI: `${DEFAULT_BASE_URI}${IDENTIFIER}/`
+    baseURI: `${DEFAULT_BASE_URI}${IDENTIFIER}/`,
+    visualNotation: "UML",
+    visualNotations: ["UML", "VOWL"]
   },
   modules: {
     mModal: namespaceModalModule
@@ -102,6 +104,17 @@ const configModule = {
       } else {
         if (prefix) uri = state.namespaces[prefix];
         Vue.set(state, "baseURI", uri);
+      }
+    },
+
+    /**
+     * Changes the current visual notation
+     * @param state
+     * @param notation the new visual notation, either "UML" or "VOWL"
+     */
+    updateVisualNotation(state, { notation }) {
+      if (state.visualNotations.includes(notation)) {
+        Vue.set(state, "visualNotation", notation);
       }
     }
   },
@@ -178,6 +191,24 @@ const configModule = {
      */
     baseURI: state => {
       return state.baseURI;
+    },
+
+    /**
+     * Get the current visual notation
+     * @param state
+     * @returns {string} the current visual notation
+     */
+    visualNotation: state => {
+      return state.visualNotation;
+    },
+
+    /**
+     * Get a list of possible visual notations.
+     * @param state
+     * @returns {string} the current visual notation
+     */
+    possibleVisualNotations: state => {
+      return state.visualNotations;
     }
   }
 };

@@ -124,3 +124,20 @@ function clamp(a, lower, upper) {
 export function distance(x1, y1, x2, y2) {
   return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 }
+
+/**
+ * Used to find the x coordinate corresponding to a certain y coordinate on an ellipse (used for the button placement)
+ * @param {number} y
+ * @param {number} height The height of the ellipse
+ * @param {number} width The width of the ellipse
+ * @param {number} centerX The center point of the ellipse
+ * @param {number} centerY The center point of the ellipse
+ */
+export function projectYOnEllipse(y, height, width, centerX, centerY) {
+  return (
+    Math.sqrt(
+      (1 - Math.pow(y - centerY, 2) / Math.pow(height / 2, 2)) *
+        Math.pow(width / 2, 2)
+    ) + centerX
+  );
+}
