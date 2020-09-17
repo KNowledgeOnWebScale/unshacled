@@ -14,6 +14,13 @@ export const SHACL_URI = "http://www.w3.org/ns/shacl#";
 /* Indicates which constraints should be visualized in a single entry. */
 export const SINGLE_ENTRY = ["property"];
 
+export const NOTE_CORNER_VOWL = {
+  TOP_RIGHT: 1,
+  BOTTOM_RIGHT: 2,
+  BOTTOM_LEFT: 3,
+  TOP_LEFT: 4
+};
+
 /* Regular expression to test URI's. */
 // FIXME check the validity
 export const IRI_REGEX = new RegExp(

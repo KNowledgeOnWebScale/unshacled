@@ -17,8 +17,7 @@
       ></v-text>
     </v-group>
 
-    <v-line ref="arrow" :config="getConfigs().line"></v-line>
-    <u-m-l-arrow-head :relationship="relationship"></u-m-l-arrow-head>
+    <v-arrow ref="arrow" :config="getConfigs().line"></v-arrow>
     <v-circle
       v-if="hover"
       :config="getButtonConfig()"
@@ -31,7 +30,7 @@
 
 <script>
 import {
-  WIDTH,
+  HEIGHT,
   DELETE_BUTTON_CONFIG,
   RELATIONSHIP_ARROW_CONFIG,
   RELATIONSHIP_LABEL_RECT_CONFIG,
@@ -47,13 +46,21 @@ import {
   LABEL_BOTTOM_RIGHT,
   LABEL_NO_SHIFT,
   LABEL_SHIFT_DOWN,
-  LABEL_SHIFT_UP
+  LABEL_SHIFT_UP,
+  WIDTH_VOWL,
+  HEIGHT_VOWL,
+  CENTER_SHAPE_VOWL_X,
+  CENTER_SHAPE_VOWL_Y,
+  NOTE_INSET_VOWL
 } from "../../../config/konvaConfigs";
-import { intersectionPoint } from "../../../util/calculations";
+import {
+  getNodeShapeIntersection,
+  projectYOnEllipse
+} from "../../../util/calculations";
 import { uriToPrefix } from "../../../util/urlParser";
 import { TERM } from "../../../translation/terminology";
 import { isBlankPathNode, parsePath } from "../../../util/pathPropertyUtil";
-import { COMPLIES_WITH } from "../../../util/constants";
+import { COMPLIES_WITH, NOTE_CORNER_VOWL } from "../../../util/constants";
 import UMLArrowHead from "./UMLArrowHead.vue";
 
 export default {
@@ -101,36 +108,43 @@ export default {
      */
     getEndPoints() {
       const { from, to } = this.$props;
-      const { coordinates, heights } = this.$store.state.mShape.mCoordinate;
-
-      /* Check whether the cardinality label should be put on the left side or the right side of the arrowpoint */
-      this.cardinalityLeft =
-        coordinates[to].x + WIDTH > coordinates[from].x + WIDTH / 2 &&
-        coordinates[to].y <
-          coordinates[from].y + RELATIONSHIP_LABEL_RECT_CONFIG.height;
+      const { coordinates } = this.$store.state.mShape.mCoordinate;
 
       /* Determine the center points of the start shape. */
       const start = {
-        x: coordinates[from].x + WIDTH / 2,
-        y: coordinates[from].y + heights[from] / 2
+        x: coordinates[from].x + CENTER_SHAPE_VOWL_X,
+        y: coordinates[from].y + CENTER_SHAPE_VOWL_Y,
+        height: HEIGHT_VOWL,
+        width: WIDTH_VOWL
       };
 
       const end = {
-        x: coordinates[to].x + WIDTH / 2,
-        y: coordinates[to].y + heights[to] / 2
+        x: coordinates[to].x + CENTER_SHAPE_VOWL_X,
+        y: coordinates[to].y + CENTER_SHAPE_VOWL_Y,
+        height: HEIGHT_VOWL,
+        width: WIDTH_VOWL
       };
 
-      const intersectionStart = intersectionPoint(
+      const note1 = this.getNoteProps(from);
+      const startNote = note1 || {};
+      const hasNoteStart = Boolean(note1);
+      const intersectionStart = getNodeShapeIntersection(
         start,
-        end,
-        { x: coordinates[from].x, y: coordinates[from].y },
-        { x: coordinates[from].x + WIDTH, y: coordinates[from].y + heights[from] }
+        startNote,
+        hasNoteStart,
+        NOTE_CORNER_VOWL.BOTTOM_RIGHT,
+        end
       );
-      const intersectionEnd = intersectionPoint(
+
+      const note2 = this.getNoteProps(to);
+      const endNote = note2 || {};
+      const hasNoteEnd = Boolean(note2);
+      const intersectionEnd = getNodeShapeIntersection(
         end,
-        start,
-        { x: coordinates[to].x, y: coordinates[to].y },
-        { x: coordinates[to].x + WIDTH, y: coordinates[to].y + heights[to] }
+        endNote,
+        hasNoteEnd,
+        NOTE_CORNER_VOWL.BOTTOM_RIGHT,
+        start
       );
 
       this.setCardinalitySection(start, intersectionEnd);
@@ -144,6 +158,32 @@ export default {
       ]; // x1, y1, x2, y2
     },
 
+    getNoteProps(id) {
+      const { coordinates } = this.$store.state.mShape.mCoordinate;
+
+      const infoAmount = this.$store.getters.getInfoAmount(id);
+      const constraintAmount = this.$store.getters.getConstraintAmount(id);
+
+      const toReturn =
+        infoAmount + constraintAmount > 0
+          ? {
+              y: coordinates[id].y + HEIGHT_VOWL - NOTE_INSET_VOWL,
+              x:
+                projectYOnEllipse(
+                  coordinates[id].y + HEIGHT_VOWL - NOTE_INSET_VOWL,
+                  HEIGHT_VOWL,
+                  WIDTH_VOWL,
+                  coordinates[id].x + CENTER_SHAPE_VOWL_X,
+                  coordinates[id].y + CENTER_SHAPE_VOWL_Y
+                ) - NOTE_INSET_VOWL,
+              height: (infoAmount + constraintAmount) * HEIGHT + 30,
+              width: 200
+            }
+          : undefined;
+
+      return toReturn;
+    },
+
     /**
      * Get the configurations for the components of the relationship depending on the end points of the arrow.
      * @returns {{line: object, label: object, text: object, rect: object, cardinalityLabel: object, cardinalityText: object}}
@@ -151,6 +191,8 @@ export default {
     getConfigs() {
       /* Determine the end points of the arrow. */
       const points = this.getEndPoints();
+
+      console.log(points);
 
       /* Store the endpoints, to use for the representation of logical relationships */
       this.$store.commit("updateRelationshipCoordinates", {
@@ -166,10 +208,6 @@ export default {
           y: points[3]
         }
       });
-
-      const rotation = Math.tan(
-        (points[3] - points[1]) / (points[2] - points[0])
-      );
 
       let labelY;
       switch (this.labelShift) {
@@ -214,11 +252,6 @@ export default {
         cardinalityText: {
           ...RELATIONSHIP_LABEL_TEXT_CONFIG,
           text: this.getCardinalityLabelText()
-        },
-        arrowhead: {
-          x: points[2],
-          y: points[3],
-          rotation
         }
       };
     },
@@ -358,31 +391,32 @@ export default {
         const path = this.getPropertyFromId(TERM.path, this.$props.to);
         if (path["@value"]) {
           return path["@value"];
-        } else if (path["@id"]) {
+        }
+        if (path["@id"]) {
           const pathNode = this.$store.getters.shapeWithID(path["@id"]);
           if (pathNode && isBlankPathNode(pathNode)) {
             return parsePath({
               partialPath: path["@id"],
               getters: this.$store.getters
             });
-          } else {
-            return uriToPrefix(this.$store.getters.namespaces, path["@id"]);
           }
-        } else if (path["@list"]) {
+          return uriToPrefix(this.$store.getters.namespaces, path["@id"]);
+        }
+        if (path["@list"]) {
           return parsePath({
             partialPath: path["@list"],
             getters: this.$store.getters
           });
-        } else {
-          return "value missing";
         }
-      } else if (COMPLIES_WITH.includes(this.$props.constraintID)) {
-        return "compliesWith";
-      } else if (this.$props.constraintID === TERM.not) {
-        return "NOT";
-      } else {
-        return "";
+        return "value missing";
       }
+      if (COMPLIES_WITH.includes(this.$props.constraintID)) {
+        return "compliesWith";
+      }
+      if (this.$props.constraintID === TERM.not) {
+        return "NOT";
+      }
+      return "";
     },
 
     /**

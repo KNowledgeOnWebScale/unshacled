@@ -16,6 +16,9 @@ export const WIDTH_VOWL = 200;
 export const HEIGHT_VOWL = 140;
 export const CENTER_SHAPE_VOWL_X = 100;
 export const CENTER_SHAPE_VOWL_Y = 70;
+export const MARGIN_VOWL = 10;
+export const SHAPE_NAME_PADDING_VOWL = 30;
+export const NOTE_INSET_VOWL = 40;
 
 export const RELATIONSHIP_LABEL_OFFSET = 10; // How far a label should be offset from the relationship arrow
 const RELATIONSHIP_DASH = 10;
@@ -84,17 +87,17 @@ export const SHAPE_CONFIG_VOWL = {
   x: CENTER_SHAPE_VOWL_X,
   y: CENTER_SHAPE_VOWL_Y,
   stroke: "black"
-}
+};
 
 export const NODE_SHAPE_CONFIG_VOWL = {
-  ... SHAPE_CONFIG_VOWL,
+  ...SHAPE_CONFIG_VOWL,
   fill: "#AACCFF"
 };
 
 export const PROPERTY_SHAPE_CONFIG_VOWL = {
-  ... SHAPE_CONFIG_VOWL,
+  ...SHAPE_CONFIG_VOWL,
   fill: "white"
-}
+};
 
 /**
  * Configuration for a description rectangle.
@@ -213,19 +216,21 @@ export const DESCRIPTION_TEXT_CONFIG = {
 const TEXT_CONFIG_VOWL = {
   align: "center",
   text: "",
-  width: WIDTH_VOWL,
+  width: WIDTH_VOWL - MARGIN_VOWL,
+  x: MARGIN_VOWL / 2,
   fontSize: TEXT_SIZE
 };
 
 export const NAME_TEXT_CONFIG_VOWL = {
   ...TEXT_CONFIG_VOWL,
-  y: 30,
+  y: SHAPE_NAME_PADDING_VOWL,
   fontStyle: "bold"
 };
 
 export const URI_TEXT_CONFIG_VOWL = {
   ...TEXT_CONFIG_VOWL,
-  y: CENTER_SHAPE_VOWL_Y
+  y: CENTER_SHAPE_VOWL_Y,
+  fontStyle: "italic"
 };
 
 /* BUTTONS ========================================================================================================== */
@@ -272,9 +277,15 @@ const BUTTON_CONFIG_VOWL = {
  * @type {{x: number, y: number, radius: number, fill: string}}
  */
 export const DELETE_BUTTON_CONFIG_VOWL = {
-  ...BUTTON_CONFIG,
+  ...BUTTON_CONFIG_VOWL,
   y: OFFSET,
-  x: projectYOnEllipse(OFFSET, HEIGHT_VOWL, WIDTH_VOWL, CENTER_SHAPE_VOWL_X, CENTER_SHAPE_VOWL_Y),
+  x: projectYOnEllipse(
+    OFFSET,
+    HEIGHT_VOWL,
+    WIDTH_VOWL,
+    CENTER_SHAPE_VOWL_X,
+    CENTER_SHAPE_VOWL_Y
+  ),
   fill: "red"
 };
 
@@ -283,9 +294,15 @@ export const DELETE_BUTTON_CONFIG_VOWL = {
  * @type {{x: number, y: number, radius: number, fill: string}}
  */
 export const ADD_PREDICATE_CONFIG_VOWL = {
-  ...BUTTON_CONFIG,
+  ...BUTTON_CONFIG_VOWL,
   y: OFFSET + HEIGHT / 2,
-  x: projectYOnEllipse(OFFSET + HEIGHT / 2, HEIGHT_VOWL, WIDTH_VOWL, CENTER_SHAPE_VOWL_X, CENTER_SHAPE_VOWL_Y),
+  x: projectYOnEllipse(
+    OFFSET + HEIGHT / 2,
+    HEIGHT_VOWL,
+    WIDTH_VOWL,
+    CENTER_SHAPE_VOWL_X,
+    CENTER_SHAPE_VOWL_Y
+  ),
   fill: "green"
 };
 

@@ -12,10 +12,7 @@
         <!-- Header -->
         <v-group @click="startEditing">
           <v-ellipse :config="getShapeConfig()"></v-ellipse>
-          <v-text
-            ref="shapeLabel"
-            :config="getLabelTextConfig()"
-          ></v-text>
+          <v-text ref="shapeLabel" :config="getLabelTextConfig()"></v-text>
           <v-text ref="shapeURI" :config="getURITextConfig()"></v-text>
         </v-group>
       </v-group>
@@ -37,57 +34,47 @@
           @mouseleave="setCursor('')"
         ></v-circle>
       </v-group>
-      
-      <!-- Shape information
-      <v-group>
-        <v-rect :config="getInfoShapeConfig()"></v-rect>
-        <div v-for="(prop, key) in getShapeInfo()" :key="key">
-          <constraint
-            :constraint-i-d="key"
-            :shape-i-d="$props.id"
-            :node-shape="$props.nodeShape"
-            :stroke="shapeConfig.stroke"
-          ></constraint>
-        </div>
-      </v-group> -->
 
-      <!-- Constraints
-      <v-group>
-        <v-rect :config="getConstraintShapeConfig()"></v-rect>
-        <div v-for="(prop, key) in getConstraints()" :key="key">
-          <constraint
-            :constraint-i-d="key"
-            :shape-i-d="$props.id"
-            :node-shape="$props.nodeShape"
-            :stroke="shapeConfig.stroke"
-          ></constraint>
-        </div>
-      </v-group> -->
+      <!-- Information & constraints -->
+      <v-group :v-if="getNoteLength() > 0" :config="getNoteConfig()">
+        <note :length="getNoteLength()" :shape-id="this.$props.id" />
+        <v-group :config="getConstraintsConfig()">
+          <div v-for="(prop, key) in getShapeInfo()" :key="key">
+            <constraint
+              :constraint-i-d="key"
+              :shape-i-d="$props.id"
+              :node-shape="$props.nodeShape"
+              :stroke="shapeConfig.stroke"
+            ></constraint>
+          </div>
+          <div v-for="(prop, key) in getConstraints()" :key="key">
+            <constraint
+              :constraint-i-d="key"
+              :shape-i-d="$props.id"
+              :node-shape="$props.nodeShape"
+              :stroke="shapeConfig.stroke"
+            ></constraint>
+          </div>
+        </v-group>
+      </v-group>
     </v-group>
   </div>
 </template>
 
 <script>
 import Constraint from "./Constraint.vue";
+import Note from "./Note.vue";
 import { uriToPrefix } from "../../../util/urlParser";
 import {
-  DELETE_BUTTON_CONFIG,
-  LABEL_TEXT_CONFIG,
-  ADD_PREDICATE_CONFIG,
-  URI_TEXT_CONFIG,
   TEXT_OFFSET,
-  OFFSET,
   DESCRIPTION_RECT_CONFIG,
   DESCRIPTION_TITLE_CONFIG,
   DESCRIPTION_TEXT_CONFIG,
-  PROPERTY_RECT_CONFIG,
   MAX_LENGTH,
   TEXT_SIZE,
   pointerCursor,
   resetCursor,
   textCursor,
-  SHAPE_CONFIG,
-  HEIGHT_HEADER,
   HEIGHT,
   NODE_SHAPE_CONFIG_VOWL,
   PROPERTY_SHAPE_CONFIG_VOWL,
@@ -95,16 +82,21 @@ import {
   NAME_TEXT_CONFIG_VOWL,
   URI_TEXT_CONFIG_VOWL,
   DELETE_BUTTON_CONFIG_VOWL,
-  ADD_PREDICATE_CONFIG_VOWL
-
+  ADD_PREDICATE_CONFIG_VOWL,
+  HEIGHT_VOWL,
+  WIDTH_VOWL,
+  CENTER_SHAPE_VOWL_X,
+  CENTER_SHAPE_VOWL_Y,
+  NOTE_INSET_VOWL
 } from "../../../config/konvaConfigs";
 import { TERM } from "../../../translation/terminology";
 import { abbreviate } from "../../../util/strings";
 import { LABEL } from "../../../util/constants";
+import { projectYOnEllipse } from "../../../util/calculations";
 
 export default {
   name: "Shape",
-  components: { Constraint },
+  components: { Constraint, Note },
   props: {
     id: {
       type: String,
@@ -119,15 +111,6 @@ export default {
       required: false
     }
   },
-  /**
-   * Hover {boolean} indicates if the user is hovering over this shape.
-   * TitleHover {boolean} indicates if the user is hovering over the title of this shape.
-   * ShapeConfig {object} configuration object for the rectangle of the shape.
-   * DeleteNodeConfig {object} configuration of the delete button.
-   * IDTextConfig {object} configuration of the ID text.
-   * AddPredicateConfig {object} configuration of the "add predicate"-button
-   * @returns {{hover: boolean, titleHover: boolean, shapeConfig: object, deleteNodeConfig: object, idTextConfig: object, addPredicateConfig: object}}}
-   */
   data() {
     return {
       hover: false,
@@ -136,11 +119,7 @@ export default {
         ? NODE_SHAPE_CONFIG_VOWL
         : PROPERTY_SHAPE_CONFIG_VOWL,
       deleteNodeConfig: DELETE_BUTTON_CONFIG_VOWL,
-      addPredicateConfig: ADD_PREDICATE_CONFIG_VOWL,
-      idTextConfig: {
-        ...LABEL_TEXT_CONFIG,
-        text: uriToPrefix(this.$store.state.mConfig.namespaces, this.$props.id)
-      }
+      addPredicateConfig: ADD_PREDICATE_CONFIG_VOWL
     };
   },
   mounted() {
@@ -163,16 +142,39 @@ export default {
     );
   },
   methods: {
-
-    getShapeConfig(){
+    getShapeConfig() {
+      let config;
       if (this.$props.hasType) {
-        if (this.$props.nodeShape){
-          return NODE_SHAPE_CONFIG_VOWL;
+        if (this.$props.nodeShape) {
+          config = NODE_SHAPE_CONFIG_VOWL;
         } else {
-          return PROPERTY_SHAPE_CONFIG_VOWL;
+          config = PROPERTY_SHAPE_CONFIG_VOWL;
         }
       } else {
-        return SHAPE_CONFIG_VOWL;
+        config = SHAPE_CONFIG_VOWL;
+      }
+
+      return {
+        ...config,
+        stroke: this.getBorderColor()
+      };
+    },
+
+    getBorderColor() {
+      const info = this.$store.getters.shapeInfo(this.$props.id);
+      if (info[TERM.severity]) {
+        switch (info[TERM.severity][0]["@id"]) {
+          case TERM.Info:
+            return "#93c47d";
+          case TERM.Warning:
+            return "#ffd966";
+          case TERM.Violation:
+            return "#e06666";
+          default:
+            return "#e06666";
+        }
+      } else {
+        return "#e06666";
       }
     },
 
@@ -196,43 +198,43 @@ export default {
      * @returns {object} the configuration of the URI.
      */
     getURITextConfig() {
-      const uri = uriToPrefix(this.$store.state.mConfig.namespaces, this.$props.id);
-      const text = uri[0] === "_" ? "" : uri
+      const uri = uriToPrefix(
+        this.$store.state.mConfig.namespaces,
+        this.$props.id
+      );
+      const text = uri[0] === "_" ? "" : uri;
       return {
         ...URI_TEXT_CONFIG_VOWL,
         text
-      };  
+      };
     },
 
-    /**
-     * Get the config for the rectangle around the shape information
-     * the y value starts below the header
-     * the height is the amount of information properties * the common height of a property box
-     * @returns {object} the configuration for the rectangle around the shape information
-     */
-    getInfoShapeConfig() {
-      const infoAmount = this.$store.getters.getInfoAmount(this.id);
+    getNoteConfig() {
       return {
-        ...PROPERTY_RECT_CONFIG,
-        height: infoAmount ? infoAmount * HEIGHT : HEIGHT,
-        y: HEIGHT_HEADER
-      }
+        y: HEIGHT_VOWL - NOTE_INSET_VOWL,
+        x:
+          projectYOnEllipse(
+            HEIGHT_VOWL - NOTE_INSET_VOWL,
+            HEIGHT_VOWL,
+            WIDTH_VOWL,
+            CENTER_SHAPE_VOWL_X,
+            CENTER_SHAPE_VOWL_Y
+          ) - NOTE_INSET_VOWL
+      };
     },
 
-    /**
-     * Get the config for the rectangle around the shape constraints
-     * the y value starts below the information rectangle
-     * the height is the amount of constraints * the common height of a property box
-     * @returns {object} the configuration for the rectangle around the shape constraints
-     */
-    getConstraintShapeConfig() {
+    getNoteLength() {
       const infoAmount = this.$store.getters.getInfoAmount(this.id);
       const constraintAmount = this.$store.getters.getConstraintAmount(this.id);
+
+      return (infoAmount + constraintAmount) * HEIGHT;
+    },
+
+    getConstraintsConfig() {
       return {
-        ...PROPERTY_RECT_CONFIG,
-        height: constraintAmount ? constraintAmount * HEIGHT : HEIGHT,
-        y: infoAmount ? HEIGHT_HEADER + (infoAmount * HEIGHT) : HEIGHT_HEADER + HEIGHT
-      }
+        x: -10,
+        y: -30
+      };
     },
 
     /**
@@ -300,7 +302,6 @@ export default {
      * @returns {object} an object mapping every informative constraint name to a (list of) values.
      */
     getShapeInfo() {
-      // console.log(this.$store.getters.shapeInfo(this.$props.id));
       return this.$store.getters.shapeInfo(this.$props.id);
     },
 
