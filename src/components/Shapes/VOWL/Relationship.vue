@@ -192,8 +192,6 @@ export default {
       /* Determine the end points of the arrow. */
       const points = this.getEndPoints();
 
-      console.log(points);
-
       /* Store the endpoints, to use for the representation of logical relationships */
       this.$store.commit("updateRelationshipCoordinates", {
         constraintId: this.$props.constraintID,
