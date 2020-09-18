@@ -903,8 +903,7 @@ const json = [
     ],
     "http://www.w3.org/ns/shacl#parameter": [
       {
-        "@id":
-          "http://www.w3.org/ns/shacl#DatatypeConstraintComponent-datatype"
+        "@id": "http://www.w3.org/ns/shacl#DatatypeConstraintComponent-datatype"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -955,8 +954,7 @@ const json = [
     ],
     "http://www.w3.org/ns/shacl#parameter": [
       {
-        "@id":
-          "http://www.w3.org/ns/shacl#DisjointConstraintComponent-disjoint"
+        "@id": "http://www.w3.org/ns/shacl#DisjointConstraintComponent-disjoint"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1117,8 +1115,7 @@ const json = [
     ],
     "http://www.w3.org/ns/shacl#parameter": [
       {
-        "@id":
-          "http://www.w3.org/ns/shacl#HasValueConstraintComponent-hasValue"
+        "@id": "http://www.w3.org/ns/shacl#HasValueConstraintComponent-hasValue"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1586,8 +1583,7 @@ const json = [
     ],
     "http://www.w3.org/ns/shacl#parameter": [
       {
-        "@id":
-          "http://www.w3.org/ns/shacl#LessThanConstraintComponent-lessThan"
+        "@id": "http://www.w3.org/ns/shacl#LessThanConstraintComponent-lessThan"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1702,8 +1698,7 @@ const json = [
     ],
     "http://www.w3.org/ns/shacl#parameter": [
       {
-        "@id":
-          "http://www.w3.org/ns/shacl#MaxCountConstraintComponent-maxCount"
+        "@id": "http://www.w3.org/ns/shacl#MaxCountConstraintComponent-maxCount"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -1912,8 +1907,7 @@ const json = [
     ],
     "http://www.w3.org/ns/shacl#parameter": [
       {
-        "@id":
-          "http://www.w3.org/ns/shacl#MinCountConstraintComponent-minCount"
+        "@id": "http://www.w3.org/ns/shacl#MinCountConstraintComponent-minCount"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -2190,8 +2184,7 @@ const json = [
     ],
     "http://www.w3.org/ns/shacl#parameter": [
       {
-        "@id":
-          "http://www.w3.org/ns/shacl#NodeKindConstraintComponent-nodeKind"
+        "@id": "http://www.w3.org/ns/shacl#NodeKindConstraintComponent-nodeKind"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -2505,8 +2498,7 @@ const json = [
     ],
     "http://www.w3.org/ns/shacl#parameter": [
       {
-        "@id":
-          "http://www.w3.org/ns/shacl#PropertyConstraintComponent-property"
+        "@id": "http://www.w3.org/ns/shacl#PropertyConstraintComponent-property"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": [
@@ -6433,7 +6425,8 @@ export const constraintsByTypes = {
     "http://www.w3.org/ns/shacl#class",
     // "http://www.w3.org/ns/shacl#path",
     "http://www.w3.org/ns/shacl#datatype",
-    "http://www.w3.org/ns/shacl#nodeKind"
+    "http://www.w3.org/ns/shacl#nodeKind",
+    "http://www.w3.org/ns/shacl#severity"
   ],
   "Cardinality Constraints": [
     "http://www.w3.org/ns/shacl#minCount",

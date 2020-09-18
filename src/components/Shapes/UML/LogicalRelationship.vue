@@ -16,8 +16,8 @@ import {
   RELATIONSHIP_LABEL_TEXT_CONFIG,
   RELATIONSHIP_LABEL_RECT_CONFIG,
   LOGICAL_RELATIONSHIP_APPENDAGE
-} from "../../config/konvaConfigs";
-import { TERM } from "../../translation/terminology";
+} from "../../../config/konvaConfigs";
+import { TERM } from "../../../translation/terminology";
 
 export default {
   name: "LogicalRelationship",

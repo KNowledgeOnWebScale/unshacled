@@ -1,3 +1,5 @@
+import { projectYOnEllipse } from "../util/calculations";
+
 /* CONSTANTS ======================================================================================================== */
 
 export const WIDTH = 250; // Width of a rectangle.
@@ -9,6 +11,15 @@ export const MARGIN_TOP = 40; // Margin to accomodate the navbar.
 export const OFFSET = 10; // General offset.
 export const TEXT_OFFSET = 15; // Offset for text.
 export const MAX_LENGTH = 30; // Maximum length for labels.
+export const BUTTON_RADIUS = 8;
+
+export const WIDTH_VOWL = 200;
+export const HEIGHT_VOWL = 140;
+export const CENTER_SHAPE_VOWL_X = 100;
+export const CENTER_SHAPE_VOWL_Y = 70;
+export const MARGIN_VOWL = 10;
+export const SHAPE_NAME_PADDING_VOWL = 30;
+export const NOTE_INSET_VOWL = 40;
 
 export const RELATIONSHIP_LABEL_OFFSET = 10; // How far a label should be offset from the relationship arrow
 const RELATIONSHIP_DASH = 10;
@@ -69,6 +80,24 @@ export const PROPERTY_SHAPE_CONFIG = {
   height: HEIGHT_HEADER,
   fill: "white",
   stroke: "black"
+};
+
+export const SHAPE_CONFIG_VOWL = {
+  height: HEIGHT_VOWL,
+  width: WIDTH_VOWL,
+  x: CENTER_SHAPE_VOWL_X,
+  y: CENTER_SHAPE_VOWL_Y,
+  stroke: "black"
+};
+
+export const NODE_SHAPE_CONFIG_VOWL = {
+  ...SHAPE_CONFIG_VOWL,
+  fill: "#AACCFF"
+};
+
+export const PROPERTY_SHAPE_CONFIG_VOWL = {
+  ...SHAPE_CONFIG_VOWL,
+  fill: "white"
 };
 
 /**
@@ -185,6 +214,26 @@ export const DESCRIPTION_TEXT_CONFIG = {
   align: "left"
 };
 
+const TEXT_CONFIG_VOWL = {
+  align: "center",
+  text: "",
+  width: WIDTH_VOWL - MARGIN_VOWL,
+  x: MARGIN_VOWL / 2,
+  fontSize: TEXT_SIZE
+};
+
+export const NAME_TEXT_CONFIG_VOWL = {
+  ...TEXT_CONFIG_VOWL,
+  y: SHAPE_NAME_PADDING_VOWL,
+  fontStyle: "bold"
+};
+
+export const URI_TEXT_CONFIG_VOWL = {
+  ...TEXT_CONFIG_VOWL,
+  y: CENTER_SHAPE_VOWL_Y,
+  fontStyle: "italic"
+};
+
 /* BUTTONS ========================================================================================================== */
 
 /**
@@ -193,7 +242,7 @@ export const DESCRIPTION_TEXT_CONFIG = {
  */
 const BUTTON_CONFIG = {
   x: BUTTON_OFFSET,
-  radius: 6
+  radius: BUTTON_RADIUS
 };
 
 /**
@@ -213,6 +262,48 @@ export const DELETE_BUTTON_CONFIG = {
 export const ADD_PREDICATE_CONFIG = {
   ...BUTTON_CONFIG,
   y: OFFSET + HEIGHT / 2,
+  fill: "green"
+};
+
+/**
+ * Default button configuration.
+ * @type {{x: number, radius: number}}
+ */
+const BUTTON_CONFIG_VOWL = {
+  radius: BUTTON_RADIUS
+};
+
+/**
+ * Configuration for delete buttons.
+ * @type {{x: number, y: number, radius: number, fill: string}}
+ */
+export const DELETE_BUTTON_CONFIG_VOWL = {
+  ...BUTTON_CONFIG_VOWL,
+  y: OFFSET,
+  x: projectYOnEllipse(
+    OFFSET,
+    HEIGHT_VOWL,
+    WIDTH_VOWL,
+    CENTER_SHAPE_VOWL_X,
+    CENTER_SHAPE_VOWL_Y
+  ),
+  fill: "red"
+};
+
+/**
+ * Configuration for "add predicate"-buttons.
+ * @type {{x: number, y: number, radius: number, fill: string}}
+ */
+export const ADD_PREDICATE_CONFIG_VOWL = {
+  ...BUTTON_CONFIG_VOWL,
+  y: OFFSET + HEIGHT / 2,
+  x: projectYOnEllipse(
+    OFFSET + HEIGHT / 2,
+    HEIGHT_VOWL,
+    WIDTH_VOWL,
+    CENTER_SHAPE_VOWL_X,
+    CENTER_SHAPE_VOWL_Y
+  ),
   fill: "green"
 };
 

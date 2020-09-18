@@ -77,7 +77,7 @@
 
 <script>
 import Constraint from "./Constraint.vue";
-import { uriToPrefix } from "../../util/urlParser";
+import { uriToPrefix } from "../../../util/urlParser";
 import {
   DELETE_BUTTON_CONFIG,
   LABEL_TEXT_CONFIG,
@@ -99,10 +99,10 @@ import {
   SHAPE_CONFIG,
   HEIGHT_HEADER,
   HEIGHT
-} from "../../config/konvaConfigs";
-import { TERM } from "../../translation/terminology";
-import { abbreviate } from "../../util/strings";
-import { LABEL } from "../../util/constants";
+} from "../../../config/konvaConfigs";
+import { TERM } from "../../../translation/terminology";
+import { abbreviate } from "../../../util/strings";
+import { LABEL } from "../../../util/constants";
 
 export default {
   name: "Shape",

@@ -26,8 +26,8 @@ import {
   UML_ARROWHEAD_SHIFT,
   UML_ARROWHEAD_ROTATE,
   HALF_CIRCLE
-} from "../../config/konvaConfigs";
-import { relationshipUID } from "../../util/relationshipUID";
+} from "../../../config/konvaConfigs";
+import { relationshipUID } from "../../../util/relationshipUID";
 
 export default {
   name: "UMLArrowHead",
