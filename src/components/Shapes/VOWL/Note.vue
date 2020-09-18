@@ -7,8 +7,8 @@
           context.moveTo(0, 0);
           context.lineTo(180, 0);
           context.lineTo(200, 20);
-          context.lineTo(200, 30 + shapeLength);
-          context.lineTo(0, 30 + shapeLength);
+          context.lineTo(200, 30 + getNoteLength());
+          context.lineTo(0, 30 + getNoteLength());
           context.closePath();
           context.fillStrokeShape(shape);
         },
@@ -21,30 +21,26 @@
 </template>
 
 <script>
+import { HEIGHT } from "../../../config/konvaConfigs";
 import { TERM } from "../../../translation/terminology";
 
 export default {
   name: "Note",
   components: {},
   props: {
-    length: {
-      type: Number,
-      required: true
-    },
     shapeId: {
       type: String,
       required: true
     }
   },
-  data() {
-    return {
-      shapeLength: this.$props.length
-    };
-  },
-  mounted() {},
   methods: {
-    updateLength(length) {
-      this.shapeLength = length;
+    getNoteLength() {
+      const infoAmount = this.$store.getters.getInfoAmount(this.$props.shapeId);
+      const constraintAmount = this.$store.getters.getConstraintAmount(
+        this.$props.shapeId
+      );
+
+      return (infoAmount + constraintAmount) * HEIGHT;
     },
 
     getBorderColor() {

@@ -42,8 +42,8 @@ const configModule = {
       "dbpedia-owl": "http://dbpedia.org/ontology/"
     },
     baseURI: `${DEFAULT_BASE_URI}${IDENTIFIER}/`,
-    visualNotation: "UML",
-    visualNotations: ["UML", "VOWL"]
+    visualNotation: "ShapeUML",
+    visualNotations: ["ShapeUML", "ShapeVOWL"]
   },
   modules: {
     mModal: namespaceModalModule

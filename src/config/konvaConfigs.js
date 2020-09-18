@@ -11,6 +11,7 @@ export const MARGIN_TOP = 40; // Margin to accomodate the navbar.
 export const OFFSET = 10; // General offset.
 export const TEXT_OFFSET = 15; // Offset for text.
 export const MAX_LENGTH = 30; // Maximum length for labels.
+export const BUTTON_RADIUS = 8;
 
 export const WIDTH_VOWL = 200;
 export const HEIGHT_VOWL = 140;
@@ -241,7 +242,7 @@ export const URI_TEXT_CONFIG_VOWL = {
  */
 const BUTTON_CONFIG = {
   x: BUTTON_OFFSET,
-  radius: 6
+  radius: BUTTON_RADIUS
 };
 
 /**
@@ -269,7 +270,7 @@ export const ADD_PREDICATE_CONFIG = {
  * @type {{x: number, radius: number}}
  */
 const BUTTON_CONFIG_VOWL = {
-  radius: 6
+  radius: BUTTON_RADIUS
 };
 
 /**

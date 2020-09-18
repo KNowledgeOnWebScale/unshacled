@@ -37,7 +37,7 @@
 
       <!-- Information & constraints -->
       <v-group :v-if="getNoteLength() > 0" :config="getNoteConfig()">
-        <note :length="getNoteLength()" :shape-id="this.$props.id" />
+        <note :shape-id="this.$props.id" />
         <v-group :config="getConstraintsConfig()">
           <div v-for="(prop, key) in getShapeInfo()" :key="key">
             <constraint

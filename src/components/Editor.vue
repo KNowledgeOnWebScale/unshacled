@@ -14,7 +14,7 @@
         ref="relationships"
       >
         <relationship-u-m-l
-          v-if="visualNotation === 'UML'"
+          v-if="visualNotation === 'ShapeUML'"
           :id="key"
           :from="obj.from"
           :to="obj.to"
@@ -22,7 +22,7 @@
           :on-click-props="obj.onClick"
         ></relationship-u-m-l>
         <relationship-v-o-w-l
-          v-else-if="visualNotation === 'VOWL'"
+          v-else-if="visualNotation === 'ShapeVOWL'"
           :id="key"
           :from="obj.from"
           :to="obj.to"
@@ -39,14 +39,14 @@
         ref="logicalRelationships"
       >
         <logical-relationship-u-m-l
-          v-if="visualNotation === 'UML'"
+          v-if="visualNotation === 'ShapeUML'"
           :id="key"
           :from="obj.from"
           :to="obj.to"
           :constraint-i-d="obj.constraintID"
         ></logical-relationship-u-m-l>
         <logical-relationship-v-o-w-l
-          v-else-if="visualNotation === 'VOWL'"
+          v-else-if="visualNotation === 'ShapeVOWL'"
           :id="key"
           :from="obj.from"
           :to="obj.to"
@@ -59,13 +59,13 @@
         :key="key"
       >
         <shape-u-m-l
-          v-if="visualNotation === 'UML'"
+          v-if="visualNotation === 'ShapeUML'"
           :id="key"
           :ref="key"
           :has-type="false"
         ></shape-u-m-l>
         <shape-v-o-w-l
-          v-else-if="visualNotation === 'VOWL'"
+          v-else-if="visualNotation === 'ShapeVOWL'"
           :id="key"
           :ref="key"
           :has-type="false"
@@ -73,14 +73,14 @@
       </div>
       <div v-for="(obj, key) in this.$store.getters.propertyShapes" :key="key">
         <shape-u-m-l
-          v-if="visualNotation === 'UML'"
+          v-if="visualNotation === 'ShapeUML'"
           :id="key"
           :ref="key"
           :has-type="true"
           :node-shape="false"
         ></shape-u-m-l>
         <shape-v-o-w-l
-          v-else-if="visualNotation === 'VOWL'"
+          v-else-if="visualNotation === 'ShapeVOWL'"
           :id="key"
           :ref="key"
           :has-type="true"
@@ -89,14 +89,14 @@
       </div>
       <div v-for="(obj, key) in this.$store.getters.nodeShapes" :key="key">
         <shape-u-m-l
-          v-if="visualNotation === 'UML'"
+          v-if="visualNotation === 'ShapeUML'"
           :id="key"
           :ref="key"
           :has-type="true"
           :node-shape="true"
         ></shape-u-m-l>
         <shape-v-o-w-l
-          v-else-if="visualNotation === 'VOWL'"
+          v-else-if="visualNotation === 'ShapeVOWL'"
           :id="key"
           :ref="key"
           :has-type="true"
