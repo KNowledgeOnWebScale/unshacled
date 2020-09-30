@@ -38,7 +38,7 @@
       <!-- Information & constraints -->
       <v-group :v-if="getNoteLength() > 0" :config="getNoteConfig()">
         <note :shape-id="this.$props.id" />
-        <v-group :config="getConstraintsConfig()">
+        <v-group :config="constraintLayout">
           <div v-for="(prop, key) in getShapeInfo()" :key="key">
             <constraint
               :constraint-i-d="key"
@@ -87,7 +87,8 @@ import {
   WIDTH_VOWL,
   CENTER_SHAPE_VOWL_X,
   CENTER_SHAPE_VOWL_Y,
-  NOTE_INSET_VOWL
+  NOTE_INSET_VOWL,
+  NOTE_MARGIN_VOWL
 } from "../../../config/konvaConfigs";
 import { TERM } from "../../../translation/terminology";
 import { abbreviate } from "../../../util/strings";
@@ -119,7 +120,8 @@ export default {
         ? NODE_SHAPE_CONFIG_VOWL
         : PROPERTY_SHAPE_CONFIG_VOWL,
       deleteNodeConfig: DELETE_BUTTON_CONFIG_VOWL,
-      addPredicateConfig: ADD_PREDICATE_CONFIG_VOWL
+      addPredicateConfig: ADD_PREDICATE_CONFIG_VOWL,
+      constraintLayout: { y: NOTE_MARGIN_VOWL }
     };
   },
   mounted() {
@@ -228,13 +230,6 @@ export default {
       const constraintAmount = this.$store.getters.getConstraintAmount(this.id);
 
       return (infoAmount + constraintAmount) * HEIGHT;
-    },
-
-    getConstraintsConfig() {
-      return {
-        x: -10,
-        y: -30
-      };
     },
 
     /**

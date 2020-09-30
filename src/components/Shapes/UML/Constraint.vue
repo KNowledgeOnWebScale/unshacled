@@ -1,5 +1,9 @@
 <template>
-  <v-group @mouseenter="hoverKey = true" @mouseleave="hoverKey = false">
+  <v-group
+    :config="headerShift"
+    @mouseenter="hoverKey = true"
+    @mouseleave="hoverKey = false"
+  >
     <v-text ref="key" :config="getConfigs().keyConfig"></v-text>
     <v-text
       :config="getValueConfig(getConstraintValues())"
@@ -28,7 +32,8 @@ import {
   MAX_LENGTH,
   pointerCursor,
   textCursor,
-  resetCursor
+  resetCursor,
+  HEADER_MARGIN
 } from "../../../config/konvaConfigs";
 import { uriToPrefix, urlToName } from "../../../util/urlParser";
 import { SINGLE_ENTRY, APPLIES_ON } from "../../../util/constants";
@@ -94,6 +99,9 @@ export default {
       deleteConstraintConfig: {
         ...DELETE_BUTTON_CONFIG,
         y: HEIGHT / 2
+      },
+      headerShift: {
+        y: HEADER_MARGIN + HEIGHT
       }
     };
   },

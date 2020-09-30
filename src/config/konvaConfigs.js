@@ -19,7 +19,11 @@ export const CENTER_SHAPE_VOWL_X = 100;
 export const CENTER_SHAPE_VOWL_Y = 70;
 export const MARGIN_VOWL = 10;
 export const SHAPE_NAME_PADDING_VOWL = 30;
+
 export const NOTE_INSET_VOWL = 40;
+export const NOTE_WIDTH_VOWL = 200;
+export const NOTE_CORNER_INSET_VOWL = 20;
+export const NOTE_MARGIN_VOWL = 10;
 
 export const RELATIONSHIP_LABEL_OFFSET = 10; // How far a label should be offset from the relationship arrow
 const RELATIONSHIP_DASH = 10;
@@ -232,6 +236,18 @@ export const URI_TEXT_CONFIG_VOWL = {
   ...TEXT_CONFIG_VOWL,
   y: CENTER_SHAPE_VOWL_Y,
   fontStyle: "italic"
+};
+
+/**
+ * Configuration for a shape's constraint text.
+ * @type {{width: number, fontSize: number, text: string, align: string}}
+ */
+export const CONSTRAINT_TEXT_CONFIG_VOWL = {
+  ...TEXT_CONFIG_VOWL,
+  align: "left",
+  width: NOTE_WIDTH_VOWL - 2 * TEXT_OFFSET,
+  x: TEXT_OFFSET,
+  fontSize: CONSTRAINT_TEXT_SIZE
 };
 
 /* BUTTONS ========================================================================================================== */

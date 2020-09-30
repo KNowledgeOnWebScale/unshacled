@@ -45,7 +45,7 @@
           @mouseleave="setCursor('')"
         ></v-circle>
       </v-group>
-      
+
       <!-- Shape information -->
       <v-group>
         <v-rect :config="getInfoShapeConfig()"></v-rect>
@@ -96,7 +96,6 @@ import {
   pointerCursor,
   resetCursor,
   textCursor,
-  SHAPE_CONFIG,
   HEIGHT_HEADER,
   HEIGHT
 } from "../../../config/konvaConfigs";
@@ -139,8 +138,8 @@ export default {
         : PROPERTY_SHAPE_CONFIG,
       shapeLabel: this.$props.hasType
         ? this.$props.nodeShape
-        ? "<<NodeConditions>>"
-        : "<<PropertyConditions>>"
+          ? "<<NodeConditions>>"
+          : "<<PropertyConditions>>"
         : "<<Conditions>>",
       deleteNodeConfig: DELETE_BUTTON_CONFIG,
       idTextConfig: {
@@ -208,7 +207,7 @@ export default {
         ...PROPERTY_RECT_CONFIG,
         height: infoAmount ? infoAmount * HEIGHT : HEIGHT,
         y: HEIGHT_HEADER
-      }
+      };
     },
 
     /**
@@ -223,8 +222,10 @@ export default {
       return {
         ...PROPERTY_RECT_CONFIG,
         height: constraintAmount ? constraintAmount * HEIGHT : HEIGHT,
-        y: infoAmount ? HEIGHT_HEADER + (infoAmount * HEIGHT) : HEIGHT_HEADER + HEIGHT
-      }
+        y: infoAmount
+          ? HEIGHT_HEADER + infoAmount * HEIGHT
+          : HEIGHT_HEADER + HEIGHT
+      };
     },
 
     /**

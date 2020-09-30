@@ -5,10 +5,10 @@
         sceneFunc: function(context, shape) {
           context.beginPath();
           context.moveTo(0, 0);
-          context.lineTo(180, 0);
-          context.lineTo(200, 20);
-          context.lineTo(200, 30 + getNoteLength());
-          context.lineTo(0, 30 + getNoteLength());
+          context.lineTo(shapeData.noteWidth - shapeData.cornerInset, 0);
+          context.lineTo(shapeData.noteWidth, shapeData.cornerInset);
+          context.lineTo(shapeData.noteWidth, shapeData.cornerInset + shapeData.noteMargin + getNoteLength());
+          context.lineTo(0, shapeData.cornerInset + shapeData.noteMargin + getNoteLength());
           context.closePath();
           context.fillStrokeShape(shape);
         },
@@ -21,7 +21,12 @@
 </template>
 
 <script>
-import { HEIGHT } from "../../../config/konvaConfigs";
+import {
+  HEIGHT,
+  NOTE_CORNER_INSET_VOWL,
+  NOTE_MARGIN_VOWL,
+  NOTE_WIDTH_VOWL
+} from "../../../config/konvaConfigs";
 import { TERM } from "../../../translation/terminology";
 
 export default {
@@ -32,6 +37,15 @@ export default {
       type: String,
       required: true
     }
+  },
+  data() {
+    return {
+      shapeData: {
+        noteWidth: NOTE_WIDTH_VOWL,
+        cornerInset: NOTE_CORNER_INSET_VOWL,
+        noteMargin: NOTE_MARGIN_VOWL
+      }
+    };
   },
   methods: {
     getNoteLength() {

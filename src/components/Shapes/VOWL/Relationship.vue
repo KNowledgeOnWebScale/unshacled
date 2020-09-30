@@ -51,7 +51,7 @@ import {
   HEIGHT_VOWL,
   CENTER_SHAPE_VOWL_X,
   CENTER_SHAPE_VOWL_Y,
-  NOTE_INSET_VOWL
+  NOTE_INSET_VOWL, NOTE_CORNER_INSET_VOWL, NOTE_MARGIN_VOWL, NOTE_WIDTH_VOWL
 } from "../../../config/konvaConfigs";
 import {
   getNodeShapeIntersection,
@@ -176,8 +176,8 @@ export default {
                   coordinates[id].x + CENTER_SHAPE_VOWL_X,
                   coordinates[id].y + CENTER_SHAPE_VOWL_Y
                 ) - NOTE_INSET_VOWL,
-              height: (infoAmount + constraintAmount) * HEIGHT + 30,
-              width: 200
+              height: (infoAmount + constraintAmount) * HEIGHT + NOTE_CORNER_INSET_VOWL + NOTE_MARGIN_VOWL,
+              width: NOTE_WIDTH_VOWL
             }
           : undefined;
 

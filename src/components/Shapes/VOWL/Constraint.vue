@@ -1,15 +1,14 @@
 <template>
   <v-group @mouseenter="hoverKey = true" @mouseleave="hoverKey = false">
-    <v-text ref="key" :config="getConfigs().keyConfig"></v-text>
     <v-text
-      :config="getValueConfig(getConstraintValues())"
+      :config="getTextConfig()"
       @click="editValue(0)"
       @mouseenter="setCursor('text')"
       @mouseleave="setCursor('')"
     ></v-text>
     <v-circle
       v-if="hoverKey && canBeDeleted()"
-      :config="getConfigs().deleteConstraint"
+      :config="getDeleteConfig()"
       @click="deleteConstraint"
       @mouseenter="setCursor('pointer')"
       @mouseleave="setCursor('')"
@@ -23,12 +22,13 @@ import {
   WIDTH,
   CONSTRAINT_CONFIG,
   CONSTRAINT_TEXT_CONFIG,
+  CONSTRAINT_TEXT_CONFIG_VOWL,
   DELETE_BUTTON_CONFIG,
   TEXT_OFFSET,
   MAX_LENGTH,
   pointerCursor,
   textCursor,
-  resetCursor
+  resetCursor, DELETE_BUTTON_CONFIG_VOWL, NOTE_WIDTH_VOWL, NOTE_MARGIN_VOWL
 } from "../../../config/konvaConfigs";
 import { uriToPrefix, urlToName } from "../../../util/urlParser";
 import { SINGLE_ENTRY, APPLIES_ON } from "../../../util/constants";
@@ -82,8 +82,7 @@ export default {
         stroke: this.$props.stroke
       },
       keyConfig: {
-        ...CONSTRAINT_TEXT_CONFIG,
-        x: TEXT_OFFSET,
+        ...CONSTRAINT_TEXT_CONFIG_VOWL,
         y: TEXT_OFFSET
       },
       valueConfig: {
@@ -92,7 +91,8 @@ export default {
         x: WIDTH / 3
       },
       deleteConstraintConfig: {
-        ...DELETE_BUTTON_CONFIG,
+        ...DELETE_BUTTON_CONFIG_VOWL,
+        x: NOTE_WIDTH_VOWL - NOTE_MARGIN_VOWL,
         y: HEIGHT / 2
       }
     };
@@ -346,6 +346,60 @@ export default {
     },
 
     /* CONFIGURATIONS =============================================================================================== */
+
+    getTextConfig() {
+      const key = this.$props.constraintID;
+      let value = this.getConstraintValues();
+
+      if (value.length === 1) {
+        const val = value[0];
+        value = val;
+      }
+
+      const keyText = uriToPrefix(this.$store.state.mConfig.namespaces, key);
+      const valueText = uriToPrefix(this.$store.state.mConfig.namespaces, value);
+
+      let text;
+      switch (key) {
+        case TERM.languageIn: {
+          text = `languageIn(${value.map(x => `'${x}'`).join(", ")})`;
+          break;
+        }
+        case TERM.closed: {
+          text = `onlyListedProperties(${valueText})`;
+          break;
+        }
+        case TERM.ignoredProperties: {
+          text = `otherAllowedProperties(${value.map(x => `'${x}'`).join(", ")})`;
+          break;
+        }
+        case TERM.in: {
+          text = `valueIn(${value.map(x => `'${x}'`).join(", ")})`;
+          break;
+        }
+        default: {
+          text = `${keyText}(${valueText})`;
+          break;
+        }
+      }
+
+      const y = this.getYValue();
+
+      return {
+        ...this.keyConfig,
+        y: this.keyConfig.y + y,
+        text
+      };
+    },
+
+    getDeleteConfig() {
+      const y = this.getYValue();
+
+      return {
+        ...this.deleteConstraintConfig,
+        y: this.deleteConstraintConfig.y + y
+      };
+    },
 
     /**
      * Get the y value of this constraint.
