@@ -54,33 +54,23 @@ export default {
     constraintID: {
       type: String,
       required: true
-    },
-    stroke: {
-      type: String,
-      required: false,
-      default: "black"
     }
   },
   /**
    * HoverKey {boolean} indicates if the mouse is hovering over the key of the constraint.
    * HoverValues {boolean} indicates if the mouse is hovering over the values of the constraint.
    *
-   * RectangleConfig {} the configuration of the rectangle.
    * KeyConfig {} the configuration of the key text field.
    * ValueConfig {} the configuration of the value text field.
    * DeleteConstraintConfig {} the configuration of the delete button.
    *
-   * @returns {{hoverKey: boolean, hoverValues: boolean, rectangleConfig: {}, keyConfig: {}, valueConfig: {}, deleteConstraintConfig: {}}}
+   * @returns {{hoverKey: boolean, hoverValues: boolean, keyConfig: {}, valueConfig: {}, deleteConstraintConfig: {}}}
    */
   data() {
     return {
       hoverKey: false,
       hoverValues: false,
 
-      rectangleConfig: {
-        ...CONSTRAINT_CONFIG,
-        stroke: this.$props.stroke
-      },
       keyConfig: {
         ...CONSTRAINT_TEXT_CONFIG_VOWL,
         y: TEXT_OFFSET
@@ -383,7 +373,7 @@ export default {
         }
       }
 
-      const y = this.getYValue();
+      const y = 0;
 
       return {
         ...this.keyConfig,
@@ -414,7 +404,7 @@ export default {
     /**
      * Get the configurations for the different visualization components.
      * This is mainly to dynamically set the y values and heights of the different components.
-     * @returns {{rectangleConfig: object, keyConfig: object, valueConfig: object, deleteConstraint: object}}
+     * @returns {{keyConfig: object, valueConfig: object, deleteConstraint: object}}
      */
     getConfigs() {
       /* Determine the current y value. */
@@ -434,11 +424,6 @@ export default {
       }
 
       return {
-        rectangleConfig: {
-          ...this.rectangleConfig,
-          y,
-          height: HEIGHT
-        },
         keyConfig: {
           ...this.keyConfig,
           y: this.keyConfig.y + y,

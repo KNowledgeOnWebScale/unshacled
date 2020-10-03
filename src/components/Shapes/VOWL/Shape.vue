@@ -35,28 +35,8 @@
         ></v-circle>
       </v-group>
 
-      <!-- Information & constraints -->
-      <v-group :v-if="getNoteLength() > 0" :config="getNoteConfig()">
-        <note :shape-id="this.$props.id" />
-        <v-group :config="constraintLayout">
-          <div v-for="(prop, key) in getShapeInfo()" :key="key">
-            <constraint
-              :constraint-i-d="key"
-              :shape-i-d="$props.id"
-              :node-shape="$props.nodeShape"
-              :stroke="shapeConfig.stroke"
-            ></constraint>
-          </div>
-          <div v-for="(prop, key) in getConstraints()" :key="key">
-            <constraint
-              :constraint-i-d="key"
-              :shape-i-d="$props.id"
-              :node-shape="$props.nodeShape"
-              :stroke="shapeConfig.stroke"
-            ></constraint>
-          </div>
-        </v-group>
-      </v-group>
+      <property-group :shape-id="$props.id" :node-shape="$props.nodeShape"></property-group>
+
     </v-group>
   </div>
 </template>
@@ -64,6 +44,7 @@
 <script>
 import Constraint from "./Constraint.vue";
 import Note from "./Note.vue";
+import PropertyGroup from "./PropertyGroup.vue";
 import { uriToPrefix } from "../../../util/urlParser";
 import {
   TEXT_OFFSET,
@@ -97,7 +78,7 @@ import { projectYOnEllipse } from "../../../util/calculations";
 
 export default {
   name: "Shape",
-  components: { Constraint, Note },
+  components: { PropertyGroup, Constraint, Note },
   props: {
     id: {
       type: String,

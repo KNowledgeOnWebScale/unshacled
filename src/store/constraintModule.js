@@ -9,7 +9,12 @@ import getValueType, {
 import {
   IGNORED_PROPERTIES,
   INFO_PROPERTIES,
-  RELATIONSHIP_PROPERTIES
+  RELATIONSHIP_PROPERTIES,
+  VOWL_CONCATTED_NOTE,
+  VOWL_LENGTH_CONSTRAINTS,
+  VOWL_RANGE_CONSTRAINTS,
+  VOWL_SAME_NOTE,
+  VOWL_SEPARATE_NOTE
 } from "../util/constants";
 import predicateModalModule from "./modals/predicateModalModule";
 
@@ -594,7 +599,103 @@ const constraintModule = {
         }
       }
       return output;
-    }
+    },
+
+    singleNoteVOWLConstraints: (_state, _getters, _rootState, rootGetters) => shapeID => {
+      const constraints = {};
+      const shape = rootGetters.shapeWithID(shapeID);
+
+      if (shape) {
+        for (const prop in shape) {
+          /* Only handle the constraints that are not ignored. */
+          if (VOWL_SAME_NOTE.includes(prop)) {
+            if (shape[prop].length > 1) {
+              /* Get the ID of every element in the list. */
+              const properties = [];
+              Object.values(shape[prop]).map(p => properties.push(p["@id"]));
+              constraints[prop] = properties;
+            } else {
+              constraints[prop] = shape[prop];
+            }
+          }
+        }
+        return constraints;
+      } else {
+        return undefined;
+      }
+    },
+
+    separateNotesVOWLConstraints: (_state, _getters, _rootState, rootGetters) => shapeID => {
+      const constraints = {};
+      const shape = rootGetters.shapeWithID(shapeID);
+
+      if (shape) {
+        for (const prop in shape) {
+          /* Only handle the constraints that are not ignored. */
+          if (VOWL_SEPARATE_NOTE.includes(prop)) {
+            if (shape[prop].length > 1) {
+              /* Get the ID of every element in the list. */
+              const properties = [];
+              Object.values(shape[prop]).map(p => properties.push(p["@id"]));
+              constraints[prop] = properties;
+            } else {
+              constraints[prop] = shape[prop];
+            }
+          }
+        }
+        return constraints;
+      } else {
+        return undefined;
+      }
+    },
+
+    rangeVOWLConstraints: (_state, _getters, _rootState, rootGetters) => shapeID => {
+      const constraints = {};
+      const shape = rootGetters.shapeWithID(shapeID);
+
+      if (shape) {
+        for (const prop in shape) {
+          /* Only handle the constraints that are not ignored. */
+          if (VOWL_RANGE_CONSTRAINTS.includes(prop)) {
+            if (shape[prop].length > 1) {
+              /* Get the ID of every element in the list. */
+              const properties = [];
+              Object.values(shape[prop]).map(p => properties.push(p["@id"]));
+              constraints[prop] = properties;
+            } else {
+              constraints[prop] = shape[prop];
+            }
+          }
+        }
+        return constraints;
+      } else {
+        return undefined;
+      }
+    },
+
+    lengthVOWLConstraints: (_state, _getters, _rootState, rootGetters) => shapeID => {
+      const constraints = {};
+      const shape = rootGetters.shapeWithID(shapeID);
+
+      if (shape) {
+        for (const prop in shape) {
+          /* Only handle the constraints that are not ignored. */
+          if (VOWL_LENGTH_CONSTRAINTS.includes(prop)) {
+            if (shape[prop].length > 1) {
+              /* Get the ID of every element in the list. */
+              const properties = [];
+              Object.values(shape[prop]).map(p => properties.push(p["@id"]));
+              constraints[prop] = properties;
+            } else {
+              constraints[prop] = shape[prop];
+            }
+          }
+        }
+        return constraints;
+      } else {
+        return undefined;
+      }
+    },
   }
 };
 

@@ -55,6 +55,44 @@ export const IGNORED_PROPERTIES = [
   TERM.description
 ];
 
+/* All these properties should be on the same note in the vowl representation. */
+export const VOWL_SAME_NOTE = [
+  TERM.nodeKind,
+  TERM.pattern,
+  TERM.languageIn,
+  TERM.uniqueLang,
+  TERM.closed,
+  TERM.ignoredProperties,
+  TERM.hasValue,
+  TERM.in,
+  TERM.deactivated
+];
+
+/* All these constraints together should be visualised as the singular "range()" constraint in ShapeVOWL */
+export const VOWL_RANGE_CONSTRAINTS = [
+  TERM.minInclusive,
+  TERM.minExclusive,
+  TERM.maxInclusive,
+  TERM.maxExclusive
+];
+
+/* All these constraints together should be visualised as the singular "length()" constraint in ShapeVOWL */
+export const VOWL_LENGTH_CONSTRAINTS = [TERM.minLength, TERM.maxLength];
+
+/* These properties get their own separate note, but more than one of these properties might be needed to create the note. */
+export const VOWL_CONCATTED_NOTE = [
+  ...VOWL_RANGE_CONSTRAINTS,
+  ...VOWL_LENGTH_CONSTRAINTS
+];
+
+/* These properties get their own separate note, often with a symbol to accompany them */
+export const VOWL_SEPARATE_NOTE = [
+  TERM.equals,
+  TERM.disjoint,
+  TERM.lessThan,
+  TERM.lessThanOrEquals
+];
+
 /* The realtionships that have to be visualised as "compliesWith" according to the ShapeUML spec */
 export const COMPLIES_WITH = [TERM.node, TERM.qualifiedValueShape];
 

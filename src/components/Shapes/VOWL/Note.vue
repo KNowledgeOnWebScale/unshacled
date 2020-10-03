@@ -7,8 +7,8 @@
           context.moveTo(0, 0);
           context.lineTo(shapeData.noteWidth - shapeData.cornerInset, 0);
           context.lineTo(shapeData.noteWidth, shapeData.cornerInset);
-          context.lineTo(shapeData.noteWidth, shapeData.cornerInset + shapeData.noteMargin + getNoteLength());
-          context.lineTo(0, shapeData.cornerInset + shapeData.noteMargin + getNoteLength());
+          context.lineTo(shapeData.noteWidth, shapeData.noteMargin + getNoteLength());
+          context.lineTo(0, shapeData.noteMargin + getNoteLength());
           context.closePath();
           context.fillStrokeShape(shape);
         },
@@ -22,7 +22,7 @@
 
 <script>
 import {
-  HEIGHT,
+  NOTE_HEIGHT,
   NOTE_CORNER_INSET_VOWL,
   NOTE_MARGIN_VOWL,
   NOTE_WIDTH_VOWL
@@ -35,6 +35,10 @@ export default {
   props: {
     shapeId: {
       type: String,
+      required: true
+    }, 
+    calculateLength: {
+      type: Boolean,
       required: true
     }
   },
@@ -49,12 +53,13 @@ export default {
   },
   methods: {
     getNoteLength() {
-      const infoAmount = this.$store.getters.getInfoAmount(this.$props.shapeId);
-      const constraintAmount = this.$store.getters.getConstraintAmount(
-        this.$props.shapeId
-      );
-
-      return (infoAmount + constraintAmount) * HEIGHT;
+      if (this.$props.calculateLength){
+        const constraintAmount = Object.keys(this.$store.getters.singleNoteVOWLConstraints(
+          this.$props.shapeId
+        )).length;
+        return constraintAmount * NOTE_HEIGHT;
+      }
+      return NOTE_HEIGHT;
     },
 
     getBorderColor() {
