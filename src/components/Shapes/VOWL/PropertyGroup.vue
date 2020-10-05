@@ -64,6 +64,7 @@
 <script>
 import {
   NOTE_HEIGHT,
+  NOTE_HEIGHT_CALC,
   NOTE_ICON_SIZE_VOWL,
   NOTE_MARGIN_VOWL,
   NOTE_WIDTH_VOWL,
@@ -96,13 +97,13 @@ export default {
     };
   },
   mounted() {
-    this.getConfigs();
-    this.$store.subscribe(mutation => {
-      this.getConfigs();
+    this.setConfigs();
+    this.$store.subscribe(() => {
+      this.setConfigs();
     });
   },
   methods: {
-    getConfigs() {
+    setConfigs() {
       const { shapeId } = this.$props;
 
       const singleNoteKeys = Object.keys(this.$store.getters.singleNoteVOWLConstraints(shapeId));
@@ -112,8 +113,17 @@ export default {
 
       this.singleNotePresent = singleNoteKeys.length;
 
-      const NOTE_HEIGHT_CALC = NOTE_HEIGHT + NOTE_MARGIN_VOWL;
+      const singleNoteHeight = this.setSingleNoteConfigs(singleNoteKeys);
 
+      const concatHeight = this.setConcatConfigs(
+        {rangeConstraints, lengthConstraints},
+        singleNoteHeight
+      );
+
+      this.setSeparateConfigs(separateKeys, singleNoteHeight, concatHeight);
+    },
+
+    setSingleNoteConfigs(singleNoteKeys) {
       /* Collect all required info for the first note */
       let singleNoteHeight = 0;
       if (singleNoteKeys.length) {
@@ -141,6 +151,12 @@ export default {
         this.singleNote.constraints = singleNoteConstraints;
       }
 
+      return singleNoteHeight;
+    },
+
+    setConcatConfigs(constraints, singleNoteHeight) {
+      const { lengthConstraints, rangeConstraints } = constraints;
+
       const concatConstraints = [];
 
       /* Collect all required info for the range note */
@@ -149,27 +165,6 @@ export default {
 
       if (rangeKeys.length) {
         concatHeight += NOTE_HEIGHT_CALC;
-        let start = 0;
-        let end = "*";
-        if (rangeKeys.includes(TERM.minExclusive)) {
-          start =
-            Number.parseInt(rangeConstraints[TERM.minExclusive][0]["@value"]) + 1;
-        } else if (rangeKeys.includes(TERM.minInclusive)) {
-          start = Number.parseInt(
-            rangeConstraints[TERM.minInclusive][0]["@value"]
-          );
-        }
-
-        if (rangeKeys.includes(TERM.maxExclusive)) {
-          end =
-            Number.parseInt(rangeConstraints[TERM.maxExclusive][0]["@value"]) - 1;
-        } else if (rangeKeys.includes(TERM.maxInclusive)) {
-          end = Number.parseInt(
-            rangeConstraints[TERM.maxInclusive][0]["@value"]
-          );
-        }
-
-        const rangeLabel = `range(${start}..${end})`;
 
         concatConstraints.push({
           id: "range",
@@ -181,7 +176,7 @@ export default {
               height: NOTE_HEIGHT_CALC
             },
             constraint: {
-              text: rangeLabel,
+              text: this.getRangeLabel(rangeConstraints),
               align: "left",
               fontSize: TEXT_SIZE,
               x: 2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL,
@@ -195,23 +190,11 @@ export default {
 
       /* Collect all required info for the length note */
       const lengthKeys = Object.keys(lengthConstraints);
-      let lengthLabel;
+
       if (lengthKeys.length) {
         concatHeight += concatHeight
           ? NOTE_HEIGHT_CALC + NOTE_MARGIN_VOWL
           : NOTE_HEIGHT_CALC;
-        let start = 0;
-        let end = "*";
-        if (lengthKeys.includes(TERM.minLength)) {
-          start = Number.parseInt(
-            lengthConstraints[TERM.minLength][0]["@value"]
-          );
-        }
-        if (lengthKeys.includes(TERM.maxLength)) {
-          end = Number.parseInt(lengthConstraints[TERM.maxLength][0]["@value"]);
-        }
-
-        lengthLabel = `length(${start}..${end})`;
 
         concatConstraints.push({
           id: "length",
@@ -223,7 +206,7 @@ export default {
               height: NOTE_HEIGHT_CALC
             },
             constraint: {
-              text: lengthLabel,
+              text: this.getLengthLabel(lengthConstraints),
               align: "left",
               fontSize: TEXT_SIZE,
               x: 2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL,
@@ -244,6 +227,10 @@ export default {
         height: concatHeight
       };
 
+      return concatHeight;
+    },
+
+    setSeparateConfigs(separateKeys, singleNoteHeight, concatHeight) {
       if (separateKeys.length) {
         const separateConstraints = [];
         for (const [index, constraint] of separateKeys.entries()) {
@@ -283,6 +270,47 @@ export default {
         height: separateKeys.length * (NOTE_HEIGHT_CALC + NOTE_MARGIN_VOWL),
         width: NOTE_WIDTH_VOWL
       };
+    },
+
+    getRangeLabel(rangeConstraints) {
+      const rangeKeys = Object.keys(rangeConstraints);
+      let start = 0;
+      let end = "*";
+      if (rangeKeys.includes(TERM.minExclusive)) {
+        start =
+          Number.parseInt(rangeConstraints[TERM.minExclusive][0]["@value"]) + 1;
+      } else if (rangeKeys.includes(TERM.minInclusive)) {
+        start = Number.parseInt(
+          rangeConstraints[TERM.minInclusive][0]["@value"]
+        );
+      }
+
+      if (rangeKeys.includes(TERM.maxExclusive)) {
+        end =
+          Number.parseInt(rangeConstraints[TERM.maxExclusive][0]["@value"]) - 1;
+      } else if (rangeKeys.includes(TERM.maxInclusive)) {
+        end = Number.parseInt(
+          rangeConstraints[TERM.maxInclusive][0]["@value"]
+        );
+      }
+      return `range(${start}..${end})`;
+    },
+
+    getLengthLabel(lengthConstraints) {
+      const lengthKeys = Object.keys(lengthConstraints);
+
+      let start = 0;
+      let end = "*";
+      if (lengthKeys.includes(TERM.minLength)) {
+        start = Number.parseInt(
+          lengthConstraints[TERM.minLength][0]["@value"]
+        );
+      }
+      if (lengthKeys.includes(TERM.maxLength)) {
+        end = Number.parseInt(lengthConstraints[TERM.maxLength][0]["@value"]);
+      }
+
+      return `length(${start}..${end})`;
     },
 
     getIcon(constraint) {

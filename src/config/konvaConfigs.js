@@ -23,8 +23,9 @@ export const SHAPE_NAME_PADDING_VOWL = 30;
 export const NOTE_INSET_VOWL = 40;
 export const NOTE_WIDTH_VOWL = 200;
 export const NOTE_HEIGHT = 30;
-export const NOTE_CORNER_INSET_VOWL = 20;
 export const NOTE_MARGIN_VOWL = 5;
+export const NOTE_HEIGHT_CALC = NOTE_HEIGHT + NOTE_MARGIN_VOWL;
+export const NOTE_CORNER_INSET_VOWL = 20;
 export const NOTE_ICON_SIZE_VOWL = 30;
 
 export const RELATIONSHIP_LABEL_OFFSET = 10; // How far a label should be offset from the relationship arrow
