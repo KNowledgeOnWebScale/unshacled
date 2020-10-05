@@ -2,7 +2,10 @@
   <v-group>
     <!-- The first note, this contains all properties in constants > VOWL_SAME_NOTE -->
     <v-group v-if="singleNotePresent">
-      <note :shape-id="this.$props.shapeId" :calculate-length="true" />
+      <note
+        :shape-id="$props.shapeId"
+        :calculate-length="true"
+      />
       <v-group :config="singleNote.config">
         <v-group
           v-for="constraint in singleNote.constraints"
@@ -23,10 +26,14 @@
       <v-group
         v-for="constraint in concatted.constraints"
         :key="constraint.id"
-        :config="constraint.config"
+        :config="constraint.config.note"
       >
-        <note :shape-id="$props.shapeId" :calculate-length="false" :icon="constraint.icon" />
-        <v-text :config="constraint.textConfig"/>
+        <note
+          :shape-id="$props.shapeId"
+          :calculate-length="false"
+          :icon="constraint.icon"
+        />
+        <v-text :config="constraint.config.constraint" />
       </v-group>
     </v-group>
 
@@ -35,14 +42,20 @@
       <v-group
         v-for="constraint in separate.constraints"
         :key="constraint.id"
-        :config="constraint.config"
+        :config="constraint.config.note"
       >
-        <note :shape-id="this.$props.shapeId" :calculate-length="false" :icon="constraint.icon" />
-        <constraint
-          :constraint-i-d="constraint.id"
-          :shape-i-d="$props.shapeId"
-          :node-shape="$props.nodeShape"
-        ></constraint>
+        <note
+          :shape-id="$props.shapeId"
+          :calculate-length="false"
+          :icon="constraint.icon"
+        />
+        <v-group :config="constraint.config.constraint">
+          <constraint
+            :constraint-i-d="constraint.id"
+            :shape-i-d="$props.shapeId"
+            :node-shape="$props.nodeShape"
+          ></constraint>
+        </v-group>
       </v-group>
     </v-group>
   </v-group>
@@ -50,7 +63,6 @@
 
 <script>
 import {
-  NOTE_CORNER_INSET_VOWL,
   NOTE_HEIGHT,
   NOTE_ICON_SIZE_VOWL,
   NOTE_MARGIN_VOWL,
@@ -78,9 +90,9 @@ export default {
   data() {
     return {
       singleNotePresent: false,
-      singleNote: {},
-      concatted: {},
-      separate: {}
+      singleNote: { constraints: [] },
+      concatted: { constraints: [] },
+      separate: { constraints: [] }
     };
   },
   mounted() {
@@ -91,7 +103,7 @@ export default {
   },
   methods: {
     getConfigs() {
-      const shapeId = this.$props.shapeId;
+      const { shapeId } = this.$props;
 
       const singleNoteKeys = Object.keys(this.$store.getters.singleNoteVOWLConstraints(shapeId));
       const separateKeys = Object.keys(this.$store.getters.separateNotesVOWLConstraints(shapeId));
@@ -105,7 +117,8 @@ export default {
       /* Collect all required info for the first note */
       let singleNoteHeight = 0;
       if (singleNoteKeys.length) {
-        singleNoteHeight = singleNoteKeys.length * NOTE_HEIGHT + NOTE_MARGIN_VOWL;
+        singleNoteHeight =
+          singleNoteKeys.length * NOTE_HEIGHT + NOTE_MARGIN_VOWL;
         this.singleNote.config = {
           x: 0,
           y: 0,
@@ -127,8 +140,8 @@ export default {
         }
         this.singleNote.constraints = singleNoteConstraints;
       }
-      
-      let concatConstraints = [];
+
+      const concatConstraints = [];
 
       /* Collect all required info for the range note */
       let concatHeight = 0;
@@ -139,15 +152,21 @@ export default {
         let start = 0;
         let end = "*";
         if (rangeKeys.includes(TERM.minExclusive)) {
-          start = Number.parseInt(rangeConstraints[TERM.minExclusive][0]["@value"]) + 1;
+          start =
+            Number.parseInt(rangeConstraints[TERM.minExclusive][0]["@value"]) + 1;
         } else if (rangeKeys.includes(TERM.minInclusive)) {
-          start = Number.parseInt(rangeConstraints[TERM.minInclusive][0]["@value"]);
+          start = Number.parseInt(
+            rangeConstraints[TERM.minInclusive][0]["@value"]
+          );
         }
 
         if (rangeKeys.includes(TERM.maxExclusive)) {
-          end = Number.parseInt(rangeConstraints[TERM.maxExclusive][0]["@value"]) - 1;
+          end =
+            Number.parseInt(rangeConstraints[TERM.maxExclusive][0]["@value"]) - 1;
         } else if (rangeKeys.includes(TERM.maxInclusive)) {
-          end = Number.parseInt(rangeConstraints[TERM.maxInclusive][0]["@value"]);
+          end = Number.parseInt(
+            rangeConstraints[TERM.maxInclusive][0]["@value"]
+          );
         }
 
         const rangeLabel = `range(${start}..${end})`;
@@ -155,20 +174,22 @@ export default {
         concatConstraints.push({
           id: "range",
           config: {
-            x: 0,
-            y: 0,
-            width: NOTE_WIDTH_VOWL,
-            height: concatHeight,
+            note: {
+              x: 0,
+              y: 0,
+              width: NOTE_WIDTH_VOWL,
+              height: NOTE_HEIGHT_CALC
+            },
+            constraint: {
+              text: rangeLabel,
+              align: "left",
+              fontSize: TEXT_SIZE,
+              x: 2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL,
+              y: NOTE_HEIGHT_CALC / 2 - TEXT_SIZE / 2,
+              width: NOTE_WIDTH_VOWL - (2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL)
+            }
           },
-          icon: "tachometer alternate",
-          textConfig: {
-            text: rangeLabel,
-            align: "left",
-            fontSize: TEXT_SIZE,
-            x: 2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL,
-            y: NOTE_HEIGHT_CALC / 2 - (TEXT_SIZE/2),
-            width: NOTE_WIDTH_VOWL - (2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL)
-          }
+          icon: "tachometer alternate"
         });
       }
 
@@ -178,11 +199,13 @@ export default {
       if (lengthKeys.length) {
         concatHeight += concatHeight
           ? NOTE_HEIGHT_CALC + NOTE_MARGIN_VOWL
-          : NOTE_HEIGHT_CALC
+          : NOTE_HEIGHT_CALC;
         let start = 0;
         let end = "*";
         if (lengthKeys.includes(TERM.minLength)) {
-          start = Number.parseInt(lengthConstraints[TERM.minLength][0]["@value"]);
+          start = Number.parseInt(
+            lengthConstraints[TERM.minLength][0]["@value"]
+          );
         }
         if (lengthKeys.includes(TERM.maxLength)) {
           end = Number.parseInt(lengthConstraints[TERM.maxLength][0]["@value"]);
@@ -193,20 +216,22 @@ export default {
         concatConstraints.push({
           id: "length",
           config: {
-            x: 0,
-            y: rangeKeys.length ? NOTE_HEIGHT_CALC + NOTE_MARGIN_VOWL : 0,
-            width: NOTE_WIDTH_VOWL,
-            height: concatHeight
+            note: {
+              x: 0,
+              y: rangeKeys.length ? NOTE_HEIGHT_CALC + NOTE_MARGIN_VOWL : 0,
+              width: NOTE_WIDTH_VOWL,
+              height: NOTE_HEIGHT_CALC
+            },
+            constraint: {
+              text: lengthLabel,
+              align: "left",
+              fontSize: TEXT_SIZE,
+              x: 2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL,
+              y: NOTE_HEIGHT_CALC / 2 - TEXT_SIZE / 2,
+              width: NOTE_WIDTH_VOWL - (2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL)
+            }
           },
-          icon: "text width",
-          textConfig: {
-            text: lengthLabel,
-            align: "left",
-            fontSize: TEXT_SIZE,
-            x: 2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL,
-            y: NOTE_HEIGHT_CALC / 2 - (TEXT_SIZE/2),
-            width: NOTE_WIDTH_VOWL - (2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL)
-          }
+          icon: "text width"
         });
       }
 
@@ -219,15 +244,56 @@ export default {
         height: concatHeight
       };
 
-      this.separate = {
-        config: {
-          x: 0,
-          y: 0,
-          width: 0,
-          height: 0
-        },
-        constraints: []
+      if (separateKeys.length) {
+        const separateConstraints = [];
+        for (const [index, constraint] of separateKeys.entries()) {
+          separateConstraints.push({
+            id: constraint,
+            config: {
+              note: {
+                x: 0,
+                y: index * (NOTE_HEIGHT_CALC + NOTE_MARGIN_VOWL),
+                width: NOTE_WIDTH_VOWL,
+                height: NOTE_HEIGHT_CALC
+              },
+              constraint: {
+                x: NOTE_ICON_SIZE_VOWL + TEXT_OFFSET,
+                width: NOTE_WIDTH_VOWL - (2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL),
+                height: NOTE_HEIGHT_CALC
+              }
+            },
+            icon: this.getIcon(constraint)
+          });
+        }
+
+        this.separate.constraints = separateConstraints;
+      }
+
+      const separateY = singleNoteHeight
+        ? concatHeight
+          ? singleNoteHeight + concatHeight + 2 * NOTE_MARGIN_VOWL
+          : singleNoteHeight + NOTE_MARGIN_VOWL
+        : concatHeight
+        ? concatHeight + NOTE_MARGIN_VOWL
+        : 0;
+
+      this.separate.config = {
+        x: 0,
+        y: separateY,
+        height: separateKeys.length * (NOTE_HEIGHT_CALC + NOTE_MARGIN_VOWL),
+        width: NOTE_WIDTH_VOWL
       };
+    },
+
+    getIcon(constraint) {
+      const iconMap = {
+        [TERM.equals]: "equals",
+        [TERM.disjoint]: "not equal",
+        [TERM.lessThan]: "lt",
+        [TERM.lessThanOrEquals]: "le"
+      };
+
+      return iconMap[constraint];
     }
   }
 };

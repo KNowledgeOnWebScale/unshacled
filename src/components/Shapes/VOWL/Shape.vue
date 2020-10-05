@@ -78,7 +78,7 @@ import { projectYOnEllipse } from "../../../util/calculations";
 
 export default {
   name: "Shape",
-  components: { PropertyGroup, Constraint, Note },
+  components: { PropertyGroup },
   props: {
     id: {
       type: String,
