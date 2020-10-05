@@ -33,7 +33,15 @@
           :calculate-length="false"
           :icon="constraint.icon"
         />
-        <v-text :config="constraint.config.constraint" />
+        <v-group :config="constraint.config.constraint">
+          <constraint
+            :constraint-i-d="constraint.id"
+            :shape-i-d="$props.shapeId"
+            :node-shape="$props.nodeShape"
+            :is-concat="true"
+            :has-icon="true"
+          ></constraint>
+        </v-group>
       </v-group>
     </v-group>
 
@@ -54,6 +62,7 @@
             :constraint-i-d="constraint.id"
             :shape-i-d="$props.shapeId"
             :node-shape="$props.nodeShape"
+            :has-icon="true"
           ></constraint>
         </v-group>
       </v-group>
@@ -68,8 +77,7 @@ import {
   NOTE_ICON_SIZE_VOWL,
   NOTE_MARGIN_VOWL,
   NOTE_WIDTH_VOWL,
-  TEXT_OFFSET,
-  TEXT_SIZE
+  TEXT_OFFSET
 } from "../../../config/konvaConfigs";
 import { TERM } from "../../../translation/terminology";
 import Constraint from "./Constraint.vue";
@@ -116,7 +124,7 @@ export default {
       const singleNoteHeight = this.setSingleNoteConfigs(singleNoteKeys);
 
       const concatHeight = this.setConcatConfigs(
-        {rangeConstraints, lengthConstraints},
+        { rangeConstraints, lengthConstraints },
         singleNoteHeight
       );
 
@@ -149,6 +157,8 @@ export default {
           });
         }
         this.singleNote.constraints = singleNoteConstraints;
+      } else {
+        this.singleNote.constraints = [];
       }
 
       return singleNoteHeight;
@@ -176,12 +186,9 @@ export default {
               height: NOTE_HEIGHT_CALC
             },
             constraint: {
-              text: this.getRangeLabel(rangeConstraints),
-              align: "left",
-              fontSize: TEXT_SIZE,
-              x: 2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL,
-              y: NOTE_HEIGHT_CALC / 2 - TEXT_SIZE / 2,
-              width: NOTE_WIDTH_VOWL - (2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL)
+              x: NOTE_ICON_SIZE_VOWL + TEXT_OFFSET,
+              width: NOTE_WIDTH_VOWL - (2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL),
+              height: NOTE_HEIGHT_CALC
             }
           },
           icon: "tachometer alternate"
@@ -206,12 +213,9 @@ export default {
               height: NOTE_HEIGHT_CALC
             },
             constraint: {
-              text: this.getLengthLabel(lengthConstraints),
-              align: "left",
-              fontSize: TEXT_SIZE,
-              x: 2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL,
-              y: NOTE_HEIGHT_CALC / 2 - TEXT_SIZE / 2,
-              width: NOTE_WIDTH_VOWL - (2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL)
+              x: NOTE_ICON_SIZE_VOWL + TEXT_OFFSET,
+              width: NOTE_WIDTH_VOWL - (2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL),
+              height: NOTE_HEIGHT_CALC
             }
           },
           icon: "text width"
@@ -245,7 +249,8 @@ export default {
               },
               constraint: {
                 x: NOTE_ICON_SIZE_VOWL + TEXT_OFFSET,
-                width: NOTE_WIDTH_VOWL - (2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL),
+                width:
+                  NOTE_WIDTH_VOWL - (2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL),
                 height: NOTE_HEIGHT_CALC
               }
             },
@@ -254,6 +259,8 @@ export default {
         }
 
         this.separate.constraints = separateConstraints;
+      } else {
+        this.separate.constraints = [];
       }
 
       const separateY = singleNoteHeight
@@ -270,47 +277,6 @@ export default {
         height: separateKeys.length * (NOTE_HEIGHT_CALC + NOTE_MARGIN_VOWL),
         width: NOTE_WIDTH_VOWL
       };
-    },
-
-    getRangeLabel(rangeConstraints) {
-      const rangeKeys = Object.keys(rangeConstraints);
-      let start = 0;
-      let end = "*";
-      if (rangeKeys.includes(TERM.minExclusive)) {
-        start =
-          Number.parseInt(rangeConstraints[TERM.minExclusive][0]["@value"]) + 1;
-      } else if (rangeKeys.includes(TERM.minInclusive)) {
-        start = Number.parseInt(
-          rangeConstraints[TERM.minInclusive][0]["@value"]
-        );
-      }
-
-      if (rangeKeys.includes(TERM.maxExclusive)) {
-        end =
-          Number.parseInt(rangeConstraints[TERM.maxExclusive][0]["@value"]) - 1;
-      } else if (rangeKeys.includes(TERM.maxInclusive)) {
-        end = Number.parseInt(
-          rangeConstraints[TERM.maxInclusive][0]["@value"]
-        );
-      }
-      return `range(${start}..${end})`;
-    },
-
-    getLengthLabel(lengthConstraints) {
-      const lengthKeys = Object.keys(lengthConstraints);
-
-      let start = 0;
-      let end = "*";
-      if (lengthKeys.includes(TERM.minLength)) {
-        start = Number.parseInt(
-          lengthConstraints[TERM.minLength][0]["@value"]
-        );
-      }
-      if (lengthKeys.includes(TERM.maxLength)) {
-        end = Number.parseInt(lengthConstraints[TERM.maxLength][0]["@value"]);
-      }
-
-      return `length(${start}..${end})`;
     },
 
     getIcon(constraint) {

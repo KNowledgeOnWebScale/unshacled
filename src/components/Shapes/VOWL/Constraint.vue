@@ -8,7 +8,7 @@
     ></v-text>
     <v-circle
       v-if="hoverKey && canBeDeleted()"
-      :config="getDeleteConfig()"
+      :config="deleteConstraintConfig"
       @click="deleteConstraint"
       @mouseenter="setCursor('pointer')"
       @mouseleave="setCursor('')"
@@ -18,17 +18,17 @@
 
 <script>
 import {
-  HEIGHT,
-  WIDTH,
-  CONSTRAINT_CONFIG,
-  CONSTRAINT_TEXT_CONFIG,
   CONSTRAINT_TEXT_CONFIG_VOWL,
-  DELETE_BUTTON_CONFIG,
   TEXT_OFFSET,
   MAX_LENGTH,
   pointerCursor,
   textCursor,
-  resetCursor, DELETE_BUTTON_CONFIG_VOWL, NOTE_WIDTH_VOWL, NOTE_MARGIN_VOWL
+  resetCursor,
+  DELETE_BUTTON_CONFIG_VOWL,
+  NOTE_WIDTH_VOWL,
+  NOTE_MARGIN_VOWL,
+  NOTE_HEIGHT_CALC,
+  NOTE_ICON_SIZE_VOWL
 } from "../../../config/konvaConfigs";
 import { uriToPrefix, urlToName } from "../../../util/urlParser";
 import { SINGLE_ENTRY, APPLIES_ON } from "../../../util/constants";
@@ -54,6 +54,16 @@ export default {
     constraintID: {
       type: String,
       required: true
+    },
+    isConcat: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    hasIcon: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   /**
@@ -61,10 +71,7 @@ export default {
    * HoverValues {boolean} indicates if the mouse is hovering over the values of the constraint.
    *
    * KeyConfig {} the configuration of the key text field.
-   * ValueConfig {} the configuration of the value text field.
    * DeleteConstraintConfig {} the configuration of the delete button.
-   *
-   * @returns {{hoverKey: boolean, hoverValues: boolean, keyConfig: {}, valueConfig: {}, deleteConstraintConfig: {}}}
    */
   data() {
     return {
@@ -75,15 +82,15 @@ export default {
         ...CONSTRAINT_TEXT_CONFIG_VOWL,
         y: TEXT_OFFSET
       },
-      valueConfig: {
-        ...CONSTRAINT_TEXT_CONFIG,
-        y: TEXT_OFFSET,
-        x: WIDTH / 3
-      },
       deleteConstraintConfig: {
         ...DELETE_BUTTON_CONFIG_VOWL,
-        x: NOTE_WIDTH_VOWL - NOTE_MARGIN_VOWL,
-        y: HEIGHT / 2
+        x: this.$props.hasIcon
+          ? NOTE_WIDTH_VOWL -
+            NOTE_ICON_SIZE_VOWL -
+            TEXT_OFFSET -
+            NOTE_MARGIN_VOWL
+          : NOTE_WIDTH_VOWL - 2 * NOTE_MARGIN_VOWL,
+        y: NOTE_HEIGHT_CALC / 2
       }
     };
   },
@@ -147,42 +154,42 @@ export default {
      * Delete the current constraint from its shape.
      */
     deleteConstraint() {
-      const args = {
-        shapeID: this.$props.shapeID,
-        constraintID: this.$props.constraintID
-      };
-      this.$store.dispatch("deleteConstraintFromShapeWithID", args);
-      this.$store.commit("updateYValues", {
-        shapeID: this.$props.shapeID,
-        shapes: this.$store.state.mShape.model
-      });
+      if (this.$props.isConcat) {
+        const concatMap = {
+          "range": Object.keys(
+            this.$store.getters.rangeVOWLConstraints(this.$props.shapeID)
+          ),
+          "length": Object.keys(
+            this.$store.getters.lengthVOWLConstraints(this.$props.shapeID)
+          ),
+        };
+        let args;
+        for (const concatConstraint of concatMap[this.$props.constraintID]) {
+          args = {
+            shapeID: this.$props.shapeID,
+            constraintID: concatConstraint
+          };
+          this.$store.dispatch("deleteConstraintFromShapeWithID", args);
 
-      /* Save the state to undo later. */
-      this.$store.commit("saveOperation", {
-        state: this.$store.state,
-        action: { type: "deleteConstraintFromShapeWithID", args }
-      });
-    },
-
-    /**
-     * Delete the constraint value at the given index,
-     * @param {number} index the index of the value in the constraint.
-     */
-    deleteConstraintValue(index) {
-      const args = {
-        shapeID: this.$props.shapeID,
-        constraintID: this.$props.constraintID,
-        valueIndex: index
-      };
-      this.$store.dispatch("deleteConstraintValueWithIndex", args);
-      /* Save the state to undo later. */
-      this.$store.commit("saveOperation", {
-        state: this.$store.state,
-        action: {
-          type: "deleteConstraintValueWithIndex",
-          args
+          /* Save the state to undo later. */
+          this.$store.commit("saveOperation", {
+            state: this.$store.state,
+            action: { type: "deleteConstraintFromShapeWithID", args }
+          });
         }
-      });
+      } else {
+        const args = {
+          shapeID: this.$props.shapeID,
+          constraintID: this.$props.constraintID
+        };
+        this.$store.dispatch("deleteConstraintFromShapeWithID", args);
+
+        /* Save the state to undo later. */
+        this.$store.commit("saveOperation", {
+          state: this.$store.state,
+          action: { type: "deleteConstraintFromShapeWithID", args }
+        });
+      }
       this.$store.commit("updateYValues", {
         shapeID: this.$props.shapeID,
         shapes: this.$store.state.mShape.model
@@ -339,142 +346,93 @@ export default {
 
     getTextConfig() {
       const key = this.$props.constraintID;
-      let value = this.getConstraintValues();
-
-      if (value.length === 1) {
-        const val = value[0];
-        value = val;
-      }
-
-      const keyText = uriToPrefix(this.$store.state.mConfig.namespaces, key);
-      const valueText = uriToPrefix(this.$store.state.mConfig.namespaces, value);
-
       let text;
-      switch (key) {
-        case TERM.languageIn: {
-          text = `languageIn(${value.map(x => `'${x}'`).join(", ")})`;
-          break;
+      if (!this.$props.isConcat) {
+        let value = this.getConstraintValues();
+
+        if (value.length === 1) {
+          const val = value[0];
+          value = val;
         }
-        case TERM.closed: {
-          text = `onlyListedProperties(${valueText})`;
-          break;
-        }
-        case TERM.ignoredProperties: {
-          text = `otherAllowedProperties(${value.map(x => `'${x}'`).join(", ")})`;
-          break;
-        }
-        case TERM.in: {
-          text = `valueIn(${value.map(x => `'${x}'`).join(", ")})`;
-          break;
-        }
-        default: {
+
+        const keyText = uriToPrefix(this.$store.state.mConfig.namespaces, key);
+        const valueText = uriToPrefix(this.$store.state.mConfig.namespaces, value);
+
+        const textMap = {
+          [TERM.languageIn]: value =>
+            `languageIn(${value.map(x => `'${x}'`).join(", ")})`,
+          [TERM.closed]: () => `onlyListedProperties(${valueText})`,
+          [TERM.ignoredProperties]: value =>
+            `otherAllowedProperties(${value.map(x => `'${x}'`).join(", ")})`,
+          [TERM.in]: value => `valueIn(${value.map(x => `'${x}'`).join(", ")})`
+        };
+
+        if (textMap[key]) {
+          text = textMap[key];
+        } else {
           text = `${keyText}(${valueText})`;
-          break;
         }
+      } else if (key === "range") {
+        text = this.getRangeText();
+      } else if (key === "length") {
+        text = this.getLengthText();
       }
-
-      const y = 0;
-
       return {
         ...this.keyConfig,
-        y: this.keyConfig.y + y,
         text
       };
     },
 
+    getRangeText() {
+      const rangeConstraints = this.$store.getters.rangeVOWLConstraints(
+        this.$props.shapeID
+      );
+      const rangeKeys = Object.keys(rangeConstraints);
+
+      let start = 0;
+      let end = "*";
+      if (rangeKeys.includes(TERM.minExclusive)) {
+        start =
+          Number.parseInt(rangeConstraints[TERM.minExclusive][0]["@value"]) + 1;
+      } else if (rangeKeys.includes(TERM.minInclusive)) {
+        start = Number.parseInt(
+          rangeConstraints[TERM.minInclusive][0]["@value"]
+        );
+      }
+
+      if (rangeKeys.includes(TERM.maxExclusive)) {
+        end =
+          Number.parseInt(rangeConstraints[TERM.maxExclusive][0]["@value"]) - 1;
+      } else if (rangeKeys.includes(TERM.maxInclusive)) {
+        end = Number.parseInt(rangeConstraints[TERM.maxInclusive][0]["@value"]);
+      }
+      return `range(${start}..${end})`;
+    },
+
+    getLengthText() {
+      const lengthConstraints = this.$store.getters.lengthVOWLConstraints(
+        this.$props.shapeID
+      );
+      const lengthKeys = Object.keys(lengthConstraints);
+
+      let start = 0;
+      let end = "*";
+      if (lengthKeys.includes(TERM.minLength)) {
+        start = Number.parseInt(lengthConstraints[TERM.minLength][0]["@value"]);
+      }
+      if (lengthKeys.includes(TERM.maxLength)) {
+        end = Number.parseInt(lengthConstraints[TERM.maxLength][0]["@value"]);
+      }
+
+      return `length(${start}..${end})`;
+    },
+
     getDeleteConfig() {
-      const y = this.getYValue();
+      const y = 0;
 
       return {
         ...this.deleteConstraintConfig,
         y: this.deleteConstraintConfig.y + y
-      };
-    },
-
-    /**
-     * Get the y value of this constraint.
-     * @returns {number} the y value of this constraint.
-     */
-    getYValue() {
-      return this.$store.state.mShape.mCoordinate.yValues[this.$props.shapeID][
-        this.$props.constraintID
-      ];
-    },
-
-    /**
-     * Get the configurations for the different visualization components.
-     * This is mainly to dynamically set the y values and heights of the different components.
-     * @returns {{keyConfig: object, valueConfig: object, deleteConstraint: object}}
-     */
-    getConfigs() {
-      /* Determine the current y value. */
-      const y = this.getYValue();
-
-      const key = this.$props.constraintID;
-      let keyText;
-      if (key === "@id") {
-        keyText = "IRI";
-      } else if (APPLIES_ON.includes(key)) {
-        keyText = "appliesOn";
-      } else {
-        keyText = uriToPrefix(
-          this.$store.state.mConfig.namespaces,
-          this.$props.constraintID
-        );
-      }
-
-      return {
-        keyConfig: {
-          ...this.keyConfig,
-          y: this.keyConfig.y + y,
-          text: keyText
-        },
-        valueConfig: {
-          ...this.valueConfig,
-          y: this.valueConfig.y + y
-        },
-        deleteConstraint: {
-          ...this.deleteConstraintConfig,
-          y: this.deleteConstraintConfig.y + y
-        }
-      };
-    },
-
-    /**
-     * Get the configuration for a constraint value.
-     * This will set the y coordinate and the text using the given value and index.
-     * @param {string} value text that should be visualized in this constraint component.
-     * @param {number} index the index of the constraint value.
-     * @returns {{y: number, text: string}}
-     */
-    getValueConfig(value) {
-      if (value.length === 1) {
-        const val = value[0];
-        value = val;
-      }
-      const text = uriToPrefix(this.$store.state.mConfig.namespaces, value);
-
-      // Determine if the value has to move up to free up space for the label/name.
-      const move = text.length - 2 > MAX_LENGTH ? -HEIGHT / 6 : 0;
-      return {
-        ...this.valueConfig,
-        y: this.valueConfig.y + this.getYValue() + move,
-        text
-      };
-    },
-
-    /**
-     * Get the configuration of the delete button for the constraint value at the given index.
-     * @param {number} index the index of the constraint value.
-     * @returns {object} the configuration object with an updated y value.
-     */
-    getDeleteValueConfig(index) {
-      return {
-        ...this.deleteConstraintConfig,
-        y:
-          this.deleteConstraintConfig.y +
-          (index + 1) * HEIGHT +
-          this.getYValue()
       };
     },
 
