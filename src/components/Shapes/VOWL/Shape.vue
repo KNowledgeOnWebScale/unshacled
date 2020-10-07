@@ -35,7 +35,9 @@
         ></v-circle>
       </v-group>
 
-      <property-group :shape-id="$props.id" :node-shape="$props.nodeShape"></property-group>
+      <v-group :draggable="true" ref="constraints" @dragmove="transLateToShape" @dragend="updateConstraintCoordinates()" :config="getDefaultConstraintsConfig()">
+        <property-group :shape-id="$props.id" :node-shape="$props.nodeShape" @new-height="setPropertyGroupHeight"></property-group>
+      </v-group>
 
     </v-group>
   </div>
@@ -69,12 +71,12 @@ import {
   CENTER_SHAPE_VOWL_X,
   CENTER_SHAPE_VOWL_Y,
   NOTE_INSET_VOWL,
-  NOTE_MARGIN_VOWL
+  NOTE_MARGIN_VOWL, NOTE_WIDTH_VOWL
 } from "../../../config/konvaConfigs";
 import { TERM } from "../../../translation/terminology";
 import { abbreviate } from "../../../util/strings";
 import { LABEL } from "../../../util/constants";
-import { projectYOnEllipse } from "../../../util/calculations";
+import { getDefaultEllipsePosition, getPropertyGroupBounds, projectYOnEllipse } from "../../../util/calculations";
 
 export default {
   name: "Shape",
@@ -102,7 +104,7 @@ export default {
         : PROPERTY_SHAPE_CONFIG_VOWL,
       deleteNodeConfig: DELETE_BUTTON_CONFIG_VOWL,
       addPredicateConfig: ADD_PREDICATE_CONFIG_VOWL,
-      constraintLayout: { y: NOTE_MARGIN_VOWL }
+      constraintsHeight: 0
     };
   },
   mounted() {
@@ -192,25 +194,64 @@ export default {
       };
     },
 
-    getNoteConfig() {
-      return {
-        y: HEIGHT_VOWL - NOTE_INSET_VOWL,
-        x:
-          projectYOnEllipse(
-            HEIGHT_VOWL - NOTE_INSET_VOWL,
-            HEIGHT_VOWL,
-            WIDTH_VOWL,
-            CENTER_SHAPE_VOWL_X,
-            CENTER_SHAPE_VOWL_Y
-          ) - NOTE_INSET_VOWL
-      };
-    },
-
     getNoteLength() {
       const infoAmount = this.$store.getters.getInfoAmount(this.id);
       const constraintAmount = this.$store.getters.getConstraintAmount(this.id);
 
       return (infoAmount + constraintAmount) * HEIGHT;
+    },
+
+    setPropertyGroupHeight(newHeight) {
+      this.constraintsHeight = newHeight;
+    },
+
+    transLateToShape(){
+      const coords = this.$store.state.mShape.mCoordinate.coordinates[this.$props.id];
+      const shape = this.$refs.constraints.getNode();
+      const constraintsRectangle = {
+        x: shape.x(),
+        y: shape.y(),
+        width: NOTE_WIDTH_VOWL,
+        height: this.constraintsHeight
+      };
+      const ellipse = {
+        x: CENTER_SHAPE_VOWL_X,
+        y: CENTER_SHAPE_VOWL_Y,
+        width: WIDTH_VOWL * NOTE_INSET_VOWL,
+        height: HEIGHT_VOWL * NOTE_INSET_VOWL
+      };
+      const newCoords = getPropertyGroupBounds(constraintsRectangle, ellipse);
+      if (! (Number.isNaN(newCoords.x) || Number.isNaN(newCoords.y))){
+        shape.x(newCoords.x);
+        shape.y(newCoords.y);
+      }
+    },
+
+    updateConstraintCoordinates() {
+      const constraints = this.$refs.constraints.getNode();
+      
+      if (constraints) {
+        this.$store.commit("updateVOWLConstraintCoordinates", {
+          shapeID: this.$props.id,
+          x: constraints.x(),
+          y: constraints.y()
+        });
+      }
+    },
+
+    getDefaultConstraintsConfig() {
+      const { VOWLconstraintCoordinates } = this.$store.state.mShape.mCoordinate;
+      if (VOWLconstraintCoordinates[this.$props.id]){
+        return VOWLconstraintCoordinates[this.$props.id];
+      } else {
+        const ellipse = {
+          x: CENTER_SHAPE_VOWL_X,
+          y: CENTER_SHAPE_VOWL_Y,
+          width: WIDTH_VOWL * NOTE_INSET_VOWL,
+          height: HEIGHT_VOWL * NOTE_INSET_VOWL
+        };
+        return getDefaultEllipsePosition(ellipse);
+      }
     },
 
     /**

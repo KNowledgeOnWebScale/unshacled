@@ -101,13 +101,16 @@ export default {
       singleNotePresent: false,
       singleNote: { constraints: [] },
       concatted: { constraints: [] },
-      separate: { constraints: [] }
+      separate: { constraints: [] },
+      updateConfigs: ["deleteConstraintFromShape", "addPredicate", "updateShape"]
     };
   },
   mounted() {
     this.setConfigs();
-    this.$store.subscribe(() => {
-      this.setConfigs();
+    this.$store.subscribe(mutation => {
+      if (this.updateConfigs.includes(mutation.type)){
+        this.setConfigs();
+      }
     });
   },
   methods: {
@@ -128,7 +131,13 @@ export default {
         singleNoteHeight
       );
 
-      this.setSeparateConfigs(separateKeys, singleNoteHeight, concatHeight);
+      const separateHeight = this.setSeparateConfigs(
+        separateKeys,
+        singleNoteHeight,
+        concatHeight
+      );
+
+      this.emitHeight(singleNoteHeight, concatHeight, separateHeight);
     },
 
     setSingleNoteConfigs(singleNoteKeys) {
@@ -271,12 +280,29 @@ export default {
         ? concatHeight + NOTE_MARGIN_VOWL
         : 0;
 
+      const separateHeight =
+        separateKeys.length * (NOTE_HEIGHT_CALC + NOTE_MARGIN_VOWL);
+
       this.separate.config = {
         x: 0,
         y: separateY,
-        height: separateKeys.length * (NOTE_HEIGHT_CALC + NOTE_MARGIN_VOWL),
+        height: separateHeight,
         width: NOTE_WIDTH_VOWL
       };
+
+      return separateHeight;
+    },
+
+    emitHeight(singleNoteHeight, concatHeight, separateHeight) {
+      let totalHeight = singleNoteHeight + concatHeight + separateHeight;
+      const marginAmount =
+        Number(Boolean(singleNoteHeight)) +
+        Number(Boolean(concatHeight)) +
+        Number(Boolean(separateHeight));
+      if (marginAmount > 1) {
+        totalHeight += (marginAmount - 1) * NOTE_MARGIN_VOWL;
+      }
+      this.$emit("new-height", totalHeight);
     },
 
     getIcon(constraint) {

@@ -1,4 +1,4 @@
-import { CENTER_SHAPE_VOWL_Y, HEIGHT_VOWL, WIDTH_VOWL } from "../config/konvaConfigs";
+import { CENTER_SHAPE_VOWL_X, CENTER_SHAPE_VOWL_Y, HEIGHT_VOWL, WIDTH_VOWL } from "../config/konvaConfigs";
 import { NOTE_CORNER_VOWL } from "./constants";
 
 /**
@@ -378,4 +378,93 @@ export function getNodeShapeIntersection(
         : noteIntersect
       : ellipseIntersection;
   return toReturn;
+}
+
+export function getPropertyGroupBounds(rectangle, ellipse) {
+  const TL = { x: rectangle.x, y: rectangle.y };
+  const TR = { x: rectangle.x + rectangle.width, y: rectangle.y };
+  const BL = { x: rectangle.x, y: rectangle.y + rectangle.height };
+  const BR = { x: rectangle.x + rectangle.width, y: rectangle.y + rectangle.height };
+
+  const TLangle = -Math.atan2(
+    TL.y - ellipse.y,
+    TL.x - ellipse.x
+  );
+  const TRangle = -Math.atan2(
+    TR.y - ellipse.y,
+    TR.x - ellipse.x
+  );
+  const BLangle = -Math.atan2(
+    BL.y - ellipse.y,
+    BL.x - ellipse.x
+  );
+  const BRangle = -Math.atan2(
+    BR.y - ellipse.y,
+    BR.x - ellipse.x
+  );
+
+  if (between(BLangle, 0, Math.PI/2)) {
+    const points = ellipseProjections(ellipse, BL);
+    const newPoint = points[0].y < points[1].y ? points[0] : points[1];
+    return {
+      x: newPoint.x,
+      y: newPoint.y - rectangle.height
+    }
+  } else if (between(BRangle, Math.PI/2, Math.PI)) {
+    const points = ellipseProjections(ellipse, BR);
+    const newPoint = points[0].y < points[1].y ? points[0] : points[1];
+    return {
+      x: newPoint.x - rectangle.width,
+      y: newPoint.y - rectangle.height
+    }
+  } else if (between(TRangle, -Math.PI, -Math.PI/2)) {
+    const points = ellipseProjections(ellipse, TR);
+    const newPoint = points[0].y > points[1].y ? points[0] : points[1];
+    return {
+      x: newPoint.x - rectangle.width,
+      y: newPoint.y
+    }
+  } else if (between(TLangle, -Math.PI/2, 0)) {
+    const points = ellipseProjections(ellipse, TL);
+    const newPoint = points[0].y > points[1].y ? points[0] : points[1];
+    return newPoint
+  } else if (between(BLangle, Math.PI/2, Math.PI) && between(BRangle, 0, Math.PI/2)) {
+    return {
+      x: rectangle.x,
+      y: ellipse.y - ellipse.height/2 - rectangle.height
+    }
+  } else if (between(TLangle, -Math.PI, -Math.PI/2) && between(BRangle, -Math.PI/2, 0)) {
+    return {
+      x: rectangle.x,
+      y: ellipse.y + ellipse.height/2
+    }
+  } else if (between(TLangle, 0, Math.PI/2) && between(BLangle, -Math.PI/2, 0)) {
+    return {
+      x: ellipse.x + ellipse.width/2,
+      y: rectangle.y
+    }
+  } else if (between(TRangle, Math.PI/2, Math.PI) && between(BRangle, -Math.PI, -Math.PI/2)) {
+    return {
+      x: ellipse.x - ellipse.width/2 - rectangle.width,
+      y: rectangle.y
+    }
+  } else {
+    return getDefaultEllipsePosition(ellipse);
+  }
+}
+
+export function getDefaultEllipsePosition(ellipse) {
+  const points = ellipseProjections(ellipse, {
+    x: ellipse.x + 1,
+    y: ellipse.y + 1
+  });
+  const newPoint = points[0].y > points[1].y ? points[0] : points[1];
+  return newPoint
+}
+
+function ellipseProjections(ellipse, point) {
+  const m = slope(ellipse, point);
+  const c = -m * ellipse.x + ellipse.y;
+  const line = { m, c };
+  return getEllipseIntersections(ellipse, line);
 }

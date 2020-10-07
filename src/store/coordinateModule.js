@@ -20,7 +20,8 @@ const coordinateModule = {
     yValues: {},
     coordinates: {},
     heights: {},
-    relationshipCoordinates: {}
+    relationshipCoordinates: {},
+    VOWLconstraintCoordinates: {}
   },
 
   mutations: {
@@ -151,6 +152,13 @@ const coordinateModule = {
         from: fromCoords,
         to: toCoords
       });
+    },
+
+    updateVOWLConstraintCoordinates(
+      state,
+      { shapeID, x, y }
+    ) {
+      Vue.set(state.VOWLconstraintCoordinates, shapeID, { x, y });
     },
 
     /**

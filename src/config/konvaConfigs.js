@@ -20,7 +20,7 @@ export const CENTER_SHAPE_VOWL_Y = 70;
 export const MARGIN_VOWL = 10;
 export const SHAPE_NAME_PADDING_VOWL = 30;
 
-export const NOTE_INSET_VOWL = 40;
+export const NOTE_INSET_VOWL = 0.7;
 export const NOTE_WIDTH_VOWL = 200;
 export const NOTE_HEIGHT = 30;
 export const NOTE_MARGIN_VOWL = 5;
