@@ -26,7 +26,7 @@ export const NOTE_HEIGHT = 30;
 export const NOTE_MARGIN_VOWL = 5;
 export const NOTE_HEIGHT_CALC = NOTE_HEIGHT + NOTE_MARGIN_VOWL;
 export const NOTE_CORNER_INSET_VOWL = 20;
-export const NOTE_ICON_SIZE_VOWL = 30;
+export const NOTE_ICON_SIZE_VOWL = NOTE_HEIGHT_CALC - 2 * NOTE_MARGIN_VOWL;
 
 export const RELATIONSHIP_LABEL_OFFSET = 10; // How far a label should be offset from the relationship arrow
 const RELATIONSHIP_DASH = 10;

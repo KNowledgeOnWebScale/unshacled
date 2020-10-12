@@ -17,6 +17,7 @@
         strokeWidth: 2
       }"
     />
+    <v-image v-if="$props.icon !== 'none'" :config="iconConfig"></v-image>
   </div>
 </template>
 
@@ -25,7 +26,7 @@ import {
   NOTE_HEIGHT,
   NOTE_CORNER_INSET_VOWL,
   NOTE_MARGIN_VOWL,
-  NOTE_WIDTH_VOWL
+  NOTE_WIDTH_VOWL, NOTE_ICON_SIZE_VOWL, NOTE_HEIGHT_CALC
 } from "../../../config/konvaConfigs";
 import { TERM } from "../../../translation/terminology";
 
@@ -40,6 +41,11 @@ export default {
     calculateLength: {
       type: Boolean,
       required: true
+    },
+    icon: {
+      type: String,
+      required: false,
+      default: "none"
     }
   },
   data() {
@@ -48,8 +54,25 @@ export default {
         noteWidth: NOTE_WIDTH_VOWL,
         cornerInset: NOTE_CORNER_INSET_VOWL,
         noteMargin: NOTE_MARGIN_VOWL
-      }
+      },
+      iconImage: new Image(NOTE_ICON_SIZE_VOWL, NOTE_ICON_SIZE_VOWL)
     };
+  },
+  mounted() {
+    if (this.$props.icon !== "none") {
+      this.iconImage.src = `/icons/${this.$props.icon}.svg`;
+    }
+  },
+  computed: {
+    iconConfig: function() {
+      return {
+        x: NOTE_MARGIN_VOWL,
+        y: NOTE_MARGIN_VOWL,
+        image: this.iconImage,
+        width: NOTE_ICON_SIZE_VOWL,
+        height: NOTE_ICON_SIZE_VOWL
+      }
+    }
   },
   methods: {
     getNoteLength() {

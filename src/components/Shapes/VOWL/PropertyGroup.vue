@@ -195,12 +195,12 @@ export default {
               height: NOTE_HEIGHT_CALC
             },
             constraint: {
-              x: NOTE_ICON_SIZE_VOWL + TEXT_OFFSET,
+              x: NOTE_ICON_SIZE_VOWL + NOTE_MARGIN_VOWL,
               width: NOTE_WIDTH_VOWL - (2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL),
               height: NOTE_HEIGHT_CALC
             }
           },
-          icon: "tachometer alternate"
+          icon: "range"
         });
       }
 
@@ -222,12 +222,12 @@ export default {
               height: NOTE_HEIGHT_CALC
             },
             constraint: {
-              x: NOTE_ICON_SIZE_VOWL + TEXT_OFFSET,
+              x: NOTE_ICON_SIZE_VOWL + NOTE_MARGIN_VOWL,
               width: NOTE_WIDTH_VOWL - (2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL),
               height: NOTE_HEIGHT_CALC
             }
           },
-          icon: "text width"
+          icon: "length"
         });
       }
 
@@ -257,7 +257,7 @@ export default {
                 height: NOTE_HEIGHT_CALC
               },
               constraint: {
-                x: NOTE_ICON_SIZE_VOWL + TEXT_OFFSET,
+                x: NOTE_ICON_SIZE_VOWL + NOTE_MARGIN_VOWL,
                 width:
                   NOTE_WIDTH_VOWL - (2 * TEXT_OFFSET + NOTE_ICON_SIZE_VOWL),
                 height: NOTE_HEIGHT_CALC
@@ -307,8 +307,8 @@ export default {
 
     getIcon(constraint) {
       const iconMap = {
-        [TERM.equals]: "equals",
-        [TERM.disjoint]: "not equal",
+        [TERM.equals]: "eq",
+        [TERM.disjoint]: "neq",
         [TERM.lessThan]: "lt",
         [TERM.lessThanOrEquals]: "le"
       };
