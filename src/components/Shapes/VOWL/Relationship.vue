@@ -346,7 +346,6 @@ export default {
       const { label } = this.getConfigs();
 
       if (this.$refs.text && this.$refs.text.getNode()) {
-        console.log("TEST");
         return {
           ...label,
           x: label.x - this.$refs.text.getNode().width() / 2

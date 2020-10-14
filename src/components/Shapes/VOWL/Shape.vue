@@ -7,9 +7,6 @@
       @mouseleave="hover = false"
       @dragmove="updatePosition"
     >
-      <!-- An icon, if one is needed -->
-      <v-image v-if="icon !== 'none'" :config="iconConfig"></v-image>
-
       <!-- Main ellipse -->
       <v-group @mouseenter="titleHover = true" @mouseleave="titleHover = false">
         <!-- Header -->
@@ -37,6 +34,9 @@
           @mouseleave="setCursor('')"
         ></v-circle>
       </v-group>
+
+      <!-- An icon, if one is needed -->
+      <v-image v-if="icon !== 'none'" :config="iconConfig"></v-image>
 
       <v-group
         ref="constraints"
@@ -173,7 +173,6 @@ export default {
       () => self.$store.getters.shapeInfo(self.$props.id),
       () => {
         self.getConstraints();
-        self.getDescriptionConfig();
       }
     );
   },
@@ -333,42 +332,6 @@ export default {
         }
       }
       return false;
-    },
-
-    /**
-     * Get the configuration objects for the visualization of the description.
-     * @returns {{rect: object, title: object, text: object}}
-     */
-    getDescriptionConfig() {
-      /* Check if the shape has a description first. */
-      if (this.hasDescription()) {
-        const text = this.$store.getters.shapeWithID(this.id)[
-          TERM.description
-        ][0]["@value"];
-
-        // Constants for the configuration.
-        let lines = Math.ceil(text.length / MAX_LENGTH);
-        if (lines < 2) lines = 2;
-
-        return {
-          rect: {
-            ...DESCRIPTION_RECT_CONFIG,
-            height: lines * TEXT_SIZE + TEXT_OFFSET
-          },
-          title: DESCRIPTION_TITLE_CONFIG,
-          text: {
-            ...DESCRIPTION_TEXT_CONFIG,
-            text
-          }
-        };
-      }
-
-      /* If the shape does not have a description, no configurations are needed. */
-      return {
-        rect: {},
-        title: {},
-        text: {}
-      };
     },
 
     /**
