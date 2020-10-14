@@ -7,6 +7,9 @@
       @mouseleave="hover = false"
       @dragmove="updatePosition"
     >
+      <!-- An icon, if one is needed -->
+      <v-image v-if="icon !== 'none'" :config="iconConfig"></v-image>
+
       <!-- Main ellipse -->
       <v-group @mouseenter="titleHover = true" @mouseleave="titleHover = false">
         <!-- Header -->
@@ -35,17 +38,24 @@
         ></v-circle>
       </v-group>
 
-      <v-group :draggable="true" ref="constraints" @dragmove="transLateToShape" @dragend="updateConstraintCoordinates()" :config="getDefaultConstraintsConfig()">
-        <property-group :shape-id="$props.id" :node-shape="$props.nodeShape" @new-height="setPropertyGroupHeight"></property-group>
+      <v-group
+        ref="constraints"
+        :draggable="true"
+        :config="getDefaultConstraintsConfig()"
+        @dragmove="transLateToShape"
+        @dragend="updateConstraintCoordinates()"
+      >
+        <property-group
+          :shape-id="$props.id"
+          :node-shape="$props.nodeShape"
+          @new-height="setPropertyGroupHeight"
+        ></property-group>
       </v-group>
-
     </v-group>
   </div>
 </template>
 
 <script>
-import Constraint from "./Constraint.vue";
-import Note from "./Note.vue";
 import PropertyGroup from "./PropertyGroup.vue";
 import { uriToPrefix } from "../../../util/urlParser";
 import {
@@ -71,12 +81,15 @@ import {
   CENTER_SHAPE_VOWL_X,
   CENTER_SHAPE_VOWL_Y,
   NOTE_INSET_VOWL,
-  NOTE_MARGIN_VOWL, NOTE_WIDTH_VOWL
+  NOTE_WIDTH_VOWL, NOTE_ICON_SIZE_VOWL, NOTE_MARGIN_VOWL
 } from "../../../config/konvaConfigs";
 import { TERM } from "../../../translation/terminology";
 import { abbreviate } from "../../../util/strings";
-import { LABEL } from "../../../util/constants";
-import { getDefaultEllipsePosition, getPropertyGroupBounds, projectYOnEllipse } from "../../../util/calculations";
+import { LABEL, VOWL_SHAPE_ICONS } from "../../../util/constants";
+import {
+  getDefaultEllipsePosition,
+  getPropertyGroupBounds
+} from "../../../util/calculations";
 
 export default {
   name: "Shape",
@@ -104,7 +117,8 @@ export default {
         : PROPERTY_SHAPE_CONFIG_VOWL,
       deleteNodeConfig: DELETE_BUTTON_CONFIG_VOWL,
       addPredicateConfig: ADD_PREDICATE_CONFIG_VOWL,
-      constraintsHeight: 0
+      constraintsHeight: 0,
+      iconImage: new Image(NOTE_ICON_SIZE_VOWL, NOTE_ICON_SIZE_VOWL)
     };
   },
   mounted() {
@@ -115,6 +129,12 @@ export default {
       .getNode()
       .setPosition(this.$store.state.mShape.mCoordinate.coordinates[id]);
     this.updatePosition();
+    this.updateConstraintCoordinates();
+
+    const icon = this.icon;
+    if (icon !== "none") {
+      this.iconImage.src = `/icons/${icon}.svg`;
+    }
 
     /* Update the constraints when the store state changes. */
     this.$store.watch(
@@ -125,6 +145,30 @@ export default {
         self.getDescriptionConfig();
       }
     );
+  },
+  computed: {
+    icon() {
+      const iconConstraints = this.$store.getters.shapeIconVOWLConstraints(this.$props.id);
+      const iconKeys = Object.keys(iconConstraints)
+      if (iconKeys.length){
+        const iconMap = {
+          [TERM.class]: "class",
+          [TERM.datatype]: "datatype"
+        };
+        return iconMap[iconKeys[0]];
+      } else {
+        return "none";
+      }
+    },
+    iconConfig() {
+      return {
+        x: 2 * NOTE_MARGIN_VOWL,
+        y: CENTER_SHAPE_VOWL_Y - NOTE_ICON_SIZE_VOWL/2,
+        image: this.iconImage,
+        width: NOTE_ICON_SIZE_VOWL,
+        height: NOTE_ICON_SIZE_VOWL
+      };
+    }
   },
   methods: {
     getShapeConfig() {
@@ -194,6 +238,10 @@ export default {
       };
     },
 
+    getIconConfig() {
+
+    },
+
     getNoteLength() {
       const infoAmount = this.$store.getters.getInfoAmount(this.id);
       const constraintAmount = this.$store.getters.getConstraintAmount(this.id);
@@ -205,8 +253,7 @@ export default {
       this.constraintsHeight = newHeight;
     },
 
-    transLateToShape(){
-      const coords = this.$store.state.mShape.mCoordinate.coordinates[this.$props.id];
+    transLateToShape() {
       const shape = this.$refs.constraints.getNode();
       const constraintsRectangle = {
         x: shape.x(),
@@ -221,7 +268,7 @@ export default {
         height: HEIGHT_VOWL * NOTE_INSET_VOWL
       };
       const newCoords = getPropertyGroupBounds(constraintsRectangle, ellipse);
-      if (! (Number.isNaN(newCoords.x) || Number.isNaN(newCoords.y))){
+      if (!(Number.isNaN(newCoords.x) || Number.isNaN(newCoords.y))) {
         shape.x(newCoords.x);
         shape.y(newCoords.y);
       }
@@ -229,7 +276,7 @@ export default {
 
     updateConstraintCoordinates() {
       const constraints = this.$refs.constraints.getNode();
-      
+
       if (constraints) {
         this.$store.commit("updateVOWLConstraintCoordinates", {
           shapeID: this.$props.id,
@@ -240,8 +287,10 @@ export default {
     },
 
     getDefaultConstraintsConfig() {
-      const { VOWLconstraintCoordinates } = this.$store.state.mShape.mCoordinate;
-      if (VOWLconstraintCoordinates[this.$props.id]){
+      const {
+        VOWLconstraintCoordinates
+      } = this.$store.state.mShape.mCoordinate;
+      if (VOWLconstraintCoordinates[this.$props.id]) {
         return VOWLconstraintCoordinates[this.$props.id];
       } else {
         const ellipse = {

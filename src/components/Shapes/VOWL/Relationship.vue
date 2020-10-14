@@ -40,10 +40,6 @@ import {
   MARGIN,
   pointerCursor,
   resetCursor,
-  LABEL_TOP_LEFT,
-  LABEL_TOP_RIGHT,
-  LABEL_BOTTOM_LEFT,
-  LABEL_BOTTOM_RIGHT,
   LABEL_NO_SHIFT,
   LABEL_SHIFT_DOWN,
   LABEL_SHIFT_UP,
@@ -51,11 +47,14 @@ import {
   HEIGHT_VOWL,
   CENTER_SHAPE_VOWL_X,
   CENTER_SHAPE_VOWL_Y,
-  NOTE_INSET_VOWL, NOTE_CORNER_INSET_VOWL, NOTE_MARGIN_VOWL, NOTE_WIDTH_VOWL
+  NOTE_INSET_VOWL,
+  NOTE_CORNER_INSET_VOWL,
+  NOTE_MARGIN_VOWL,
+  NOTE_WIDTH_VOWL,
+  LABEL_SECTION
 } from "../../../config/konvaConfigs";
 import {
-  getNodeShapeIntersection,
-  projectYOnEllipse
+  getNodeShapeIntersection
 } from "../../../util/calculations";
 import { uriToPrefix } from "../../../util/urlParser";
 import { TERM } from "../../../translation/terminology";
@@ -128,22 +127,22 @@ export default {
       const note1 = this.getNoteProps(from);
       const startNote = note1 || {};
       const hasNoteStart = Boolean(note1);
+
       const intersectionStart = getNodeShapeIntersection(
         start,
         startNote,
         hasNoteStart,
-        NOTE_CORNER_VOWL.BOTTOM_RIGHT,
         end
       );
 
       const note2 = this.getNoteProps(to);
       const endNote = note2 || {};
       const hasNoteEnd = Boolean(note2);
+
       const intersectionEnd = getNodeShapeIntersection(
         end,
         endNote,
         hasNoteEnd,
-        NOTE_CORNER_VOWL.BOTTOM_RIGHT,
         start
       );
 
@@ -160,26 +159,17 @@ export default {
 
     getNoteProps(id) {
       const { coordinates } = this.$store.state.mShape.mCoordinate;
-
-      const infoAmount = this.$store.getters.getInfoAmount(id);
-      const constraintAmount = this.$store.getters.getConstraintAmount(id);
+      const { VOWLconstraintCoordinates, VOWLconstraintHeights } = this.$store.state.mShape.mCoordinate;
 
       const toReturn =
-        infoAmount + constraintAmount > 0
-          ? {
-              y: coordinates[id].y + HEIGHT_VOWL - NOTE_INSET_VOWL,
-              x:
-                projectYOnEllipse(
-                  coordinates[id].y + HEIGHT_VOWL - NOTE_INSET_VOWL,
-                  HEIGHT_VOWL,
-                  WIDTH_VOWL,
-                  coordinates[id].x + CENTER_SHAPE_VOWL_X,
-                  coordinates[id].y + CENTER_SHAPE_VOWL_Y
-                ) - NOTE_INSET_VOWL,
-              height: (infoAmount + constraintAmount) * HEIGHT + NOTE_CORNER_INSET_VOWL + NOTE_MARGIN_VOWL,
-              width: NOTE_WIDTH_VOWL
-            }
-          : undefined;
+      VOWLconstraintHeights[id]
+        ? {
+            y: coordinates[id].y + VOWLconstraintCoordinates[id].y,
+            x: coordinates[id].x + VOWLconstraintCoordinates[id].x,
+            height: VOWLconstraintHeights[id],
+            width: NOTE_WIDTH_VOWL
+          }
+        : undefined;
 
       return toReturn;
     },
@@ -287,25 +277,25 @@ export default {
         switch (endPoint.side) {
           case "T":
             this.cardinalitySection =
-              endPoint.x < midPoint.x ? LABEL_TOP_LEFT : LABEL_TOP_RIGHT;
+              endPoint.x < midPoint.x ? LABEL_SECTION.TL : LABEL_SECTION.TR;
             break;
           case "L":
             this.cardinalitySection =
-              endPoint.y < midPoint.y ? LABEL_TOP_LEFT : LABEL_BOTTOM_LEFT;
+              endPoint.y < midPoint.y ? LABEL_SECTION.TL : LABEL_SECTION.BL;
             break;
           case "B":
             this.cardinalitySection =
-              endPoint.x < midPoint.x ? LABEL_BOTTOM_LEFT : LABEL_BOTTOM_RIGHT;
+              endPoint.x < midPoint.x ? LABEL_SECTION.BL : LABEL_SECTION.BR;
             break;
           case "R":
             this.cardinalitySection =
-              endPoint.y < midPoint.y ? LABEL_TOP_RIGHT : LABEL_BOTTOM_RIGHT;
+              endPoint.y < midPoint.y ? LABEL_SECTION.TR : LABEL_SECTION.BR;
             break;
           default:
-            this.cardinalitySection = 0;
+            this.cardinalitySection = LABEL_SECTION.UNSPECIFIED;
         }
       } else {
-        this.cardinalitySection = 0;
+        this.cardinalitySection = LABEL_SECTION.TR;
       }
     },
 
@@ -342,7 +332,7 @@ export default {
 
       if (this.$refs.cardinalityText && this.$refs.cardinalityText.getNode()) {
         switch (this.cardinalitySection) {
-          case LABEL_TOP_LEFT:
+          case LABEL_SECTION.TL:
             return {
               x:
                 cardinalityLabel.x -
@@ -353,7 +343,7 @@ export default {
                 this.$refs.cardinalityText.getNode().height() -
                 RELATIONSHIP_LABEL_OFFSET
             };
-          case LABEL_TOP_RIGHT:
+          case LABEL_SECTION.TR:
             return {
               x: cardinalityLabel.x + RELATIONSHIP_LABEL_OFFSET,
               y:
@@ -361,12 +351,12 @@ export default {
                 this.$refs.cardinalityText.getNode().height() -
                 RELATIONSHIP_LABEL_OFFSET
             };
-          case LABEL_BOTTOM_RIGHT:
+          case LABEL_SECTION.BR:
             return {
               x: cardinalityLabel.x + RELATIONSHIP_LABEL_OFFSET,
               y: cardinalityLabel.y + RELATIONSHIP_LABEL_OFFSET
             };
-          case LABEL_BOTTOM_LEFT:
+          case LABEL_SECTION.BL:
             return {
               x:
                 cardinalityLabel.x -

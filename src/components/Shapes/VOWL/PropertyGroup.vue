@@ -2,10 +2,7 @@
   <v-group>
     <!-- The first note, this contains all properties in constants > VOWL_SAME_NOTE -->
     <v-group v-if="singleNotePresent">
-      <note
-        :shape-id="$props.shapeId"
-        :calculate-length="true"
-      />
+      <note :shape-id="$props.shapeId" :calculate-length="true" />
       <v-group :config="singleNote.config">
         <v-group
           v-for="constraint in singleNote.constraints"
@@ -102,13 +99,17 @@ export default {
       singleNote: { constraints: [] },
       concatted: { constraints: [] },
       separate: { constraints: [] },
-      updateConfigs: ["deleteConstraintFromShape", "addPredicate", "updateShape"]
+      updateConfigs: [
+        "deleteConstraintFromShape",
+        "addPredicate",
+        "updateShape"
+      ]
     };
   },
   mounted() {
     this.setConfigs();
     this.$store.subscribe(mutation => {
-      if (this.updateConfigs.includes(mutation.type)){
+      if (this.updateConfigs.includes(mutation.type)) {
         this.setConfigs();
       }
     });
@@ -303,6 +304,10 @@ export default {
         totalHeight += (marginAmount - 1) * NOTE_MARGIN_VOWL;
       }
       this.$emit("new-height", totalHeight);
+      this.$store.commit("updateVOWLConstraintHeights", {
+        shapeID: this.$props.shapeId,
+        height: totalHeight
+      });
     },
 
     getIcon(constraint) {

@@ -14,7 +14,8 @@ import {
   VOWL_LENGTH_CONSTRAINTS,
   VOWL_RANGE_CONSTRAINTS,
   VOWL_SAME_NOTE,
-  VOWL_SEPARATE_NOTE
+  VOWL_SEPARATE_NOTE,
+  VOWL_SHAPE_ICONS
 } from "../util/constants";
 import predicateModalModule from "./modals/predicateModalModule";
 
@@ -681,6 +682,30 @@ const constraintModule = {
         for (const prop in shape) {
           /* Only handle the constraints that are not ignored. */
           if (VOWL_LENGTH_CONSTRAINTS.includes(prop)) {
+            if (shape[prop].length > 1) {
+              /* Get the ID of every element in the list. */
+              const properties = [];
+              Object.values(shape[prop]).map(p => properties.push(p["@id"]));
+              constraints[prop] = properties;
+            } else {
+              constraints[prop] = shape[prop];
+            }
+          }
+        }
+        return constraints;
+      } else {
+        return undefined;
+      }
+    },
+
+    shapeIconVOWLConstraints: (_state, _getters, _rootState, rootGetters) => shapeID => {
+      const constraints = {};
+      const shape = rootGetters.shapeWithID(shapeID);
+
+      if (shape) {
+        for (const prop in shape) {
+          /* Only handle the constraints that are not ignored. */
+          if (VOWL_SHAPE_ICONS.includes(prop)) {
             if (shape[prop].length > 1) {
               /* Get the ID of every element in the list. */
               const properties = [];

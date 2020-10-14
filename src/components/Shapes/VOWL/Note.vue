@@ -26,7 +26,8 @@ import {
   NOTE_HEIGHT,
   NOTE_CORNER_INSET_VOWL,
   NOTE_MARGIN_VOWL,
-  NOTE_WIDTH_VOWL, NOTE_ICON_SIZE_VOWL, NOTE_HEIGHT_CALC
+  NOTE_WIDTH_VOWL,
+  NOTE_ICON_SIZE_VOWL
 } from "../../../config/konvaConfigs";
 import { TERM } from "../../../translation/terminology";
 
@@ -37,7 +38,7 @@ export default {
     shapeId: {
       type: String,
       required: true
-    }, 
+    },
     calculateLength: {
       type: Boolean,
       required: true
@@ -58,28 +59,29 @@ export default {
       iconImage: new Image(NOTE_ICON_SIZE_VOWL, NOTE_ICON_SIZE_VOWL)
     };
   },
-  mounted() {
-    if (this.$props.icon !== "none") {
-      this.iconImage.src = `/icons/${this.$props.icon}.svg`;
-    }
-  },
   computed: {
-    iconConfig: function() {
+    iconConfig() {
       return {
         x: NOTE_MARGIN_VOWL,
         y: NOTE_MARGIN_VOWL,
         image: this.iconImage,
         width: NOTE_ICON_SIZE_VOWL,
         height: NOTE_ICON_SIZE_VOWL
-      }
+      };
+    }
+  },
+  mounted() {
+    if (this.$props.icon !== "none") {
+      this.iconImage.src = `/icons/${this.$props.icon}.svg`;
     }
   },
   methods: {
     getNoteLength() {
-      if (this.$props.calculateLength){
-        const constraintAmount = Object.keys(this.$store.getters.singleNoteVOWLConstraints(
+      if (this.$props.calculateLength) {
+        const singleNoteVOWLConstraints = this.$store.getters.singleNoteVOWLConstraints(
           this.$props.shapeId
-        )).length;
+        );
+        const constraintAmount = Object.keys(singleNoteVOWLConstraints).length;
         return constraintAmount * NOTE_HEIGHT;
       }
       return NOTE_HEIGHT;

@@ -21,7 +21,8 @@ const coordinateModule = {
     coordinates: {},
     heights: {},
     relationshipCoordinates: {},
-    VOWLconstraintCoordinates: {}
+    VOWLconstraintCoordinates: {},
+    VOWLconstraintHeights: {}
   },
 
   mutations: {
@@ -154,11 +155,12 @@ const coordinateModule = {
       });
     },
 
-    updateVOWLConstraintCoordinates(
-      state,
-      { shapeID, x, y }
-    ) {
+    updateVOWLConstraintCoordinates(state, { shapeID, x, y }) {
       Vue.set(state.VOWLconstraintCoordinates, shapeID, { x, y });
+    },
+
+    updateVOWLConstraintHeights(state, { shapeID, height }) {
+      Vue.set(state.VOWLconstraintHeights, shapeID, height);
     },
 
     /**

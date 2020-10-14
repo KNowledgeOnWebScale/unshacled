@@ -1,5 +1,4 @@
-import { CENTER_SHAPE_VOWL_X, CENTER_SHAPE_VOWL_Y, HEIGHT_VOWL, WIDTH_VOWL } from "../config/konvaConfigs";
-import { NOTE_CORNER_VOWL } from "./constants";
+import { NOTE_CORNER_INSET_VOWL } from "../config/konvaConfigs";
 
 /**
  * Return the nearest point to the given reference on the perimeter of the rectangle
@@ -34,78 +33,66 @@ function slope(point1, point2) {
 }
 
 /**
- * Find the intersection of the line that goes from midPoint to destinationPoint
- * with the rectangle defined by the topLeft and bottomRight parameters.
+ * Find the intersection of the line that goes from startPoint to endPoint with the give rectangle.
  * This is done by defining the equation of the line going through the two points,
  * then defining the intersection of that line with all four lines (not line segments) of the rectangle.
  * Then, for each intersection, there's a check to see whether that intersection is part of the line segment of that side of the rectangle,
  * if that's the case, the intersection is returned.
  * If that's not the case for all four sides, this means the shapes overlap and this simply returns the midPoint.
- * @param {object} midPoint The center point of the source shape, with an x and y component
- * @param {object} destinationPoint The center point of the destination shape, with an x and y component
- * @param {object} topLeft The top left point of the source shape, with an x and y component
- * @param {object} bottomRight The bottom right point of the source shape, with an x and y component
+ * @param {Object} startPoint The center point of the source shape, with an x and y component
+ * @param {Object} endPoint The center point of the destination shape, with an x and y component
+ * @param {Object} rectangle An object
+ * @returns {Object} An intersection point, with an x and y component
  */
-export function intersectionPoint(
-  midPoint,
-  destinationPoint,
-  topLeft,
-  bottomRight
-) {
-  const m = slope(midPoint, destinationPoint);
-  const c = -m * midPoint.x + midPoint.y;
+export function intersectionPointRectangle(startPoint, endPoint, rectangle) {
+  if (startPoint.x !== endPoint.x) {
+    const m = slope(startPoint, endPoint);
+    const c = -m * startPoint.x + startPoint.y;
 
-  const rect = {
-    ...topLeft,
-    width: Math.abs(bottomRight.x - topLeft.x),
-    height: Math.abs(bottomRight.y - topLeft.y)
-  };
+    const line = { m, c };
 
-  const line = { m, c };
+    const intersections = getRectangleIntersections(rectangle, line);
 
-  const intersections = getRectangleIntersections(rect, line);
-
-  if (
-    intersections.top.x >= topLeft.x &&
-    intersections.top.x <= bottomRight.x &&
-    destinationPoint.y < midPoint.y
-  ) {
-    return {
-      ...intersections.top,
-      side: "T"
-    };
+    if (
+      between(intersections.top.x, rectangle.x, rectangle.x + rectangle.width) &&
+      endPoint.y < startPoint.y
+    ) {
+      return intersections.top;
+    }
+    if (
+      between(intersections.bottom.x, rectangle.x, rectangle.x + rectangle.width) &&
+      endPoint.y > startPoint.y
+    ) {
+      return intersections.bottom;
+    }
+    if (
+      between(intersections.left.y, rectangle.y, rectangle.y + rectangle.height) &&
+      endPoint.x < startPoint.x
+    ) {
+      return intersections.left;
+    }
+    if (
+      between(intersections.right.y, rectangle.y, rectangle.y + rectangle.height) &&
+      endPoint.x > startPoint.x
+    ) {
+      return intersections.right;
+    }
+    return startPoint;
+  } else {
+    if (startPoint.y < endPoint.y) { // Return bottom intersection
+      return {
+        x: startPoint.x,
+        y: rectangle.y + rectangle.height,
+        side: "B"
+      };
+    } else { // Return top intersection
+      return {
+        x: startPoint.x,
+        y: rectangle.y,
+        side: "T"
+      };
+    }
   }
-  if (
-    intersections.bottom.x >= topLeft.x &&
-    intersections.bottom.x <= bottomRight.x &&
-    destinationPoint.y > midPoint.y
-  ) {
-    return {
-      ...intersections.bottom,
-      side: "B"
-    };
-  }
-  if (
-    intersections.left.y >= topLeft.y &&
-    intersections.left.y <= bottomRight.y &&
-    destinationPoint.x < midPoint.x
-  ) {
-    return {
-      ...intersections.left,
-      side: "L"
-    };
-  }
-  if (
-    intersections.right.y >= topLeft.y &&
-    intersections.right.y <= bottomRight.y &&
-    destinationPoint.x > midPoint.x
-  ) {
-    return {
-      ...intersections.right,
-      side: "R"
-    };
-  }
-  return midPoint;
 }
 
 /**
@@ -159,7 +146,7 @@ export function projectYOnEllipse(y, height, width, centerX, centerY) {
  * @param {Object} line An object representing a line, should have the following keys: m (the slope), c (the translation term of a linear equation)
  * @returns {Object} A list containing a point object for each of the 2 intersections
  */
-export function getEllipseIntersections(ellipse, line) {
+export function getEllipseIntersections(ellipse, midPoint2, line) {
   const h = ellipse.x;
   const k = ellipse.y;
   const a = ellipse.width / 2;
@@ -211,19 +198,23 @@ export function getRectangleIntersections(rectangle, line) {
 
   const topIntersection = {
     x: (topLeft.y - c) / m,
-    y: topLeft.y
+    y: topLeft.y,
+    side: "T"
   };
   const bottomIntersection = {
     x: (bottomRight.y - c) / m,
-    y: bottomRight.y
+    y: bottomRight.y,
+    side: "B"
   };
   const leftIntersection = {
     x: topLeft.x,
-    y: m * topLeft.x + c
+    y: m * topLeft.x + c,
+    side: "L"
   };
   const rightIntersection = {
     x: bottomRight.x,
-    y: m * bottomRight.x + c
+    y: m * bottomRight.x + c,
+    side: "R"
   };
 
   const intersections = {
@@ -236,7 +227,13 @@ export function getRectangleIntersections(rectangle, line) {
   return intersections;
 }
 
-export function getEllipseSection(midPointAngle){
+/**
+ * This is used to add a "side" property to the returned intersection points when calculating relationship endpoints.
+ * Since an ellipse has no definable sides, the angle between the two endpoints is used here.
+ * @param {Number} midPointAngle The angle between the two midpoints of a relationship in radians
+ * @returns {String} One of four possible sides: T, B, L or R
+ */
+export function getEllipseSection(midPointAngle) {
   const minAngle = -Math.PI; // -180 deg
   const maxAngle = Math.PI; // 180 deg
 
@@ -245,14 +242,17 @@ export function getEllipseSection(midPointAngle){
   const angle3 = Math.atan2(1, 1); // 45 deg
   const angle4 = Math.atan2(1, -1); // 135 deg
 
-  if(between(midPointAngle, minAngle, angle1) || between(midPointAngle, angle4, maxAngle)){
+  if (
+    between(midPointAngle, minAngle, angle1) ||
+    between(midPointAngle, angle4, maxAngle)
+  ) {
     return "L";
-  } else if (between(midPointAngle, angle1, angle2)){
-    return "B"
-  } else if (between(midPointAngle, angle2, angle3)){
-    return "R"
+  } else if (between(midPointAngle, angle1, angle2)) {
+    return "B";
+  } else if (between(midPointAngle, angle2, angle3)) {
+    return "R";
   } else {
-    return "T"
+    return "T";
   }
 }
 
@@ -273,34 +273,14 @@ export function between(x, lower, upper) {
  * @param {Object} ellipse An object representing the ellipse of a nodeShape, should have the following keys: x, y, height, width
  * @param {Object} note An object representing the (optional) note of a nodeShape, should have the following keys: x, y, height, width
  * @param {Booelan} hasNote A boolean indicating whether or not a note is present on the nodeShape
- * @param {Number} corner A value indicating on which corner of a shape the note is placed (the use of NOTE_CORNER_VOWL values is recommended here)
  * @param {Object} midPoint2 An object representing the second midPoint, from which the line is coming, should have the following keys: x, y
  * @returns {Object} A point on the outline of the nodeShape where it intersects with the given line
  */
-export function getNodeShapeIntersection(
-  ellipse,
-  note,
-  hasNote,
-  corner,
-  midPoint2
-) {
+export function getNodeShapeIntersection(ellipse, note, hasNote, midPoint2) {
+
   // Equation of line going between the 2 midpoints
   const m = slope(ellipse, midPoint2);
   const c = -m * ellipse.x + ellipse.y;
-
-  if (m === undefined || (m && (m === Infinity || m === -Infinity))){
-    if (midPoint2.y < ellipse.y){
-      return {
-        x: ellipse.x,
-        y: ellipse.y - CENTER_SHAPE_VOWL_Y
-      };
-    } else {
-      return {
-        x: ellipse.x,
-        y: ellipse.y + CENTER_SHAPE_VOWL_Y
-      };
-    }
-  }
 
   const line = { m, c };
 
@@ -309,162 +289,167 @@ export function getNodeShapeIntersection(
     midPoint2.x - ellipse.x
   );
 
-  let noteIntersect;
+  if (ellipse.x !== midPoint2.x) {
+    const noteIntersection = intersectionPointRectangle(ellipse, midPoint2, note);
+    const ellipseIntersections = getEllipseIntersections(ellipse, midPoint2, line);
 
-  const noteIntersections = getRectangleIntersections(note, line);
-  switch (corner) {
-    case NOTE_CORNER_VOWL.TOP_RIGHT: {
-      // Check top intersection and right intersection
-      if (between(noteIntersections.top.x, note.x, note.x + note.width)) {
-        noteIntersect = noteIntersections.top;
-      } else if (between(noteIntersections.right.y, note.y, note.y + note.height)) {
-        noteIntersect = noteIntersections.right;
+    const ellipseIntersect =
+      distance(ellipseIntersections[0], midPoint2) <
+      distance(ellipseIntersections[1], midPoint2)
+        ? ellipseIntersections[0]
+        : ellipseIntersections[1];
+
+    const ellipseIntersection = {
+      ...ellipseIntersect,
+      side: getEllipseSection(midPointAngle)
+    };
+
+    const toReturn =
+      hasNote && noteIntersection
+        ? distance(ellipseIntersection, midPoint2) <
+          distance(noteIntersection, midPoint2)
+          ? ellipseIntersection
+          : noteIntersection
+        : ellipseIntersection;
+    return toReturn;
+  } else {
+    let rectangleIncluded = between(ellipse.x, note.x, note.x + note.width);
+    if (ellipse.y < midPoint2.y) {
+      if (rectangleIncluded && note.y < ellipse.y) { // Return the intersection on top of the note
+        return {
+          x: ellipse.x,
+          y: note.y,
+          side: "T"
+        };
+      } else { // Return the intersection on top of the ellipse
+        return {
+          x: ellipse.x,
+          y: ellipse.y - ellipse.height / 2,
+          side: "T"
+        };
       }
-      break;
-    }
-    case NOTE_CORNER_VOWL.BOTTOM_RIGHT: {
-      // Check top intersection and right intersection
-      if (between(noteIntersections.bottom.x, note.x, note.x + note.width)) {
-        noteIntersect = noteIntersections.bottom;
-      } else if (between(noteIntersections.right.y, note.y, note.y + note.height)) {
-        noteIntersect = noteIntersections.right;
+    } else {
+      if (rectangleIncluded && note.y > ellipse.y) { // Return the intersection on top of the note
+        return {
+          x: ellipse.x,
+          y: note.y + note.height,
+          side: "B"
+        };
+      } else { // Return the intersection on top of the ellipse
+        return {
+          x: ellipse.x,
+          y: ellipse.y + ellipse.height / 2,
+          side: "B"
+        };
       }
-      break;
-    }
-    case NOTE_CORNER_VOWL.BOTTOM_LEFT: {
-      // Check top intersection and right intersection
-      if (between(noteIntersections.bottom.x, note.x, note.x + note.width)) {
-        noteIntersect = noteIntersections.bottom;
-      } else if (between(noteIntersections.left.y, note.y, note.y + note.height)) {
-        noteIntersect = noteIntersections.left;
-      }
-      break;
-    }
-    case NOTE_CORNER_VOWL.TOP_LEFT: {
-      // Check top intersection and right intersection
-      if (between(noteIntersections.top.x, note.x, note.x + note.width)) {
-        noteIntersect = noteIntersections.top;
-      } else if (between(noteIntersections.left.y, note.y, note.y + note.height)) {
-        noteIntersect = noteIntersections.left;
-      }
-      break;
     }
   }
-
-  const ellipseIntersections = getEllipseIntersections(ellipse, line);
-
-  // (x1, y1) and (y1, y2) are now the 2 intersections of the line and the ellipse
-  // however, we are dealing with a line segment, not a line, so we now have to decide which of these to return
-
-  // this checks whether the first intersection's y value (when normalised)
-  // has the same sign as the angle between the midpoints
-  // if that's the case, the first intersection is returned, otherwise, the second is returned
-
-  const ellipseIntersect =
-    distance(ellipseIntersections[0], midPoint2) < distance(ellipseIntersections[1], midPoint2)
-    ? ellipseIntersections[0]
-    : ellipseIntersections[1];
-
-  const ellipseIntersection = {
-    ...ellipseIntersect,
-    side: getEllipseSection(midPointAngle)
-  };
-
-  const toReturn =
-    hasNote && noteIntersect
-      ? distance(ellipseIntersection, midPoint2) <
-        distance(noteIntersect, midPoint2)
-        ? ellipseIntersection
-        : noteIntersect
-      : ellipseIntersection;
-  return toReturn;
 }
 
+/**
+ * Bounding function for a PropertyGroup component, this makes it so the PropertyGroup is draggable, but only around the given shape.
+ * @param {Object} rectangle A rectangle, representing the PropertyGroup, contains (at least) these properties: x, y, width, height
+ * @param {Object} ellipse An ellipse, representing the base shape, contains (at least) these properties: x, y, width, height (x and y here are the center point, not the topleft point)
+ * @returns {Object} A new point for the PropertyGroup component to be set to
+ */
 export function getPropertyGroupBounds(rectangle, ellipse) {
   const TL = { x: rectangle.x, y: rectangle.y };
   const TR = { x: rectangle.x + rectangle.width, y: rectangle.y };
   const BL = { x: rectangle.x, y: rectangle.y + rectangle.height };
   const BR = { x: rectangle.x + rectangle.width, y: rectangle.y + rectangle.height };
 
-  const TLangle = -Math.atan2(
-    TL.y - ellipse.y,
-    TL.x - ellipse.x
-  );
-  const TRangle = -Math.atan2(
-    TR.y - ellipse.y,
-    TR.x - ellipse.x
-  );
-  const BLangle = -Math.atan2(
-    BL.y - ellipse.y,
-    BL.x - ellipse.x
-  );
-  const BRangle = -Math.atan2(
-    BR.y - ellipse.y,
-    BR.x - ellipse.x
-  );
+  const TLangle = -Math.atan2(TL.y - ellipse.y, TL.x - ellipse.x);
+  const TRangle = -Math.atan2(TR.y - ellipse.y, TR.x - ellipse.x);
+  const BLangle = -Math.atan2(BL.y - ellipse.y, BL.x - ellipse.x);
+  const BRangle = -Math.atan2(BR.y - ellipse.y, BR.x - ellipse.x);
 
-  if (between(BLangle, 0, Math.PI/2)) {
+  if (between(BLangle, 0, Math.PI / 2)) {
     const points = ellipseProjections(ellipse, BL);
     const newPoint = points[0].y < points[1].y ? points[0] : points[1];
     return {
       x: newPoint.x,
       y: newPoint.y - rectangle.height
-    }
-  } else if (between(BRangle, Math.PI/2, Math.PI)) {
+    };
+  } else if (between(BRangle, Math.PI / 2, Math.PI)) {
     const points = ellipseProjections(ellipse, BR);
     const newPoint = points[0].y < points[1].y ? points[0] : points[1];
     return {
       x: newPoint.x - rectangle.width,
       y: newPoint.y - rectangle.height
-    }
-  } else if (between(TRangle, -Math.PI, -Math.PI/2)) {
+    };
+  } else if (between(TRangle, -Math.PI, -Math.PI / 2)) {
     const points = ellipseProjections(ellipse, TR);
     const newPoint = points[0].y > points[1].y ? points[0] : points[1];
     return {
       x: newPoint.x - rectangle.width,
       y: newPoint.y
-    }
-  } else if (between(TLangle, -Math.PI/2, 0)) {
+    };
+  } else if (between(TLangle, -Math.PI / 2, 0)) {
     const points = ellipseProjections(ellipse, TL);
     const newPoint = points[0].y > points[1].y ? points[0] : points[1];
-    return newPoint
-  } else if (between(BLangle, Math.PI/2, Math.PI) && between(BRangle, 0, Math.PI/2)) {
+    return newPoint;
+  } else if (
+    between(BLangle, Math.PI / 2, Math.PI) &&
+    between(BRangle, 0, Math.PI / 2)
+  ) {
     return {
       x: rectangle.x,
-      y: ellipse.y - ellipse.height/2 - rectangle.height
-    }
-  } else if (between(TLangle, -Math.PI, -Math.PI/2) && between(BRangle, -Math.PI/2, 0)) {
+      y: ellipse.y - ellipse.height / 2 - rectangle.height
+    };
+  } else if (
+    between(TLangle, -Math.PI, -Math.PI / 2) &&
+    between(BRangle, -Math.PI / 2, 0)
+  ) {
     return {
       x: rectangle.x,
-      y: ellipse.y + ellipse.height/2
-    }
-  } else if (between(TLangle, 0, Math.PI/2) && between(BLangle, -Math.PI/2, 0)) {
+      y: ellipse.y + ellipse.height / 2
+    };
+  } else if (
+    between(TLangle, 0, Math.PI / 2) &&
+    between(BLangle, -Math.PI / 2, 0)
+  ) {
     return {
-      x: ellipse.x + ellipse.width/2,
+      x: ellipse.x + ellipse.width / 2,
       y: rectangle.y
-    }
-  } else if (between(TRangle, Math.PI/2, Math.PI) && between(BRangle, -Math.PI, -Math.PI/2)) {
+    };
+  } else if (
+    between(TRangle, Math.PI / 2, Math.PI) &&
+    between(BRangle, -Math.PI, -Math.PI / 2)
+  ) {
     return {
-      x: ellipse.x - ellipse.width/2 - rectangle.width,
+      x: ellipse.x - ellipse.width / 2 - rectangle.width,
       y: rectangle.y
-    }
+    };
   } else {
     return getDefaultEllipsePosition(ellipse);
   }
 }
 
+/**
+ * Defines a line starting at the centerpoint of a given ellipse, going 45 degrees down to the right,
+ * then returns the intersection point of that line and the ellipse. This is used as a default position to put the ShapeVOWL notes.
+ * @param {Object} ellipse The ellipse, an object containing (at least) these properties: x, y, width, height
+ * @returns {Object} A default position for the PropertyGroup component, an object containing (at least) these properties: x, y
+ */
 export function getDefaultEllipsePosition(ellipse) {
   const points = ellipseProjections(ellipse, {
     x: ellipse.x + 1,
     y: ellipse.y + 1
   });
   const newPoint = points[0].y > points[1].y ? points[0] : points[1];
-  return newPoint
+  return newPoint;
 }
 
+/**
+ * Defines the line between a given point and the centerpoint of an ellipse,
+ * then return both intersection points of this line and the ellipse
+ * @param {Object} ellipse The ellipse, an object containing (at least) these properties: x, y, width, height
+ * @param {Object} point The point, an object containing (at least) these properties: x, y
+ * @returns {Object} A list with 2 points, objects containing (at least) these properties: x, y
+ */
 function ellipseProjections(ellipse, point) {
   const m = slope(ellipse, point);
   const c = -m * ellipse.x + ellipse.y;
   const line = { m, c };
-  return getEllipseIntersections(ellipse, line);
+  return getEllipseIntersections(ellipse, point, line);
 }

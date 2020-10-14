@@ -55,6 +55,12 @@ export const IGNORED_PROPERTIES = [
   TERM.description
 ];
 
+/* If a shape has any of these properties, it should have an icon in ShapeVOWL representation */
+export const VOWL_SHAPE_ICONS = [
+  TERM.datatype,
+  TERM.class
+];
+
 /* All these properties should be on the same note in the vowl representation. */
 export const VOWL_SAME_NOTE = [
   TERM.nodeKind,

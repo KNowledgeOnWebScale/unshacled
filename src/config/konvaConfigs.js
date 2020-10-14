@@ -33,10 +33,14 @@ const RELATIONSHIP_DASH = 10;
 export const RELATIONSHIP_DASH_ARRAY = [RELATIONSHIP_DASH, RELATIONSHIP_DASH]; // The dash array for a relationship, to be used for e.g. compliesWith
 export const LOGICAL_RELATIONSHIP_APPENDAGE = 50;
 
-export const LABEL_TOP_LEFT = 1; // For placement of relationship cardinality labels
-export const LABEL_TOP_RIGHT = 2; // For placement of relationship cardinality labels
-export const LABEL_BOTTOM_RIGHT = 3; // For placement of relationship cardinality labels
-export const LABEL_BOTTOM_LEFT = 4; // For placement of relationship cardinality labels
+// For placement of relationship cardinality labels
+export const LABEL_SECTION = {
+  TL: 1,
+  TR: 2,
+  BR: 3,
+  BL: 4,
+  UNSPECIFIED: 0
+};
 
 export const LABEL_NO_SHIFT = 0; // For placement of relationship labels
 export const LABEL_SHIFT_UP = 1; // For placement of relationship labels
@@ -94,7 +98,8 @@ export const SHAPE_CONFIG_VOWL = {
   width: WIDTH_VOWL,
   x: CENTER_SHAPE_VOWL_X,
   y: CENTER_SHAPE_VOWL_Y,
-  stroke: "black"
+  stroke: "black",
+  fill: "#FFFFFF"
 };
 
 export const NODE_SHAPE_CONFIG_VOWL = {
@@ -104,7 +109,7 @@ export const NODE_SHAPE_CONFIG_VOWL = {
 
 export const PROPERTY_SHAPE_CONFIG_VOWL = {
   ...SHAPE_CONFIG_VOWL,
-  fill: "white"
+  fill: "#FFFFFF"
 };
 
 /**
