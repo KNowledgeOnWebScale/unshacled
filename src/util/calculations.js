@@ -1,5 +1,3 @@
-import { NOTE_CORNER_INSET_VOWL } from "../config/konvaConfigs";
-
 /**
  * Return the nearest point to the given reference on the perimeter of the rectangle
  * defined by the given top left and bottom right coordiantes.
@@ -54,44 +52,60 @@ export function intersectionPointRectangle(startPoint, endPoint, rectangle) {
     const intersections = getRectangleIntersections(rectangle, line);
 
     if (
-      between(intersections.top.x, rectangle.x, rectangle.x + rectangle.width) &&
+      between(
+        intersections.top.x,
+        rectangle.x,
+        rectangle.x + rectangle.width
+      ) &&
       endPoint.y < startPoint.y
     ) {
       return intersections.top;
     }
     if (
-      between(intersections.bottom.x, rectangle.x, rectangle.x + rectangle.width) &&
+      between(
+        intersections.bottom.x,
+        rectangle.x,
+        rectangle.x + rectangle.width
+      ) &&
       endPoint.y > startPoint.y
     ) {
       return intersections.bottom;
     }
     if (
-      between(intersections.left.y, rectangle.y, rectangle.y + rectangle.height) &&
+      between(
+        intersections.left.y,
+        rectangle.y,
+        rectangle.y + rectangle.height
+      ) &&
       endPoint.x < startPoint.x
     ) {
       return intersections.left;
     }
     if (
-      between(intersections.right.y, rectangle.y, rectangle.y + rectangle.height) &&
+      between(
+        intersections.right.y,
+        rectangle.y,
+        rectangle.y + rectangle.height
+      ) &&
       endPoint.x > startPoint.x
     ) {
       return intersections.right;
     }
     return startPoint;
+  } else if (startPoint.y < endPoint.y) {
+    // Return bottom intersection
+    return {
+      x: startPoint.x,
+      y: rectangle.y + rectangle.height,
+      side: "B"
+    };
   } else {
-    if (startPoint.y < endPoint.y) { // Return bottom intersection
-      return {
-        x: startPoint.x,
-        y: rectangle.y + rectangle.height,
-        side: "B"
-      };
-    } else { // Return top intersection
-      return {
-        x: startPoint.x,
-        y: rectangle.y,
-        side: "T"
-      };
-    }
+    // Return top intersection
+    return {
+      x: startPoint.x,
+      y: rectangle.y,
+      side: "T"
+    };
   }
 }
 
@@ -277,7 +291,6 @@ export function between(x, lower, upper) {
  * @returns {Object} A point on the outline of the nodeShape where it intersects with the given line
  */
 export function getNodeShapeIntersection(ellipse, note, hasNote, midPoint2) {
-
   // Equation of line going between the 2 midpoints
   const m = slope(ellipse, midPoint2);
   const c = -m * ellipse.x + ellipse.y;
@@ -289,9 +302,50 @@ export function getNodeShapeIntersection(ellipse, note, hasNote, midPoint2) {
     midPoint2.x - ellipse.x
   );
 
-  if (ellipse.x !== midPoint2.x) {
-    const noteIntersection = intersectionPointRectangle(ellipse, midPoint2, note);
-    const ellipseIntersections = getEllipseIntersections(ellipse, midPoint2, line);
+  if (ellipse.x === midPoint2.x) {
+    const rectangleIncluded = between(ellipse.x, note.x, note.x + note.width);
+    if (ellipse.y > midPoint2.y) {
+      if (rectangleIncluded && note.y < ellipse.y) {
+        // Return the intersection on top of the note
+        return {
+          x: ellipse.x,
+          y: note.y,
+          side: "T"
+        };
+      } else {
+        // Return the intersection on top of the ellipse
+        return {
+          x: ellipse.x,
+          y: ellipse.y - ellipse.height / 2,
+          side: "T"
+        };
+      }
+    } else if (rectangleIncluded && note.y > ellipse.y) {
+      // Return the intersection on top of the note
+      return {
+        x: ellipse.x,
+        y: note.y + note.height,
+        side: "B"
+      };
+    } else {
+      // Return the intersection on top of the ellipse
+      return {
+        x: ellipse.x,
+        y: ellipse.y + ellipse.height / 2,
+        side: "B"
+      };
+    }
+  } else {
+    const noteIntersection = intersectionPointRectangle(
+      ellipse,
+      midPoint2,
+      note
+    );
+    const ellipseIntersections = getEllipseIntersections(
+      ellipse,
+      midPoint2,
+      line
+    );
 
     const ellipseIntersect =
       distance(ellipseIntersections[0], midPoint2) <
@@ -312,37 +366,6 @@ export function getNodeShapeIntersection(ellipse, note, hasNote, midPoint2) {
           : noteIntersection
         : ellipseIntersection;
     return toReturn;
-  } else {
-    let rectangleIncluded = between(ellipse.x, note.x, note.x + note.width);
-    if (ellipse.y < midPoint2.y) {
-      if (rectangleIncluded && note.y < ellipse.y) { // Return the intersection on top of the note
-        return {
-          x: ellipse.x,
-          y: note.y,
-          side: "T"
-        };
-      } else { // Return the intersection on top of the ellipse
-        return {
-          x: ellipse.x,
-          y: ellipse.y - ellipse.height / 2,
-          side: "T"
-        };
-      }
-    } else {
-      if (rectangleIncluded && note.y > ellipse.y) { // Return the intersection on top of the note
-        return {
-          x: ellipse.x,
-          y: note.y + note.height,
-          side: "B"
-        };
-      } else { // Return the intersection on top of the ellipse
-        return {
-          x: ellipse.x,
-          y: ellipse.y + ellipse.height / 2,
-          side: "B"
-        };
-      }
-    }
   }
 }
 

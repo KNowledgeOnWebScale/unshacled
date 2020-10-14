@@ -1,10 +1,5 @@
 <template>
   <v-group ref="group" @mouseenter="hover = true" @mouseleave="hover = false">
-    <v-group ref="label" :config="getConfigs().label">
-      <v-rect :config="getRectConfig(this.$refs.text)"></v-rect>
-      <v-text ref="text" :config="getConfigs().text"></v-text>
-    </v-group>
-
     <v-group
       v-if="cardinalityPresent"
       ref="cardinalityLabel"
@@ -18,6 +13,12 @@
     </v-group>
 
     <v-arrow ref="arrow" :config="getConfigs().line"></v-arrow>
+
+    <v-group v-if="hasLabel" ref="label" :config="getLabelConfig()">
+      <v-rect :config="getLabelRectConfig(this.$refs.text)"></v-rect>
+      <v-text ref="text" :config="getConfigs().text"></v-text>
+    </v-group>
+
     <v-circle
       v-if="hover"
       :config="getButtonConfig()"
@@ -30,7 +31,6 @@
 
 <script>
 import {
-  HEIGHT,
   DELETE_BUTTON_CONFIG,
   RELATIONSHIP_ARROW_CONFIG,
   RELATIONSHIP_LABEL_RECT_CONFIG,
@@ -47,24 +47,17 @@ import {
   HEIGHT_VOWL,
   CENTER_SHAPE_VOWL_X,
   CENTER_SHAPE_VOWL_Y,
-  NOTE_INSET_VOWL,
-  NOTE_CORNER_INSET_VOWL,
-  NOTE_MARGIN_VOWL,
   NOTE_WIDTH_VOWL,
   LABEL_SECTION
 } from "../../../config/konvaConfigs";
-import {
-  getNodeShapeIntersection
-} from "../../../util/calculations";
+import { getNodeShapeIntersection } from "../../../util/calculations";
 import { uriToPrefix } from "../../../util/urlParser";
 import { TERM } from "../../../translation/terminology";
 import { isBlankPathNode, parsePath } from "../../../util/pathPropertyUtil";
-import { COMPLIES_WITH, NOTE_CORNER_VOWL } from "../../../util/constants";
-import UMLArrowHead from "./UMLArrowHead.vue";
+import { COMPLIES_WITH, VOWL_BORDER_COLOR } from "../../../util/constants";
 
 export default {
   name: "Relationship",
-  components: { UMLArrowHead },
   props: {
     from: {
       type: String,
@@ -97,7 +90,8 @@ export default {
         constraintID: this.$props.constraintID,
         from: this.$props.from,
         to: this.$props.to
-      }
+      },
+      hasLabel: true
     };
   },
   methods: {
@@ -159,10 +153,12 @@ export default {
 
     getNoteProps(id) {
       const { coordinates } = this.$store.state.mShape.mCoordinate;
-      const { VOWLconstraintCoordinates, VOWLconstraintHeights } = this.$store.state.mShape.mCoordinate;
+      const {
+        VOWLconstraintCoordinates,
+        VOWLconstraintHeights
+      } = this.$store.state.mShape.mCoordinate;
 
-      const toReturn =
-      VOWLconstraintHeights[id]
+      const toReturn = VOWLconstraintHeights[id]
         ? {
             y: coordinates[id].y + VOWLconstraintCoordinates[id].y,
             x: coordinates[id].x + VOWLconstraintCoordinates[id].x,
@@ -197,17 +193,22 @@ export default {
         }
       });
 
+      const isProperty = this.$props.constraintID === TERM.property;
       let labelY;
-      switch (this.labelShift) {
-        case LABEL_NO_SHIFT:
-          labelY = (points[1] + points[3]) / 2 - 2 * MARGIN;
-          break;
-        case LABEL_SHIFT_UP:
-          labelY = (points[1] + points[3]) / 2 - 3 * MARGIN;
-          break;
-        case LABEL_SHIFT_DOWN:
-          labelY = (points[1] + points[3]) / 2 + MARGIN;
-          break;
+      if (isProperty) {
+        labelY = (points[1] + points[3]) / 2 - MARGIN;
+      } else {
+        switch (this.labelShift) {
+          case LABEL_NO_SHIFT:
+            labelY = (points[1] + points[3]) / 2 - 2 * MARGIN;
+            break;
+          case LABEL_SHIFT_UP:
+            labelY = (points[1] + points[3]) / 2 - 3 * MARGIN;
+            break;
+          case LABEL_SHIFT_DOWN:
+            labelY = (points[1] + points[3]) / 2 + MARGIN;
+            break;
+        }
       }
 
       /* Create and return the configuration objects using these end points. */
@@ -221,7 +222,7 @@ export default {
           points
         },
         label: {
-          x: (points[0] + points[2]) / 2 + RELATIONSHIP_LABEL_OFFSET,
+          x: (points[0] + points[2]) / 2,
           y: labelY
         },
         text: {
@@ -260,6 +261,29 @@ export default {
         };
       }
       return configs.rect;
+    },
+
+    /**
+     * Sets the label to the correct fill color, outline color and height
+     * @param {String} ref The reference for the label text.
+     * @returns {Object} A configuration object.
+     */
+    getLabelRectConfig(ref) {
+      const rectConfig = this.getRectConfig(ref);
+      const isProperty = this.$props.constraintID === TERM.property;
+      const strokeColor =
+        VOWL_BORDER_COLOR[this.$store.getters.getSeverity(this.$props.to)];
+      if (ref && ref.getNode()) {
+        return {
+          ...rectConfig,
+          fill: isProperty ? "#AACCFF" : "white",
+          height: ref.getNode().height() + MARGIN * 2,
+          strokeEnabled: isProperty,
+          stroke: isProperty ? strokeColor : "black"
+        };
+      } else {
+        return rectConfig;
+      }
     },
 
     /**
@@ -315,6 +339,20 @@ export default {
         }
       } else {
         this.labelShift = LABEL_NO_SHIFT;
+      }
+    },
+
+    getLabelConfig() {
+      const { label } = this.getConfigs();
+
+      if (this.$refs.text && this.$refs.text.getNode()) {
+        console.log("TEST");
+        return {
+          ...label,
+          x: label.x - this.$refs.text.getNode().width() / 2
+        };
+      } else {
+        return label;
       }
     },
 
@@ -399,11 +437,12 @@ export default {
         return "value missing";
       }
       if (COMPLIES_WITH.includes(this.$props.constraintID)) {
-        return "compliesWith";
+        return "complyWith";
       }
       if (this.$props.constraintID === TERM.not) {
         return "NOT";
       }
+      this.hasLabel = false;
       return "";
     },
 

@@ -10,7 +10,6 @@ import {
   IGNORED_PROPERTIES,
   INFO_PROPERTIES,
   RELATIONSHIP_PROPERTIES,
-  VOWL_CONCATTED_NOTE,
   VOWL_LENGTH_CONSTRAINTS,
   VOWL_RANGE_CONSTRAINTS,
   VOWL_SAME_NOTE,
@@ -602,7 +601,12 @@ const constraintModule = {
       return output;
     },
 
-    singleNoteVOWLConstraints: (_state, _getters, _rootState, rootGetters) => shapeID => {
+    singleNoteVOWLConstraints: (
+      _state,
+      _getters,
+      _rootState,
+      rootGetters
+    ) => shapeID => {
       const constraints = {};
       const shape = rootGetters.shapeWithID(shapeID);
 
@@ -626,7 +630,12 @@ const constraintModule = {
       }
     },
 
-    separateNotesVOWLConstraints: (_state, _getters, _rootState, rootGetters) => shapeID => {
+    separateNotesVOWLConstraints: (
+      _state,
+      _getters,
+      _rootState,
+      rootGetters
+    ) => shapeID => {
       const constraints = {};
       const shape = rootGetters.shapeWithID(shapeID);
 
@@ -650,7 +659,12 @@ const constraintModule = {
       }
     },
 
-    rangeVOWLConstraints: (_state, _getters, _rootState, rootGetters) => shapeID => {
+    rangeVOWLConstraints: (
+      _state,
+      _getters,
+      _rootState,
+      rootGetters
+    ) => shapeID => {
       const constraints = {};
       const shape = rootGetters.shapeWithID(shapeID);
 
@@ -674,7 +688,12 @@ const constraintModule = {
       }
     },
 
-    lengthVOWLConstraints: (_state, _getters, _rootState, rootGetters) => shapeID => {
+    lengthVOWLConstraints: (
+      _state,
+      _getters,
+      _rootState,
+      rootGetters
+    ) => shapeID => {
       const constraints = {};
       const shape = rootGetters.shapeWithID(shapeID);
 
@@ -698,7 +717,12 @@ const constraintModule = {
       }
     },
 
-    shapeIconVOWLConstraints: (_state, _getters, _rootState, rootGetters) => shapeID => {
+    shapeIconVOWLConstraints: (
+      _state,
+      _getters,
+      _rootState,
+      rootGetters
+    ) => shapeID => {
       const constraints = {};
       const shape = rootGetters.shapeWithID(shapeID);
 
@@ -721,6 +745,36 @@ const constraintModule = {
         return undefined;
       }
     },
+
+    getSeverity: (_state, _getters, _rootState, rootGetters) => shapeID => {
+      const shape = rootGetters.shapeWithID(shapeID);
+
+      if (shape && Object.keys(shape).includes(TERM.severity)) {
+        return shape[TERM.severity][0]["@id"];
+      } else {
+        return TERM.Violation;
+      }
+    },
+
+    isClosed: (_state, _getters, _rootState, rootGetters) => shapeID => {
+      const shape = rootGetters.shapeWithID(shapeID);
+
+      if (shape && Object.keys(shape).includes(TERM.closed)) {
+        return shape[TERM.closed][0]["@value"] === "true";
+      } else {
+        return false;
+      }
+    },
+
+    isDeactivated: (_state, _getters, _rootState, rootGetters) => shapeID => {
+      const shape = rootGetters.shapeWithID(shapeID);
+
+      if (shape && Object.keys(shape).includes(TERM.deactivated)) {
+        return shape[TERM.deactivated][0]["@value"] === "true";
+      } else {
+        return false;
+      }
+    }
   }
 };
 

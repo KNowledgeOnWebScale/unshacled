@@ -14,7 +14,9 @@
         },
         fill: 'white',
         stroke: getBorderColor(),
-        strokeWidth: 2
+        strokeWidth: 2,
+        dashEnabled: isDeactivated,
+        dash: shapeData.dashArray
       }"
     />
     <v-image v-if="$props.icon !== 'none'" :config="iconConfig"></v-image>
@@ -27,9 +29,10 @@ import {
   NOTE_CORNER_INSET_VOWL,
   NOTE_MARGIN_VOWL,
   NOTE_WIDTH_VOWL,
-  NOTE_ICON_SIZE_VOWL
+  NOTE_ICON_SIZE_VOWL,
+  RELATIONSHIP_DASH_ARRAY
 } from "../../../config/konvaConfigs";
-import { TERM } from "../../../translation/terminology";
+import { VOWL_BORDER_COLOR } from "../../../util/constants";
 
 export default {
   name: "Note",
@@ -54,7 +57,8 @@ export default {
       shapeData: {
         noteWidth: NOTE_WIDTH_VOWL,
         cornerInset: NOTE_CORNER_INSET_VOWL,
-        noteMargin: NOTE_MARGIN_VOWL
+        noteMargin: NOTE_MARGIN_VOWL,
+        dashArray: RELATIONSHIP_DASH_ARRAY
       },
       iconImage: new Image(NOTE_ICON_SIZE_VOWL, NOTE_ICON_SIZE_VOWL)
     };
@@ -68,6 +72,10 @@ export default {
         width: NOTE_ICON_SIZE_VOWL,
         height: NOTE_ICON_SIZE_VOWL
       };
+    },
+
+    isDeactivated() {
+      return this.$store.getters.isDeactivated(this.$props.shapeId);
     }
   },
   mounted() {
@@ -88,21 +96,9 @@ export default {
     },
 
     getBorderColor() {
-      const info = this.$store.getters.shapeInfo(this.$props.shapeId);
-      if (info[TERM.severity]) {
-        switch (info[TERM.severity][0]["@id"]) {
-          case TERM.Info:
-            return "#93c47d";
-          case TERM.Warning:
-            return "#ffd966";
-          case TERM.Violation:
-            return "#e06666";
-          default:
-            return "#e06666";
-        }
-      } else {
-        return "#e06666";
-      }
+      return VOWL_BORDER_COLOR[
+        this.$store.getters.getSeverity(this.$props.shapeId)
+      ];
     }
   }
 };

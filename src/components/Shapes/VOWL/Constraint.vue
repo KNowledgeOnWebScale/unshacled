@@ -156,12 +156,12 @@ export default {
     deleteConstraint() {
       if (this.$props.isConcat) {
         const concatMap = {
-          "range": Object.keys(
+          range: Object.keys(
             this.$store.getters.rangeVOWLConstraints(this.$props.shapeID)
           ),
-          "length": Object.keys(
+          length: Object.keys(
             this.$store.getters.lengthVOWLConstraints(this.$props.shapeID)
-          ),
+          )
         };
         let args;
         for (const concatConstraint of concatMap[this.$props.constraintID]) {
@@ -368,7 +368,7 @@ export default {
         };
 
         if (textMap[key]) {
-          text = textMap[key];
+          text = textMap[key](value);
         } else {
           text = `${keyText}(${valueText})`;
         }

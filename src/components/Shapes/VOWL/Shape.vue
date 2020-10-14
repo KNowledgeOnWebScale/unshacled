@@ -81,11 +81,16 @@ import {
   CENTER_SHAPE_VOWL_X,
   CENTER_SHAPE_VOWL_Y,
   NOTE_INSET_VOWL,
-  NOTE_WIDTH_VOWL, NOTE_ICON_SIZE_VOWL, NOTE_MARGIN_VOWL
+  NOTE_WIDTH_VOWL,
+  NOTE_ICON_SIZE_VOWL,
+  NOTE_MARGIN_VOWL,
+  RELATIONSHIP_DASH_ARRAY,
+  CLOSED_BORDER_WIDTH_VOWL,
+  BORDER_WIDTH_VOWL
 } from "../../../config/konvaConfigs";
 import { TERM } from "../../../translation/terminology";
 import { abbreviate } from "../../../util/strings";
-import { LABEL, VOWL_SHAPE_ICONS } from "../../../util/constants";
+import { LABEL } from "../../../util/constants";
 import {
   getDefaultEllipsePosition,
   getPropertyGroupBounds
@@ -121,6 +126,32 @@ export default {
       iconImage: new Image(NOTE_ICON_SIZE_VOWL, NOTE_ICON_SIZE_VOWL)
     };
   },
+  computed: {
+    icon() {
+      const iconConstraints = this.$store.getters.shapeIconVOWLConstraints(
+        this.$props.id
+      );
+      const iconKeys = Object.keys(iconConstraints);
+      if (iconKeys.length) {
+        const iconMap = {
+          [TERM.class]: "class",
+          [TERM.datatype]: "datatype"
+        };
+        return iconMap[iconKeys[0]];
+      } else {
+        return "none";
+      }
+    },
+    iconConfig() {
+      return {
+        x: 2 * NOTE_MARGIN_VOWL,
+        y: CENTER_SHAPE_VOWL_Y - NOTE_ICON_SIZE_VOWL / 2,
+        image: this.iconImage,
+        width: NOTE_ICON_SIZE_VOWL,
+        height: NOTE_ICON_SIZE_VOWL
+      };
+    }
+  },
   mounted() {
     const self = this;
     const { id } = this.$props;
@@ -131,7 +162,7 @@ export default {
     this.updatePosition();
     this.updateConstraintCoordinates();
 
-    const icon = this.icon;
+    const { icon } = this;
     if (icon !== "none") {
       this.iconImage.src = `/icons/${icon}.svg`;
     }
@@ -145,30 +176,6 @@ export default {
         self.getDescriptionConfig();
       }
     );
-  },
-  computed: {
-    icon() {
-      const iconConstraints = this.$store.getters.shapeIconVOWLConstraints(this.$props.id);
-      const iconKeys = Object.keys(iconConstraints)
-      if (iconKeys.length){
-        const iconMap = {
-          [TERM.class]: "class",
-          [TERM.datatype]: "datatype"
-        };
-        return iconMap[iconKeys[0]];
-      } else {
-        return "none";
-      }
-    },
-    iconConfig() {
-      return {
-        x: 2 * NOTE_MARGIN_VOWL,
-        y: CENTER_SHAPE_VOWL_Y - NOTE_ICON_SIZE_VOWL/2,
-        image: this.iconImage,
-        width: NOTE_ICON_SIZE_VOWL,
-        height: NOTE_ICON_SIZE_VOWL
-      };
-    }
   },
   methods: {
     getShapeConfig() {
@@ -185,7 +192,12 @@ export default {
 
       return {
         ...config,
-        stroke: this.getBorderColor()
+        strokeWidth: this.isClosed()
+          ? CLOSED_BORDER_WIDTH_VOWL
+          : BORDER_WIDTH_VOWL,
+        stroke: this.getBorderColor(),
+        dashEnabled: this.isDeactivated(),
+        dash: RELATIONSHIP_DASH_ARRAY
       };
     },
 
@@ -205,6 +217,14 @@ export default {
       } else {
         return "#e06666";
       }
+    },
+
+    isClosed() {
+      return this.$store.getters.isClosed(this.$props.id);
+    },
+
+    isDeactivated() {
+      return this.$store.getters.isDeactivated(this.$props.id);
     },
 
     /**
@@ -236,10 +256,6 @@ export default {
         ...URI_TEXT_CONFIG_VOWL,
         text
       };
-    },
-
-    getIconConfig() {
-
     },
 
     getNoteLength() {
