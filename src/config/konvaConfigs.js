@@ -101,7 +101,7 @@ export const SHAPE_CONFIG_VOWL = {
   x: CENTER_SHAPE_VOWL_X,
   y: CENTER_SHAPE_VOWL_Y,
   stroke: "black",
-  fill: "#FFFFFF"
+  fill: "#AACCFF"
 };
 
 export const NODE_SHAPE_CONFIG_VOWL = {
@@ -111,7 +111,7 @@ export const NODE_SHAPE_CONFIG_VOWL = {
 
 export const PROPERTY_SHAPE_CONFIG_VOWL = {
   ...SHAPE_CONFIG_VOWL,
-  fill: "#FFFFFF"
+  fill: "#AACCFF"
 };
 
 /**
@@ -244,7 +244,7 @@ export const NAME_TEXT_CONFIG_VOWL = {
 
 export const URI_TEXT_CONFIG_VOWL = {
   ...TEXT_CONFIG_VOWL,
-  y: CENTER_SHAPE_VOWL_Y,
+  y: CENTER_SHAPE_VOWL_Y - TEXT_SIZE / 2,
   fontStyle: "italic"
 };
 

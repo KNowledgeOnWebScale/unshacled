@@ -9,7 +9,7 @@
     >
       <!-- Main ellipse -->
       <v-group @mouseenter="titleHover = true" @mouseleave="titleHover = false">
-        <!-- Header -->
+        <!-- Shape label & uri -->
         <v-group @click="startEditing">
           <v-ellipse :config="getShapeConfig()"></v-ellipse>
           <v-text ref="shapeLabel" :config="getLabelTextConfig()"></v-text>
@@ -86,7 +86,8 @@ import {
   NOTE_MARGIN_VOWL,
   RELATIONSHIP_DASH_ARRAY,
   CLOSED_BORDER_WIDTH_VOWL,
-  BORDER_WIDTH_VOWL
+  BORDER_WIDTH_VOWL,
+  MARGIN_VOWL
 } from "../../../config/konvaConfigs";
 import { TERM } from "../../../translation/terminology";
 import { abbreviate } from "../../../util/strings";
@@ -110,7 +111,8 @@ export default {
     },
     nodeShape: {
       type: Boolean,
-      required: false
+      required: false,
+      default: false
     }
   },
   data() {
@@ -246,15 +248,37 @@ export default {
      * @returns {object} the configuration of the URI.
      */
     getURITextConfig() {
-      const uri = uriToPrefix(
-        this.$store.state.mConfig.namespaces,
-        this.$props.id
-      );
+      const uri = this.icon === "class" || this.icon === "datatype"
+        ? this.getIconPropertyURI()
+        : this.$props.nodeShape
+          ? uriToPrefix(
+              this.$store.state.mConfig.namespaces,
+              this.$props.id
+            )
+          : "";
       const text = uri[0] === "_" ? "" : uri;
       return {
         ...URI_TEXT_CONFIG_VOWL,
+        width: this.icon !== "none" ? WIDTH_VOWL - NOTE_ICON_SIZE_VOWL - 1.5 * MARGIN_VOWL : WIDTH_VOWL - MARGIN_VOWL,
+        x: this.icon !== "none" ? NOTE_ICON_SIZE_VOWL +  MARGIN_VOWL : MARGIN_VOWL / 2,
+        fontStyle: this.icon !== "none" ? "normal" : "italic",
         text
       };
+    },
+
+    getIconPropertyURI() {
+      const shape = this.$store.getters.shapeWithID(this.$props.id);
+      if (shape) {
+        const iconProp = this.icon === "class" ? TERM.class : TERM.datatype;
+        const classProp = shape[iconProp];
+        if (classProp) {
+          return uriToPrefix(
+            this.$store.state.mConfig.namespaces,
+            classProp[0]["@id"]
+          );
+        }
+      }
+      return("");
     },
 
     getNoteLength() {
