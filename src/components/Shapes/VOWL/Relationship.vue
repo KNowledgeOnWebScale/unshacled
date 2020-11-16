@@ -48,13 +48,14 @@ import {
   CENTER_SHAPE_VOWL_X,
   CENTER_SHAPE_VOWL_Y,
   NOTE_WIDTH_VOWL,
-  LABEL_SECTION
+  LABEL_SECTION,
+  HEIGHT_LITERAL_VOWL
 } from "../../../config/konvaConfigs";
-import { getNodeShapeIntersection } from "../../../util/calculations";
+import { getShapeIntersection } from "../../../util/calculations";
 import { uriToPrefix } from "../../../util/urlParser";
 import { TERM } from "../../../translation/terminology";
 import { isBlankPathNode, parsePath } from "../../../util/pathPropertyUtil";
-import { COMPLIES_WITH, VOWL_BORDER_COLOR } from "../../../util/constants";
+import { COMPLIES_WITH, VOWL_BORDER_COLOR, VOWL_SHAPE_KIND } from "../../../util/constants";
 
 export default {
   name: "Relationship",
@@ -104,25 +105,45 @@ export default {
       const { coordinates } = this.$store.state.mShape.mCoordinate;
 
       /* Determine the center points of the start shape. */
-      const start = {
+      const startKind = this.$store.getters.getShapeKind(from);
+      const start = startKind === VOWL_SHAPE_KIND.RDF_RESOURCE
+      ? {
         x: coordinates[from].x + CENTER_SHAPE_VOWL_X,
         y: coordinates[from].y + CENTER_SHAPE_VOWL_Y,
         height: HEIGHT_VOWL,
-        width: WIDTH_VOWL
+        width: WIDTH_VOWL,
+        kind: startKind
+      }
+      : {
+        x: coordinates[from].x,
+        y: coordinates[from].y,
+        height: HEIGHT_LITERAL_VOWL,
+        width: WIDTH_VOWL,
+        kind: startKind
       };
 
-      const end = {
+      const endKind = this.$store.getters.getShapeKind(to);
+      const end = endKind === VOWL_SHAPE_KIND.RDF_RESOURCE
+      ? {
         x: coordinates[to].x + CENTER_SHAPE_VOWL_X,
         y: coordinates[to].y + CENTER_SHAPE_VOWL_Y,
         height: HEIGHT_VOWL,
-        width: WIDTH_VOWL
+        width: WIDTH_VOWL,
+        kind: endKind
+      }
+      : {
+        x: coordinates[to].x,
+        y: coordinates[to].y,
+        height: HEIGHT_LITERAL_VOWL,
+        width: WIDTH_VOWL,
+        kind: endKind
       };
 
       const note1 = this.getNoteProps(from);
       const startNote = note1 || {};
       const hasNoteStart = Boolean(note1);
 
-      const intersectionStart = getNodeShapeIntersection(
+      const intersectionStart = getShapeIntersection(
         start,
         startNote,
         hasNoteStart,
@@ -133,7 +154,7 @@ export default {
       const endNote = note2 || {};
       const hasNoteEnd = Boolean(note2);
 
-      const intersectionEnd = getNodeShapeIntersection(
+      const intersectionEnd = getShapeIntersection(
         end,
         endNote,
         hasNoteEnd,

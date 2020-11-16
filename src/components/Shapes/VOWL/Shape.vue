@@ -11,7 +11,11 @@
       <v-group @mouseenter="titleHover = true" @mouseleave="titleHover = false">
         <!-- Shape label & uri -->
         <v-group @click="startEditing">
-          <v-ellipse :config="getShapeConfig()"></v-ellipse>
+          <v-ellipse
+            v-if="shapeKind === 1"
+            :config="getShapeConfig()"
+          ></v-ellipse>
+          <v-rect v-if="shapeKind === 2" :config="getShapeConfig()"></v-rect>
           <v-text ref="shapeLabel" :config="getLabelTextConfig()"></v-text>
           <v-text ref="shapeURI" :config="getURITextConfig()"></v-text>
         </v-group>
@@ -59,23 +63,12 @@
 import PropertyGroup from "./PropertyGroup.vue";
 import { uriToPrefix } from "../../../util/urlParser";
 import {
-  TEXT_OFFSET,
-  DESCRIPTION_RECT_CONFIG,
-  DESCRIPTION_TITLE_CONFIG,
-  DESCRIPTION_TEXT_CONFIG,
-  MAX_LENGTH,
-  TEXT_SIZE,
   pointerCursor,
   resetCursor,
   textCursor,
   HEIGHT,
-  NODE_SHAPE_CONFIG_VOWL,
-  PROPERTY_SHAPE_CONFIG_VOWL,
-  SHAPE_CONFIG_VOWL,
   NAME_TEXT_CONFIG_VOWL,
   URI_TEXT_CONFIG_VOWL,
-  DELETE_BUTTON_CONFIG_VOWL,
-  ADD_PREDICATE_CONFIG_VOWL,
   HEIGHT_VOWL,
   WIDTH_VOWL,
   CENTER_SHAPE_VOWL_X,
@@ -87,11 +80,18 @@ import {
   RELATIONSHIP_DASH_ARRAY,
   CLOSED_BORDER_WIDTH_VOWL,
   BORDER_WIDTH_VOWL,
-  MARGIN_VOWL
+  MARGIN_VOWL,
+  RDF_RESOURCE_SHAPE_CONFIG,
+  LITERAL_SHAPE_CONFIG,
+  HEIGHT_LITERAL_VOWL,
+  DELETE_BUTTON_CONFIG_VOWL_RDF,
+  DELETE_BUTTON_CONFIG_VOWL_LITERAL,
+  ADD_PREDICATE_CONFIG_VOWL_RDF,
+  ADD_PREDICATE_CONFIG_VOWL_LITERAL
 } from "../../../config/konvaConfigs";
 import { TERM } from "../../../translation/terminology";
 import { abbreviate } from "../../../util/strings";
-import { LABEL } from "../../../util/constants";
+import { LABEL, VOWL_SHAPE_KIND } from "../../../util/constants";
 import {
   getDefaultEllipsePosition,
   getPropertyGroupBounds
@@ -119,11 +119,10 @@ export default {
     return {
       hover: false,
       titleHover: false,
-      shapeConfig: this.$props.nodeShape
-        ? NODE_SHAPE_CONFIG_VOWL
-        : PROPERTY_SHAPE_CONFIG_VOWL,
-      deleteNodeConfig: DELETE_BUTTON_CONFIG_VOWL,
-      addPredicateConfig: ADD_PREDICATE_CONFIG_VOWL,
+      shapeConfig:
+        this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE
+          ? RDF_RESOURCE_SHAPE_CONFIG
+          : LITERAL_SHAPE_CONFIG,
       constraintsHeight: 0,
       iconImage: new Image(NOTE_ICON_SIZE_VOWL, NOTE_ICON_SIZE_VOWL)
     };
@@ -144,6 +143,7 @@ export default {
         return "none";
       }
     },
+
     iconConfig() {
       return {
         x: 2 * NOTE_MARGIN_VOWL,
@@ -152,6 +152,22 @@ export default {
         width: NOTE_ICON_SIZE_VOWL,
         height: NOTE_ICON_SIZE_VOWL
       };
+    },
+
+    shapeKind() {
+      return this.$store.getters.getShapeKind(this.$props.id);
+    },
+
+    deleteNodeConfig() {
+      return this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE
+        ? DELETE_BUTTON_CONFIG_VOWL_RDF
+        : DELETE_BUTTON_CONFIG_VOWL_LITERAL;
+    },
+
+    addPredicateConfig() {
+      return this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE
+        ? ADD_PREDICATE_CONFIG_VOWL_RDF
+        : ADD_PREDICATE_CONFIG_VOWL_LITERAL;
     }
   },
   mounted() {
@@ -180,16 +196,10 @@ export default {
   },
   methods: {
     getShapeConfig() {
-      let config;
-      if (this.$props.hasType) {
-        if (this.$props.nodeShape) {
-          config = NODE_SHAPE_CONFIG_VOWL;
-        } else {
-          config = PROPERTY_SHAPE_CONFIG_VOWL;
-        }
-      } else {
-        config = SHAPE_CONFIG_VOWL;
-      }
+      const config =
+        this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE
+          ? RDF_RESOURCE_SHAPE_CONFIG
+          : LITERAL_SHAPE_CONFIG;
 
       return {
         ...config,
@@ -248,25 +258,29 @@ export default {
      * @returns {object} the configuration of the URI.
      */
     getURITextConfig() {
-      const uri = this.icon === "class" || this.icon === "datatype"
-        ? this.getIconPropertyURI()
-        : this.$props.nodeShape
-          ? uriToPrefix(
-              this.$store.state.mConfig.namespaces,
-              this.$props.id
-            )
+      const uri =
+        this.icon === "class" || this.icon === "datatype"
+          ? this.getShapeKindURI()
+          : this.$props.nodeShape
+          ? uriToPrefix(this.$store.state.mConfig.namespaces, this.$props.id)
           : "";
       const text = uri[0] === "_" ? "" : uri;
       return {
         ...URI_TEXT_CONFIG_VOWL,
-        width: this.icon !== "none" ? WIDTH_VOWL - NOTE_ICON_SIZE_VOWL - 1.5 * MARGIN_VOWL : WIDTH_VOWL - MARGIN_VOWL,
-        x: this.icon !== "none" ? NOTE_ICON_SIZE_VOWL +  MARGIN_VOWL : MARGIN_VOWL / 2,
-        fontStyle: this.icon !== "none" ? "normal" : "italic",
+        width:
+          this.icon === "none"
+            ? WIDTH_VOWL - MARGIN_VOWL
+            : WIDTH_VOWL - NOTE_ICON_SIZE_VOWL - 1.5 * MARGIN_VOWL,
+        x:
+          this.icon === "none"
+            ? MARGIN_VOWL / 2
+            : NOTE_ICON_SIZE_VOWL + MARGIN_VOWL,
+        fontStyle: this.icon === "none" ? "italic" : "normal",
         text
       };
     },
 
-    getIconPropertyURI() {
+    getShapeKindURI() {
       const shape = this.$store.getters.shapeWithID(this.$props.id);
       if (shape) {
         const iconProp = this.icon === "class" ? TERM.class : TERM.datatype;
@@ -278,7 +292,7 @@ export default {
           );
         }
       }
-      return("");
+      return "";
     },
 
     getNoteLength() {
@@ -293,23 +307,38 @@ export default {
     },
 
     transLateToShape() {
-      const shape = this.$refs.constraints.getNode();
+      const propertyGroup = this.$refs.constraints.getNode();
+
       const constraintsRectangle = {
-        x: shape.x(),
-        y: shape.y(),
+        x: propertyGroup.x(),
+        y: propertyGroup.y(),
         width: NOTE_WIDTH_VOWL,
         height: this.constraintsHeight
       };
-      const ellipse = {
-        x: CENTER_SHAPE_VOWL_X,
-        y: CENTER_SHAPE_VOWL_Y,
-        width: WIDTH_VOWL * NOTE_INSET_VOWL,
-        height: HEIGHT_VOWL * NOTE_INSET_VOWL
-      };
-      const newCoords = getPropertyGroupBounds(constraintsRectangle, ellipse);
+
+      const shape =
+        this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE
+          ? {
+              x: CENTER_SHAPE_VOWL_X,
+              y: CENTER_SHAPE_VOWL_Y,
+              width: WIDTH_VOWL * NOTE_INSET_VOWL,
+              height: HEIGHT_VOWL * NOTE_INSET_VOWL
+            }
+          : {
+              x: 0,
+              y: 0,
+              width: WIDTH_VOWL,
+              height: HEIGHT_LITERAL_VOWL
+            };
+
+      const newCoords = getPropertyGroupBounds(
+        this.shapeKind,
+        constraintsRectangle,
+        shape
+      );
       if (!(Number.isNaN(newCoords.x) || Number.isNaN(newCoords.y))) {
-        shape.x(newCoords.x);
-        shape.y(newCoords.y);
+        propertyGroup.x(newCoords.x);
+        propertyGroup.y(newCoords.y);
       }
     },
 
@@ -325,13 +354,17 @@ export default {
       }
     },
 
+    /**
+     * Returns default position for the PropertyGroup constraints container
+     * @returns {Object} Object containing an x and y value of the default position for PropertyGroup
+     */
     getDefaultConstraintsConfig() {
       const {
         VOWLconstraintCoordinates
       } = this.$store.state.mShape.mCoordinate;
       if (VOWLconstraintCoordinates[this.$props.id]) {
         return VOWLconstraintCoordinates[this.$props.id];
-      } else {
+      } else if (this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE) {
         const ellipse = {
           x: CENTER_SHAPE_VOWL_X,
           y: CENTER_SHAPE_VOWL_Y,
@@ -339,6 +372,11 @@ export default {
           height: HEIGHT_VOWL * NOTE_INSET_VOWL
         };
         return getDefaultEllipsePosition(ellipse);
+      } else {
+        return {
+          x: 0,
+          y: HEIGHT_LITERAL_VOWL + MARGIN_VOWL
+        };
       }
     },
 
