@@ -19,7 +19,6 @@ export const HEIGHT_LITERAL_VOWL = 70;
 export const CENTER_SHAPE_VOWL_X = 100;
 export const CENTER_SHAPE_VOWL_Y = 70;
 export const MARGIN_VOWL = 10;
-export const SHAPE_NAME_PADDING_VOWL = 30;
 export const BORDER_WIDTH_VOWL = 2;
 export const CLOSED_BORDER_WIDTH_VOWL = 5;
 
@@ -231,7 +230,7 @@ export const DESCRIPTION_TEXT_CONFIG = {
   align: "left"
 };
 
-const TEXT_CONFIG_VOWL = {
+export const TEXT_CONFIG_VOWL = {
   align: "center",
   text: "",
   width: WIDTH_VOWL - MARGIN_VOWL,
@@ -239,13 +238,13 @@ const TEXT_CONFIG_VOWL = {
   fontSize: TEXT_SIZE
 };
 
-export const NAME_TEXT_CONFIG_VOWL = {
+export const SUBJECT_HR_LABEL_CONFIG = {
   ...TEXT_CONFIG_VOWL,
-  y: SHAPE_NAME_PADDING_VOWL,
+  y: HEIGHT_VOWL / 2 - MARGIN_VOWL - TEXT_SIZE / 2,
   fontStyle: "bold"
 };
 
-export const URI_TEXT_CONFIG_VOWL = {
+export const SUBJECT_URI_TEXT_CONFIG_VOWL = {
   ...TEXT_CONFIG_VOWL,
   y: CENTER_SHAPE_VOWL_Y - TEXT_SIZE / 2,
   fontStyle: "italic"

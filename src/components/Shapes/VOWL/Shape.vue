@@ -16,8 +16,8 @@
             :config="getShapeConfig()"
           ></v-ellipse>
           <v-rect v-if="shapeKind === 2" :config="getShapeConfig()"></v-rect>
-          <v-text ref="shapeLabel" :config="getLabelTextConfig()"></v-text>
-          <v-text ref="shapeURI" :config="getURITextConfig()"></v-text>
+          <v-text ref="upperLabel" :config="getUpperLabelConfig()"></v-text>
+          <v-text ref="centerLabel" :config="getCenterLabelConfig()"></v-text>
         </v-group>
       </v-group>
 
@@ -67,8 +67,8 @@ import {
   resetCursor,
   textCursor,
   HEIGHT,
-  NAME_TEXT_CONFIG_VOWL,
-  URI_TEXT_CONFIG_VOWL,
+  SUBJECT_HR_LABEL_CONFIG,
+  SUBJECT_URI_TEXT_CONFIG_VOWL,
   HEIGHT_VOWL,
   WIDTH_VOWL,
   CENTER_SHAPE_VOWL_X,
@@ -87,7 +87,9 @@ import {
   DELETE_BUTTON_CONFIG_VOWL_RDF,
   DELETE_BUTTON_CONFIG_VOWL_LITERAL,
   ADD_PREDICATE_CONFIG_VOWL_RDF,
-  ADD_PREDICATE_CONFIG_VOWL_LITERAL
+  ADD_PREDICATE_CONFIG_VOWL_LITERAL,
+  TEXT_CONFIG_VOWL,
+  TEXT_SIZE
 } from "../../../config/konvaConfigs";
 import { TERM } from "../../../translation/terminology";
 import { abbreviate } from "../../../util/strings";
@@ -145,9 +147,10 @@ export default {
     },
 
     iconConfig() {
+      const isRDF = this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE;
       return {
         x: 2 * NOTE_MARGIN_VOWL,
-        y: CENTER_SHAPE_VOWL_Y - NOTE_ICON_SIZE_VOWL / 2,
+        y: isRDF ? CENTER_SHAPE_VOWL_Y - NOTE_ICON_SIZE_VOWL / 2 : HEIGHT_LITERAL_VOWL / 2 - NOTE_ICON_SIZE_VOWL / 2,
         image: this.iconImage,
         width: NOTE_ICON_SIZE_VOWL,
         height: NOTE_ICON_SIZE_VOWL
@@ -239,45 +242,64 @@ export default {
     },
 
     /**
-     * Create the label text configuration object.
-     * Abbreviate the text if needed and change the namespace URL to the prefix if possible.
-     * @returns {object} the configuration object for the label.
+     * Create the upper label text configuration object.
+     * The upper label is only used for subject shapes / node shapes in ShapeVOWL,
+     * this label contains a bold human readable label, if one is present.
+     * The object shapes don't use this, since they put this human readable label in the relationship label.
+     * @returns {object} the configuration object for the upper label.
      */
-    getLabelTextConfig() {
-      const label = this.$store.getters.labelsForIds[this.id];
-      const text = label ? abbreviate(label) : "";
-      return {
-        ...NAME_TEXT_CONFIG_VOWL,
-        text
-      };
+    getUpperLabelConfig() {
+      if (this.$props.nodeShape) {
+        // Subject shape, should have a bold human readable label in the upper label, if one is present.
+        const label = this.$store.getters.labelsForIds[this.id];
+        const text = label ? abbreviate(label) : "";
+        return {
+          ...SUBJECT_HR_LABEL_CONFIG,
+          text
+        };
+      }
     },
 
     /**
-     * Create the URI text configuration object.
-     * Abbreviate the URI if needed.
-     * @returns {object} the configuration of the URI.
+     * Create the center label text configuration object.
+     * This is used by both subject and object shapes.
+     * Subject shapes use this to display their own IRI.
+     * Object shapes use this to display the IRI of sh:datatype or sh:class,
+     * if they have that property, otherwise, this label is empty.
+     * For object shapes, a distinction also has to be made between the RDF Resource shape kind
+     * and the Literal shape kind, since they have to put the label at a different y.
+     * @returns {object} the configuration object for the center label.
      */
-    getURITextConfig() {
-      const uri =
-        this.icon === "class" || this.icon === "datatype"
+    getCenterLabelConfig() {
+      if (this.$props.nodeShape) {
+        const text = uriToPrefix(this.$store.state.mConfig.namespaces, this.$props.id);
+        return {
+          ...SUBJECT_URI_TEXT_CONFIG_VOWL,
+          text
+        };
+      } else {
+        const text = this.icon === "class" || this.icon === "datatype"
           ? this.getShapeKindURI()
-          : this.$props.nodeShape
-          ? uriToPrefix(this.$store.state.mConfig.namespaces, this.$props.id)
           : "";
-      const text = uri[0] === "_" ? "" : uri;
-      return {
-        ...URI_TEXT_CONFIG_VOWL,
-        width:
-          this.icon === "none"
-            ? WIDTH_VOWL - MARGIN_VOWL
-            : WIDTH_VOWL - NOTE_ICON_SIZE_VOWL - 1.5 * MARGIN_VOWL,
-        x:
-          this.icon === "none"
-            ? MARGIN_VOWL / 2
-            : NOTE_ICON_SIZE_VOWL + MARGIN_VOWL,
-        fontStyle: this.icon === "none" ? "italic" : "normal",
-        text
-      };
+        const baseConfig = {
+          ...TEXT_CONFIG_VOWL,
+          align: "left",
+          width: WIDTH_VOWL - NOTE_ICON_SIZE_VOWL - 2 * MARGIN_VOWL,
+          x: NOTE_ICON_SIZE_VOWL + 2 * MARGIN_VOWL,
+          text
+        };
+        if (this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE) {
+          return {
+            ...baseConfig,
+            y: CENTER_SHAPE_VOWL_Y - TEXT_SIZE / 2,
+          };
+        } else {
+          return {
+            ...baseConfig,
+            y: HEIGHT_LITERAL_VOWL / 2 - TEXT_SIZE / 2,
+          };
+        }
+      }
     },
 
     getShapeKindURI() {
@@ -439,7 +461,7 @@ export default {
       this.$store.commit("resetPredicateModal");
       this.$store.commit("togglePredicateModal", {
         shapeID: this.id,
-        shapeType: this.nodeShape ? "NodeShape" : "PropertyShape",
+        shapeType: this.$props.nodeShape ? "NodeShape" : "PropertyShape",
         onExit: "addPredicate",
         editing: false
       });
@@ -477,7 +499,7 @@ export default {
         labelLang,
         description,
         descrLang,
-        nodeShape: this.nodeShape
+        nodeShape: this.$props.nodeShape
       });
     },
 
