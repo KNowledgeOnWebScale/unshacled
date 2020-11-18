@@ -15,7 +15,14 @@
     <v-arrow ref="arrow" :config="getConfigs().line"></v-arrow>
 
     <v-group v-if="hasLabel" ref="label" :config="getLabelConfig()">
-      <v-rect :config="getLabelRectConfig(this.$refs.text)"></v-rect>
+      <v-rect
+        :config="getLabelRectConfig(this.$refs.text, this.$refs.hr_label)"
+      ></v-rect>
+      <v-text
+        v-if="getConfigs().hrLabel !== undefined"
+        ref="hr_label"
+        :config="getConfigs().hrLabel"
+      ></v-text>
       <v-text ref="text" :config="getConfigs().text"></v-text>
     </v-group>
 
@@ -48,13 +55,19 @@ import {
   CENTER_SHAPE_VOWL_X,
   CENTER_SHAPE_VOWL_Y,
   NOTE_WIDTH_VOWL,
-  LABEL_SECTION
+  LABEL_SECTION,
+  HEIGHT_LITERAL_VOWL,
+  TEXT_SIZE
 } from "../../../config/konvaConfigs";
-import { getNodeShapeIntersection } from "../../../util/calculations";
+import { getShapeIntersection } from "../../../util/calculations";
 import { uriToPrefix } from "../../../util/urlParser";
 import { TERM } from "../../../translation/terminology";
 import { isBlankPathNode, parsePath } from "../../../util/pathPropertyUtil";
-import { COMPLIES_WITH, VOWL_BORDER_COLOR } from "../../../util/constants";
+import {
+  COMPLIES_WITH,
+  VOWL_BORDER_COLOR,
+  VOWL_SHAPE_KIND
+} from "../../../util/constants";
 
 export default {
   name: "Relationship",
@@ -104,25 +117,47 @@ export default {
       const { coordinates } = this.$store.state.mShape.mCoordinate;
 
       /* Determine the center points of the start shape. */
-      const start = {
-        x: coordinates[from].x + CENTER_SHAPE_VOWL_X,
-        y: coordinates[from].y + CENTER_SHAPE_VOWL_Y,
-        height: HEIGHT_VOWL,
-        width: WIDTH_VOWL
-      };
+      const startKind = this.$store.getters.getShapeKind(from);
+      const start =
+        startKind === VOWL_SHAPE_KIND.RDF_RESOURCE
+          ? {
+              x: coordinates[from].x + CENTER_SHAPE_VOWL_X,
+              y: coordinates[from].y + CENTER_SHAPE_VOWL_Y,
+              height: HEIGHT_VOWL,
+              width: WIDTH_VOWL,
+              kind: startKind
+            }
+          : {
+              x: coordinates[from].x,
+              y: coordinates[from].y,
+              height: HEIGHT_LITERAL_VOWL,
+              width: WIDTH_VOWL,
+              kind: startKind
+            };
 
-      const end = {
-        x: coordinates[to].x + CENTER_SHAPE_VOWL_X,
-        y: coordinates[to].y + CENTER_SHAPE_VOWL_Y,
-        height: HEIGHT_VOWL,
-        width: WIDTH_VOWL
-      };
+      const endKind = this.$store.getters.getShapeKind(to);
+      const end =
+        endKind === VOWL_SHAPE_KIND.RDF_RESOURCE
+          ? {
+              x: coordinates[to].x + CENTER_SHAPE_VOWL_X,
+              y: coordinates[to].y + CENTER_SHAPE_VOWL_Y,
+              height: HEIGHT_VOWL,
+              width: WIDTH_VOWL,
+              kind: endKind
+            }
+          : {
+              x: coordinates[to].x,
+              y: coordinates[to].y,
+              height: HEIGHT_LITERAL_VOWL,
+              width: WIDTH_VOWL,
+              kind: endKind
+            };
 
       const note1 = this.getNoteProps(from);
       const startNote = note1 || {};
       const hasNoteStart = Boolean(note1);
 
-      const intersectionStart = getNodeShapeIntersection(
+      const intersectionStart = getShapeIntersection(
         start,
         startNote,
         hasNoteStart,
@@ -133,7 +168,7 @@ export default {
       const endNote = note2 || {};
       const hasNoteEnd = Boolean(note2);
 
-      const intersectionEnd = getNodeShapeIntersection(
+      const intersectionEnd = getShapeIntersection(
         end,
         endNote,
         hasNoteEnd,
@@ -195,8 +230,25 @@ export default {
 
       const isProperty = this.$props.constraintID === TERM.property;
       let labelY;
+      let hrLabelY;
+      let labelWidth;
       if (isProperty) {
         labelY = (points[1] + points[3]) / 2 - MARGIN;
+        const hrLabelText = this.$store.getters.labelsForIds[this.$props.to];
+        if (hrLabelText) {
+          hrLabelY = labelY - TEXT_SIZE;
+          if (
+            this.$refs.text &&
+            this.$refs.text.getNode() &&
+            this.$refs.hr_label &&
+            this.$refs.hr_label.getNode()
+          ) {
+            labelWidth = Math.max(
+              this.$refs.text.getNode().width(),
+              this.$refs.hr_label.getNode().width()
+            );
+          }
+        }
       } else {
         switch (this.labelShift) {
           case LABEL_NO_SHIFT:
@@ -227,8 +279,20 @@ export default {
         },
         text: {
           ...RELATIONSHIP_LABEL_TEXT_CONFIG,
-          text: this.getLabelText()
+          text: this.getLabelText(),
+          y: hrLabelY === undefined ? 0 : TEXT_SIZE,
+          width: labelWidth || "auto"
         },
+        hrLabel:
+          hrLabelY === undefined
+            ? undefined
+            : {
+                ...RELATIONSHIP_LABEL_TEXT_CONFIG,
+                fontStyle: "bold",
+                text: this.$store.getters.labelsForIds[this.$props.to],
+                y: 0,
+                width: labelWidth || "auto"
+              },
         rect: {
           ...RELATIONSHIP_LABEL_RECT_CONFIG,
           x: -MARGIN,
@@ -265,19 +329,31 @@ export default {
 
     /**
      * Sets the label to the correct fill color, outline color and height
-     * @param {String} ref The reference for the label text.
+     * @param {String} textRef The reference for the normal label text, e.g. the property path.
+     * @param {String} labelRef The reference for the human readable label text, if there is one.
      * @returns {Object} A configuration object.
      */
-    getLabelRectConfig(ref) {
-      const rectConfig = this.getRectConfig(ref);
+    getLabelRectConfig(textRef, labelRef) {
+      let rectConfig = this.getRectConfig(textRef);
+      const hasHRLabel = Boolean(
+        this.$store.getters.labelsForIds[this.$props.to]
+      );
+      if (labelRef) {
+        const rectConfig2 = this.getRectConfig(labelRef);
+        if (rectConfig2.width > rectConfig.width) {
+          rectConfig = rectConfig2;
+        }
+      }
       const isProperty = this.$props.constraintID === TERM.property;
       const strokeColor =
         VOWL_BORDER_COLOR[this.$store.getters.getSeverity(this.$props.to)];
-      if (ref && ref.getNode()) {
+      if (textRef && textRef.getNode()) {
         return {
           ...rectConfig,
           fill: isProperty ? "#AACCFF" : "white",
-          height: ref.getNode().height() + MARGIN * 2,
+          height: hasHRLabel
+            ? (TEXT_SIZE + MARGIN) * 2
+            : TEXT_SIZE + MARGIN * 2,
           strokeEnabled: isProperty,
           stroke: isProperty ? strokeColor : "black"
         };

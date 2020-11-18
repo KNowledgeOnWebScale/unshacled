@@ -15,10 +15,10 @@ export const BUTTON_RADIUS = 8;
 
 export const WIDTH_VOWL = 200;
 export const HEIGHT_VOWL = 140;
+export const HEIGHT_LITERAL_VOWL = 70;
 export const CENTER_SHAPE_VOWL_X = 100;
 export const CENTER_SHAPE_VOWL_Y = 70;
 export const MARGIN_VOWL = 10;
-export const SHAPE_NAME_PADDING_VOWL = 30;
 export const BORDER_WIDTH_VOWL = 2;
 export const CLOSED_BORDER_WIDTH_VOWL = 5;
 
@@ -96,22 +96,24 @@ export const PROPERTY_SHAPE_CONFIG = {
 };
 
 export const SHAPE_CONFIG_VOWL = {
-  height: HEIGHT_VOWL,
   width: WIDTH_VOWL,
+  stroke: "black"
+};
+
+export const RDF_RESOURCE_SHAPE_CONFIG = {
+  ...SHAPE_CONFIG_VOWL,
+  fill: "#AACCFF",
+  height: HEIGHT_VOWL,
   x: CENTER_SHAPE_VOWL_X,
   y: CENTER_SHAPE_VOWL_Y,
-  stroke: "black",
-  fill: "#AACCFF"
 };
 
-export const NODE_SHAPE_CONFIG_VOWL = {
+export const LITERAL_SHAPE_CONFIG = {
   ...SHAPE_CONFIG_VOWL,
-  fill: "#AACCFF"
-};
-
-export const PROPERTY_SHAPE_CONFIG_VOWL = {
-  ...SHAPE_CONFIG_VOWL,
-  fill: "#AACCFF"
+  fill: "#FFCC33",
+  height: HEIGHT_LITERAL_VOWL,
+  x: 0,
+  y: 0
 };
 
 /**
@@ -228,7 +230,7 @@ export const DESCRIPTION_TEXT_CONFIG = {
   align: "left"
 };
 
-const TEXT_CONFIG_VOWL = {
+export const TEXT_CONFIG_VOWL = {
   align: "center",
   text: "",
   width: WIDTH_VOWL - MARGIN_VOWL,
@@ -236,13 +238,13 @@ const TEXT_CONFIG_VOWL = {
   fontSize: TEXT_SIZE
 };
 
-export const NAME_TEXT_CONFIG_VOWL = {
+export const SUBJECT_HR_LABEL_CONFIG = {
   ...TEXT_CONFIG_VOWL,
-  y: SHAPE_NAME_PADDING_VOWL,
+  y: HEIGHT_VOWL / 2 - MARGIN_VOWL - TEXT_SIZE / 2,
   fontStyle: "bold"
 };
 
-export const URI_TEXT_CONFIG_VOWL = {
+export const SUBJECT_URI_TEXT_CONFIG_VOWL = {
   ...TEXT_CONFIG_VOWL,
   y: CENTER_SHAPE_VOWL_Y - TEXT_SIZE / 2,
   fontStyle: "italic"
@@ -303,7 +305,7 @@ const BUTTON_CONFIG_VOWL = {
  * Configuration for delete buttons.
  * @type {{x: number, y: number, radius: number, fill: string}}
  */
-export const DELETE_BUTTON_CONFIG_VOWL = {
+export const DELETE_BUTTON_CONFIG_VOWL_RDF = {
   ...BUTTON_CONFIG_VOWL,
   y: OFFSET,
   x: projectYOnEllipse(
@@ -317,10 +319,21 @@ export const DELETE_BUTTON_CONFIG_VOWL = {
 };
 
 /**
+ * Configuration for delete buttons.
+ * @type {{x: number, y: number, radius: number, fill: string}}
+ */
+export const DELETE_BUTTON_CONFIG_VOWL_LITERAL = {
+  ...BUTTON_CONFIG_VOWL,
+  y: OFFSET,
+  x: WIDTH_VOWL - OFFSET,
+  fill: "red"
+}
+
+/**
  * Configuration for "add predicate"-buttons.
  * @type {{x: number, y: number, radius: number, fill: string}}
  */
-export const ADD_PREDICATE_CONFIG_VOWL = {
+export const ADD_PREDICATE_CONFIG_VOWL_RDF = {
   ...BUTTON_CONFIG_VOWL,
   y: OFFSET + HEIGHT / 2,
   x: projectYOnEllipse(
@@ -332,6 +345,17 @@ export const ADD_PREDICATE_CONFIG_VOWL = {
   ),
   fill: "green"
 };
+
+/**
+ * Configuration for "add predicate"-buttons.
+ * @type {{x: number, y: number, radius: number, fill: string}}
+ */
+export const ADD_PREDICATE_CONFIG_VOWL_LITERAL = {
+  ...BUTTON_CONFIG_VOWL,
+  y: OFFSET + HEIGHT / 2,
+  x: WIDTH_VOWL - OFFSET,
+  fill: "green"
+}
 
 /* RELATIONSHIPS ==================================================================================================== */
 

@@ -14,7 +14,8 @@ import {
   VOWL_RANGE_CONSTRAINTS,
   VOWL_SAME_NOTE,
   VOWL_SEPARATE_NOTE,
-  VOWL_SHAPE_ICONS
+  VOWL_SHAPE_ICONS,
+  VOWL_SHAPE_KIND
 } from "../util/constants";
 import predicateModalModule from "./modals/predicateModalModule";
 
@@ -754,6 +755,38 @@ const constraintModule = {
       } else {
         return TERM.Violation;
       }
+    },
+
+    getNodeKind: (_state, _getters, _rootState, rootGetters) => shapeID => {
+      const shape = rootGetters.shapeWithID(shapeID);
+
+      if (shape && Object.keys(shape).includes(TERM.nodeKind)) {
+        return shape[TERM.nodeKind][0]["@id"];
+      } else {
+        return undefined;
+      }
+    },
+
+    getShapeKind: (_state, _getters, _rootState, rootGetters) => shapeID => {
+      const shape = rootGetters.shapeWithID(shapeID);
+      const constraintList = Object.keys(shape);
+
+      if (
+        (constraintList.includes(TERM.nodeKind) &&
+          shape[TERM.nodeKind][0]["@id"] === TERM.Literal) ||
+        constraintList.includes(TERM.datatype) ||
+        constraintList.includes(TERM.minExclusive) ||
+        constraintList.includes(TERM.minInclusive) ||
+        constraintList.includes(TERM.maxExclusive) ||
+        constraintList.includes(TERM.maxInclusive) ||
+        constraintList.includes(TERM.languageIn) ||
+        constraintList.includes(TERM.uniqueLang) ||
+        constraintList.includes(TERM.lessThan) ||
+        constraintList.includes(TERM.lessThanOrEquals)
+      ) {
+        return VOWL_SHAPE_KIND.LITERAL;
+      }
+      return VOWL_SHAPE_KIND.RDF_RESOURCE;
     },
 
     isClosed: (_state, _getters, _rootState, rootGetters) => shapeID => {

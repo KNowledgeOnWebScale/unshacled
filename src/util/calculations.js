@@ -1,3 +1,6 @@
+import { MARGIN_VOWL } from "../config/konvaConfigs";
+import { VOWL_SHAPE_KIND } from "./constants";
+
 /**
  * Return the nearest point to the given reference on the perimeter of the rectangle
  * defined by the given top left and bottom right coordiantes.
@@ -290,81 +293,120 @@ export function between(x, lower, upper) {
  * @param {Object} midPoint2 An object representing the second midPoint, from which the line is coming, should have the following keys: x, y
  * @returns {Object} A point on the outline of the nodeShape where it intersects with the given line
  */
-export function getNodeShapeIntersection(ellipse, note, hasNote, midPoint2) {
+export function getShapeIntersection(startShape, note, hasNote, midPoint2) {
   // Equation of line going between the 2 midpoints
-  const m = slope(ellipse, midPoint2);
-  const c = -m * ellipse.x + ellipse.y;
+  const m = slope(startShape, midPoint2);
+  const c = -m * startShape.x + startShape.y;
 
   const line = { m, c };
 
-  const midPointAngle = Math.atan2(
-    midPoint2.y - ellipse.y,
-    midPoint2.x - ellipse.x
-  );
+  const startRDF = startShape.kind === VOWL_SHAPE_KIND.RDF_RESOURCE;
 
-  if (ellipse.x === midPoint2.x) {
-    const rectangleIncluded = between(ellipse.x, note.x, note.x + note.width);
-    if (ellipse.y > midPoint2.y) {
-      if (rectangleIncluded && note.y < ellipse.y) {
+  const midPointAngle = startRDF
+  ? Math.atan2(
+    midPoint2.y - startShape.y,
+    midPoint2.x - startShape.x
+  )
+  : Math.atan2(
+    midPoint2.y - startShape.y + startShape.height / 2,
+    midPoint2.x - startShape.x + startShape.width / 2
+  )
+
+  if (startShape.x === midPoint2.x) {
+    // The calculation for the slope yields +-Infinity here, so we have to return a fixed position.
+    const rectangleIncluded = startRDF
+        ? between(startShape.x, note.x, note.x + note.width)
+        : startShape.x === note.x;
+    if (startShape.y > midPoint2.y) {
+      if (rectangleIncluded && note.y < startShape.y) {
         // Return the intersection on top of the note
         return {
-          x: ellipse.x,
+          x: note.x + note.width / 2,
           y: note.y,
           side: "T"
         };
       } else {
-        // Return the intersection on top of the ellipse
+        // Return the intersection on top of the startShape
         return {
-          x: ellipse.x,
-          y: ellipse.y - ellipse.height / 2,
+          x: startRDF ? startShape.x : startShape.x + startShape.width / 2,
+          y: startRDF ? startShape.y - startShape.height / 2 : startShape.y,
           side: "T"
         };
       }
-    } else if (rectangleIncluded && note.y > ellipse.y) {
-      // Return the intersection on top of the note
+    } else if (rectangleIncluded && note.y > startShape.y) {
+      // Return the intersection on bottom of the note
       return {
-        x: ellipse.x,
+        x: note.x + note.width / 2,
         y: note.y + note.height,
         side: "B"
       };
     } else {
-      // Return the intersection on top of the ellipse
+      // Return the intersection on bottom of the startShape
       return {
-        x: ellipse.x,
-        y: ellipse.y + ellipse.height / 2,
+        x: startRDF ? startShape.x : startShape.x + startShape.width / 2,
+        y: startRDF ? startShape.y + startShape.height / 2 : startShape.y + startShape.height,
         side: "B"
       };
     }
   } else {
-    const noteIntersection = intersectionPointRectangle(
-      ellipse,
+    // No mathematical problems, so the intersection can be found by calculating the intersection with both shapes
+    // and checking which one is closer to midPoint2
+
+
+    const startPointLiteral = {
+      x: startShape.x + startShape.width / 2,
+      y: startShape.y + startShape.height / 2
+    }
+
+    const noteIntersection = startRDF
+    ? intersectionPointRectangle(
+      startShape,
+      midPoint2,
+      note
+    )
+    : intersectionPointRectangle(
+      startPointLiteral,
       midPoint2,
       note
     );
-    const ellipseIntersections = getEllipseIntersections(
-      ellipse,
+
+    const startShapeIntersections = startRDF
+    ? getEllipseIntersections(
+      startShape,
       midPoint2,
       line
+    )
+    : intersectionPointRectangle(
+      startPointLiteral,
+      midPoint2,
+      startShape
     );
 
-    const ellipseIntersect =
-      distance(ellipseIntersections[0], midPoint2) <
-      distance(ellipseIntersections[1], midPoint2)
-        ? ellipseIntersections[0]
-        : ellipseIntersections[1];
+    // if(!startRDF) console.log(startShapeIntersections);
 
-    const ellipseIntersection = {
-      ...ellipseIntersect,
-      side: getEllipseSection(midPointAngle)
-    };
+    let startShapeIntersection;
+    if (startRDF) {
+      const startShapeIntersect =
+        distance(startShapeIntersections[0], midPoint2) <
+        distance(startShapeIntersections[1], midPoint2)
+          ? startShapeIntersections[0]
+          : startShapeIntersections[1];
+
+      startShapeIntersection = {
+        ...startShapeIntersect,
+        side: getEllipseSection(midPointAngle)
+      };
+    } else {
+      startShapeIntersection = startShapeIntersections;
+    }
 
     const toReturn =
       hasNote && noteIntersection
-        ? distance(ellipseIntersection, midPoint2) <
+        ? distance(startShapeIntersection, midPoint2) <
           distance(noteIntersection, midPoint2)
-          ? ellipseIntersection
+          ? startShapeIntersection
           : noteIntersection
-        : ellipseIntersection;
+        : startShapeIntersection;
     return toReturn;
   }
 }
@@ -375,76 +417,124 @@ export function getNodeShapeIntersection(ellipse, note, hasNote, midPoint2) {
  * @param {Object} ellipse An ellipse, representing the base shape, contains (at least) these properties: x, y, width, height (x and y here are the center point, not the topleft point)
  * @returns {Object} A new point for the PropertyGroup component to be set to
  */
-export function getPropertyGroupBounds(rectangle, ellipse) {
-  const TL = { x: rectangle.x, y: rectangle.y };
-  const TR = { x: rectangle.x + rectangle.width, y: rectangle.y };
-  const BL = { x: rectangle.x, y: rectangle.y + rectangle.height };
-  const BR = { x: rectangle.x + rectangle.width, y: rectangle.y + rectangle.height };
+export function getPropertyGroupBounds(shapeKind, propertyGroup, shape) {
+  if (shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE) {
+    const TL = { x: propertyGroup.x, y: propertyGroup.y };
+    const TR = { x: propertyGroup.x + propertyGroup.width, y: propertyGroup.y };
+    const BL = { x: propertyGroup.x, y: propertyGroup.y + propertyGroup.height };
+    const BR = { x: propertyGroup.x + propertyGroup.width, y: propertyGroup.y + propertyGroup.height };
 
-  const TLangle = -Math.atan2(TL.y - ellipse.y, TL.x - ellipse.x);
-  const TRangle = -Math.atan2(TR.y - ellipse.y, TR.x - ellipse.x);
-  const BLangle = -Math.atan2(BL.y - ellipse.y, BL.x - ellipse.x);
-  const BRangle = -Math.atan2(BR.y - ellipse.y, BR.x - ellipse.x);
+    const TLangle = -Math.atan2(TL.y - shape.y, TL.x - shape.x);
+    const TRangle = -Math.atan2(TR.y - shape.y, TR.x - shape.x);
+    const BLangle = -Math.atan2(BL.y - shape.y, BL.x - shape.x);
+    const BRangle = -Math.atan2(BR.y - shape.y, BR.x - shape.x);
 
-  if (between(BLangle, 0, Math.PI / 2)) {
-    const points = ellipseProjections(ellipse, BL);
-    const newPoint = points[0].y < points[1].y ? points[0] : points[1];
-    return {
-      x: newPoint.x,
-      y: newPoint.y - rectangle.height
-    };
-  } else if (between(BRangle, Math.PI / 2, Math.PI)) {
-    const points = ellipseProjections(ellipse, BR);
-    const newPoint = points[0].y < points[1].y ? points[0] : points[1];
-    return {
-      x: newPoint.x - rectangle.width,
-      y: newPoint.y - rectangle.height
-    };
-  } else if (between(TRangle, -Math.PI, -Math.PI / 2)) {
-    const points = ellipseProjections(ellipse, TR);
-    const newPoint = points[0].y > points[1].y ? points[0] : points[1];
-    return {
-      x: newPoint.x - rectangle.width,
-      y: newPoint.y
-    };
-  } else if (between(TLangle, -Math.PI / 2, 0)) {
-    const points = ellipseProjections(ellipse, TL);
-    const newPoint = points[0].y > points[1].y ? points[0] : points[1];
-    return newPoint;
-  } else if (
-    between(BLangle, Math.PI / 2, Math.PI) &&
-    between(BRangle, 0, Math.PI / 2)
-  ) {
-    return {
-      x: rectangle.x,
-      y: ellipse.y - ellipse.height / 2 - rectangle.height
-    };
-  } else if (
-    between(TLangle, -Math.PI, -Math.PI / 2) &&
-    between(BRangle, -Math.PI / 2, 0)
-  ) {
-    return {
-      x: rectangle.x,
-      y: ellipse.y + ellipse.height / 2
-    };
-  } else if (
-    between(TLangle, 0, Math.PI / 2) &&
-    between(BLangle, -Math.PI / 2, 0)
-  ) {
-    return {
-      x: ellipse.x + ellipse.width / 2,
-      y: rectangle.y
-    };
-  } else if (
-    between(TRangle, Math.PI / 2, Math.PI) &&
-    between(BRangle, -Math.PI, -Math.PI / 2)
-  ) {
-    return {
-      x: ellipse.x - ellipse.width / 2 - rectangle.width,
-      y: rectangle.y
-    };
+    if (between(BLangle, 0, Math.PI / 2)) {
+      const points = ellipseProjections(shape, BL);
+      const newPoint = points[0].y < points[1].y ? points[0] : points[1];
+      return {
+        x: newPoint.x,
+        y: newPoint.y - propertyGroup.height
+      };
+    } else if (between(BRangle, Math.PI / 2, Math.PI)) {
+      const points = ellipseProjections(shape, BR);
+      const newPoint = points[0].y < points[1].y ? points[0] : points[1];
+      return {
+        x: newPoint.x - propertyGroup.width,
+        y: newPoint.y - propertyGroup.height
+      };
+    } else if (between(TRangle, -Math.PI, -Math.PI / 2)) {
+      const points = ellipseProjections(shape, TR);
+      const newPoint = points[0].y > points[1].y ? points[0] : points[1];
+      return {
+        x: newPoint.x - propertyGroup.width,
+        y: newPoint.y
+      };
+    } else if (between(TLangle, -Math.PI / 2, 0)) {
+      const points = ellipseProjections(shape, TL);
+      const newPoint = points[0].y > points[1].y ? points[0] : points[1];
+      return newPoint;
+    } else if (
+      between(BLangle, Math.PI / 2, Math.PI) &&
+      between(BRangle, 0, Math.PI / 2)
+    ) {
+      return {
+        x: propertyGroup.x,
+        y: shape.y - shape.height / 2 - propertyGroup.height
+      };
+    } else if (
+      between(TLangle, -Math.PI, -Math.PI / 2) &&
+      between(BRangle, -Math.PI / 2, 0)
+    ) {
+      return {
+        x: propertyGroup.x,
+        y: shape.y + shape.height / 2
+      };
+    } else if (
+      between(TLangle, 0, Math.PI / 2) &&
+      between(BLangle, -Math.PI / 2, 0)
+    ) {
+      return {
+        x: shape.x + shape.width / 2,
+        y: propertyGroup.y
+      };
+    } else if (
+      between(TRangle, Math.PI / 2, Math.PI) &&
+      between(BRangle, -Math.PI, -Math.PI / 2)
+    ) {
+      return {
+        x: shape.x - shape.width / 2 - propertyGroup.width,
+        y: propertyGroup.y
+      };
+    } else {
+      return getDefaultEllipsePosition(shape);
+    }
   } else {
-    return getDefaultEllipsePosition(ellipse);
+    const pgMid = {
+      x: (propertyGroup.x + propertyGroup.width) / 2,
+      y: (propertyGroup.y + propertyGroup.height) / 2
+    };
+    const shapeMid = {
+      x: (shape.x + shape.width) / 2,
+      y: (shape.y + shape.height) / 2
+    };
+
+    const angle = -Math.atan2(pgMid.y - shapeMid.y, pgMid.x - shapeMid.x);
+
+    if (between(angle, Math.PI / 4, (3 * Math.PI) / 4)) {
+      // TOP
+      return {
+        x: 0,
+        y: -propertyGroup.height - MARGIN_VOWL
+      };
+    } else if (between(angle, (-3 * Math.PI) / 4, -Math.PI / 4)) {
+      // BOTTOM
+      return {
+        x: 0,
+        y: shape.height + MARGIN_VOWL
+      };
+    } else if (between(angle, -Math.PI / 4, Math.PI / 4)) {
+      // RIGHT
+      return {
+        x: shape.width + MARGIN_VOWL,
+        y: 0
+      };
+    } else if (
+      between(angle, (3 * Math.PI) / 4, Math.PI) ||
+      between(angle, -Math.PI, (-3 * Math.PI) / 4)
+    ) {
+      // LEFT
+      return {
+        x: -propertyGroup.width - MARGIN_VOWL,
+        y: 0
+      };
+    } else {
+      // RETURN DEFAULT BOTTOM POSITION
+      return {
+        x: 0,
+        y: shape.height + MARGIN_VOWL
+      };
+    }
   }
 }
 
@@ -458,7 +548,7 @@ export function getDefaultEllipsePosition(ellipse) {
   const points = ellipseProjections(ellipse, {
     x: ellipse.x + 1,
     y: ellipse.y + 1
-  });
+  }); // Put propertyGroup at default position of -45 degrees
   const newPoint = points[0].y > points[1].y ? points[0] : points[1];
   return newPoint;
 }
