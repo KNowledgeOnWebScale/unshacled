@@ -364,7 +364,8 @@ export default {
           [TERM.closed]: () => `onlyListedProperties(${valueText})`,
           [TERM.ignoredProperties]: value =>
             `otherAllowedProperties(${value.map(x => `'${x}'`).join(", ")})`,
-          [TERM.in]: value => `valueIn(${value.map(x => `'${x}'`).join(", ")})`
+          [TERM.in]: value => `valueIn(${value.map(x => `'${x}'`).join(", ")})`,
+          [TERM.pattern]: value => `${keyText}("${valueText}")`
         };
 
         if (textMap[key]) {
