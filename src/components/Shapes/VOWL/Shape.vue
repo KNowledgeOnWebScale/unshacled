@@ -150,7 +150,9 @@ export default {
       const isRDF = this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE;
       return {
         x: 2 * NOTE_MARGIN_VOWL,
-        y: isRDF ? CENTER_SHAPE_VOWL_Y - NOTE_ICON_SIZE_VOWL / 2 : HEIGHT_LITERAL_VOWL / 2 - NOTE_ICON_SIZE_VOWL / 2,
+        y: isRDF
+          ? CENTER_SHAPE_VOWL_Y - NOTE_ICON_SIZE_VOWL / 2
+          : HEIGHT_LITERAL_VOWL / 2 - NOTE_ICON_SIZE_VOWL / 2,
         image: this.iconImage,
         width: NOTE_ICON_SIZE_VOWL,
         height: NOTE_ICON_SIZE_VOWL
@@ -272,15 +274,19 @@ export default {
      */
     getCenterLabelConfig() {
       if (this.$props.nodeShape) {
-        const text = uriToPrefix(this.$store.state.mConfig.namespaces, this.$props.id);
+        const text = uriToPrefix(
+          this.$store.state.mConfig.namespaces,
+          this.$props.id
+        );
         return {
           ...SUBJECT_URI_TEXT_CONFIG_VOWL,
           text
         };
       } else {
-        const text = this.icon === "class" || this.icon === "datatype"
-          ? this.getShapeKindURI()
-          : "";
+        const text =
+          this.icon === "class" || this.icon === "datatype"
+            ? this.getShapeKindURI()
+            : "";
         const baseConfig = {
           ...TEXT_CONFIG_VOWL,
           align: "left",
@@ -291,12 +297,12 @@ export default {
         if (this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE) {
           return {
             ...baseConfig,
-            y: CENTER_SHAPE_VOWL_Y - TEXT_SIZE / 2,
+            y: CENTER_SHAPE_VOWL_Y - TEXT_SIZE / 2
           };
         } else {
           return {
             ...baseConfig,
-            y: HEIGHT_LITERAL_VOWL / 2 - TEXT_SIZE / 2,
+            y: HEIGHT_LITERAL_VOWL / 2 - TEXT_SIZE / 2
           };
         }
       }
