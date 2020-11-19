@@ -3,7 +3,7 @@ import ValueType, {
   getValueTypeFromConstraint,
   ValueTypes
 } from "../util/enums/ValueType";
-import { HEIGHT, HEADER_MARGIN } from "../config/konvaConfigs";
+import { HEIGHT } from "../config/konvaConfigs";
 import {
   IGNORED_PROPERTIES,
   INFO_PROPERTIES,
@@ -20,7 +20,9 @@ const coordinateModule = {
     yValues: {},
     coordinates: {},
     heights: {},
-    relationshipCoordinates: {}
+    relationshipCoordinates: {},
+    VOWLconstraintCoordinates: {},
+    VOWLconstraintHeights: {}
   },
 
   mutations: {
@@ -100,20 +102,20 @@ const coordinateModule = {
         }
 
         /* Calculate their y values. */
-        let i = 1;
+        let i = 0;
         for (const con of Object.keys(info)) {
-          Vue.set(state.yValues[shapeID], con, i * HEIGHT + HEADER_MARGIN);
+          Vue.set(state.yValues[shapeID], con, i * HEIGHT);
           i += 1;
         }
-        if (i === 1) {
+        if (i === 0) {
           i += 1;
         }
         for (const con of Object.keys(constraints)) {
-          Vue.set(state.yValues[shapeID], con, i * HEIGHT + HEADER_MARGIN);
+          Vue.set(state.yValues[shapeID], con, i * HEIGHT);
           i += 1;
         }
         /* Set the bottom coordinate. */
-        Vue.set(state.heights, shapeID, i * HEIGHT + HEADER_MARGIN);
+        Vue.set(state.heights, shapeID, i * HEIGHT);
       }
     },
 
@@ -151,6 +153,14 @@ const coordinateModule = {
         from: fromCoords,
         to: toCoords
       });
+    },
+
+    updateVOWLConstraintCoordinates(state, { shapeID, x, y }) {
+      Vue.set(state.VOWLconstraintCoordinates, shapeID, { x, y });
+    },
+
+    updateVOWLConstraintHeights(state, { shapeID, height }) {
+      Vue.set(state.VOWLconstraintHeights, shapeID, height);
     },
 
     /**

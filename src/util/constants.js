@@ -55,6 +55,47 @@ export const IGNORED_PROPERTIES = [
   TERM.description
 ];
 
+/* If a shape has any of these properties, it should have an icon in ShapeVOWL representation */
+export const VOWL_SHAPE_ICONS = [TERM.datatype, TERM.class];
+
+/* All these properties should be on the same note in the vowl representation. */
+export const VOWL_SAME_NOTE = [
+  TERM.nodeKind,
+  TERM.pattern,
+  TERM.languageIn,
+  TERM.uniqueLang,
+  TERM.closed,
+  TERM.ignoredProperties,
+  TERM.hasValue,
+  TERM.in,
+  TERM.deactivated
+];
+
+/* All these constraints together should be visualised as the singular "range()" constraint in ShapeVOWL */
+export const VOWL_RANGE_CONSTRAINTS = [
+  TERM.minInclusive,
+  TERM.minExclusive,
+  TERM.maxInclusive,
+  TERM.maxExclusive
+];
+
+/* All these constraints together should be visualised as the singular "length()" constraint in ShapeVOWL */
+export const VOWL_LENGTH_CONSTRAINTS = [TERM.minLength, TERM.maxLength];
+
+/* These properties get their own separate note, but more than one of these properties might be needed to create the note. */
+export const VOWL_CONCATTED_NOTE = [
+  ...VOWL_RANGE_CONSTRAINTS,
+  ...VOWL_LENGTH_CONSTRAINTS
+];
+
+/* These properties get their own separate note, often with a symbol to accompany them */
+export const VOWL_SEPARATE_NOTE = [
+  TERM.equals,
+  TERM.disjoint,
+  TERM.lessThan,
+  TERM.lessThanOrEquals
+];
+
 /* The realtionships that have to be visualised as "compliesWith" according to the ShapeUML spec */
 export const COMPLIES_WITH = [TERM.node, TERM.qualifiedValueShape];
 
@@ -77,3 +118,9 @@ export const PATH_PROPERTIES = [
   TERM.zeroOrOnePath,
   TERM.oneOrMorePath
 ];
+
+export const VOWL_BORDER_COLOR = {
+  [TERM.Violation]: "#e06666",
+  [TERM.Warning]: "#ffd966",
+  [TERM.Info]: "#93c47d"
+};

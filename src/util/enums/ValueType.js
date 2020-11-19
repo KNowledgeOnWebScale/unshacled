@@ -23,12 +23,12 @@ const ids = new Set([
   TERM.targetObjectsOf,
   TERM.equals,
   TERM.disjoint,
+  TERM.hasValue,
   TERM.lessThan,
   TERM.lessThanOrEquals,
   TERM.not,
   TERM.node,
   TERM.path,
-  TERM.pattern,
   TERM.qualifiedMaxCount,
   TERM.qualifiedMinCount,
   TERM.qualifiedValueShape,
@@ -36,7 +36,6 @@ const ids = new Set([
 ]);
 const values = new Set([
   TERM.closed,
-  TERM.hasValue,
   TERM.minCount,
   TERM.maxCount,
   TERM.minExclusive,
@@ -48,10 +47,11 @@ const values = new Set([
   TERM.name,
   TERM.uniqueLang,
   TERM.description,
+  TERM.pattern,
   LABEL
 ]);
-const valueLists = new Set([TERM.ignoredProperties, TERM.languageIn, TERM.in]);
-const idLists = new Set([TERM.and, TERM.or, TERM.xone]);
+const valueLists = new Set([TERM.languageIn, TERM.in]);
+const idLists = new Set([TERM.ignoredProperties, TERM.and, TERM.or, TERM.xone]);
 
 /**
  * Get the value type of the given predicate.

@@ -41,15 +41,12 @@ import {
   MARGIN,
   pointerCursor,
   resetCursor,
-  LABEL_TOP_LEFT,
-  LABEL_TOP_RIGHT,
-  LABEL_BOTTOM_LEFT,
-  LABEL_BOTTOM_RIGHT,
   LABEL_NO_SHIFT,
   LABEL_SHIFT_DOWN,
-  LABEL_SHIFT_UP
+  LABEL_SHIFT_UP,
+  LABEL_SECTION
 } from "../../../config/konvaConfigs";
-import { intersectionPoint } from "../../../util/calculations";
+import { intersectionPointRectangle } from "../../../util/calculations";
 import { uriToPrefix } from "../../../util/urlParser";
 import { TERM } from "../../../translation/terminology";
 import { isBlankPathNode, parsePath } from "../../../util/pathPropertyUtil";
@@ -120,18 +117,16 @@ export default {
         y: coordinates[to].y + heights[to] / 2
       };
 
-      const intersectionStart = intersectionPoint(
-        start,
-        end,
-        { x: coordinates[from].x, y: coordinates[from].y },
-        { x: coordinates[from].x + WIDTH, y: coordinates[from].y + heights[from] }
-      );
-      const intersectionEnd = intersectionPoint(
-        end,
-        start,
-        { x: coordinates[to].x, y: coordinates[to].y },
-        { x: coordinates[to].x + WIDTH, y: coordinates[to].y + heights[to] }
-      );
+      const intersectionStart = intersectionPointRectangle(start, end, {
+        ...coordinates[from],
+        width: WIDTH,
+        height: heights[from]
+      });
+      const intersectionEnd = intersectionPointRectangle(end, start, {
+        ...coordinates[to],
+        width: WIDTH,
+        height: heights[to]
+      });
 
       this.setCardinalitySection(start, intersectionEnd);
       this.setLabelShift(start, intersectionEnd);
@@ -256,25 +251,25 @@ export default {
         switch (endPoint.side) {
           case "T":
             this.cardinalitySection =
-              endPoint.x < midPoint.x ? LABEL_TOP_LEFT : LABEL_TOP_RIGHT;
+              endPoint.x < midPoint.x ? LABEL_SECTION.TL : LABEL_SECTION.TR;
             break;
           case "L":
             this.cardinalitySection =
-              endPoint.y < midPoint.y ? LABEL_TOP_LEFT : LABEL_BOTTOM_LEFT;
+              endPoint.y < midPoint.y ? LABEL_SECTION.TL : LABEL_SECTION.BL;
             break;
           case "B":
             this.cardinalitySection =
-              endPoint.x < midPoint.x ? LABEL_BOTTOM_LEFT : LABEL_BOTTOM_RIGHT;
+              endPoint.x < midPoint.x ? LABEL_SECTION.BL : LABEL_SECTION.BR;
             break;
           case "R":
             this.cardinalitySection =
-              endPoint.y < midPoint.y ? LABEL_TOP_RIGHT : LABEL_BOTTOM_RIGHT;
+              endPoint.y < midPoint.y ? LABEL_SECTION.TR : LABEL_SECTION.BR;
             break;
           default:
-            this.cardinalitySection = 0;
+            this.cardinalitySection = LABEL_SECTION.UNSPECIFIED;
         }
       } else {
-        this.cardinalitySection = 0;
+        this.cardinalitySection = LABEL_SECTION.TR;
       }
     },
 
@@ -311,7 +306,7 @@ export default {
 
       if (this.$refs.cardinalityText && this.$refs.cardinalityText.getNode()) {
         switch (this.cardinalitySection) {
-          case LABEL_TOP_LEFT:
+          case LABEL_SECTION.TL:
             return {
               x:
                 cardinalityLabel.x -
@@ -322,7 +317,7 @@ export default {
                 this.$refs.cardinalityText.getNode().height() -
                 RELATIONSHIP_LABEL_OFFSET
             };
-          case LABEL_TOP_RIGHT:
+          case LABEL_SECTION.TR:
             return {
               x: cardinalityLabel.x + RELATIONSHIP_LABEL_OFFSET,
               y:
@@ -330,12 +325,12 @@ export default {
                 this.$refs.cardinalityText.getNode().height() -
                 RELATIONSHIP_LABEL_OFFSET
             };
-          case LABEL_BOTTOM_RIGHT:
+          case LABEL_SECTION.BR:
             return {
               x: cardinalityLabel.x + RELATIONSHIP_LABEL_OFFSET,
               y: cardinalityLabel.y + RELATIONSHIP_LABEL_OFFSET
             };
-          case LABEL_BOTTOM_LEFT:
+          case LABEL_SECTION.BL:
             return {
               x:
                 cardinalityLabel.x -

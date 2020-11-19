@@ -31,7 +31,7 @@ const emptyState = {
       schema: "http://schema.org/",
       foaf: "http://xmlns.com/foaf/0.1/",
       xsd: "http://www.w3.org/2001/XMLSchema#",
-      ex: "http://www.example.com/",
+      ex: "http://example.org/ns#",
       skos: "http://www.w3.org/2004/02/skos/core#",
       ost: "http://w3id.org/ost/ns#",
       org: "http://www.w3.org/ns/org#",

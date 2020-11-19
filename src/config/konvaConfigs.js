@@ -19,17 +19,30 @@ export const CENTER_SHAPE_VOWL_X = 100;
 export const CENTER_SHAPE_VOWL_Y = 70;
 export const MARGIN_VOWL = 10;
 export const SHAPE_NAME_PADDING_VOWL = 30;
-export const NOTE_INSET_VOWL = 40;
+export const BORDER_WIDTH_VOWL = 2;
+export const CLOSED_BORDER_WIDTH_VOWL = 5;
+
+export const NOTE_INSET_VOWL = 0.7;
+export const NOTE_WIDTH_VOWL = 200;
+export const NOTE_HEIGHT = 30;
+export const NOTE_MARGIN_VOWL = 5;
+export const NOTE_HEIGHT_CALC = NOTE_HEIGHT + NOTE_MARGIN_VOWL;
+export const NOTE_CORNER_INSET_VOWL = 20;
+export const NOTE_ICON_SIZE_VOWL = NOTE_HEIGHT_CALC - 2 * NOTE_MARGIN_VOWL;
 
 export const RELATIONSHIP_LABEL_OFFSET = 10; // How far a label should be offset from the relationship arrow
 const RELATIONSHIP_DASH = 10;
 export const RELATIONSHIP_DASH_ARRAY = [RELATIONSHIP_DASH, RELATIONSHIP_DASH]; // The dash array for a relationship, to be used for e.g. compliesWith
 export const LOGICAL_RELATIONSHIP_APPENDAGE = 50;
 
-export const LABEL_TOP_LEFT = 1; // For placement of relationship cardinality labels
-export const LABEL_TOP_RIGHT = 2; // For placement of relationship cardinality labels
-export const LABEL_BOTTOM_RIGHT = 3; // For placement of relationship cardinality labels
-export const LABEL_BOTTOM_LEFT = 4; // For placement of relationship cardinality labels
+// For placement of relationship cardinality labels
+export const LABEL_SECTION = {
+  TL: 1,
+  TR: 2,
+  BR: 3,
+  BL: 4,
+  UNSPECIFIED: 0
+};
 
 export const LABEL_NO_SHIFT = 0; // For placement of relationship labels
 export const LABEL_SHIFT_UP = 1; // For placement of relationship labels
@@ -87,7 +100,8 @@ export const SHAPE_CONFIG_VOWL = {
   width: WIDTH_VOWL,
   x: CENTER_SHAPE_VOWL_X,
   y: CENTER_SHAPE_VOWL_Y,
-  stroke: "black"
+  stroke: "black",
+  fill: "#AACCFF"
 };
 
 export const NODE_SHAPE_CONFIG_VOWL = {
@@ -97,7 +111,7 @@ export const NODE_SHAPE_CONFIG_VOWL = {
 
 export const PROPERTY_SHAPE_CONFIG_VOWL = {
   ...SHAPE_CONFIG_VOWL,
-  fill: "white"
+  fill: "#AACCFF"
 };
 
 /**
@@ -230,8 +244,20 @@ export const NAME_TEXT_CONFIG_VOWL = {
 
 export const URI_TEXT_CONFIG_VOWL = {
   ...TEXT_CONFIG_VOWL,
-  y: CENTER_SHAPE_VOWL_Y,
+  y: CENTER_SHAPE_VOWL_Y - TEXT_SIZE / 2,
   fontStyle: "italic"
+};
+
+/**
+ * Configuration for a shape's constraint text.
+ * @type {{width: number, fontSize: number, text: string, align: string}}
+ */
+export const CONSTRAINT_TEXT_CONFIG_VOWL = {
+  ...TEXT_CONFIG_VOWL,
+  align: "left",
+  width: NOTE_WIDTH_VOWL - 2 * TEXT_OFFSET,
+  x: TEXT_OFFSET,
+  fontSize: CONSTRAINT_TEXT_SIZE
 };
 
 /* BUTTONS ========================================================================================================== */
