@@ -254,19 +254,19 @@ export function getEllipseSection(midPointAngle) {
   const minAngle = -Math.PI; // -180 deg
   const maxAngle = Math.PI; // 180 deg
 
-  const angle1 = Math.atan2(-1, -1); // -135 deg
-  const angle2 = Math.atan2(-1, 1); // -45 deg
-  const angle3 = Math.atan2(1, 1); // 45 deg
-  const angle4 = Math.atan2(1, -1); // 135 deg
+  const angle1 = (-160 * Math.PI) / 180; // -135 deg
+  const angle2 = (-20 * Math.PI) / 180; // -45 deg
+  const angle3 = (20 * Math.PI) / 180; // 45 deg
+  const angle4 = (160 * Math.PI) / 180; // 135 deg
 
-  if (
-    between(midPointAngle, minAngle, angle1) ||
-    between(midPointAngle, angle4, maxAngle)
-  ) {
+  const mpA = -midPointAngle; // Fix for wrong calculation of midPointAngle
+  console.log((mpA * 180) / Math.PI);
+
+  if (between(mpA, minAngle, angle1) || between(mpA, angle4, maxAngle)) {
     return "L";
-  } else if (between(midPointAngle, angle1, angle2)) {
+  } else if (between(mpA, angle1, angle2)) {
     return "B";
-  } else if (between(midPointAngle, angle2, angle3)) {
+  } else if (between(mpA, angle2, angle3)) {
     return "R";
   } else {
     return "T";
@@ -303,20 +303,17 @@ export function getShapeIntersection(startShape, note, hasNote, midPoint2) {
   const startRDF = startShape.kind === VOWL_SHAPE_KIND.RDF_RESOURCE;
 
   const midPointAngle = startRDF
-  ? Math.atan2(
-    midPoint2.y - startShape.y,
-    midPoint2.x - startShape.x
-  )
-  : Math.atan2(
-    midPoint2.y - startShape.y + startShape.height / 2,
-    midPoint2.x - startShape.x + startShape.width / 2
-  )
+    ? Math.atan2(midPoint2.y - startShape.y, midPoint2.x - startShape.x)
+    : Math.atan2(
+        midPoint2.y - startShape.y + startShape.height / 2,
+        midPoint2.x - startShape.x + startShape.width / 2
+      );
 
   if (startShape.x === midPoint2.x) {
     // The calculation for the slope yields +-Infinity here, so we have to return a fixed position.
     const rectangleIncluded = startRDF
-        ? between(startShape.x, note.x, note.x + note.width)
-        : startShape.x === note.x;
+      ? between(startShape.x, note.x, note.x + note.width)
+      : startShape.x === note.x;
     if (startShape.y > midPoint2.y) {
       if (rectangleIncluded && note.y < startShape.y) {
         // Return the intersection on top of the note
@@ -352,11 +349,10 @@ export function getShapeIntersection(startShape, note, hasNote, midPoint2) {
     // No mathematical problems, so the intersection can be found by calculating the intersection with both shapes
     // and checking which one is closer to midPoint2
 
-
     const startPointLiteral = {
       x: startShape.x + startShape.width / 2,
       y: startShape.y + startShape.height / 2
-    }
+    };
 
     const noteIntersection = startRDF
     ? intersectionPointRectangle(

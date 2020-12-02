@@ -24,7 +24,11 @@ import {
   pointerCursor,
   textCursor,
   resetCursor,
+<<<<<<< HEAD
   DELETE_BUTTON_CONFIG,
+=======
+  DELETE_BUTTON_CONFIG_VOWL_LITERAL,
+>>>>>>> 3858ded60686a67a1ca50b493293d5ad07d06a96
   NOTE_WIDTH_VOWL,
   NOTE_MARGIN_VOWL,
   NOTE_HEIGHT_CALC,
@@ -83,7 +87,7 @@ export default {
         y: TEXT_OFFSET
       },
       deleteConstraintConfig: {
-        ...DELETE_BUTTON_CONFIG,
+        ...DELETE_BUTTON_CONFIG_VOWL_LITERAL,
         x: this.$props.hasIcon
           ? NOTE_WIDTH_VOWL -
             NOTE_ICON_SIZE_VOWL -
@@ -364,7 +368,8 @@ export default {
           [TERM.closed]: () => `onlyListedProperties(${valueText})`,
           [TERM.ignoredProperties]: value =>
             `otherAllowedProperties(${value.map(x => `'${x}'`).join(", ")})`,
-          [TERM.in]: value => `valueIn(${value.map(x => `'${x}'`).join(", ")})`
+          [TERM.in]: value => `valueIn(${value.map(x => `'${x}'`).join(", ")})`,
+          [TERM.pattern]: value => `${keyText}("${valueText}")`
         };
 
         if (textMap[key]) {
