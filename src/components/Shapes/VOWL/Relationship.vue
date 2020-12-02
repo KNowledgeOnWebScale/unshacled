@@ -1,5 +1,5 @@
 <template>
-  <v-group ref="group" @mouseenter="hover = true" @mouseleave="hover = false">
+  <v-group ref="group" @mouseenter="sethover" @mouseleave="hover = false">
     <v-group
       v-if="cardinalityPresent"
       ref="cardinalityLabel"
@@ -108,6 +108,10 @@ export default {
     };
   },
   methods: {
+    sethover() {
+      this.hover = true;
+      console.log(this.$props.constraintID);
+    },
     /**
      * Get the end points of the relationship line.
      * @returns {[number]} a list of coordinates: [x1, y1, x2, y2]
@@ -454,7 +458,7 @@ export default {
               y:
                 cardinalityLabel.y -
                 this.$refs.cardinalityText.getNode().height() -
-                RELATIONSHIP_LABEL_OFFSET
+                2 * RELATIONSHIP_LABEL_OFFSET
             };
           case LABEL_SECTION.TR:
             return {
@@ -462,12 +466,12 @@ export default {
               y:
                 cardinalityLabel.y -
                 this.$refs.cardinalityText.getNode().height() -
-                RELATIONSHIP_LABEL_OFFSET
+                2 * RELATIONSHIP_LABEL_OFFSET
             };
           case LABEL_SECTION.BR:
             return {
               x: cardinalityLabel.x + RELATIONSHIP_LABEL_OFFSET,
-              y: cardinalityLabel.y + RELATIONSHIP_LABEL_OFFSET
+              y: cardinalityLabel.y + 2 * RELATIONSHIP_LABEL_OFFSET
             };
           case LABEL_SECTION.BL:
             return {
@@ -475,7 +479,7 @@ export default {
                 cardinalityLabel.x -
                 this.$refs.cardinalityText.getNode().width() -
                 RELATIONSHIP_LABEL_OFFSET,
-              y: cardinalityLabel.y + RELATIONSHIP_LABEL_OFFSET
+              y: cardinalityLabel.y + 2 * RELATIONSHIP_LABEL_OFFSET
             };
         }
       } else {

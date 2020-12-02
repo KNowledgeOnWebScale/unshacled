@@ -99,6 +99,8 @@ import { TERM } from "../../translation/terminology";
 import { ENTER, SCHEMA_URI } from "../../util/constants";
 import { XML_DATATYPES } from "../../util";
 import PredicateTable from "../FormElements/PredicateTable.vue";
+import shaclDictionary from "../../translation/shaclDictionary";
+import { CUSTOM_URI } from "../../translation/terminology";
 
 export default {
   name: "PredicateModal",
@@ -240,6 +242,9 @@ export default {
           this.$store.getters.namespaces,
           inputWithoutUrl
         );
+        if (finalInput.includes("www.w3.org/ns/shacl")) {
+          finalInput = CUSTOM_URI + finalInput.substring(finalInput.indexOf("#") + 1);
+        }
         // Check if the input is an URL or has a prefix.
         if (!isUrl(finalInput)) {
           // If not, add the original URL.
