@@ -24,11 +24,7 @@ import {
   pointerCursor,
   textCursor,
   resetCursor,
-<<<<<<< HEAD
-  DELETE_BUTTON_CONFIG,
-=======
   DELETE_BUTTON_CONFIG_VOWL_LITERAL,
->>>>>>> 3858ded60686a67a1ca50b493293d5ad07d06a96
   NOTE_WIDTH_VOWL,
   NOTE_MARGIN_VOWL,
   NOTE_HEIGHT_CALC,
