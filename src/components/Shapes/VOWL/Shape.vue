@@ -10,12 +10,12 @@
       <!-- Main ellipse -->
       <v-group @mouseenter="titleHover = true" @mouseleave="titleHover = false">
         <!-- Shape label & uri -->
-        <v-group @click="startEditing">
+        <v-group @click="startEditing" @mouseover="printModel">
           <v-ellipse
             v-if="shapeKind === 1"
             :config="getShapeConfig()"
           ></v-ellipse>
-          <v-rect v-if="shapeKind === 2" :config="getShapeConfig()"></v-rect>
+          <v-rect v-else :config="getShapeConfig()"></v-rect>
           <v-text ref="upperLabel" :config="getUpperLabelConfig()"></v-text>
           <v-text ref="centerLabel" :config="getCenterLabelConfig()"></v-text>
         </v-group>
@@ -93,7 +93,7 @@ import {
 } from "../../../config/konvaConfigs";
 import { TERM } from "../../../translation/terminology";
 import { abbreviate } from "../../../util/strings";
-import { LABEL, VOWL_SHAPE_KIND } from "../../../util/constants";
+import { LABEL, VOWL_LITERAL_CONSTRAINTS, VOWL_SHAPE_KIND } from "../../../util/constants";
 import {
   getDefaultEllipsePosition,
   getPropertyGroupBounds
@@ -126,7 +126,8 @@ export default {
           ? RDF_RESOURCE_SHAPE_CONFIG
           : LITERAL_SHAPE_CONFIG,
       constraintsHeight: 0,
-      iconImage: new Image(NOTE_ICON_SIZE_VOWL, NOTE_ICON_SIZE_VOWL)
+      iconImage: new Image(NOTE_ICON_SIZE_VOWL, NOTE_ICON_SIZE_VOWL),
+      debug: true
     };
   },
   computed: {
@@ -157,10 +158,6 @@ export default {
       };
     },
 
-    shapeKind() {
-      return this.$store.getters.getShapeKind(this.$props.id);
-    },
-
     deleteNodeConfig() {
       return this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE
         ? DELETE_BUTTON_CONFIG_VOWL_RDF
@@ -171,31 +168,57 @@ export default {
       return this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE
         ? ADD_PREDICATE_CONFIG_VOWL_RDF
         : ADD_PREDICATE_CONFIG_VOWL_LITERAL;
+    },
+
+    constraintList() {
+      const model = this.$store.state.mShape.model;
+      for (const el of model) {
+        if (el["@id"] === this.id) return el;
+      }
+    },
+
+    shapeKind() {
+      const shape = this.$store.getters.shapeWithID(this.id);
+      const isLiteral = VOWL_LITERAL_CONSTRAINTS.some(x => shape[x]) || (shape[TERM.nodeKind] && shape[TERM.nodeKind][0]["@id"] === TERM.Literal);
+      if (this.debug) {
+        // if (shape[TERM.nodeKind]) console.log(this.id, shape[TERM.nodeKind]);
+        // else console.log(this.id, "no nodekind", shape);
+        // if (isLiteral) console.log(this.id, "is Literal");
+        // else console.log(this.id, "is an RDF resource");
+      }
+      return isLiteral ? VOWL_SHAPE_KIND.LITERAL : VOWL_SHAPE_KIND.RDF_RESOURCE
     }
   },
   mounted() {
     const self = this;
     const { id } = this.$props;
     /* Move the shape to the defined coordinate. */
-    this.$refs.posRef
-      .getNode()
+    const posRef = this.$refs.posRef;
+    if (posRef && posRef.getNode()){
+      posRef.getNode()
       .setPosition(this.$store.state.mShape.mCoordinate.coordinates[id]);
+    }
     this.updatePosition();
     this.updateConstraintCoordinates();
 
-    const { icon } = this;
-    if (icon !== "none") {
-      this.iconImage.src = `/icons/${icon}.svg`;
+    if (self.icon !== "none") {
+      this.iconImage.src = `/icons/${self.icon}.svg`;
     }
 
-    /* Update the constraints when the store state changes. */
-    this.$store.watch(
-      () => self.$store.getters.shapeConstraints(self.$props.id),
-      () => self.$store.getters.shapeInfo(self.$props.id),
-      () => {
-        self.getConstraints();
+    const noUpdate = [
+      "updateRelationshipCoordinates",
+      "updateVOWLConstraintCoordinates",
+      "updateCoordinates",
+      "updateYValues",
+      "updateVOWLConstraintHeights"
+    ];
+    this.$store.subscribe(mutation => {
+      if (!noUpdate.includes(mutation.type)){
+        this.transLateToShape();
+        this.updateConstraintCoordinates();
+        this.$forceUpdate();
       }
-    );
+    });
   },
   methods: {
     getShapeConfig() {
@@ -329,45 +352,49 @@ export default {
     },
 
     transLateToShape() {
-      const propertyGroup = this.$refs.constraints.getNode();
+      const pgRef = this.$refs.constraints;
 
-      const constraintsRectangle = {
-        x: propertyGroup.x(),
-        y: propertyGroup.y(),
-        width: NOTE_WIDTH_VOWL,
-        height: this.constraintsHeight
-      };
+      if (pgRef && pgRef.getNode()) {
+        const propertyGroup = pgRef.getNode();
+        const constraintsRectangle = {
+          x: propertyGroup.x(),
+          y: propertyGroup.y(),
+          width: NOTE_WIDTH_VOWL,
+          height: this.constraintsHeight
+        };
 
-      const shape =
-        this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE
-          ? {
-              x: CENTER_SHAPE_VOWL_X,
-              y: CENTER_SHAPE_VOWL_Y,
-              width: WIDTH_VOWL * NOTE_INSET_VOWL,
-              height: HEIGHT_VOWL * NOTE_INSET_VOWL
-            }
-          : {
-              x: 0,
-              y: 0,
-              width: WIDTH_VOWL,
-              height: HEIGHT_LITERAL_VOWL
-            };
+        const shape =
+          this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE
+            ? {
+                x: CENTER_SHAPE_VOWL_X,
+                y: CENTER_SHAPE_VOWL_Y,
+                width: WIDTH_VOWL * NOTE_INSET_VOWL,
+                height: HEIGHT_VOWL * NOTE_INSET_VOWL
+              }
+            : {
+                x: 0,
+                y: 0,
+                width: WIDTH_VOWL,
+                height: HEIGHT_LITERAL_VOWL
+              };
 
-      const newCoords = getPropertyGroupBounds(
-        this.shapeKind,
-        constraintsRectangle,
-        shape
-      );
-      if (!(Number.isNaN(newCoords.x) || Number.isNaN(newCoords.y))) {
-        propertyGroup.x(newCoords.x);
-        propertyGroup.y(newCoords.y);
+        const newCoords = getPropertyGroupBounds(
+          this.shapeKind,
+          constraintsRectangle,
+          shape
+        );
+        if (!(Number.isNaN(newCoords.x) || Number.isNaN(newCoords.y))) {
+          propertyGroup.x(newCoords.x);
+          propertyGroup.y(newCoords.y);
+        }
       }
     },
 
     updateConstraintCoordinates() {
-      const constraints = this.$refs.constraints.getNode();
+      const pgRef = this.$refs.constraints;
 
-      if (constraints) {
+      if (pgRef && pgRef.getNode()) {
+        const constraints = pgRef.getNode();
         this.$store.commit("updateVOWLConstraintCoordinates", {
           shapeID: this.$props.id,
           x: constraints.x(),
@@ -529,6 +556,13 @@ export default {
       if (type === "pointer") pointerCursor();
       else if (type === "text") textCursor();
       else resetCursor();
+    },
+
+    printModel() {
+      const shape = this.$store.getters.shapeWithID(this.id);
+      if (shape && this.debug){
+        console.log(shape);
+      }
     }
   }
 };

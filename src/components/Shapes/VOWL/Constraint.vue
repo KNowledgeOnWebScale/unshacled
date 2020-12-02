@@ -24,7 +24,7 @@ import {
   pointerCursor,
   textCursor,
   resetCursor,
-  DELETE_BUTTON_CONFIG_VOWL,
+  DELETE_BUTTON_CONFIG_VOWL_LITERAL,
   NOTE_WIDTH_VOWL,
   NOTE_MARGIN_VOWL,
   NOTE_HEIGHT_CALC,
@@ -83,7 +83,7 @@ export default {
         y: TEXT_OFFSET
       },
       deleteConstraintConfig: {
-        ...DELETE_BUTTON_CONFIG_VOWL,
+        ...DELETE_BUTTON_CONFIG_VOWL_LITERAL,
         x: this.$props.hasIcon
           ? NOTE_WIDTH_VOWL -
             NOTE_ICON_SIZE_VOWL -

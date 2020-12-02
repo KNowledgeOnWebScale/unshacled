@@ -11,6 +11,7 @@ import {
   INFO_PROPERTIES,
   RELATIONSHIP_PROPERTIES,
   VOWL_LENGTH_CONSTRAINTS,
+  VOWL_LITERAL_CONSTRAINTS,
   VOWL_RANGE_CONSTRAINTS,
   VOWL_SAME_NOTE,
   VOWL_SEPARATE_NOTE,
@@ -118,6 +119,11 @@ const constraintModule = {
           /* Otherwise, determine which list we want to add the predicate to. */
           const list = isList ? shape[predicate][0]["@list"] : shape[predicate];
           list.push(value);
+          if (isList) {
+            Vue.set(shape[predicate][0], "@list", list);
+          } else {
+            Vue.set(shape, predicate, list);
+          }
         }
 
         /* Add the predicate to the shape. */
@@ -769,24 +775,8 @@ const constraintModule = {
 
     getShapeKind: (_state, _getters, _rootState, rootGetters) => shapeID => {
       const shape = rootGetters.shapeWithID(shapeID);
-      const constraintList = Object.keys(shape);
-
-      if (
-        (constraintList.includes(TERM.nodeKind) &&
-          shape[TERM.nodeKind][0]["@id"] === TERM.Literal) ||
-        constraintList.includes(TERM.datatype) ||
-        constraintList.includes(TERM.minExclusive) ||
-        constraintList.includes(TERM.minInclusive) ||
-        constraintList.includes(TERM.maxExclusive) ||
-        constraintList.includes(TERM.maxInclusive) ||
-        constraintList.includes(TERM.languageIn) ||
-        constraintList.includes(TERM.uniqueLang) ||
-        constraintList.includes(TERM.lessThan) ||
-        constraintList.includes(TERM.lessThanOrEquals)
-      ) {
-        return VOWL_SHAPE_KIND.LITERAL;
-      }
-      return VOWL_SHAPE_KIND.RDF_RESOURCE;
+      const isLiteral = VOWL_LITERAL_CONSTRAINTS.some(x => shape[x]) || (shape[TERM.nodeKind] && shape[TERM.nodeKind][0]["@id"] === TERM.Literal);
+      return isLiteral ? VOWL_SHAPE_KIND.LITERAL : VOWL_SHAPE_KIND.RDF_RESOURCE
     },
 
     isClosed: (_state, _getters, _rootState, rootGetters) => shapeID => {
