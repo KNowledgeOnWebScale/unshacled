@@ -93,7 +93,11 @@ import {
 } from "../../../config/konvaConfigs";
 import { TERM } from "../../../translation/terminology";
 import { abbreviate } from "../../../util/strings";
-import { LABEL, VOWL_LITERAL_CONSTRAINTS, VOWL_SHAPE_KIND } from "../../../util/constants";
+import {
+  LABEL,
+  VOWL_LITERAL_CONSTRAINTS,
+  VOWL_SHAPE_KIND
+} from "../../../util/constants";
 import {
   getDefaultEllipsePosition,
   getPropertyGroupBounds
@@ -151,7 +155,9 @@ export default {
       const isRDF = this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE;
       return {
         x: 2 * NOTE_MARGIN_VOWL,
-        y: isRDF ? CENTER_SHAPE_VOWL_Y - NOTE_ICON_SIZE_VOWL / 2 : HEIGHT_LITERAL_VOWL / 2 - NOTE_ICON_SIZE_VOWL / 2,
+        y: isRDF
+          ? CENTER_SHAPE_VOWL_Y - NOTE_ICON_SIZE_VOWL / 2
+          : HEIGHT_LITERAL_VOWL / 2 - NOTE_ICON_SIZE_VOWL / 2,
         image: this.iconImage,
         width: NOTE_ICON_SIZE_VOWL,
         height: NOTE_ICON_SIZE_VOWL
@@ -171,32 +177,37 @@ export default {
     },
 
     constraintList() {
-      const model = this.$store.state.mShape.model;
+      const { model } = this.$store.state.mShape;
       for (const el of model) {
         if (el["@id"] === this.id) return el;
       }
+      return undefined;
     },
 
     shapeKind() {
       const shape = this.$store.getters.shapeWithID(this.id);
-      const isLiteral = VOWL_LITERAL_CONSTRAINTS.some(x => shape[x]) || (shape[TERM.nodeKind] && shape[TERM.nodeKind][0]["@id"] === TERM.Literal);
+      const isLiteral =
+        VOWL_LITERAL_CONSTRAINTS.some(x => shape[x]) ||
+          (shape[TERM.nodeKind] &&
+          shape[TERM.nodeKind][0]["@id"] === TERM.Literal);
       if (this.debug) {
         // if (shape[TERM.nodeKind]) console.log(this.id, shape[TERM.nodeKind]);
         // else console.log(this.id, "no nodekind", shape);
         // if (isLiteral) console.log(this.id, "is Literal");
         // else console.log(this.id, "is an RDF resource");
       }
-      return isLiteral ? VOWL_SHAPE_KIND.LITERAL : VOWL_SHAPE_KIND.RDF_RESOURCE
+      return isLiteral ? VOWL_SHAPE_KIND.LITERAL : VOWL_SHAPE_KIND.RDF_RESOURCE;
     }
   },
   mounted() {
     const self = this;
     const { id } = this.$props;
     /* Move the shape to the defined coordinate. */
-    const posRef = this.$refs.posRef;
-    if (posRef && posRef.getNode()){
-      posRef.getNode()
-      .setPosition(this.$store.state.mShape.mCoordinate.coordinates[id]);
+    const { posRef } = this.$refs;
+    if (posRef && posRef.getNode()) {
+      posRef
+        .getNode()
+        .setPosition(this.$store.state.mShape.mCoordinate.coordinates[id]);
     }
     this.updatePosition();
     this.updateConstraintCoordinates();
@@ -213,7 +224,7 @@ export default {
       "updateVOWLConstraintHeights"
     ];
     this.$store.subscribe(mutation => {
-      if (!noUpdate.includes(mutation.type)){
+      if (!noUpdate.includes(mutation.type)) {
         this.transLateToShape();
         this.updateConstraintCoordinates();
         this.$forceUpdate();
@@ -295,15 +306,19 @@ export default {
      */
     getCenterLabelConfig() {
       if (this.$props.nodeShape) {
-        const text = uriToPrefix(this.$store.state.mConfig.namespaces, this.$props.id);
+        const text = uriToPrefix(
+          this.$store.state.mConfig.namespaces,
+          this.$props.id
+        );
         return {
           ...SUBJECT_URI_TEXT_CONFIG_VOWL,
           text
         };
       } else {
-        const text = this.icon === "class" || this.icon === "datatype"
-          ? this.getShapeKindURI()
-          : "";
+        const text =
+          this.icon === "class" || this.icon === "datatype"
+            ? this.getShapeKindURI()
+            : "";
         const baseConfig = {
           ...TEXT_CONFIG_VOWL,
           align: "left",
@@ -314,12 +329,12 @@ export default {
         if (this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE) {
           return {
             ...baseConfig,
-            y: CENTER_SHAPE_VOWL_Y - TEXT_SIZE / 2,
+            y: CENTER_SHAPE_VOWL_Y - TEXT_SIZE / 2
           };
         } else {
           return {
             ...baseConfig,
-            y: HEIGHT_LITERAL_VOWL / 2 - TEXT_SIZE / 2,
+            y: HEIGHT_LITERAL_VOWL / 2 - TEXT_SIZE / 2
           };
         }
       }
@@ -560,7 +575,7 @@ export default {
 
     printModel() {
       const shape = this.$store.getters.shapeWithID(this.id);
-      if (shape && this.debug){
+      if (shape && this.debug) {
         console.log(shape);
       }
     }
