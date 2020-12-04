@@ -11,10 +11,12 @@ import {
   INFO_PROPERTIES,
   RELATIONSHIP_PROPERTIES,
   VOWL_LENGTH_CONSTRAINTS,
+  VOWL_LITERAL_CONSTRAINTS,
   VOWL_RANGE_CONSTRAINTS,
   VOWL_SAME_NOTE,
   VOWL_SEPARATE_NOTE,
-  VOWL_SHAPE_ICONS
+  VOWL_SHAPE_ICONS,
+  VOWL_SHAPE_KIND
 } from "../util/constants";
 import predicateModalModule from "./modals/predicateModalModule";
 
@@ -117,6 +119,11 @@ const constraintModule = {
           /* Otherwise, determine which list we want to add the predicate to. */
           const list = isList ? shape[predicate][0]["@list"] : shape[predicate];
           list.push(value);
+          if (isList) {
+            Vue.set(shape[predicate][0], "@list", list);
+          } else {
+            Vue.set(shape, predicate, list);
+          }
         }
 
         /* Add the predicate to the shape. */
@@ -754,6 +761,22 @@ const constraintModule = {
       } else {
         return TERM.Violation;
       }
+    },
+
+    getNodeKind: (_state, _getters, _rootState, rootGetters) => shapeID => {
+      const shape = rootGetters.shapeWithID(shapeID);
+
+      if (shape && Object.keys(shape).includes(TERM.nodeKind)) {
+        return shape[TERM.nodeKind][0]["@id"];
+      } else {
+        return undefined;
+      }
+    },
+
+    getShapeKind: (_state, _getters, _rootState, rootGetters) => shapeID => {
+      const shape = rootGetters.shapeWithID(shapeID);
+      const isLiteral = VOWL_LITERAL_CONSTRAINTS.some(x => shape[x]) || (shape[TERM.nodeKind] && shape[TERM.nodeKind][0]["@id"] === TERM.Literal);
+      return isLiteral ? VOWL_SHAPE_KIND.LITERAL : VOWL_SHAPE_KIND.RDF_RESOURCE
     },
 
     isClosed: (_state, _getters, _rootState, rootGetters) => shapeID => {

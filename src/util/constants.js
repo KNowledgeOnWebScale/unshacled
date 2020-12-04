@@ -124,3 +124,20 @@ export const VOWL_BORDER_COLOR = {
   [TERM.Warning]: "#ffd966",
   [TERM.Info]: "#93c47d"
 };
+
+export const VOWL_SHAPE_KIND = {
+  RDF_RESOURCE: 1,
+  LITERAL: 2
+};
+
+export const VOWL_LITERAL_CONSTRAINTS = [
+  TERM.datatype,
+  TERM.minExclusive,
+  TERM.maxExclusive,
+  TERM.minInclusive,
+  TERM.maxInclusive,
+  TERM.languageIn,
+  TERM.uniqueLang,
+  TERM.lessThan,
+  TERM.lessThanOrEquals
+];
