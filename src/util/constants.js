@@ -127,7 +127,8 @@ export const VOWL_BORDER_COLOR = {
 
 export const VOWL_SHAPE_KIND = {
   RDF_RESOURCE: 1,
-  LITERAL: 2
+  LITERAL: 2,
+  RELATIONSHIP: 3
 };
 
 export const VOWL_LITERAL_CONSTRAINTS = [

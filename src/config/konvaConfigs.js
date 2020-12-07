@@ -35,6 +35,10 @@ const RELATIONSHIP_DASH = 10;
 export const RELATIONSHIP_DASH_ARRAY = [RELATIONSHIP_DASH, RELATIONSHIP_DASH]; // The dash array for a relationship, to be used for e.g. compliesWith
 export const LOGICAL_RELATIONSHIP_APPENDAGE = 50;
 
+export const LOGICAL_SHAPE_HEIGHT = 80;
+export const LOGICAL_SHAPE_WIDTH = 95;
+export const LOGICAL_ICON_SIZE = 40;
+
 // For placement of relationship cardinality labels
 export const LABEL_SECTION = {
   TL: 1,
@@ -114,6 +118,15 @@ export const LITERAL_SHAPE_CONFIG = {
   height: HEIGHT_LITERAL_VOWL,
   x: 0,
   y: 0
+};
+
+export const LOGICAL_SHAPE_CONFIG = {
+  ...SHAPE_CONFIG_VOWL,
+  fill: "#AACCFF",
+  width: LOGICAL_SHAPE_WIDTH,
+  height: LOGICAL_SHAPE_HEIGHT,
+  x: LOGICAL_SHAPE_WIDTH / 2,
+  y: LOGICAL_SHAPE_HEIGHT / 2,
 };
 
 /**
@@ -327,7 +340,20 @@ export const DELETE_BUTTON_CONFIG_VOWL_LITERAL = {
   y: OFFSET,
   x: WIDTH_VOWL - OFFSET,
   fill: "red"
-}
+};
+
+export const DELETE_BUTTON_CONFIG_LOGICAL_REL = {
+  ...BUTTON_CONFIG_VOWL,
+  y: OFFSET,
+  x: projectYOnEllipse(
+    OFFSET,
+    LOGICAL_SHAPE_HEIGHT,
+    LOGICAL_SHAPE_WIDTH,
+    LOGICAL_SHAPE_WIDTH / 2,
+    LOGICAL_SHAPE_HEIGHT / 2
+  ),
+  fill: "red"
+};
 
 /**
  * Configuration for "add predicate"-buttons.
@@ -355,7 +381,20 @@ export const ADD_PREDICATE_CONFIG_VOWL_LITERAL = {
   y: OFFSET + HEIGHT / 2,
   x: WIDTH_VOWL - OFFSET,
   fill: "green"
-}
+};
+
+export const ADD_PREDICATE_CONFIG_LOGICAL_REL = {
+  ...BUTTON_CONFIG_VOWL,
+  y: OFFSET + HEIGHT / 2,
+  x: projectYOnEllipse(
+    OFFSET + HEIGHT / 2,
+    LOGICAL_SHAPE_HEIGHT,
+    LOGICAL_SHAPE_WIDTH,
+    LOGICAL_SHAPE_WIDTH / 2,
+    LOGICAL_SHAPE_HEIGHT / 2
+  ),
+  fill: "green"
+};
 
 /* RELATIONSHIPS ==================================================================================================== */
 

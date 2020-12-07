@@ -260,7 +260,6 @@ export function getEllipseSection(midPointAngle) {
   const angle4 = (160 * Math.PI) / 180; // 135 deg
 
   const mpA = -midPointAngle; // Fix for wrong calculation of midPointAngle
-  console.log((mpA * 180) / Math.PI);
 
   if (between(mpA, minAngle, angle1) || between(mpA, angle4, maxAngle)) {
     return "L";
@@ -300,7 +299,7 @@ export function getShapeIntersection(startShape, note, hasNote, midPoint2) {
 
   const line = { m, c };
 
-  const startRDF = startShape.kind === VOWL_SHAPE_KIND.RDF_RESOURCE;
+  const startRDF = startShape.kind === VOWL_SHAPE_KIND.RDF_RESOURCE || startShape.kind === VOWL_SHAPE_KIND.RELATIONSHIP;
 
   const midPointAngle = startRDF
     ? Math.atan2(midPoint2.y - startShape.y, midPoint2.x - startShape.x)
@@ -414,7 +413,7 @@ export function getShapeIntersection(startShape, note, hasNote, midPoint2) {
  * @returns {Object} A new point for the PropertyGroup component to be set to
  */
 export function getPropertyGroupBounds(shapeKind, propertyGroup, shape) {
-  if (shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE) {
+  if (shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE || shapeKind === VOWL_SHAPE_KIND.RELATIONSHIP) {
     const TL = { x: propertyGroup.x, y: propertyGroup.y };
     const TR = { x: propertyGroup.x + propertyGroup.width, y: propertyGroup.y };
     const BL = { x: propertyGroup.x, y: propertyGroup.y + propertyGroup.height };

@@ -45,13 +45,6 @@
           :to="obj.to"
           :constraint-i-d="obj.constraintID"
         ></logical-relationship-u-m-l>
-        <logical-relationship-v-o-w-l
-          v-else-if="visualNotation === 'ShapeVOWL'"
-          :id="key"
-          :from="obj.from"
-          :to="obj.to"
-          :constraint-i-d="obj.constraintID"
-        ></logical-relationship-v-o-w-l>
       </v-group>
 
       <div
@@ -124,8 +117,6 @@ const LogicalRelationshipUML = () => import("./Shapes/UML/LogicalRelationship");
 const ShapeVOWL = () => import("./Shapes/VOWL/Shape");
 /** Imports VOWL-style relationship under different name */
 const RelationshipVOWL = () => import("./Shapes/VOWL/Relationship");
-/** Imports VOWL-style logical relationship under different name */
-const LogicalRelationshipVOWL = () => import("./Shapes/VOWL/LogicalRelationship");
 
 export default {
   name: "Editor",
@@ -134,8 +125,7 @@ export default {
     RelationshipUML,
     LogicalRelationshipUML,
     ShapeVOWL,
-    RelationshipVOWL,
-    LogicalRelationshipVOWL
+    RelationshipVOWL
   },
 
   /**
