@@ -15,5 +15,6 @@ export function relationshipUID(relationship) {
  * @returns {string} A unique identifier for a logical relationship
  */
 export function logicalRelationshipUID(logicalRelationship) {
-  return `${logicalRelationship.constraintID} - ${logicalRelationship.from} - ${logicalRelationship.to[0]} / ${logicalRelationship.to[1]}`;
+  const toJoined = logicalRelationship.to.join(" / ");
+  return `${logicalRelationship.constraintID} - ${logicalRelationship.from} - ${toJoined}`;
 }

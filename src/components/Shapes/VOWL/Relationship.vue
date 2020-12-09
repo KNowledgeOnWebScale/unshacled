@@ -1,5 +1,5 @@
 <template>
-  <v-group ref="group" @mouseenter="sethover" @mouseleave="hover = false">
+  <v-group v-if="shouldRender" ref="group" @mouseenter="sethover" @mouseleave="hover = false">
     <v-group
       v-if="cardinalityPresent"
       ref="cardinalityLabel"
@@ -106,13 +106,25 @@ export default {
         from: this.$props.from,
         to: this.$props.to
       },
-      hasLabel: true
+      hasLabel: true,
+      debug: false
     };
+  },
+  computed: {
+    /**
+     * This checks whether the relationship arrow should render
+     * If the source or destination shape isn't rendered, the arrow shouldn't be rendered either
+     * This saves on unnecessary calculations and prevents unwanted errors
+     */
+    shouldRender() {
+      const { coordinates } = this.$store.state.mShape.mCoordinate;
+      return (coordinates[this.to] && coordinates[this.from]);
+    }
   },
   methods: {
     sethover() {
       this.hover = true;
-      console.log(this.$props.constraintID);
+      if (this.debug) console.log(this.$props.constraintID);
     },
     /**
      * Get the end points of the relationship line.

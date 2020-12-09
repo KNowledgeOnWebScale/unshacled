@@ -306,7 +306,8 @@ export default {
       /* Update the y values of the components relative to this shape. */
       this.$store.commit("updateYValues", {
         shapeID: this.$props.id,
-        shapes: this.$store.state.mShape.model
+        shapes: this.$store.state.mShape.model,
+        relationships: this.$store.getters.relationships
       });
       /* Update the coordinates of this shape. */
       this.$store.commit("updateCoordinates", {

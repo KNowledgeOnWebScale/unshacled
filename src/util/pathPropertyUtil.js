@@ -20,6 +20,29 @@ export function isBlankPathNode(node) {
 }
 
 /**
+ * This is a very complicated way to check for a very specific case.
+ * This checks whether a node is a blank node that has sh:property as its only property and
+ * if so, if that node is the destination shape of a relationship, coming from a nodeshape.
+ * If these are both true, the node shouldn't be rendered and instead, a relationship node should be shown.
+ * @param {Object} node The node that is being checked for being a blank property node and destination of a relationship from a nodeshape
+ * @param {Object} relationships All relationships, to check for the relationship coming from a nodeshape to the node being checked
+ * @param {Object} model The entire model, to check whether the source shape is a nodeshape
+ */
+export function isBlankLogicalRelationshipNode(node, relationships, model) {
+  if (node["@id"][0] === "_" && Object.keys(node).length === 2) {
+    const testConstraints = [TERM.property, "@id"].every(x => Object.keys(node).includes(x));
+    if (testConstraints) {
+      for (const rel of relationships) {
+        if (rel.to === node["@id"]) {
+          return model.some(item => item["@id"] === rel.from && item["@type"] && item["@type"][0] === TERM.NodeShape);
+        }
+      }
+    }
+  }
+  return false;
+}
+
+/**
  * This function parses a complex path, following the blank path nodes
  * (blank nodes with only one property, a (special) path property)
  * @param partialPath A partially parsed path, this is either the uri of a blank path node, just a regular uri, or a list of uri's indicating a sequence path

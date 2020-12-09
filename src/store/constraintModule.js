@@ -136,7 +136,7 @@ const constraintModule = {
         /* Update the y values. */
         commit(
           "updateYValues",
-          { shapeID, shapes: rootState.mShape.model },
+          { shapeID, shapes: rootState.mShape.model, relationships: getters.relationships },
           { root: true }
         );
       }
@@ -276,7 +276,7 @@ const constraintModule = {
     ) {
       const shape = getters.shapeWithID(shapeID);
       commit("deleteConstraintFromShape", { shape, constraintID });
-      commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
+      commit("updateYValues", { shapeID, shapes: rootState.mShape.model, relationships: getters.relationships });
     },
 
     /**
@@ -308,11 +308,11 @@ const constraintModule = {
         // Updating the y values should happen last, so insert this mutation on the second to last place.
         const shape = getters.shapeWithID(shapeID);
         commit("deleteConstraintFromShape", { shape, constraintID });
-        commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
+        commit("updateYValues", { shapeID, shapes: rootState.mShape.model, relationships: getters.relationships });
       }
 
       /* Execute the updating of the y values. */
-      commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
+      commit("updateYValues", { shapeID, shapes: rootState.mShape.model, relationships: getters.relationships });
     },
 
     /**
@@ -350,11 +350,11 @@ const constraintModule = {
       if (iter.length === 0) {
         const shape = getters.shapeWithID(shapeID);
         commit("deleteConstraintFromShape", { shape, constraintID });
-        commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
+        commit("updateYValues", { shapeID, shapes: rootState.mShape.model, relationships: getters.relationships });
       }
 
       /* Update the y values. */
-      commit("updateYValues", { shapeID, shapes: rootState.mShape.model });
+      commit("updateYValues", { shapeID, shapes: rootState.mShape.model, relationships: getters.relationships });
     }
   },
 

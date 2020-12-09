@@ -192,7 +192,8 @@ export default {
       }
       this.$store.commit("updateYValues", {
         shapeID: this.$props.shapeID,
-        shapes: this.$store.state.mShape.model
+        shapes: this.$store.state.mShape.model,
+        relationships: this.$store.getters.relationships
       });
     },
 

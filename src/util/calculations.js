@@ -310,9 +310,11 @@ export function getShapeIntersection(startShape, note, hasNote, midPoint2) {
 
   if (startShape.x === midPoint2.x) {
     // The calculation for the slope yields +-Infinity here, so we have to return a fixed position.
-    const rectangleIncluded = startRDF
-      ? between(startShape.x, note.x, note.x + note.width)
-      : startShape.x === note.x;
+    const rectangleIncluded = hasNote
+      ? startRDF
+        ? between(startShape.x, note.x, note.x + note.width)
+        : startShape.x === note.x
+      : false;
     if (startShape.y > midPoint2.y) {
       if (rectangleIncluded && note.y < startShape.y) {
         // Return the intersection on top of the note
@@ -353,17 +355,20 @@ export function getShapeIntersection(startShape, note, hasNote, midPoint2) {
       y: startShape.y + startShape.height / 2
     };
 
-    const noteIntersection = startRDF
-    ? intersectionPointRectangle(
-      startShape,
-      midPoint2,
-      note
-    )
-    : intersectionPointRectangle(
-      startPointLiteral,
-      midPoint2,
-      note
-    );
+    let noteIntersection;
+    if (hasNote) {
+      noteIntersection = startRDF
+      ? intersectionPointRectangle(
+        startShape,
+        midPoint2,
+        note
+      )
+      : intersectionPointRectangle(
+        startPointLiteral,
+        midPoint2,
+        note
+      );
+    } else { noteIntersection = null; }
 
     const startShapeIntersections = startRDF
     ? getEllipseIntersections(

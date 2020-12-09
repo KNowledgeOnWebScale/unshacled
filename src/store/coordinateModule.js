@@ -9,7 +9,7 @@ import {
   INFO_PROPERTIES,
   RELATIONSHIP_PROPERTIES
 } from "../util/constants";
-import { isBlankPathNode } from "../util/pathPropertyUtil";
+import { isBlankLogicalRelationshipNode, isBlankPathNode } from "../util/pathPropertyUtil";
 
 /**
  * This module contains everything regarding coordinates, locations and positioning.
@@ -58,14 +58,14 @@ const coordinateModule = {
      * @param {string} shapeID the ID of the shape we want to update the y values from.
      * @param {string} shapes the list of shapes currently in the model.
      */
-    updateYValues(state, { shapeID, shapes }) {
+    updateYValues(state, { shapeID, shapes, relationships }) {
       /* Get the shape with the given ID. */
       let shape;
       for (const item of shapes) {
         if (item["@id"] === shapeID) shape = item;
       }
 
-      if (!isBlankPathNode(shape)) {
+      if (!isBlankPathNode(shape) && !isBlankLogicalRelationshipNode(shape, relationships, shapes)) {
         /* Update the y values of the properties. */
         Vue.set(state.yValues, shapeID, {});
 
@@ -134,6 +134,10 @@ const coordinateModule = {
       if (!isBlankPathNode(shape)) {
         Vue.set(state.coordinates, shapeID, { x, y });
       }
+    },
+
+    setCoordinates(state, { shapeID, x, y }) {
+      Vue.set(state.coordinates, shapeID, { x, y });
     },
 
     /**
