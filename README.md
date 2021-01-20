@@ -1,4 +1,4 @@
-# UnSHACLed]
+# UnSHACLed
 
 A visual editor for RDF constraints
 currently supporting the visual notations [ShapeUML](https://w3id.org/imec/unshacled/spec/shape-uml/20210118) and [ShapeVOWL](https://w3id.org/imec/unshacled/spec/shape-vowl/20210118/)
