@@ -1,5 +1,12 @@
-# [UnSHACLed](https://osoc19.github.io/unshacled/)
-Visual editor for shape constraint languages.
+# UnSHACLed]
+
+A visual editor for RDF constraints
+currently supporting the visual notations [ShapeUML](https://w3id.org/imec/unshacled/spec/shape-uml/20210118) and [ShapeVOWL](https://w3id.org/imec/unshacled/spec/shape-vowl/20210118/)
+and import/export/validation of [SHACL](https://www.w3.org/TR/shacl/) constraints.
+
+The [previous version](https://github.com/oSoc19/unshacled) of UnSHACLed was implemented during the Open Summer of Code 2019 in Belgium under the MIT license.
+This is an updated version which adds support for different visual notations to interact visually with RDF constraints.
+
 ## Contents
 1. [Overview](#Overview)
 2. [Setup](#Setup)
@@ -51,7 +58,7 @@ npm run build
 
 ## Contribute
 This section contains information to help contribute to this project.
-For more information about the project structure, the internal model et cetera, please consult [the wiki](https://github.com/oSoc19/unshacled/wiki/Home).
+For more information about the project structure, the internal model et cetera, please consult [the wiki of the previous version](https://github.com/oSoc19/unshacled/wiki/Home).
 
 ### Linting
 To ensure code style consistency we use [ESLint](https://eslint.org/) and [Prettier](https://prettier.io/) which are configured in `.eslintrc.js`.
