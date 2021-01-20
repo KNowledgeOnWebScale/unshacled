@@ -46,8 +46,8 @@
           :constraint-i-d="obj.constraintID"
         ></logical-relationship-u-m-l>
         <logical-relationship-v-o-w-l
-          v-else-if="visualNotation === 'ShapeVOWL'"
-          :id="key"
+          v-if="visualNotation === 'ShapeVOWL'"
+          :id="logicalRelationshipUID(obj)"
           :from="obj.from"
           :to="obj.to"
           :constraint-i-d="obj.constraintID"

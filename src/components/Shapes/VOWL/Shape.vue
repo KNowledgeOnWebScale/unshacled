@@ -12,7 +12,7 @@
         <!-- Shape label & uri -->
         <v-group @click="startEditing" @mouseover="printModel">
           <v-ellipse
-            v-if="shapeKind === 1"
+            v-if="shapeKind === 1 || shapeKind == 3"
             :config="getShapeConfig()"
           ></v-ellipse>
           <v-rect v-else :config="getShapeConfig()"></v-rect>
@@ -89,14 +89,23 @@ import {
   ADD_PREDICATE_CONFIG_VOWL_RDF,
   ADD_PREDICATE_CONFIG_VOWL_LITERAL,
   TEXT_CONFIG_VOWL,
-  TEXT_SIZE
+  TEXT_SIZE,
+  LOGICAL_SHAPE_CONFIG,
+  DELETE_BUTTON_CONFIG,
+  DELETE_BUTTON_CONFIG_LOGICAL_REL,
+  ADD_PREDICATE_CONFIG_LOGICAL_REL,
+  LOGICAL_SHAPE_WIDTH,
+  LOGICAL_SHAPE_HEIGHT,
+  LOGICAL_ICON_SIZE
 } from "../../../config/konvaConfigs";
 import { TERM } from "../../../translation/terminology";
 import { abbreviate } from "../../../util/strings";
 import {
   LABEL,
+  LOGICAL_RELATIONSHIPS,
   VOWL_LITERAL_CONSTRAINTS,
-  VOWL_SHAPE_KIND
+  VOWL_SHAPE_KIND,
+  VOWL_SHAPE_ICONS
 } from "../../../util/constants";
 import {
   getDefaultEllipsePosition,
@@ -125,55 +134,79 @@ export default {
     return {
       hover: false,
       titleHover: false,
-      shapeConfig:
-        this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE
-          ? RDF_RESOURCE_SHAPE_CONFIG
-          : LITERAL_SHAPE_CONFIG,
       constraintsHeight: 0,
-      iconImage: new Image(NOTE_ICON_SIZE_VOWL, NOTE_ICON_SIZE_VOWL),
+      iconImage: null,
       debug: true
     };
   },
   computed: {
     icon() {
-      const iconConstraints = this.$store.getters.shapeIconVOWLConstraints(
-        this.$props.id
-      );
-      const iconKeys = Object.keys(iconConstraints);
-      if (iconKeys.length) {
+      const shape = this.$store.getters.shapeWithID(this.id);
+      let iconConstraints;
+      if (this.shapeKind === VOWL_SHAPE_KIND.RELATIONSHIP){
+        iconConstraints = Object.keys(shape).filter(key => LOGICAL_RELATIONSHIPS.includes(key));
+      } else {
+        iconConstraints = Object.keys(shape).filter(key => VOWL_SHAPE_ICONS.includes(key));
+      }
+      if (iconConstraints.length) {
         const iconMap = {
+          [TERM.or]: "or",
+          [TERM.and]: "and",
+          [TERM.xone]: "xone",
           [TERM.class]: "class",
           [TERM.datatype]: "datatype"
         };
-        return iconMap[iconKeys[0]];
+        return iconMap[iconConstraints[0]];
       } else {
         return "none";
       }
     },
 
     iconConfig() {
-      const isRDF = this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE;
-      return {
-        x: 2 * NOTE_MARGIN_VOWL,
-        y: isRDF
-          ? CENTER_SHAPE_VOWL_Y - NOTE_ICON_SIZE_VOWL / 2
-          : HEIGHT_LITERAL_VOWL / 2 - NOTE_ICON_SIZE_VOWL / 2,
-        image: this.iconImage,
-        width: NOTE_ICON_SIZE_VOWL,
-        height: NOTE_ICON_SIZE_VOWL
+      const configMap = {
+        [VOWL_SHAPE_KIND.RDF_RESOURCE]: {
+          x: 2 * NOTE_MARGIN_VOWL,
+          y: CENTER_SHAPE_VOWL_Y - NOTE_ICON_SIZE_VOWL / 2,
+          image: this.iconImage,
+          width: NOTE_ICON_SIZE_VOWL,
+          height: NOTE_ICON_SIZE_VOWL
+        },
+        [VOWL_SHAPE_KIND.LITERAL]: {
+          x: 2 * NOTE_MARGIN_VOWL,
+          y: HEIGHT_LITERAL_VOWL / 2 - NOTE_ICON_SIZE_VOWL / 2,
+          image: this.iconImage,
+          width: NOTE_ICON_SIZE_VOWL,
+          height: NOTE_ICON_SIZE_VOWL
+        },
+        [VOWL_SHAPE_KIND.RELATIONSHIP]: {
+          x: LOGICAL_SHAPE_WIDTH * 0.1,
+          y: LOGICAL_SHAPE_HEIGHT - LOGICAL_ICON_SIZE - MARGIN_VOWL,
+          image: this.iconImage,
+          width: LOGICAL_SHAPE_WIDTH * 0.8,
+          height: LOGICAL_ICON_SIZE
+        }
       };
+      return configMap[this.shapeKind];
     },
 
     deleteNodeConfig() {
-      return this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE
-        ? DELETE_BUTTON_CONFIG_VOWL_RDF
-        : DELETE_BUTTON_CONFIG_VOWL_LITERAL;
+      const configMap = {
+        [VOWL_SHAPE_KIND.RDF_RESOURCE]: DELETE_BUTTON_CONFIG_VOWL_RDF,
+        [VOWL_SHAPE_KIND.LITERAL]: DELETE_BUTTON_CONFIG_VOWL_LITERAL,
+        [VOWL_SHAPE_KIND.RELATIONSHIP]: DELETE_BUTTON_CONFIG_LOGICAL_REL
+      };
+
+      return configMap[this.shapeKind];
     },
 
     addPredicateConfig() {
-      return this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE
-        ? ADD_PREDICATE_CONFIG_VOWL_RDF
-        : ADD_PREDICATE_CONFIG_VOWL_LITERAL;
+      const configMap = {
+        [VOWL_SHAPE_KIND.RDF_RESOURCE]: ADD_PREDICATE_CONFIG_VOWL_RDF,
+        [VOWL_SHAPE_KIND.LITERAL]: ADD_PREDICATE_CONFIG_VOWL_LITERAL,
+        [VOWL_SHAPE_KIND.RELATIONSHIP]: ADD_PREDICATE_CONFIG_LOGICAL_REL
+      };
+
+      return configMap[this.shapeKind];
     },
 
     constraintList() {
@@ -186,16 +219,14 @@ export default {
 
     shapeKind() {
       const shape = this.$store.getters.shapeWithID(this.id);
+      const isRelSource = LOGICAL_RELATIONSHIPS.some(x => shape[x]);
+      if (isRelSource && !this.nodeShape) {
+        return VOWL_SHAPE_KIND.RELATIONSHIP;
+      }
       const isLiteral =
         VOWL_LITERAL_CONSTRAINTS.some(x => shape[x]) ||
           (shape[TERM.nodeKind] &&
           shape[TERM.nodeKind][0]["@id"] === TERM.Literal);
-      if (this.debug) {
-        // if (shape[TERM.nodeKind]) console.log(this.id, shape[TERM.nodeKind]);
-        // else console.log(this.id, "no nodekind", shape);
-        // if (isLiteral) console.log(this.id, "is Literal");
-        // else console.log(this.id, "is an RDF resource");
-      }
       return isLiteral ? VOWL_SHAPE_KIND.LITERAL : VOWL_SHAPE_KIND.RDF_RESOURCE;
     }
   },
@@ -212,10 +243,6 @@ export default {
     this.updatePosition();
     this.updateConstraintCoordinates();
 
-    if (self.icon !== "none") {
-      this.iconImage.src = `/icons/${self.icon}.svg`;
-    }
-
     const noUpdate = [
       "updateRelationshipCoordinates",
       "updateVOWLConstraintCoordinates",
@@ -231,15 +258,25 @@ export default {
       }
     });
   },
+  created() {
+    if (this.icon !== "none") {
+      const image = this.shapeKind === VOWL_SHAPE_KIND.RELATIONSHIP ? new Image('auto', LOGICAL_ICON_SIZE) : new Image(NOTE_ICON_SIZE_VOWL, NOTE_ICON_SIZE_VOWL);
+      image.src = `/icons/${this.icon}.svg`;
+      image.onload = () => {
+        this.iconImage = image;
+      };
+    }
+  },
   methods: {
     getShapeConfig() {
-      const config =
-        this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE
-          ? RDF_RESOURCE_SHAPE_CONFIG
-          : LITERAL_SHAPE_CONFIG;
+      const configMap = {
+        [VOWL_SHAPE_KIND.RDF_RESOURCE]: RDF_RESOURCE_SHAPE_CONFIG,
+        [VOWL_SHAPE_KIND.LITERAL]: LITERAL_SHAPE_CONFIG,
+        [VOWL_SHAPE_KIND.RELATIONSHIP]: LOGICAL_SHAPE_CONFIG
+      }
 
       return {
-        ...config,
+        ...configMap[this.shapeKind],
         strokeWidth: this.isClosed()
           ? CLOSED_BORDER_WIDTH_VOWL
           : BORDER_WIDTH_VOWL,
@@ -305,7 +342,24 @@ export default {
      * @returns {object} the configuration object for the center label.
      */
     getCenterLabelConfig() {
-      if (this.$props.nodeShape) {
+      if (this.shapeKind === VOWL_SHAPE_KIND.RELATIONSHIP) {
+        const logicalLabelMap = {
+          [TERM.or]: "OR",
+          [TERM.and]: "AND",
+          [TERM.xone]: "OneOf"
+        };
+        const shape = this.$store.getters.shapeWithID(this.id);
+        const logicalConstraints = Object.keys(shape).filter(key => LOGICAL_RELATIONSHIPS.includes(key));
+        const text = logicalLabelMap[logicalConstraints[0]];
+        return {
+          align: "center",
+          x: 0,
+          width: LOGICAL_SHAPE_WIDTH,
+          y: MARGIN_VOWL,
+          fontSize: TEXT_SIZE * 1.5,
+          text
+        };
+      } else if (this.$props.nodeShape) {
         const text = uriToPrefix(
           this.$store.state.mConfig.namespaces,
           this.$props.id
@@ -377,21 +431,28 @@ export default {
           width: NOTE_WIDTH_VOWL,
           height: this.constraintsHeight
         };
+        const shapeMap = {
+          [VOWL_SHAPE_KIND.RDF_RESOURCE]: {
+              x: CENTER_SHAPE_VOWL_X,
+              y: CENTER_SHAPE_VOWL_Y,
+              width: WIDTH_VOWL * NOTE_INSET_VOWL,
+              height: HEIGHT_VOWL * NOTE_INSET_VOWL
+            },
+          [VOWL_SHAPE_KIND.LITERAL]: {
+              x: 0,
+              y: 0,
+              width: WIDTH_VOWL,
+              height: HEIGHT_LITERAL_VOWL
+            },
+          [VOWL_SHAPE_KIND.RELATIONSHIP]: {
+              x: LOGICAL_SHAPE_WIDTH / 2,
+              y: LOGICAL_SHAPE_HEIGHT / 2,
+              width: LOGICAL_SHAPE_WIDTH * NOTE_INSET_VOWL,
+              height: LOGICAL_SHAPE_HEIGHT * NOTE_INSET_VOWL
+            }
+        };
 
-        const shape =
-          this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE
-            ? {
-                x: CENTER_SHAPE_VOWL_X,
-                y: CENTER_SHAPE_VOWL_Y,
-                width: WIDTH_VOWL * NOTE_INSET_VOWL,
-                height: HEIGHT_VOWL * NOTE_INSET_VOWL
-              }
-            : {
-                x: 0,
-                y: 0,
-                width: WIDTH_VOWL,
-                height: HEIGHT_LITERAL_VOWL
-              };
+        const shape = shapeMap[this.shapeKind];
 
         const newCoords = getPropertyGroupBounds(
           this.shapeKind,
@@ -428,10 +489,17 @@ export default {
       } = this.$store.state.mShape.mCoordinate;
       if (VOWLconstraintCoordinates[this.$props.id]) {
         return VOWLconstraintCoordinates[this.$props.id];
-      } else if (this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE) {
-        const ellipse = {
+      } else if (this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE || this.shapeKind === VOWL_SHAPE_KIND.RELATIONSHIP) {
+        const ellipse = this.shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE
+        ? {
           x: CENTER_SHAPE_VOWL_X,
           y: CENTER_SHAPE_VOWL_Y,
+          width: WIDTH_VOWL * NOTE_INSET_VOWL,
+          height: HEIGHT_VOWL * NOTE_INSET_VOWL
+        }
+        : {
+          x: LOGICAL_SHAPE_WIDTH / 2,
+          y: LOGICAL_SHAPE_HEIGHT / 2,
           width: WIDTH_VOWL * NOTE_INSET_VOWL,
           height: HEIGHT_VOWL * NOTE_INSET_VOWL
         };
@@ -485,7 +553,8 @@ export default {
       /* Update the y values of the components relative to this shape. */
       this.$store.commit("updateYValues", {
         shapeID: this.$props.id,
-        shapes: this.$store.state.mShape.model
+        shapes: this.$store.state.mShape.model,
+        relationships: this.$store.getters.relationships
       });
       /* Update the coordinates of this shape. */
       this.$store.commit("updateCoordinates", {
@@ -576,7 +645,7 @@ export default {
     printModel() {
       const shape = this.$store.getters.shapeWithID(this.id);
       if (shape && this.debug) {
-        console.log(shape);
+        console.log(shape, this.shapeKind);
       }
     }
   }

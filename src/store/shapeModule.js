@@ -1,7 +1,7 @@
 import Vue from "vue";
 import constraintModule from "./constraintModule";
 import { generateUUID, getNonOverlappingCoordinates } from "../util";
-import { isBlankPathNode } from "../util/pathPropertyUtil";
+import { isBlankLogicalRelationshipNode, isBlankPathNode } from "../util/pathPropertyUtil";
 import coordinateModule from "./coordinateModule";
 import { LABEL, SHACL_URI, LOGICAL_RELATIONSHIPS } from "../util/constants";
 import { TERM } from "../translation/terminology";
@@ -56,12 +56,14 @@ const shapeModule = {
       model = JSON.parse(JSON.stringify(model));
       Vue.set(state, "model", model);
 
+      const { relationships } = getters;
       /* Update y values and set coordinates. */
       for (const shape of state.model) {
-        if (!isBlankPathNode(shape)) {
+        if (!isBlankPathNode(shape) && !isBlankLogicalRelationshipNode(shape, relationships, model)) {
           this.commit("updateYValues", {
             shapeID: shape["@id"],
-            shapes: state.model
+            shapes: state.model,
+            relationships
           });
           const { x, y } = getNonOverlappingCoordinates({
             coordinates: state.mCoordinate.coordinates,
@@ -110,7 +112,7 @@ const shapeModule = {
      * @param {object} shape the shape we want to add.
      * @param {object} bottomYs all the current shape's bottom y coordinates.
      */
-    addShape(state, { shape, bottomYs }) {
+    addShape(state, { shape, bottomYs, relationships }) {
       state.model.push(shape);
       /* Determine the shape's coordinates. */
       const { x, y } = getNonOverlappingCoordinates({
@@ -122,7 +124,8 @@ const shapeModule = {
       Vue.set(state.mCoordinate.coordinates, shape["@id"], { x, y });
       this.commit("updateYValues", {
         shapeID: shape["@id"],
-        shapes: state.model
+        shapes: state.model,
+        relationships
       });
     },
 
@@ -198,7 +201,7 @@ const shapeModule = {
         "@id": generateUUID(getters.baseURI),
         "@type": [TERM.NodeShape]
       };
-      commit("addShape", { shape, bottomYs: getters.allBottomYs });
+      commit("addShape", { shape, bottomYs: getters.allBottomYs, relationships: getters.relationships });
     },
 
     /**
@@ -209,7 +212,7 @@ const shapeModule = {
     addPropertyShape({ commit, getters }, { path }) {
       const shape = { "@id": generateUUID(getters.baseURI) };
       shape[TERM.path] = [{ "@id": path }];
-      commit("addShape", { shape, bottomYs: getters.allBottomYs });
+      commit("addShape", { shape, bottomYs: getters.allBottomYs, relationships: getters.relationships });
     },
 
     /* EDIT ========================================================================================================= */
@@ -270,7 +273,8 @@ const shapeModule = {
         for (const shape of state.model) {
           commit("updateYValues", {
             shapeID: shape["@id"],
-            shapes: state.model
+            shapes: state.model,
+            relationships: getters.relationships
           });
         }
       }
@@ -351,13 +355,15 @@ const shapeModule = {
      * Get a dictionary mapping ID's to the respective node shape objects.
      * @param state
      */
-    nodeShapes(state) {
+    nodeShapes: (state, getters) => {
       const nodeShapes = {};
+      const { relationships } = getters;
       for (const item of state.model) {
         if (
           item["@type"] &&
           item["@type"][0] === TERM.NodeShape &&
-          !isBlankPathNode(item)
+          !isBlankPathNode(item) &&
+          !isBlankLogicalRelationshipNode(item, relationships, state.model)
         )
           nodeShapes[item["@id"]] = item;
       }
@@ -367,13 +373,15 @@ const shapeModule = {
      * Get a dictionary mapping ID's to the respective property shape objects.
      * @param state
      */
-    propertyShapes(state) {
+    propertyShapes: (state, getters) => {
       const propertyShapes = {};
+      const { relationships } = getters;
       for (const item of state.model) {
         if (
           ((item["@type"] && item["@type"][0] === TERM.PropertyShape) ||
             item[TERM.path]) &&
-          !isBlankPathNode(item)
+          !isBlankPathNode(item) &&
+          !isBlankLogicalRelationshipNode(item, relationships, state.model)
         )
           propertyShapes[item["@id"]] = item;
       }
@@ -384,13 +392,15 @@ const shapeModule = {
      * Get a dictionary mapping ID's to the respective property shape objects.
      * @param state
      */
-    nonSpecifiedShapes(state) {
+    nonSpecifiedShapes: (state, getters) => {
       const shapes = {};
+      const { relationships } = getters;
       for (const item of state.model) {
         if (
           ((item["@type"] && item["@type"][0] === TERM.Shape) ||
             !(item["@type"] || item[TERM.path])) &&
-          !isBlankPathNode(item)
+          !isBlankPathNode(item) &&
+          !isBlankLogicalRelationshipNode(item, relationships, state.model)
         ) {
           shapes[item["@id"]] = item;
         }

@@ -1,5 +1,5 @@
 <template>
-  <v-group ref="group" @mouseenter="sethover" @mouseleave="hover = false">
+  <v-group v-if="shouldRender" ref="group" @mouseenter="sethover" @mouseleave="hover = false">
     <v-group
       v-if="cardinalityPresent"
       ref="cardinalityLabel"
@@ -57,7 +57,9 @@ import {
   NOTE_WIDTH_VOWL,
   LABEL_SECTION,
   HEIGHT_LITERAL_VOWL,
-  TEXT_SIZE
+  TEXT_SIZE,
+  LOGICAL_SHAPE_HEIGHT,
+  LOGICAL_SHAPE_WIDTH
 } from "../../../config/konvaConfigs";
 import { getShapeIntersection } from "../../../util/calculations";
 import { uriToPrefix } from "../../../util/urlParser";
@@ -104,13 +106,25 @@ export default {
         from: this.$props.from,
         to: this.$props.to
       },
-      hasLabel: true
+      hasLabel: true,
+      debug: false
     };
+  },
+  computed: {
+    /**
+     * This checks whether the relationship arrow should render
+     * If the source or destination shape isn't rendered, the arrow shouldn't be rendered either
+     * This saves on unnecessary calculations and prevents unwanted errors
+     */
+    shouldRender() {
+      const { coordinates } = this.$store.state.mShape.mCoordinate;
+      return (coordinates[this.to] && coordinates[this.from]);
+    }
   },
   methods: {
     sethover() {
       this.hover = true;
-      console.log(this.$props.constraintID);
+      if (this.debug) console.log(this.$props.constraintID);
     },
     /**
      * Get the end points of the relationship line.
@@ -120,42 +134,45 @@ export default {
       const { from, to } = this.$props;
       const { coordinates } = this.$store.state.mShape.mCoordinate;
 
+      const shapeMap = {
+        [VOWL_SHAPE_KIND.RDF_RESOURCE]:
+          (coords, kind) => {
+            return {
+              x: coords.x + CENTER_SHAPE_VOWL_X,
+              y: coords.y + CENTER_SHAPE_VOWL_Y,
+              height: HEIGHT_VOWL,
+              width: WIDTH_VOWL,
+              kind
+            };
+        },
+        [VOWL_SHAPE_KIND.LITERAL]:
+          (coords, kind) => {
+            return {
+              x: coords.x,
+              y: coords.y,
+              height: HEIGHT_LITERAL_VOWL,
+              width: WIDTH_VOWL,
+              kind
+            };
+        },
+        [VOWL_SHAPE_KIND.RELATIONSHIP]:
+          (coords, kind) => {
+            return {
+              x: coords.x + LOGICAL_SHAPE_WIDTH / 2,
+              y: coords.y + LOGICAL_SHAPE_HEIGHT / 2,
+              height: LOGICAL_SHAPE_HEIGHT,
+              width: LOGICAL_SHAPE_WIDTH,
+              kind
+            };
+        }
+      };
+
       /* Determine the center points of the start shape. */
       const startKind = this.$store.getters.getShapeKind(from);
-      const start =
-        startKind === VOWL_SHAPE_KIND.RDF_RESOURCE
-          ? {
-              x: coordinates[from].x + CENTER_SHAPE_VOWL_X,
-              y: coordinates[from].y + CENTER_SHAPE_VOWL_Y,
-              height: HEIGHT_VOWL,
-              width: WIDTH_VOWL,
-              kind: startKind
-            }
-          : {
-              x: coordinates[from].x,
-              y: coordinates[from].y,
-              height: HEIGHT_LITERAL_VOWL,
-              width: WIDTH_VOWL,
-              kind: startKind
-            };
+      const start = shapeMap[startKind](coordinates[from], startKind);
 
       const endKind = this.$store.getters.getShapeKind(to);
-      const end =
-        endKind === VOWL_SHAPE_KIND.RDF_RESOURCE
-          ? {
-              x: coordinates[to].x + CENTER_SHAPE_VOWL_X,
-              y: coordinates[to].y + CENTER_SHAPE_VOWL_Y,
-              height: HEIGHT_VOWL,
-              width: WIDTH_VOWL,
-              kind: endKind
-            }
-          : {
-              x: coordinates[to].x,
-              y: coordinates[to].y,
-              height: HEIGHT_LITERAL_VOWL,
-              width: WIDTH_VOWL,
-              kind: endKind
-            };
+      const end = shapeMap[endKind](coordinates[to], endKind);
 
       const note1 = this.getNoteProps(from);
       const startNote = note1 || {};

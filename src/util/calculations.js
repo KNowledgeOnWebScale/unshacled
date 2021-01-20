@@ -260,7 +260,6 @@ export function getEllipseSection(midPointAngle) {
   const angle4 = (160 * Math.PI) / 180; // 135 deg
 
   const mpA = -midPointAngle; // Fix for wrong calculation of midPointAngle
-  console.log((mpA * 180) / Math.PI);
 
   if (between(mpA, minAngle, angle1) || between(mpA, angle4, maxAngle)) {
     return "L";
@@ -300,7 +299,7 @@ export function getShapeIntersection(startShape, note, hasNote, midPoint2) {
 
   const line = { m, c };
 
-  const startRDF = startShape.kind === VOWL_SHAPE_KIND.RDF_RESOURCE;
+  const startRDF = startShape.kind === VOWL_SHAPE_KIND.RDF_RESOURCE || startShape.kind === VOWL_SHAPE_KIND.RELATIONSHIP;
 
   const midPointAngle = startRDF
     ? Math.atan2(midPoint2.y - startShape.y, midPoint2.x - startShape.x)
@@ -311,9 +310,11 @@ export function getShapeIntersection(startShape, note, hasNote, midPoint2) {
 
   if (startShape.x === midPoint2.x) {
     // The calculation for the slope yields +-Infinity here, so we have to return a fixed position.
-    const rectangleIncluded = startRDF
-      ? between(startShape.x, note.x, note.x + note.width)
-      : startShape.x === note.x;
+    const rectangleIncluded = hasNote
+      ? startRDF
+        ? between(startShape.x, note.x, note.x + note.width)
+        : startShape.x === note.x
+      : false;
     if (startShape.y > midPoint2.y) {
       if (rectangleIncluded && note.y < startShape.y) {
         // Return the intersection on top of the note
@@ -354,17 +355,20 @@ export function getShapeIntersection(startShape, note, hasNote, midPoint2) {
       y: startShape.y + startShape.height / 2
     };
 
-    const noteIntersection = startRDF
-    ? intersectionPointRectangle(
-      startShape,
-      midPoint2,
-      note
-    )
-    : intersectionPointRectangle(
-      startPointLiteral,
-      midPoint2,
-      note
-    );
+    let noteIntersection;
+    if (hasNote) {
+      noteIntersection = startRDF
+      ? intersectionPointRectangle(
+        startShape,
+        midPoint2,
+        note
+      )
+      : intersectionPointRectangle(
+        startPointLiteral,
+        midPoint2,
+        note
+      );
+    } else { noteIntersection = null; }
 
     const startShapeIntersections = startRDF
     ? getEllipseIntersections(
@@ -414,7 +418,7 @@ export function getShapeIntersection(startShape, note, hasNote, midPoint2) {
  * @returns {Object} A new point for the PropertyGroup component to be set to
  */
 export function getPropertyGroupBounds(shapeKind, propertyGroup, shape) {
-  if (shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE) {
+  if (shapeKind === VOWL_SHAPE_KIND.RDF_RESOURCE || shapeKind === VOWL_SHAPE_KIND.RELATIONSHIP) {
     const TL = { x: propertyGroup.x, y: propertyGroup.y };
     const TR = { x: propertyGroup.x + propertyGroup.width, y: propertyGroup.y };
     const BL = { x: propertyGroup.x, y: propertyGroup.y + propertyGroup.height };

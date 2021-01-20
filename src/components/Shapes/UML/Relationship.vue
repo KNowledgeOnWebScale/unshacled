@@ -1,5 +1,5 @@
 <template>
-  <v-group ref="group" @mouseenter="hover = true" @mouseleave="hover = false">
+  <v-group v-if="shouldRender" ref="group" @mouseenter="hover = true" @mouseleave="hover = false">
     <v-group ref="label" :config="getConfigs().label">
       <v-rect :config="getRectConfig(this.$refs.text)"></v-rect>
       <v-text ref="text" :config="getConfigs().text"></v-text>
@@ -90,6 +90,17 @@ export default {
         to: this.$props.to
       }
     };
+  },
+  computed: {
+    /**
+     * This checks whether the relationship arrow should render
+     * If the source or destination shape isn't rendered, the arrow shouldn't be rendered either
+     * This saves on unnecessary calculations and prevents unwanted errors
+     */
+    shouldRender() {
+      const { coordinates } = this.$store.state.mShape.mCoordinate;
+      return (coordinates[this.to] && coordinates[this.from]);
+    }
   },
   methods: {
     /**
