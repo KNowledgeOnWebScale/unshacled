@@ -21,7 +21,7 @@
         </v-group>
 
         <!-- Description -->
-        <v-group v-if="hasDescription() && titleHover">
+        <v-group v-show="hasDescription() && titleHover">
           <v-rect :config="getDescriptionConfig().rect"></v-rect>
           <v-text :config="getDescriptionConfig().title"></v-text>
           <v-text :config="getDescriptionConfig().text"></v-text>
@@ -46,22 +46,38 @@
         ></v-circle>
       </v-group>
 
+      <!-- Shape information -->
+      <v-group>
+        <v-rect :config="getInfoShapeConfig()"></v-rect>
+        <div v-for="(prop, key) in getShapeInfo()" :key="key">
+          <constraint
+            :constraint-i-d="key"
+            :shape-i-d="$props.id"
+            :node-shape="$props.nodeShape"
+            :stroke="shapeConfig.stroke"
+          ></constraint>
+        </div>
+      </v-group>
+
       <!-- Constraints -->
-      <div v-for="(prop, key) in getConstraints()" :key="key">
-        <constraint
-          :constraint-i-d="key"
-          :shape-i-d="$props.id"
-          :node-shape="$props.nodeShape"
-          :stroke="shapeConfig.stroke"
-        ></constraint>
-      </div>
+      <v-group>
+        <v-rect :config="getConstraintShapeConfig()"></v-rect>
+        <div v-for="(prop, key) in getConstraints()" :key="key">
+          <constraint
+            :constraint-i-d="key"
+            :shape-i-d="$props.id"
+            :node-shape="$props.nodeShape"
+            :stroke="shapeConfig.stroke"
+          ></constraint>
+        </div>
+      </v-group>
     </v-group>
   </div>
 </template>
 
 <script>
 import Constraint from "./Constraint.vue";
-import { uriToPrefix } from "../../util/urlParser";
+import { uriToPrefix } from "../../../util/urlParser";
 import {
   DELETE_BUTTON_CONFIG,
   LABEL_TEXT_CONFIG,
@@ -74,15 +90,18 @@ import {
   DESCRIPTION_RECT_CONFIG,
   DESCRIPTION_TITLE_CONFIG,
   DESCRIPTION_TEXT_CONFIG,
+  PROPERTY_RECT_CONFIG,
   MAX_LENGTH,
   TEXT_SIZE,
   pointerCursor,
   resetCursor,
-  textCursor
-} from "../../config/konvaConfigs";
-import { TERM } from "../../translation/terminology";
-import { abbreviate } from "../../util/strings";
-import { LABEL } from "../../util/constants";
+  textCursor,
+  HEIGHT_HEADER,
+  HEIGHT
+} from "../../../config/konvaConfigs";
+import { TERM } from "../../../translation/terminology";
+import { abbreviate } from "../../../util/strings";
+import { LABEL } from "../../../util/constants";
 
 export default {
   name: "Shape",
@@ -92,9 +111,13 @@ export default {
       type: String,
       required: true
     },
-    nodeShape: {
+    hasType: {
       type: Boolean,
       required: true
+    },
+    nodeShape: {
+      type: Boolean,
+      required: false
     }
   },
   /**
@@ -113,6 +136,11 @@ export default {
       shapeConfig: this.$props.nodeShape
         ? NODE_SHAPE_CONFIG
         : PROPERTY_SHAPE_CONFIG,
+      shapeLabel: this.$props.hasType
+        ? this.$props.nodeShape
+          ? "<<NodeConditions>>"
+          : "<<PropertyConditions>>"
+        : "<<Conditions>>",
       deleteNodeConfig: DELETE_BUTTON_CONFIG,
       idTextConfig: {
         ...LABEL_TEXT_CONFIG,
@@ -133,6 +161,7 @@ export default {
     /* Update the constraints when the store state changes. */
     this.$store.watch(
       () => self.$store.getters.shapeConstraints(self.$props.id),
+      () => self.$store.getters.shapeInfo(self.$props.id),
       () => {
         self.getConstraints();
         self.getDescriptionConfig();
@@ -147,11 +176,7 @@ export default {
      */
     getLabelTextConfig() {
       const label = this.$store.getters.labelsForIds[this.id];
-      const text = label
-        ? abbreviate(label)
-        : abbreviate(
-            uriToPrefix(this.$store.state.mConfig.namespaces, this.id)
-          );
+      const text = this.shapeLabel;
       return {
         ...LABEL_TEXT_CONFIG,
         y: label ? OFFSET : TEXT_OFFSET,
@@ -166,8 +191,41 @@ export default {
      */
     getURITextConfig() {
       const label = this.$store.getters.labelsForIds[this.id];
-      const text = label ? abbreviate(this.id) : "";
+      const text = label ? abbreviate(label) : "";
       return { ...URI_TEXT_CONFIG, text };
+    },
+
+    /**
+     * Get the config for the rectangle around the shape information
+     * the y value starts below the header
+     * the height is the amount of information properties * the common height of a property box
+     * @returns {object} the configuration for the rectangle around the shape information
+     */
+    getInfoShapeConfig() {
+      const infoAmount = this.$store.getters.getInfoAmount(this.id);
+      return {
+        ...PROPERTY_RECT_CONFIG,
+        height: infoAmount ? infoAmount * HEIGHT : HEIGHT,
+        y: HEIGHT_HEADER
+      };
+    },
+
+    /**
+     * Get the config for the rectangle around the shape constraints
+     * the y value starts below the information rectangle
+     * the height is the amount of constraints * the common height of a property box
+     * @returns {object} the configuration for the rectangle around the shape constraints
+     */
+    getConstraintShapeConfig() {
+      const infoAmount = this.$store.getters.getInfoAmount(this.id);
+      const constraintAmount = this.$store.getters.getConstraintAmount(this.id);
+      return {
+        ...PROPERTY_RECT_CONFIG,
+        height: constraintAmount ? constraintAmount * HEIGHT : HEIGHT,
+        y: infoAmount
+          ? HEIGHT_HEADER + infoAmount * HEIGHT
+          : HEIGHT_HEADER + HEIGHT
+      };
     },
 
     /**
@@ -231,6 +289,15 @@ export default {
     },
 
     /**
+     * Get an object containing all the information about the shape.
+     * @returns {object} an object mapping every informative constraint name to a (list of) values.
+     */
+    getShapeInfo() {
+      // console.log(this.$store.getters.shapeInfo(this.$props.id));
+      return this.$store.getters.shapeInfo(this.$props.id);
+    },
+
+    /**
      * Takes the coordinates from this node shape and calls store to update them.
      */
     updatePosition() {
@@ -239,11 +306,13 @@ export default {
       /* Update the y values of the components relative to this shape. */
       this.$store.commit("updateYValues", {
         shapeID: this.$props.id,
-        shapes: this.$store.state.mShape.model
+        shapes: this.$store.state.mShape.model,
+        relationships: this.$store.getters.relationships
       });
       /* Update the coordinates of this shape. */
       this.$store.commit("updateCoordinates", {
         shapeID: this.$props.id,
+        shapes: this.$store.state.mShape.model,
         x: pos.x,
         y: pos.y
       });

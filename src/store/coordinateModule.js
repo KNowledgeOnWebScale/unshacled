@@ -3,9 +3,13 @@ import ValueType, {
   getValueTypeFromConstraint,
   ValueTypes
 } from "../util/enums/ValueType";
-import { urlToName } from "../util/urlParser";
 import { HEIGHT } from "../config/konvaConfigs";
-import { IGNORED_PROPERTIES, SINGLE_ENTRY } from "../util/constants";
+import {
+  IGNORED_PROPERTIES,
+  INFO_PROPERTIES,
+  RELATIONSHIP_PROPERTIES
+} from "../util/constants";
+import { isBlankLogicalRelationshipNode, isBlankPathNode } from "../util/pathPropertyUtil";
 
 /**
  * This module contains everything regarding coordinates, locations and positioning.
@@ -15,7 +19,10 @@ const coordinateModule = {
   state: {
     yValues: {},
     coordinates: {},
-    heights: {}
+    heights: {},
+    relationshipCoordinates: {},
+    VOWLconstraintCoordinates: {},
+    VOWLconstraintHeights: {}
   },
 
   mutations: {
@@ -51,53 +58,113 @@ const coordinateModule = {
      * @param {string} shapeID the ID of the shape we want to update the y values from.
      * @param {string} shapes the list of shapes currently in the model.
      */
-    updateYValues(state, { shapeID, shapes }) {
-      /* Update the y values of the properties. */
-      Vue.set(state.yValues, shapeID, {});
-
+    updateYValues(state, { shapeID, shapes, relationships }) {
       /* Get the shape with the given ID. */
       let shape;
       for (const item of shapes) {
         if (item["@id"] === shapeID) shape = item;
       }
 
-      /* Get the IDs of all the constraints and the number of values for each constraint. */
-      const constraints = {};
-      for (const c in shape) {
-        if (!IGNORED_PROPERTIES.includes(c)) {
-          const vt = ValueType(c)
-            ? ValueType(c)
-            : getValueTypeFromConstraint(shape[c]);
-          constraints[c] =
-            shape[c].length > 1
-              ? shape[c].length
-              : vt.includes(ValueTypes.LIST)
-              ? shape[c][0]["@list"].length
-              : shape[c].length;
+      if (!isBlankPathNode(shape) && !isBlankLogicalRelationshipNode(shape, relationships, shapes)) {
+        /* Update the y values of the properties. */
+        Vue.set(state.yValues, shapeID, {});
+
+        /* Get the IDs of all the constraints and the number of values for each constraint. */
+        const constraints = {};
+        const info = {};
+        for (const c in shape) {
+          if (INFO_PROPERTIES.includes(c)) {
+            if (!(c === "@id" && shape[c][0] === "_")) {
+              const vt = ValueType(c)
+                ? ValueType(c)
+                : getValueTypeFromConstraint(shape[c]);
+              info[c] =
+                shape[c].length > 1
+                  ? shape[c].length
+                  : vt.includes(ValueTypes.LIST)
+                  ? shape[c][0]["@list"].length
+                  : shape[c].length;
+            }
+          } else if (
+            !IGNORED_PROPERTIES.includes(c) &&
+            !RELATIONSHIP_PROPERTIES.includes(c)
+          ) {
+            const vt = ValueType(c)
+              ? ValueType(c)
+              : getValueTypeFromConstraint(shape[c]);
+            constraints[c] =
+              shape[c].length > 1
+                ? shape[c].length
+                : vt.includes(ValueTypes.LIST)
+                ? shape[c][0]["@list"].length
+                : shape[c].length;
+          }
         }
-      }
 
-      /* Calculate their y values. */
-      let i = 1;
-      for (const con of Object.keys(constraints)) {
-        Vue.set(state.yValues[shapeID], con, i * HEIGHT);
-        /* Determine if every value has to be on a separate line. */
-        i += SINGLE_ENTRY.includes(urlToName(con)) ? 2 : 1 + constraints[con];
+        /* Calculate their y values. */
+        let i = 0;
+        for (const con of Object.keys(info)) {
+          Vue.set(state.yValues[shapeID], con, i * HEIGHT);
+          i += 1;
+        }
+        if (i === 0) {
+          i += 1;
+        }
+        for (const con of Object.keys(constraints)) {
+          Vue.set(state.yValues[shapeID], con, i * HEIGHT);
+          i += 1;
+        }
+        /* Set the bottom coordinate. */
+        Vue.set(state.heights, shapeID, i * HEIGHT);
       }
-
-      /* Set the bottom coordinate. */
-      Vue.set(state.heights, shapeID, i * HEIGHT);
     },
 
     /**
      * Update the coordinates of the given shapeID.
      * @param state
-     * @param s{string} hapeID the ID of the shapeID whose location should be updated.
+     * @param {string} shapeID the ID of the shapeID whose location should be updated.
      * @param {number} x the new x coordinate.
      * @param {number} y the new y coordinate.
      */
-    updateCoordinates(state, { shapeID, x, y }) {
+    updateCoordinates(state, { shapeID, shapes, x, y }) {
+      let shape;
+      for (const item of shapes) {
+        if (item["@id"] === shapeID) shape = item;
+      }
+      if (!isBlankPathNode(shape)) {
+        Vue.set(state.coordinates, shapeID, { x, y });
+      }
+    },
+
+    setCoordinates(state, { shapeID, x, y }) {
       Vue.set(state.coordinates, shapeID, { x, y });
+    },
+
+    /**
+     * Updates the coordinates of a relationship arrow.
+     * @param {string} constraintId Used to generate the key in relationshipCoordinates
+     * @param {string} from Used to generate the key in relationshipCoordinates
+     * @param {string} to Used to generate the key in relationshipCoordinates
+     * @param {object} fromCoords The coordinates of the arrow at the from-shape
+     * @param {object} toCoords The coordinates of the arrow at the to-shape
+     */
+    updateRelationshipCoordinates(
+      state,
+      { constraintId, from, to, fromCoords, toCoords }
+    ) {
+      const relKey = `${constraintId} - ${from} - ${to}`;
+      Vue.set(state.relationshipCoordinates, relKey, {
+        from: fromCoords,
+        to: toCoords
+      });
+    },
+
+    updateVOWLConstraintCoordinates(state, { shapeID, x, y }) {
+      Vue.set(state.VOWLconstraintCoordinates, shapeID, { x, y });
+    },
+
+    updateVOWLConstraintHeights(state, { shapeID, height }) {
+      Vue.set(state.VOWLconstraintHeights, shapeID, height);
     },
 
     /**

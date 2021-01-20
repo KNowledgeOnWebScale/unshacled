@@ -223,6 +223,7 @@ const dataModule = {
      * @param {array} model the shapes we want to use as a model now.
      */
     updateModel({ commit, rootGetters }, model) {
+      commit("clearModel");
       commit("setModel", { model, getters: rootGetters });
     },
 
